@@ -8,6 +8,7 @@ DEPENDPATH += .
 INCLUDEPATH += .
 
 # Input
-FORMS += test.ui
-HEADERS += main.h test.h
-SOURCES += main.cpp test.cpp
+FORMS += ui.ui
+HEADERS += main.h ui.h ../openglqt/render.h
+SOURCES += main.cpp ui.cpp
+QT += opengl
