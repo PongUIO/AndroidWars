@@ -1,3 +1,6 @@
 moc*
 *.o
-
+ui_*
+pc/pc
+pc/Makefile
+build/*
