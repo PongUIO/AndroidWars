@@ -12,6 +12,7 @@ int main(int argc, char *argv[]) {
 	drawer->showFullScreen();
 	drawer->resize(width, height);
 	drawer->setWindowTitle(QApplication::translate("childwidget", "Child widget"));
+	drawer->setMouseTracking(true);
 	QPushButton *button = new QPushButton(
 			QApplication::translate("childwidget", "Press me"), drawer);
 	button->move(100, 100);

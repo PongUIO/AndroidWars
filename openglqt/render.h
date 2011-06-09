@@ -1,14 +1,31 @@
 #include<QtGui>
 #include<qgl.h>
+#include<iostream>
+
 class MyGLDrawer : public QGLWidget {
 	Q_OBJECT        // must include this if you use Qt signals/slots
 
 	public:
+		int w, h;
+		double cx, cy;
 		MyGLDrawer( QWidget *parent = 0)
 			: QGLWidget(QGLFormat(QGL::SampleBuffers), parent) {
+				cx = 1; // Current x
+				cy = 1; // Current y
 			}
 
 	protected:
+		void keyPressEvent (QKeyEvent *event) {
+			std::cout << event->key() << std::endl;
+		}
+		void mousePressEvent(QMouseEvent * event) {
+			w = width();
+			h = height();
+			cx = -1+(((double)event->x())/width())*2;
+			cy = 1-(((double)event->y())/height())*2;
+			std::cout << cx << " " << cy << std::endl << width() << " " << height() << std::endl;
+			paintGL();
+		}
 
 		void initializeGL()
 		{
@@ -33,9 +50,10 @@ class MyGLDrawer : public QGLWidget {
 			glBegin( GL_TRIANGLES );
 			glColor3f(0.5,0.5,0.5);
 			glVertex2f(-1, -1);
-			glVertex2f(1, 0);
-			glVertex2f(-1,1);
+			glVertex2f(1, 1);
+			glVertex2f(cx,cy);
 			glEnd();
+			swapBuffers();
 		}
 
 };
