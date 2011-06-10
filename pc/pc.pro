@@ -9,6 +9,6 @@ INCLUDEPATH += .
 
 # Input
 FORMS += ui.ui
-HEADERS += main.h ui.h ../openglqt/render.h
+HEADERS += main.h ui.h ../openglqt/render.h customlabel.h
 SOURCES += main.cpp ui.cpp
 QT += opengl
