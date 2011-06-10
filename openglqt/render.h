@@ -15,9 +15,12 @@ class MyGLDrawer : public QGLWidget {
 			}
 
 	protected:
+		// overridden
 		void keyPressEvent (QKeyEvent *event) {
 			std::cout << event->key() << std::endl;
 		}
+
+		// overridden
 		void mousePressEvent(QMouseEvent * event) {
 			w = width();
 			h = height();
@@ -27,6 +30,9 @@ class MyGLDrawer : public QGLWidget {
 			paintGL();
 		}
 
+		
+			
+		// overridden
 		void initializeGL()
 		{
 			// Set up the rendering context, define display lists etc.:
@@ -34,6 +40,7 @@ class MyGLDrawer : public QGLWidget {
 			glEnable(GL_DEPTH_TEST | GL_DOUBLE);
 		}
 
+		// overridden
 		void resizeGL( int w, int h )
 		{
 			// setup viewport, projection etc.:
@@ -41,6 +48,7 @@ class MyGLDrawer : public QGLWidget {
 			//glFrustum( ... );
 		}
 
+		// overridden
 		void paintGL()
 		{
 			glClear(GL_COLOR_BUFFER_BIT);
