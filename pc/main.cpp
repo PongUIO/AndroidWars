@@ -7,6 +7,9 @@
 #include "ui.h"
 #include "customlabel.h"
 #include "../openglqt/render.h"
+void something() {
+	std::cout << "works." << std::endl;
+}
 
 int main(int argc, char *argv[]) {
 	QApplication app(argc, argv);
@@ -15,8 +18,8 @@ int main(int argc, char *argv[]) {
 	drawer->setWindowTitle(QApplication::translate("childwidget", "Child widget"));
 	drawer->setMouseTracking(true);
 	QHBoxLayout lower(drawer);
-	CustomLabel *label = new CustomLabel(drawer);
-	CustomLabel *label2 = new CustomLabel(drawer);
+	CustomLabel *label = new CustomLabel(&something, drawer);
+	CustomLabel *label2 = new CustomLabel(&something, drawer);
 	label->setPixmap(QPixmap("temp.png"));
 	label->resize(60,60);
 	label2->setPixmap(QPixmap("temp2.png"));
@@ -38,4 +41,5 @@ int main(int argc, char *argv[]) {
 	//drawer->connect(label, SIGNAL(clicked()), label, SLOT(quit()));
 	return app.exec();
 }
+
 
