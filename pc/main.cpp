@@ -24,6 +24,9 @@ int main(int argc, char *argv[]) {
 	label->resize(60,60);
 	label2->setPixmap(QPixmap("temp2.png"));
 	label2->resize(60,60);
+        QPushButton *button = new QPushButton(drawer);
+        button->move(100, 100);
+        button->show ();
 	QSpacerItem *space = new QSpacerItem(drawer->width(), 0, QSizePolicy::Expanding);
 	//space->setOrientation(Qt::Horizontal);
 	label->show();
@@ -32,7 +35,7 @@ int main(int argc, char *argv[]) {
 	//label2->move(300,200);
 	lower.insertWidget(0, label);
 	lower.insertWidget(1, label2);
-	lower.insertSpacerItem(2, space);
+        //lower.insertSpacerItem(2, space);
 	std::cout << space->expandingDirections() << std::endl;
 	lower.setAlignment(Qt::AlignBottom);
 	//lower.move(drawer->height()-50, 0);
