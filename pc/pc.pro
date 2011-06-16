@@ -12,3 +12,10 @@ FORMS += ui.ui
 HEADERS += main.h ui.h ../openglqt/render.h customlabel.h
 SOURCES += main.cpp ui.cpp
 QT += opengl
+
+RESOURCES += \
+    temp.qrc
+
+OTHER_FILES += \
+    images/temp2.png \
+    images/temp.png
