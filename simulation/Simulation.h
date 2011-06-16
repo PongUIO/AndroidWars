@@ -8,8 +8,8 @@
 
 namespace Sim {
 	struct Configuration {
-		double phaseTime;    ///< Duration of a simulation phase
-		double stepTime;     ///< Duration of a single simulation step
+		uint32_t phaseLength;  ///< Number of steps in a simulation phase
+		double stepTime;       ///< Duration of a single simulation step
 	};
 	
 	class Simulation {
@@ -24,7 +24,7 @@ namespace Sim {
 			void step();
 			void endPhase();
 			
-			//Sync checksum();
+			bool hasPhaseStep() { return mCurPhaseStep<config.phaseLength; }
 			
 			BotFactory &getBotFactory() {
 				return mBotFactory;
@@ -38,6 +38,16 @@ namespace Sim {
 			/// @name Subsystems
 			//@{
 				BotFactory mBotFactory;
+			//@}
+			
+			/// @name Phase variables
+			//@{
+				uint32_t mCurPhaseStep;
+			//@}
+			
+			/// @name Other variables
+			//@{
+				Configuration config;
 			//@}
 	};
 }

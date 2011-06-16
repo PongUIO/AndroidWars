@@ -5,16 +5,12 @@
 
 namespace Sim {
 
-	Bot::Bot(uint32_t id) : mId(id) {}
+	Bot::Bot(uint32_t id, uint32_t side) : mId(id), mSide(side) {}
 	Bot::~Bot() {}
 
 	void Bot::step(double stepTime)
 	{
-		printf("Hello! I am ID %d\n", getId());
-		while(mInput.hasInput()) {
-			printf("\tI have some input, message: %u\n",
-				mInput.nextInput().dbgMessage);
-		}
+		mBody.step(stepTime);
 	}
 
 	BotFactory::BotFactory(Simulation *sim)
@@ -26,11 +22,11 @@ namespace Sim {
 	{
 	}
 
-	uint32_t BotFactory::createBot()
+	uint32_t BotFactory::createBot(uint32_t side)
 	{
 		uint32_t id = newId();
 		
-		addObj(new Bot(id));
+		addObj(new Bot(id, side));
 		
 		return id;
 	}

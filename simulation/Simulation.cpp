@@ -10,6 +10,7 @@ namespace Sim {
 	
 	void Simulation::startup(const Configuration &config)
 	{
+		this->config = config;
 	}
 	
 	void Simulation::shutdown()
@@ -18,12 +19,16 @@ namespace Sim {
 	
 	void Simulation::startPhase()
 	{
+		mCurPhaseStep = 0;
+		
 		mBotFactory.startPhase();
 	}
 	
 	void Simulation::step()
 	{
 		mBotFactory.step(0.01);
+		
+		mCurPhaseStep++;
 	}
 	
 	void Simulation::endPhase()
