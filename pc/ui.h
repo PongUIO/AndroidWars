@@ -1,7 +1,8 @@
-#include<QtGui>
-#include "ui_ui.h"
-class GameUi : public QWidget {
-	Q_OBJECT
-	public:
-		GameUi(QWidget *parent=0);
-};
+/****************************************************************************
+** Form interface generated from reading ui file 'ui.ui'
+**
+** Created: Thu Jun 16 21:21:09 2011
+**
+** WARNING! All changes made in this file will be lost!
+****************************************************************************/
+
