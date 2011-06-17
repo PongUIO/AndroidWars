@@ -14,25 +14,33 @@ namespace Sim {
 	
 	class Simulation {
 		public:
-			Simulation();
-			~Simulation();
+			/// @name Initialization
+			//@{
+				Simulation();
+				~Simulation();
+				
+				void startup(const Configuration &config);
+				void shutdown();
+			//@}
 			
-			void startup(const Configuration &config);
-			void shutdown();
+			/// @name Phase interface
+			//@{
+				void startPhase();
+				void step();
+				void endPhase();
+				
+				bool hasPhaseStep()
+				{ return mCurPhaseStep<config.phaseLength; }
+			//@}
 			
-			void startPhase();
-			void step();
-			void endPhase();
-			
-			bool hasPhaseStep() { return mCurPhaseStep<config.phaseLength; }
-			
-			BotFactory &getBotFactory() {
-				return mBotFactory;
-			}
-			
-			InputBuffer<BotInput> &getBotInput() {
-				return mBotFactory.getInput();
-			}
+			/// @name Module accessors
+			//@{
+				BotFactory &getBotFactory()
+				{ return mBotFactory; }
+				
+				InputBuffer<BotInput> &getBotInput()
+				{ return mBotFactory.getInput(); }
+			//@}
 			
 		private:
 			/// @name Subsystems
