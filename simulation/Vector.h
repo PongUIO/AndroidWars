@@ -43,6 +43,12 @@ namespace Sim {
 			double dot() const { return x*x+y*y; }
 			double dot(const Vector &b) const
 			{ return x*b.x+y*b.y; }
+			
+			Vector normalize()
+				{ double L = len(); return Vector(x/L, y/L); }
+			
+			Vector rightNormal()
+				{ return Vector(-y, x); }
 	};
 }
 

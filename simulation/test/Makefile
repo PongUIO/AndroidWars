@@ -7,4 +7,4 @@ clean:
 	rm simtest
 
 simtest:
-	$(CC) $(CFLAGS) -o simtest ../*.cpp simtest.cpp
+	$(CC) $(CFLAGS) -o simtest ../*.cpp ../collision/*.cpp simtest.cpp

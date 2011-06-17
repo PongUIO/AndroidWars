@@ -2,8 +2,8 @@
 
 namespace Sim {
 	
-	World::World(uint32_t w, uint32_t h) :
-		mWidth(w), mHeight(h)
+	World::World(Simulation *sim, uint32_t w, uint32_t h) :
+		mWidth(w), mHeight(h), mSim(sim)
 	{
 		size_t totalSize = w*h;
 		for(size_t i=0; i<totalSize; i++) {
@@ -15,7 +15,11 @@ namespace Sim {
 	
 	World::~World()
 	{
-		delete[] mData;
+		for(size_t i=0; i<mData.size(); i++) {
+			delete mData[i];
+		}
+		
+		delete mOffScreen;
 	}
 	
 	Tile *World::getTile(uint32_t xInd, uint32_t yInd)

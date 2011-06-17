@@ -5,6 +5,8 @@
 #include <vector>
 
 namespace Sim {
+	class Simulation;
+	
 	class Tile {
 		public:
 			
@@ -14,7 +16,7 @@ namespace Sim {
 	
 	class World {
 		public:
-			World(uint32_t width, uint32_t height);
+			World(Simulation *sim, uint32_t width, uint32_t height);
 			~World();
 			
 			Tile *getTile(uint32_t xInd, uint32_t yInd);
@@ -27,6 +29,8 @@ namespace Sim {
 			
 			TileVec mData;
 			Tile *mOffScreen;
+			
+			Simulation *mSim;
 	};
 }
 
