@@ -4,7 +4,7 @@ CC = g++
 all: simtest
 
 clean:
-	rm simtest
+	rm ./simtest
 
 simtest:
 	$(CC) $(CFLAGS) -o simtest ../*.cpp ../collision/*.cpp simtest.cpp

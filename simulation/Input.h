@@ -6,15 +6,6 @@
 #include <queue>
 
 namespace Sim {
-	struct BotInput {
-		BotInput(uint32_t id=0, uint32_t msg=0) :
-			botId(id), dbgMessage(msg)
-			{}
-		
-		uint32_t botId;
-		uint32_t dbgMessage;
-	};
-	
 	/**
 	 * This class handles a buffer of input commands.
 	 */

@@ -18,6 +18,13 @@ namespace Sim {
 
 	void Bot::step(double stepTime)
 	{
+		if(isIdle() && mInput.hasInput())
+			mCurInput = mInput.nextInput();
+		
+		if(!isIdle()) {
+			mCurInput.stepCount--;
+		}
+		
 		mBody.step(stepTime);
 	}
 	

@@ -11,6 +11,12 @@ int main(void)
 	
 	sim.startup(config);
 	
+	// Create a test side
+	Sim::Side testSide;
+	testSide.allyGroup = 0;
+	
+	sim.getSideData().addSide(testSide);
+	
 	// Create a test bot
 	Sim::Bot::Config botCfg;
 	botCfg.side = 0;
@@ -18,8 +24,18 @@ int main(void)
 	uint32_t id = sim.getBotFactory().createBot( botCfg );
 	
 	// Send some input to this bot
-	sim.getBotInput().addInput( Sim::BotInput(id, 25) );
-	sim.getBotInput().addInput( Sim::BotInput(id, 75) );
+	Sim::BotInput bi;
+	bi.botId = id;
+	bi.stepCount = 20;
+	bi.type = Sim::BotInput::Move;
+	
+	Sim::BotInput::MoveP &biM = bi.move;
+	
+	biM.dir = Sim::Vector(1,0);
+	sim.getBotInput().addInput( bi );
+	
+	biM.dir = Sim::Vector(-1,0);
+	sim.getBotInput().addInput( bi );
 	
 	// Run a test phase
 	sim.startPhase();

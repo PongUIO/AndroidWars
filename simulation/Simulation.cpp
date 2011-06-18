@@ -15,12 +15,14 @@ namespace Sim {
 		
 		mData.startup();
 		mWorld.startup();
+		mSideData.startup();
 		mBotFactory.startup();
 	}
 	
 	void Simulation::shutdown()
 	{
 		mBotFactory.shutdown();
+		mSideData.shutdown();
 		mWorld.shutdown();
 		mData.shutdown();
 	}

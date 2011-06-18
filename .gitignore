@@ -4,3 +4,4 @@ ui_*
 pc/pc
 pc/Makefile
 build/*
+simulation/test/simtest

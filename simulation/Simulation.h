@@ -6,6 +6,7 @@
 #include "Input.h"
 #include "Bot.h"
 #include "World.h"
+#include "Side.h"
 #include "Data.h"
 
 namespace Sim {
@@ -43,6 +44,9 @@ namespace Sim {
 				World &getWorld()
 				{ return mWorld; }
 				
+				SideData &getSideData()
+				{ return mSideData; }
+				
 				Data &getData()
 				{ return mData; }
 				
@@ -55,6 +59,7 @@ namespace Sim {
 			//@{
 				BotFactory mBotFactory;
 				World mWorld;
+				SideData mSideData;
 				Data mData;
 			//@}
 			
