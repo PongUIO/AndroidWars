@@ -2,7 +2,8 @@
 
 namespace Sim {
 	Simulation::Simulation() :
-		mBotFactory(this)
+		mBotFactory(this),
+		mWorld(this)
 		{}
 	
 	Simulation::~Simulation()
@@ -11,10 +12,13 @@ namespace Sim {
 	void Simulation::startup(const Configuration &config)
 	{
 		this->config = config;
+		
+		mWorld.startup();
 	}
 	
 	void Simulation::shutdown()
 	{
+		mWorld.shutdown();
 	}
 	
 	void Simulation::startPhase()

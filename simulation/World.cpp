@@ -2,10 +2,20 @@
 
 namespace Sim {
 	
-	World::World(Simulation *sim, uint32_t w, uint32_t h) :
-		mWidth(w), mHeight(h), mSim(sim)
+	World::World(Simulation *sim) :
+		mSim(sim)
+	{}
+	
+	World::~World()
+	{}
+	
+	void World::startup()
 	{
-		size_t totalSize = w*h;
+		mWidth = mHeight = 32;
+		
+		mTileCol.startup(16.0, 4);
+		
+		size_t totalSize = mWidth*mHeight;
 		for(size_t i=0; i<totalSize; i++) {
 			mData.push_back( new Tile() );
 		}
@@ -13,13 +23,15 @@ namespace Sim {
 		mOffScreen = new Tile();
 	}
 	
-	World::~World()
+	void World::shutdown()
 	{
 		for(size_t i=0; i<mData.size(); i++) {
 			delete mData[i];
 		}
 		
 		delete mOffScreen;
+		
+		mTileCol.shutdown();
 	}
 	
 	Tile *World::getTile(uint32_t xInd, uint32_t yInd)

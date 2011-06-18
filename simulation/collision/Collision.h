@@ -47,32 +47,35 @@ namespace Sim {
 			ColPoints mNormals;
 			ColPoints mProjection; ///< Optimized projection of self
 			
-			template<class Predicate>
-			static Result checkPredicate(
-				const Collision *src,
-				const Vector &mypos, const Vector &myvel,
-				const Vector &theirpos,
-				const Collision *they,
-				Predicate predicate);
-			
-			static void computeDistance(
-				double &dist, int &dir,
-				const double my_min, const double my_max,
-				const double th_min, const double th_max);
-			
-			static Vector getNormal(
-				const Collision *src, const Collision *they,
-				const size_t ax);
-			
-			static void computeProjection(
-				double &my_min, double &my_max,
-				const Collision *src, const Vector &n,
-				const double offset_dot);
-			
-			static void copyProjection(
-				const Collision *src,
-				double &my_min, double &my_max,
-				const size_t index, const double offset_dot);
+			/// @name Helper functions
+			//@{
+				template<class Predicate>
+				static Result checkPredicate(
+					const Collision *src,
+					const Vector &mypos, const Vector &myvel,
+					const Vector &theirpos,
+					const Collision *they,
+					Predicate predicate);
+				
+				static void computeDistance(
+					double &dist, int &dir,
+					const double my_min, const double my_max,
+					const double th_min, const double th_max);
+				
+				static Vector getNormal(
+					const Collision *src, const Collision *they,
+					const size_t ax);
+				
+				static void computeProjection(
+					double &my_min, double &my_max,
+					const Collision *src, const Vector &n,
+					const double offset_dot);
+				
+				static void copyProjection(
+					const Collision *src,
+					double &my_min, double &my_max,
+					const size_t index, const double offset_dot);
+			//@}
 	};
 	
 }

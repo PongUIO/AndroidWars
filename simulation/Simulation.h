@@ -5,6 +5,7 @@
 
 #include "Input.h"
 #include "Bot.h"
+#include "World.h"
 
 namespace Sim {
 	struct Configuration {
@@ -38,6 +39,9 @@ namespace Sim {
 				BotFactory &getBotFactory()
 				{ return mBotFactory; }
 				
+				World &getWorld()
+				{ return mWorld; }
+				
 				InputBuffer<BotInput> &getBotInput()
 				{ return mBotFactory.getInput(); }
 			//@}
@@ -46,6 +50,7 @@ namespace Sim {
 			/// @name Subsystems
 			//@{
 				BotFactory mBotFactory;
+				World mWorld;
 			//@}
 			
 			/// @name Phase variables

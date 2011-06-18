@@ -4,23 +4,28 @@
 #include <stdint.h>
 #include <vector>
 
+#include "collision/TileCol.h"
+
 namespace Sim {
 	class Simulation;
 	
 	class Tile {
 		public:
 			
+		
 		private:
-			
+			float mHp;
 	};
 	
 	class World {
 		public:
-			World(Simulation *sim, uint32_t width, uint32_t height);
+			World(Simulation *sim);
 			~World();
 			
 			Tile *getTile(uint32_t xInd, uint32_t yInd);
 			
+			void startup();
+			void shutdown();
 			
 		private:
 			uint32_t mWidth, mHeight;
@@ -29,6 +34,8 @@ namespace Sim {
 			
 			TileVec mData;
 			Tile *mOffScreen;
+			
+			TileCol mTileCol;
 			
 			Simulation *mSim;
 	};
