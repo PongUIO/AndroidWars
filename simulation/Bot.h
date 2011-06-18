@@ -14,12 +14,18 @@ namespace Sim {
 	
 	class Bot {
 		public:
+			struct Config {
+				uint32_t side;
+				
+				Vector pos;
+			};
+			
 			bool isDead() { return false; }
 			void step(double stepTime);
 			uint32_t getId() { return mId; }
 			
 		private:
-			Bot(uint32_t id, uint32_t side);
+			Bot(uint32_t id, const Config &cfg);
 			~Bot();
 			
 			uint32_t mId;
@@ -36,7 +42,10 @@ namespace Sim {
 			BotFactory(Simulation *sim);
 			~BotFactory();
 			
-			uint32_t createBot(uint32_t side);
+			void startup();
+			void shutdown();
+			
+			uint32_t createBot(const Bot::Config &cfg);
 			
 			void startPhase();
 			void endPhase();

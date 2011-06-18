@@ -96,6 +96,15 @@ namespace Sim {
 				mFreeId.push(id);
 			}
 			
+			void killAll() {
+				for(uint32_t i = 0; i<mData.size(); i++) {
+					deleteInstance(mData[i]);
+				}
+				mData.clear();
+				mFreeId = IdStack(); // Clears the free ID list
+				mIdCounter = 0;
+			}
+			
 			ObjVec mData;
 			IdStack mFreeId;
 			uint32_t mIdCounter;
