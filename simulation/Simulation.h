@@ -54,6 +54,12 @@ namespace Sim {
 				{ return mBotFactory.getInput(); }
 			//@}
 			
+			/// @name Checksum
+			//@{
+				uint32_t checksumData();
+				uint32_t checksumSim();
+			//@}
+			
 		private:
 			/// @name Subsystems
 			//@{

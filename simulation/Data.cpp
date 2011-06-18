@@ -16,4 +16,9 @@ namespace Sim {
 	{
 		mTile.shutdown();
 	}
+	
+	void Data::checksum(Sync& sync)
+	{
+		mTile.checksum(sync);
+	}
 }

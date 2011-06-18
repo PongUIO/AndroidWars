@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <stdint.h>
+#include "../Sync.h"
 
 namespace Sim {
 	struct TileD {
@@ -12,7 +13,7 @@ namespace Sim {
 			ColAll = ~0,     // Collides with everything
 			ColNone = 0      // Collides with nothing
 		};
-		ColMask colMask;     ///< Mask for which types the tile collide with
+		uint32_t colMask;     ///< Mask for which types the tile collide with
 		
 		/// The blast resistance for the tile, if negative the tile is immune
 		double blastResist;
@@ -38,6 +39,16 @@ namespace Sim {
 			uint16_t addTile(const TileD &tile)
 			{ mData.push_back(tile); return mData.size()-1; }
 			
+			void checksum(Sync &sync) {
+				for(TileVec::iterator i=mData.begin(); i!=mData.end(); i++) {
+					TileD &t = *i;
+					
+					sync.mixInt(t.colMask);
+					sync.mixFloat(t.blastResist);
+					sync.mixFloat(t.bounce);
+					sync.mixFloat(t.friction);
+				}
+			}
 		private:
 			typedef std::vector<TileD> TileVec;
 			

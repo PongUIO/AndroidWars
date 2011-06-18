@@ -1,4 +1,5 @@
 #include "Simulation.h"
+#include "Sync.h"
 
 namespace Sim {
 	Simulation::Simulation() :
@@ -44,6 +45,22 @@ namespace Sim {
 	void Simulation::endPhase()
 	{
 		mBotFactory.endPhase();
+	}
+	
+	uint32_t Simulation::checksumData()
+	{
+		Sync sync;
+		
+		return sync.sum();
+	}
+	
+	uint32_t Simulation::checksumSim()
+	{
+		Sync sync;
+		
+		mBotFactory.checksum(sync);
+		
+		return sync.sum();
 	}
 	
 }

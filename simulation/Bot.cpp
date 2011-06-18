@@ -2,6 +2,7 @@
 
 #include "Bot.h"
 #include "Simulation.h"
+#include "Sync.h"
 
 namespace Sim {
 	// Bot
@@ -28,6 +29,10 @@ namespace Sim {
 		mBody.step(stepTime);
 	}
 	
+	void Bot::checksum(Sync& sync)
+	{
+		mBody.checksum(sync);
+	}
 	
 	// BotFactory
 	//
@@ -73,5 +78,12 @@ namespace Sim {
 	void BotFactory::endPhase()
 	{
 	}
-
+	
+	void BotFactory::checksum(Sync& sync)
+	{
+		for(ObjVec::iterator i=mData.begin(); i!=mData.end(); i++) {
+			(*i)->checksum(sync);
+		}
+	}
+	
 }

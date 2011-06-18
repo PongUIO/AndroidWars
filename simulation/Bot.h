@@ -11,6 +11,7 @@ namespace Sim {
 	// Forward declarations
 	class Simulation;
 	class BotFactory;
+	class Sync;
 	
 	struct BotInput {
 		enum InputType {
@@ -51,6 +52,8 @@ namespace Sim {
 			//@{
 				bool isDead() { return false; }
 				void step(double stepTime);
+				
+				void checksum(Sync &sync);
 			//@}
 			
 			/// @name Identification
@@ -98,6 +101,8 @@ namespace Sim {
 				void endPhase();
 				
 				InputBuffer<BotInput> &getInput() { return mInput; }
+				
+				void checksum(Sync &sync);
 			//@}
 			
 		private:

@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "../Simulation.h"
 
 int main(void)
@@ -41,6 +42,7 @@ int main(void)
 	sim.startPhase();
 	while( sim.hasPhaseStep() )
 		sim.step();
+	
 	sim.endPhase();
 	
 	// Shutdown the simulation

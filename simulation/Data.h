@@ -4,6 +4,8 @@
 #include "data/TileD.h"
 
 namespace Sim {
+	class Sync;
+	
 	class Data {
 		public:
 			Data();
@@ -14,6 +16,8 @@ namespace Sim {
 			
 			TileDatabase &getTileDb()
 			{ return mTile; }
+			
+			void checksum(Sync &sync);
 			
 		private:
 			TileDatabase mTile;

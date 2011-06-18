@@ -4,6 +4,8 @@
 #include "Vector.h"
 
 namespace Sim {
+	class Sync;
+	
 	class Body {
 		public:
 			Body();
@@ -17,6 +19,7 @@ namespace Sim {
 			
 			void step(double stepTime);
 			
+			void checksum(Sync &sync);
 		private:
 			
 	};
