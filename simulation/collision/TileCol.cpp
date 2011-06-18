@@ -6,10 +6,13 @@
 namespace Sim {
 	bool operator==(TileCol::TileType const& a, TileCol::TileType const& b)
 	{
-		for(int i=0; i<TileCol::TileType::MaxSide; i++) {
-			if(a.slope[i] != b.slope[i])
+		if(a.side != b.side)
+			return false;
+		
+		for(int i=0; i<2; i++)
+			if(a.sl[i] != b.sl[i])
 				return false;
-		}
+		
 		return true;
 	}
 
@@ -17,8 +20,9 @@ namespace Sim {
 	{
 		std::size_t seed = 0;
 		
-		for(int i=0; i<TileCol::TileType::MaxSide; i++) {
-			boost::hash_combine(seed, val.slope[i]);
+		boost::hash_combine(seed, val.side);
+		for(int i=0; i<2; i++) {
+			boost::hash_combine(seed, val.sl[i]);
 		}
 		
 		return seed;
@@ -57,18 +61,53 @@ namespace Sim {
 		return ret;
 	}
 	
+	static struct Dir {
+		uint32_t basePt[2];
+		uint32_t modPt[2];
+		Vector dir;
+		Vector off[2];
+	} dirMap[4] = {
+		{ // Left
+			{ 0, 1 },
+			{ 2, 3 },
+			Vector(1,0),
+			{ Vector(0,1), Vector(0,0) }
+		},
+		
+		{ // Up
+			{ 1, 2 },
+			{ 3, 0 },
+			Vector(0,-1),
+			{ Vector(1,1), Vector(0,1) }
+		},
+		
+		{ // Right
+			{ 2, 3 },
+			{ 0, 1 },
+			Vector(-1,0),
+			{ Vector(1,0), Vector(1,1) }
+		},
+		
+		{ // Down
+			{ 3, 0 },
+			{ 1, 2 },
+			Vector(0,1),
+			{ Vector(0,0), Vector(1,0) }
+		}
+	};
+	
 	Collision* TileCol::generateTile(const Sim::TileCol::TileType& type)
 	{
 		Collision::ColPoints points(4);
 		
-		points[TileType::Left] =
-			Vector(0, 0+getSlope(type.slope[TileType::Left]) );
-		points[TileType::Up] =
-			Vector(0+getSlope(type.slope[TileType::Up]), 0 );
-		points[TileType::Right] =
-			Vector(mTileSize, getSlope(type.slope[TileType::Right]) );
-		points[TileType::Down] =
-			Vector(mTileSize, mTileSize-getSlope(type.slope[TileType::Down]) );
+		Dir &act = dirMap[type.side];
+		
+		points[act.basePt[0]] = act.off[0]*mTileSize;
+		points[act.basePt[1]] = act.off[1]*mTileSize;
+		points[act.modPt[0]] =
+			act.off[0]*mTileSize + act.dir*getSlope(type.sl[0]);
+		points[act.modPt[1]] =
+			act.off[1]*mTileSize + act.dir*getSlope(type.sl[1]);
 		
 		return new Collision(points);
 	}

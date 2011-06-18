@@ -13,12 +13,14 @@ namespace Sim {
 	{
 		this->config = config;
 		
+		mData.startup();
 		mWorld.startup();
 	}
 	
 	void Simulation::shutdown()
 	{
 		mWorld.shutdown();
+		mData.shutdown();
 	}
 	
 	void Simulation::startPhase()

@@ -14,7 +14,7 @@ namespace Sim {
 		public:
 			struct TileType {
 				/**
-				 * Defines the indexes for each side of a tile
+				 * Defines the indexes for each base side.
 				 */
 				enum SideType {
 					Left	= 0,
@@ -25,7 +25,15 @@ namespace Sim {
 					MaxSide
 				};
 				
-				uint32_t slope[MaxSide];
+				TileType(SideType side, uint8_t a, uint8_t b)
+					: side(side)
+					{
+						sl[0] = a;
+						sl[1] = b;
+					}
+				
+				uint8_t side;
+				uint8_t sl[2];
 			};
 			
 			TileCol();
@@ -39,7 +47,7 @@ namespace Sim {
 		private:
 			Collision *generateTile(const TileType &type);
 			double getSlope(uint32_t sy)
-			{ return (double(sy)/double(mSlopeRes))*mTileSize; }
+			{ return (1.0-double(sy)/double(mSlopeRes))*mTileSize; }
 			
 			typedef boost::unordered_map<TileType, Collision*> TileMap;
 			

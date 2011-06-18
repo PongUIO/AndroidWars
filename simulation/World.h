@@ -8,13 +8,18 @@
 
 namespace Sim {
 	class Simulation;
+	class World;
 	
 	class Tile {
 		public:
-			
+			Tile(uint16_t type=0);
+			~Tile();
 		
 		private:
-			float mHp;
+			uint16_t mType;
+			TileCol::TileType mColType;
+			
+			friend class World;
 	};
 	
 	class World {
@@ -22,7 +27,7 @@ namespace Sim {
 			World(Simulation *sim);
 			~World();
 			
-			Tile *getTile(uint32_t xInd, uint32_t yInd);
+			Tile &getTile(uint32_t xInd, uint32_t yInd);
 			
 			void startup();
 			void shutdown();
@@ -30,10 +35,10 @@ namespace Sim {
 		private:
 			uint32_t mWidth, mHeight;
 			
-			typedef std::vector<Tile*> TileVec;
+			typedef std::vector<Tile> TileVec;
 			
 			TileVec mData;
-			Tile *mOffScreen;
+			Tile mOffScreen;
 			
 			TileCol mTileCol;
 			
