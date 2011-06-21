@@ -16,13 +16,18 @@ int main(int argc, char *argv[]) {
         QApplication app(argc, argv);
         QWidget *main = new QWidget();
         main->showFullScreen();
-        main->resize(QApplication::desktop()->width(), QApplication::desktop()->height()+1);
+        main->resize(QApplication::desktop()->width(), QApplication::desktop()->height());
         MyGLDrawer *drawer = new MyGLDrawer(main);
         QHBoxLayout lower(main);
         main->setWindowTitle(QApplication::translate("childwidget", "Child widget"));
         drawer->setMouseTracking(true);
+        #ifdef _WIN32
         drawer->resize(main->width(), main->height()-1);
+        #else
+        drawer->resize(main->width(), main->height());
+        #endif
         drawer->show();
+        qDebug() << drawer->height();
 
         CustomLabel *label = new CustomLabel(&something, main);
         CustomLabel *label2 = new CustomLabel(&something, main);
