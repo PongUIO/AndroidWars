@@ -22,6 +22,7 @@ namespace Sim {
 	 * Any class inheriting this template is required to have the
 	 * following implemented:
 	 * - deleteInstance(T *obj) : Called when an object is dead.
+	 * - newCopyInstance(T *obj) : Called when an object is copied
 	 * 
 	 * The object this template uses is required to have the following
 	 * implemented:
@@ -43,13 +44,10 @@ namespace Sim {
 			~Factory() {}
 			
 			virtual void deleteInstance(T *obj)=0;
+			virtual T *newCopyInstance(T *obj)=0;
 			
 			void addObj(T *obj) {
 				mData[obj->getId()] = obj;
-			}
-			
-			const T *refObj(uint32_t id) {
-				return getObject(id);
 			}
 			
 			void step(double stepTime) {
@@ -72,8 +70,27 @@ namespace Sim {
 				}
 			}
 			
+			void copyFactory(const Factory<T> &other) {
+				for(uint32_t i = 0; i<mData.size(); i++) {
+					T *otherObj = other.mData[i];
+					T *selfObj = mData[i];
+					
+					if(otherObj) {
+						if(selfObj)
+							*selfObj = *otherObj;
+						else
+							mData[i] = newCopyInstance(otherObj);
+					} else {
+						if(selfObj)
+							deleteInstance(selfObj);
+						else
+							; // Nothing to do
+					}
+				}
+			}
+			
 		protected:
-			T *getObject(uint32_t id) {
+			T *getObject(uint32_t id) const {
 				if(id >= mData.size())
 					return NULL;
 				else

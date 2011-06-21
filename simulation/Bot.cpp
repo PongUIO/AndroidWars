@@ -86,4 +86,8 @@ namespace Sim {
 		}
 	}
 	
+	void BotFactory::copyState(State& state)
+	{
+		copyFactory(state.getBotFactory());
+	}
 }

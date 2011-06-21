@@ -9,6 +9,8 @@
 namespace Sim {
 	class Simulation;
 	class World;
+	class Sync;
+	class State;
 	
 	class Tile {
 		public:
@@ -27,10 +29,20 @@ namespace Sim {
 			World(Simulation *sim);
 			~World();
 			
-			Tile &getTile(uint32_t xInd, uint32_t yInd);
-			
 			void startup();
 			void shutdown();
+			
+			Tile &getTile(uint32_t xInd, uint32_t yInd);
+			
+			void startPhase();
+			void step(double stepTime);
+			void endPhase();
+			
+			/// @name State
+			//@{
+				void checksum(Sync &sync);
+				void copyState(State &state);
+			//@}
 			
 		private:
 			uint32_t mWidth, mHeight;

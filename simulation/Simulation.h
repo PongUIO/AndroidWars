@@ -3,11 +3,8 @@
 
 #include <stdint.h>
 
-#include "Input.h"
-#include "Bot.h"
-#include "World.h"
-#include "Side.h"
 #include "Data.h"
+#include "State.h"
 
 namespace Sim {
 	struct Configuration {
@@ -34,24 +31,18 @@ namespace Sim {
 				
 				bool hasPhaseStep()
 				{ return mCurPhaseStep<config.phaseLength; }
+				
+				void rewindPhase();
+				void finalizePhase();
 			//@}
 			
 			/// @name Module accessors
 			//@{
-				BotFactory &getBotFactory()
-				{ return mBotFactory; }
-				
-				World &getWorld()
-				{ return mWorld; }
-				
-				SideData &getSideData()
-				{ return mSideData; }
+				State &getState()
+				{ return mStateActive; }
 				
 				Data &getData()
 				{ return mData; }
-				
-				InputBuffer<BotInput> &getBotInput()
-				{ return mBotFactory.getInput(); }
 			//@}
 			
 			/// @name Checksum
@@ -63,10 +54,10 @@ namespace Sim {
 		private:
 			/// @name Subsystems
 			//@{
-				BotFactory mBotFactory;
-				World mWorld;
-				SideData mSideData;
+				State mStateActive;
+				State mStateCopy;
 				Data mData;
+				
 			//@}
 			
 			/// @name Phase variables

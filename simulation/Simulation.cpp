@@ -3,8 +3,9 @@
 
 namespace Sim {
 	Simulation::Simulation() :
-		mBotFactory(this),
-		mWorld(this)
+		mStateActive(this),
+		mStateCopy(this),
+		mData()
 		{}
 	
 	Simulation::~Simulation()
@@ -14,17 +15,15 @@ namespace Sim {
 	{
 		this->config = config;
 		
+		mStateCopy.startup();
+		mStateActive.startup();
 		mData.startup();
-		mWorld.startup();
-		mSideData.startup();
-		mBotFactory.startup();
 	}
 	
 	void Simulation::shutdown()
 	{
-		mBotFactory.shutdown();
-		mSideData.shutdown();
-		mWorld.shutdown();
+		mStateActive.shutdown();
+		mStateCopy.shutdown();
 		mData.shutdown();
 	}
 	
@@ -32,35 +31,41 @@ namespace Sim {
 	{
 		mCurPhaseStep = 0;
 		
-		mBotFactory.startPhase();
+		mStateActive.startPhase();
 	}
 	
 	void Simulation::step()
 	{
-		mBotFactory.step(0.01);
+		mStateActive.step(config.stepTime);
 		
 		mCurPhaseStep++;
 	}
 	
 	void Simulation::endPhase()
 	{
-		mBotFactory.endPhase();
+		mStateActive.endPhase();
+	}
+	
+	void Simulation::rewindPhase()
+	{
+		mStateActive.copyState(mStateCopy);
+	}
+	
+	void Simulation::finalizePhase()
+	{
+		mStateCopy.copyState(mStateActive);
 	}
 	
 	uint32_t Simulation::checksumData()
 	{
 		Sync sync;
-		
+		mData.checksum(sync);
 		return sync.sum();
 	}
 	
 	uint32_t Simulation::checksumSim()
 	{
-		Sync sync;
-		
-		mBotFactory.checksum(sync);
-		
-		return sync.sum();
+		return mStateActive.checksum();
 	}
 	
 }

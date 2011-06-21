@@ -12,6 +12,7 @@ namespace Sim {
 	class Simulation;
 	class BotFactory;
 	class Sync;
+	class State;
 	
 	struct BotInput {
 		enum InputType {
@@ -43,6 +44,7 @@ namespace Sim {
 			};
 			
 			uint32_t getId() const { return mId; }
+			const Body &getBody() const { return mBody; }
 			
 		private:
 			Bot(uint32_t id, const Config &cfg);
@@ -97,16 +99,25 @@ namespace Sim {
 			//@{
 				uint32_t createBot(const Bot::Config &cfg);
 				
+				const Bot *getBot(uint32_t id) const {
+					return getObject(id);
+				}
+				
 				void startPhase();
 				void endPhase();
 				
 				InputBuffer<BotInput> &getInput() { return mInput; }
 				
-				void checksum(Sync &sync);
+				/// @name State
+				//@{
+					void checksum(Sync &sync);
+					void copyState(State &state);
+				//@}
 			//@}
 			
 		private:
 			void deleteInstance(Bot *obj) { delete obj; }
+			Bot *newCopyInstance(Bot *obj) { return new Bot(*obj); }
 			
 			InputBuffer<BotInput> mInput;
 			

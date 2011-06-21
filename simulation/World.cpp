@@ -1,4 +1,6 @@
 #include "World.h"
+#include "State.h"
+#include "Sync.h"
 
 namespace Sim {
 	
@@ -29,6 +31,40 @@ namespace Sim {
 		mData.clear();
 		
 		mTileCol.shutdown();
+	}
+	
+	void World::startPhase()
+	{
+		
+	}
+	
+	void World::step(double stepTime)
+	{
+		
+	}
+	
+	void World::endPhase()
+	{
+		
+	}
+	
+	void World::checksum(Sync& sync)
+	{
+		for(size_t i=0; i<mWidth*mHeight; i++) {
+			Tile &t = mData[i];
+			sync.mixInt(t.mType);
+			sync.mixInt(t.mColType.side);
+			sync.mixInt(t.mColType.sl[0]);
+			sync.mixInt(t.mColType.sl[1]);
+		}
+	}
+	
+	void World::copyState(State& state)
+	{
+		World &otherWorld = state.getWorld();
+		for(size_t i=0; i<mWidth*mHeight; i++) {
+			mData[i] = otherWorld.mData[i];
+		}
 	}
 	
 	Tile &World::getTile(uint32_t xInd, uint32_t yInd)

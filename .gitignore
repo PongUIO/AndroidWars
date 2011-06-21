@@ -5,3 +5,4 @@ pc/pc
 pc/Makefile
 build/*
 simulation/test/simtest
+simulation/doc/**
