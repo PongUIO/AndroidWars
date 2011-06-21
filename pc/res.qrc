@@ -1,6 +1,8 @@
 <RCC>
     <qresource prefix="/">
-        <file>images/temp.png</file>
-        <file>images/temp2.png</file>
+        <file>graphics/tiles/metal.png</file>
+        <file>graphics/temp/temp2.png</file>
+        <file>graphics/temp/temp.png</file>
+        <file>graphics/tiles/metal2surf.png</file>
     </qresource>
 </RCC>

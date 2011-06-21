@@ -5,7 +5,8 @@
 TEMPLATE = app
 TARGET = 
 DEPENDPATH += .
-INCLUDEPATH += .
+INCLUDEPATH += . ../simulation
+LIBS += -L../build/ -lAWSim
 
 # Input
 HEADERS += main.h ../openglqt/render.h customlabel.h
@@ -16,5 +17,7 @@ RESOURCES += \
     res.qrc
 
 OTHER_FILES += \
-    images/temp2.png \
-    images/temp.png
+    graphics/tiles/metal.png \
+    graphics/temp/temp.png \
+    graphics/temp/temp2.png \
+    graphics/tiles/metal2surf.png
