@@ -21,11 +21,14 @@ int main(int argc, char *argv[]) {
         QHBoxLayout lower(main);
         main->setWindowTitle(QApplication::translate("childwidget", "Child widget"));
         drawer->setMouseTracking(true);
-        #ifdef _WIN32
+//#ifdef _WIN32
         drawer->resize(main->width(), main->height()-1);
-        #else
-        drawer->resize(main->width(), main->height());
-        #endif
+        QPalette p( main->palette() );
+        p.setColor( QPalette::Window, Qt::black );
+        main->setPalette( p );
+//#else
+  //      drawer->resize(main->width(), main->height());
+//#endif
         drawer->show();
         qDebug() << drawer->height();
 
@@ -35,7 +38,7 @@ int main(int argc, char *argv[]) {
         label->setPixmap(QPixmap(":/images/temp.png"));
         label->resize(60,60);
         label2->setPixmap(QPixmap(":/images/temp2.png"));
-                label2->resize(60,60);
+        label2->resize(60,60);
         QSpacerItem *space = new QSpacerItem(main->width(), 0, QSizePolicy::Expanding);
 	label->show();
 	label2->show();
