@@ -16,8 +16,7 @@ namespace Sim {
 		public:
 			Tile(uint16_t type=0);
 			~Tile();
-		
-		private:
+			
 			uint16_t mType;
 			TileCol::TileType mColType;
 			
