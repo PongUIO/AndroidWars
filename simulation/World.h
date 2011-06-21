@@ -32,7 +32,13 @@ namespace Sim {
 			void startup();
 			void shutdown();
 			
-			Tile &getTile(uint32_t xInd, uint32_t yInd);
+			/// @name Tile information
+			//@{
+				Tile &getTile(uint32_t xInd, uint32_t yInd);
+				
+				uint32_t getWidth() { return mWidth; }
+				uint32_t getHeight() { return mHeight; }
+			//@}
 			
 			void startPhase();
 			void step(double stepTime);
