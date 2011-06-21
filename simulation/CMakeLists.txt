@@ -4,7 +4,7 @@ project(AWSimulation)
 # Set output directory
 #set(EXECUTABLE_OUTPUT_PATH ${CMAKE_DIR})
 
-find_package(Boost 1.34)
+#find_package(Boost 1.34)
 
 # Optional parameters
 set(CPPFLAGS "-g" CACHE STRING "Compiler flags to use")
