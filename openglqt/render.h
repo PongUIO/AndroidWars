@@ -1,6 +1,7 @@
 #include<QtGui>
 #include<qgl.h>
 #include<iostream>
+#include "Simulation.h"
 
 class MyGLDrawer : public QGLWidget {
 	Q_OBJECT        // must include this if you use Qt signals/slots
@@ -10,8 +11,10 @@ public:
         double cx, cy;
         QImage data;
         GLuint texture[1];
-        MyGLDrawer( QWidget *parent = 0)
+        Sim::Simulation *sim;
+        MyGLDrawer(Sim::Simulation *simIn, QWidget *parent = 0)
 			: QGLWidget(QGLFormat(QGL::SampleBuffers), parent) {
+                sim = simIn;
                 cx = 1; // Current x
                 cy = 1; // Current y
 
