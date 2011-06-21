@@ -21,14 +21,14 @@ int main(int argc, char *argv[]) {
         QHBoxLayout lower(main);
         main->setWindowTitle(QApplication::translate("childwidget", "Child widget"));
         drawer->setMouseTracking(true);
-//#ifdef _WIN32
+#ifdef _WIN32
         drawer->resize(main->width(), main->height()-1);
         QPalette p( main->palette() );
         p.setColor( QPalette::Window, Qt::black );
         main->setPalette( p );
-//#else
-  //      drawer->resize(main->width(), main->height());
-//#endif
+#else
+        drawer->resize(main->width(), main->height());
+#endif
         drawer->show();
         qDebug() << drawer->height();
 
