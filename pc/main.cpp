@@ -46,6 +46,14 @@ int main(int argc, char *argv[]) {
         biM.dir = Sim::Vector(-1,0);
         botFact.getInput().addInput( bi );
         Sim::TileDatabase &db = sim.getData().getTileDb();
+        Sim::TileD myTile;
+        myTile.colMask = 0;
+        myTile.blastResist = 0.0;
+        myTile.bounce = 0.0;
+        myTile.friction = 0.0;
+        int i = db.addTile(myTile);
+        db.addTile(myTile);
+
 
 
         QApplication app(argc, argv);

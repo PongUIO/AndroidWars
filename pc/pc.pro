@@ -19,4 +19,5 @@ RESOURCES += \
 OTHER_FILES += \
     graphics/tiles/metal.png \
     graphics/temp/temp.png \
-    graphics/temp/temp2.png
+    graphics/temp/temp2.png \
+    graphics/tiles/metal2surf.png
