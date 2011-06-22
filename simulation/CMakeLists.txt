@@ -19,6 +19,7 @@ include_directories(${Boost_INCLUDE_DIR})
 add_library(AWSim
 	Body.cpp
 	Bot.cpp
+	BotInput.cpp
 	Data.cpp
 	Side.cpp
 	Simulation.cpp

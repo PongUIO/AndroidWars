@@ -27,6 +27,11 @@ namespace Sim {
 		mData.shutdown();
 	}
 	
+	void Simulation::prepareSim()
+	{
+		mStateCopy.copyState(mStateActive);
+	}
+	
 	void Simulation::startPhase()
 	{
 		mCurPhaseStep = 0;

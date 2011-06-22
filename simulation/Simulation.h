@@ -23,8 +23,10 @@ namespace Sim {
 				void shutdown();
 			//@}
 			
-			/// @name Phase interface
+			/// @name Phase/simulation interface
 			//@{
+				void prepareSim();
+				
 				void startPhase();
 				void step();
 				void endPhase();

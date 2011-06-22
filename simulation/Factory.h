@@ -6,6 +6,8 @@
 #include <algorithm>
 #include <stdint.h>
 
+#include <stdio.h>
+
 namespace Sim {
 	// Forward declarations
 	class Simulation;
@@ -71,25 +73,50 @@ namespace Sim {
 			}
 			
 			void copyFactory(const Factory<T> &other) {
-				for(uint32_t i = 0; i<mData.size(); i++) {
-					T *otherObj = other.mData[i];
-					T *selfObj = mData[i];
+				// Make sure both vectors are of equal size
+				if(mData.size() < other.mData.size())
+					mData.resize(other.mData.size());
+				
+				// Purge extra elements
+				while(mData.size() > other.mData.size()) {
+					T *obj = mData.back();
+					mData.pop_back();
+					if(obj)
+						deleteInstance(obj);
+				}
+				
+				// Copy the data objects in the vector
+				for(uint32_t i = 0; i<other.mData.size(); i++) {
+					T *otherObj = other.getObject(i);
+					T *selfObj = getObject(i);
 					
 					if(otherObj) {
 						if(selfObj)
 							*selfObj = *otherObj;
 						else
-							mData[i] = newCopyInstance(otherObj);
+							setObject( newCopyInstance(otherObj), i );
 					} else {
-						if(selfObj)
+						if(selfObj) {
 							deleteInstance(selfObj);
-						else
+							setObject(NULL, i);
+						} else
 							; // Nothing to do
 					}
 				}
+				
+				// Copy other state variables
+				mFreeId = IdStack(other.mFreeId);
+				mIdCounter = other.mIdCounter;
 			}
 			
 		protected:
+			void setObject(T *obj, uint32_t id) {
+				if(id >= mData.size())
+					mData.resize(id+1);
+				
+				mData[id] = obj;
+			}
+			
 			T *getObject(uint32_t id) const {
 				if(id >= mData.size())
 					return NULL;

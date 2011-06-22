@@ -13,11 +13,12 @@ namespace Sim {
 			Vector mPos;
 			Vector mVel;
 			Vector mAcc;
-			Vector mMom;
 			
 			double mMass;
 			
 			void step(double stepTime);
+			void addMomentum(const Vector &mom)
+			{ mVel += mom/mMass; }
 			
 			void checksum(Sync &sync);
 		private:

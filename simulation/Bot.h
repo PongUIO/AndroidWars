@@ -11,28 +11,45 @@ namespace Sim {
 	// Forward declarations
 	class Simulation;
 	class BotFactory;
+	class Bot;
 	class Sync;
 	class State;
 	
 	struct BotInput {
-		enum InputType {
-			None=0,
-			Move
-		};
+		public:
+			enum InputType {
+				None=0,
+				Move,
+				Shoot,
+				Ability
+			};
+			
+			BotInput(uint32_t id=0, InputType type=None) :
+				botId(id), stepCount(0), type(type), dir(0)
+				{}
+			
+			static BotInput inMove(uint32_t id, uint32_t stepCount,
+				const Vector &dir) {
+				BotInput tmp = BotInput(id, Move);
+				tmp.stepCount = stepCount;
+				tmp.dir = dir;
+				
+				return tmp;
+			}
 		
-		BotInput(uint32_t id=0) :
-			botId(id), stepCount(0), type(None)
-			{}
-		
-		uint32_t botId;      ///< ID of bot to process this input
-		uint32_t stepCount;  ///< Number of steps to perform the action
-		InputType type;     ///< Type of action to perform
-		
-		struct MoveP {
-			Vector dir;
-		};
-		
-		MoveP move;
+		private:
+			uint32_t botId;      ///< ID of bot to process this input
+			uint32_t stepCount;  ///< Number of steps to perform the action
+			InputType type;      ///< Type of action to perform
+			
+			Vector dir;          ///< Direction to apply the action
+			
+			int32_t iparam[3];
+			double dparam[3];
+			Vector vparam[3];
+			
+			friend class Bot;
+			friend class BotFactory;
 	};
 	
 	class Bot {
@@ -73,6 +90,8 @@ namespace Sim {
 					return mCurInput.type==BotInput::None ||
 						mCurInput.stepCount==0;
 				}
+				
+				void handleInput();
 			//@}
 			
 			/// @name Physical

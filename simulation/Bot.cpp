@@ -19,13 +19,7 @@ namespace Sim {
 
 	void Bot::step(double stepTime)
 	{
-		if(isIdle() && mInput.hasInput())
-			mCurInput = mInput.nextInput();
-		
-		if(!isIdle()) {
-			mCurInput.stepCount--;
-		}
-		
+		handleInput();
 		mBody.step(stepTime);
 	}
 	
@@ -88,6 +82,8 @@ namespace Sim {
 	
 	void BotFactory::copyState(State& state)
 	{
-		copyFactory(state.getBotFactory());
+		BotFactory &other = state.getBotFactory();
+		copyFactory(other);
+		mInput = other.getInput();
 	}
 }

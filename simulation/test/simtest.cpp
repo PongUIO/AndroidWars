@@ -27,29 +27,32 @@ int main(void)
 	// Send some input to this bot
 	Sim::BotFactory &botFact = sim.getState().getBotFactory();
 	Sim::BotInput bi;
-	bi.botId = botId;
-	bi.stepCount = 20;
-	bi.type = Sim::BotInput::Move;
 	
-	Sim::BotInput::MoveP &biM = bi.move;
-	
-	biM.dir = Sim::Vector(1,0);
+	bi = Sim::BotInput::inMove(botId, 20, Sim::Vector(1,0) );
 	botFact.getInput().addInput( bi );
 	
-	biM.dir = Sim::Vector(-1,0);
+	bi = Sim::BotInput::inMove(botId, 20, Sim::Vector(-1,0) );
 	botFact.getInput().addInput( bi );
 	
 	// Run a test phase
-	sim.startPhase();
-	while( sim.hasPhaseStep() ) {
-		const Sim::Vector &pos =
-			botFact.getBot(botId)->getBody().mPos;
-		printf("(%g, %g)\n", pos.x, pos.y);
-		sim.step();
+	sim.prepareSim();
+	for(int i = 0; i < 3; i++) {
+		sim.startPhase();
+		while( sim.hasPhaseStep() ) {
+			const Sim::Vector &pos =
+				botFact.getBot(botId)->getBody().mPos;
+			printf("(%g, %g)\n", pos.x, pos.y);
+			sim.step();
+		}
+		
+		sim.endPhase();
+		
+		if(i==1)
+			sim.finalizePhase();
+		else
+			sim.rewindPhase();
 	}
-	
-	sim.endPhase();
-	
+		
 	// Shutdown the simulation
 	sim.shutdown();
 	
