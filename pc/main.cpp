@@ -8,6 +8,7 @@
 #include "ui.h"
 #include "customlabel.h"
 #include "../openglqt/render.h"
+#include "../util/camera.h"
 #include "Simulation.h"
 
 void something() {
@@ -60,7 +61,17 @@ int main(int argc, char *argv[]) {
         QWidget *main = new QWidget();
         main->showFullScreen();
         main->resize(QApplication::desktop()->screenGeometry().width(), QApplication::desktop()->screenGeometry().height());
-        MyGLDrawer *drawer = new MyGLDrawer(&sim, main);
+        Camera cam(0, 0, main->width(), main->height());
+        MyGLDrawer *drawer = new MyGLDrawer(&cam, &sim, main);
+
+        QTimer *glTimer = new QTimer(main);
+        drawer->connect(glTimer, SIGNAL(timeout()), drawer, SLOT(redraw()));
+        glTimer->start(0);
+
+        QTimer *timer = new QTimer(main);
+        main->connect(timer, SIGNAL(timeout()), &cam, SLOT(iter()));
+        timer->start(100);
+
         QHBoxLayout lower(main);
         main->setWindowTitle(QApplication::translate("childwidget", "Child widget"));
         drawer->setMouseTracking(true);

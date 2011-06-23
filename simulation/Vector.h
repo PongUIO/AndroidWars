@@ -35,7 +35,9 @@ namespace Sim {
 			
 			#define VECD_OPER(op) \
 				Vector operator op(const double &d) const \
-				{ return Vector(x op d, y op d); }
+				{ return Vector(x op d, y op d); } \
+				void operator op##=(const double &d) \
+				{ x op##=d; y op##= d; }
 			VECD_OPER(*)
 			VECD_OPER(/)
 			
