@@ -1,10 +1,10 @@
 #ifndef SIM_DATA_H
 #define SIM_DATA_H
 
+#include "Save.h"
 #include "data/TileD.h"
 
 namespace Sim {
-	class Sync;
 	
 	class Data {
 		public:
@@ -17,7 +17,7 @@ namespace Sim {
 			TileDatabase &getTileDb()
 			{ return mTile; }
 			
-			void checksum(Sync &sync);
+			void checksum(Save::SyncPtr &sync);
 			
 		private:
 			TileDatabase mTile;

@@ -1,6 +1,7 @@
 #include "Simulation.h"
-#include "Sync.h"
+#include "Save.h"
 
+#include <stdio.h>
 namespace Sim {
 	Simulation::Simulation() :
 		mStateActive(this),
@@ -30,6 +31,8 @@ namespace Sim {
 	void Simulation::prepareSim()
 	{
 		mStateCopy.copyState(mStateActive);
+		
+		mCurPhase = 0;
 	}
 	
 	void Simulation::startPhase()
@@ -49,6 +52,9 @@ namespace Sim {
 	void Simulation::endPhase()
 	{
 		mStateActive.endPhase();
+		mStateCopy.copyState(mStateActive);
+		
+		mCurPhase++;
 	}
 	
 	void Simulation::rewindPhase()
@@ -56,21 +62,19 @@ namespace Sim {
 		mStateActive.copyState(mStateCopy);
 	}
 	
-	void Simulation::finalizePhase()
-	{
-		mStateCopy.copyState(mStateActive);
-	}
-	
 	uint32_t Simulation::checksumData()
 	{
-		Sync sync;
+		Save dummy;
+		Save::SyncPtr sync = Save::SyncPtr(dummy);
 		mData.checksum(sync);
-		return sync.sum();
+		return sync.checksum();
 	}
 	
 	uint32_t Simulation::checksumSim()
 	{
-		return mStateActive.checksum();
+		Save save;
+		mStateActive.save(save);
+		return save.checksum();
 	}
 	
 }

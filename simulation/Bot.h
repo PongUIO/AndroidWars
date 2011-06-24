@@ -6,13 +6,13 @@
 #include "Factory.h"
 #include "Input.h"
 #include "Body.h"
+#include "Save.h"
 
 namespace Sim {
 	// Forward declarations
 	class Simulation;
 	class BotFactory;
 	class Bot;
-	class Sync;
 	class State;
 	
 	struct BotInput {
@@ -72,7 +72,7 @@ namespace Sim {
 				bool isDead() { return false; }
 				void step(double stepTime);
 				
-				void checksum(Sync &sync);
+				void save(Save::Ptr &fp);
 			//@}
 			
 			/// @name Identification
@@ -129,7 +129,7 @@ namespace Sim {
 				
 				/// @name State
 				//@{
-					void checksum(Sync &sync);
+					void save(Save::Ptr &fp);
 					void copyState(State &state);
 				//@}
 			//@}

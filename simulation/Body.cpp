@@ -1,5 +1,4 @@
 #include "Body.h"
-#include "Sync.h"
 
 namespace Sim {
 	Body::Body() :
@@ -17,11 +16,11 @@ namespace Sim {
 		mPos += mVel*stepTime + mAcc*0.5*stepTime*stepTime;
 	}
 	
-	void Body::checksum(Sync& sync)
+	void Body::save(Save::Ptr &fp)
 	{
-		sync.mixVec(mPos);
-		sync.mixVec(mVel);
-		sync.mixVec(mAcc);
-		sync.mixFloat(mMass);
+		fp.writeVec(mPos);
+		fp.writeVec(mVel);
+		fp.writeVec(mAcc);
+		fp.writeFloat(mMass);
 	}
 }

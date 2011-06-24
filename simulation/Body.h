@@ -2,10 +2,9 @@
 #define SIM_BODY_H
 
 #include "Vector.h"
+#include "Save.h"
 
 namespace Sim {
-	class Sync;
-	
 	class Body {
 		public:
 			Body();
@@ -20,7 +19,7 @@ namespace Sim {
 			void addMomentum(const Vector &mom)
 			{ mVel += mom/mMass; }
 			
-			void checksum(Sync &sync);
+			void save(Save::Ptr &fp);
 		private:
 			
 	};

@@ -24,7 +24,7 @@ add_library(AWSim
 	Side.cpp
 	Simulation.cpp
 	State.cpp
-	Sync.cpp
+	Save.cpp
 	World.cpp
 	
 	collision/Collision.cpp

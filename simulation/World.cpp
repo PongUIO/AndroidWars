@@ -1,6 +1,5 @@
 #include "World.h"
 #include "State.h"
-#include "Sync.h"
 
 namespace Sim {
 	
@@ -48,14 +47,16 @@ namespace Sim {
 		
 	}
 	
-	void World::checksum(Sync& sync)
+	void World::save(Save::Ptr &fp)
 	{
+		fp.writeInt(mWidth);
+		fp.writeInt(mHeight);
 		for(size_t i=0; i<mWidth*mHeight; i++) {
 			Tile &t = mData[i];
-			sync.mixInt(t.mType);
-			sync.mixInt(t.mColType.side);
-			sync.mixInt(t.mColType.sl[0]);
-			sync.mixInt(t.mColType.sl[1]);
+			fp.writeInt(t.mType);
+			fp.writeInt(t.mColType.side);
+			fp.writeInt(t.mColType.sl[0]);
+			fp.writeInt(t.mColType.sl[1]);
 		}
 	}
 	

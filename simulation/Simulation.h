@@ -34,8 +34,10 @@ namespace Sim {
 				bool hasPhaseStep()
 				{ return mCurPhaseStep<config.phaseLength; }
 				
+				uint32_t getCurPhase()
+				{ return mCurPhase; }
+				
 				void rewindPhase();
-				void finalizePhase();
 			//@}
 			
 			/// @name Module accessors
@@ -65,6 +67,7 @@ namespace Sim {
 			/// @name Phase variables
 			//@{
 				uint32_t mCurPhaseStep;
+				uint32_t mCurPhase;
 			//@}
 			
 			/// @name Other variables

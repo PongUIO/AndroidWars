@@ -32,7 +32,7 @@ namespace Sim {
 			//@{
 				void copyState(State &other);
 				
-				uint32_t checksum();
+				void save(Save &save);
 			//@}
 			
 			/// @name Module accessors

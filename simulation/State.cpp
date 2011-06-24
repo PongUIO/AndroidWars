@@ -3,6 +3,7 @@
 #include "World.h"
 #include "Side.h"
 #include "Simulation.h"
+#include "Save.h"
 
 namespace Sim {
 	State::State(Simulation* sim) :
@@ -54,13 +55,11 @@ namespace Sim {
 		mBotFactory.copyState(other);
 	}
 	
-	uint32_t State::checksum()
+	void State::save(Save &file)
 	{
-		Sync sync;
+		Save::Ptr fp = Save::Ptr(file);
 		
-		mWorld.checksum(sync);
-		mBotFactory.checksum(sync);
-		
-		return sync.sum();
+		mWorld.save(fp);
+		mBotFactory.save(fp);
 	}
 }

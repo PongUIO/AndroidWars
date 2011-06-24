@@ -2,7 +2,6 @@
 
 #include "Bot.h"
 #include "Simulation.h"
-#include "Sync.h"
 
 namespace Sim {
 	// Bot
@@ -23,9 +22,10 @@ namespace Sim {
 		mBody.step(stepTime);
 	}
 	
-	void Bot::checksum(Sync& sync)
+	void Bot::save(Save::Ptr &fp)
 	{
-		mBody.checksum(sync);
+		mBody.save(fp);
+		fp.writeInt(mSide);
 	}
 	
 	// BotFactory
@@ -73,11 +73,13 @@ namespace Sim {
 	{
 	}
 	
-	void BotFactory::checksum(Sync& sync)
+	void BotFactory::save(Save::Ptr &fp)
 	{
+		fp.writeInt(mData.size());
 		for(ObjVec::iterator i=mData.begin(); i!=mData.end(); i++) {
-			(*i)->checksum(sync);
+			(*i)->save(fp);
 		}
+		fp.writeInt(NoId());
 	}
 	
 	void BotFactory::copyState(State& state)

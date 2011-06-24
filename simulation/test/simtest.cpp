@@ -41,14 +41,12 @@ int main(void)
 		while( sim.hasPhaseStep() ) {
 			const Sim::Vector &pos =
 				botFact.getBot(botId)->getBody().mPos;
-			printf("(%g, %g)\n", pos.x, pos.y);
+			printf("%02d (%g, %g)\n", sim.getCurPhase(), pos.x, pos.y);
 			sim.step();
 		}
 		
-		sim.endPhase();
-		
 		if(i==1)
-			sim.finalizePhase();
+			sim.endPhase();
 		else
 			sim.rewindPhase();
 	}

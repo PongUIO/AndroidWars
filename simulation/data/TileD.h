@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <stdint.h>
-#include "../Sync.h"
+#include "../Save.h"
 
 namespace Sim {
 	struct TileD {
@@ -39,16 +39,17 @@ namespace Sim {
 			uint16_t addTile(const TileD &tile)
 			{ mData.push_back(tile); return mData.size()-1; }
 			
-			void checksum(Sync &sync) {
+			void checksum(Save::SyncPtr &sync) {
 				for(TileVec::iterator i=mData.begin(); i!=mData.end(); i++) {
 					TileD &t = *i;
 					
-					sync.mixInt(t.colMask);
-					sync.mixFloat(t.blastResist);
-					sync.mixFloat(t.bounce);
-					sync.mixFloat(t.friction);
+					sync.writeInt(t.colMask);
+					sync.writeFloat(t.blastResist);
+					sync.writeFloat(t.bounce);
+					sync.writeFloat(t.friction);
 				}
 			}
+			
 		private:
 			typedef std::vector<TileD> TileVec;
 			

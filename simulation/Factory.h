@@ -39,6 +39,8 @@ namespace Sim {
 			typedef std::vector<T*> ObjVec;
 		
 		public:
+			uint32_t NoId() const { return -1; }
+			
 			Factory(Simulation *sim) :
 				mIdCounter(0),
 				mSim(sim)

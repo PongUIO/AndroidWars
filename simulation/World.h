@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "collision/TileCol.h"
+#include "Save.h"
 
 namespace Sim {
 	class Simulation;
@@ -45,7 +46,7 @@ namespace Sim {
 			
 			/// @name State
 			//@{
-				void checksum(Sync &sync);
+				void save(Save::Ptr &fp);
 				void copyState(State &state);
 			//@}
 			
