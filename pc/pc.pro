@@ -9,7 +9,7 @@ INCLUDEPATH += . ../simulation
 LIBS += -L../build/ -lAWSim
 
 # Input
-HEADERS += main.h ../openglqt/render.h customlabel.h
+HEADERS += main.h ../openglqt/render.h customlabel.h ../util/camera.h
 SOURCES += main.cpp
 QT += opengl
 
