@@ -36,9 +36,10 @@ namespace Sim {
 	class Factory {
 		protected:
 			typedef std::stack<uint32_t> IdStack;
-			typedef std::vector<T*> ObjVec;
-		
+			
 		public:
+			typedef std::vector<T*> ObjVec;
+			
 			uint32_t NoId() const { return -1; }
 			
 			Factory(Simulation *sim) :

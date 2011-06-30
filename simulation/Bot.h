@@ -122,6 +122,10 @@ namespace Sim {
 					return getObject(id);
 				}
 				
+				const Factory<Bot>::ObjVec &getBotVector() const {
+					return mData;
+				}
+				
 				void startPhase();
 				void endPhase();
 				
