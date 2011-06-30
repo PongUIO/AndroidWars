@@ -16,7 +16,7 @@ namespace Sim {
 		mPos += mVel*stepTime + mAcc*0.5*stepTime*stepTime;
 	}
 	
-	void Body::save(Save::Ptr &fp)
+	void Body::save(Save::BasePtr &fp)
 	{
 		fp.writeVec(mPos);
 		fp.writeVec(mVel);

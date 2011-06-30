@@ -22,7 +22,7 @@ namespace Sim {
 		mBody.step(stepTime);
 	}
 	
-	void Bot::save(Save::Ptr &fp)
+	void Bot::save(Save::BasePtr &fp)
 	{
 		mBody.save(fp);
 		fp.writeInt(mSide);
@@ -73,7 +73,7 @@ namespace Sim {
 	{
 	}
 	
-	void BotFactory::save(Save::Ptr &fp)
+	void BotFactory::save(Save::BasePtr &fp)
 	{
 		fp.writeInt(mData.size());
 		for(ObjVec::iterator i=mData.begin(); i!=mData.end(); i++) {

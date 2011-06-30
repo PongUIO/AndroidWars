@@ -1,7 +1,7 @@
 #include "State.h"
 #include "Bot.h"
 #include "World.h"
-#include "Side.h"
+#include "Player.h"
 #include "Simulation.h"
 #include "Save.h"
 
@@ -9,7 +9,7 @@ namespace Sim {
 	State::State(Simulation* sim) :
 		mBotFactory(sim),
 		mWorld(sim),
-		mSide(),
+		mPlayer(),
 		mSim(sim)
 	{}
 	
@@ -20,12 +20,12 @@ namespace Sim {
 	{
 		mBotFactory.startup();
 		mWorld.startup();
-		mSide.startup();
+		mPlayer.startup();
 	}
 
 	void State::shutdown()
 	{
-		mSide.shutdown();
+		mPlayer.shutdown();
 		mWorld.shutdown();
 		mBotFactory.shutdown();
 	}
@@ -50,15 +50,14 @@ namespace Sim {
 	
 	void State::copyState(Sim::State& other)
 	{
-		//mSide.copyState(other);
+		mPlayer.copyState(other);
 		mWorld.copyState(other);
 		mBotFactory.copyState(other);
 	}
 	
-	void State::save(Save &file)
+	void State::save(Save::BasePtr &fp)
 	{
-		Save::Ptr fp = Save::Ptr(file);
-		
+		mPlayer.save(fp);
 		mWorld.save(fp);
 		mBotFactory.save(fp);
 	}

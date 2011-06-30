@@ -5,7 +5,7 @@
 
 #include "World.h"
 #include "Bot.h"
-#include "Side.h"
+#include "Player.h"
 
 namespace Sim {
 	class Simulation;
@@ -32,7 +32,7 @@ namespace Sim {
 			//@{
 				void copyState(State &other);
 				
-				void save(Save &save);
+				void save(Save::BasePtr &fp);
 			//@}
 			
 			/// @name Module accessors
@@ -43,14 +43,14 @@ namespace Sim {
 				World &getWorld()
 				{ return mWorld; }
 				
-				SideData &getSideData()
-				{ return mSide; }
+				PlayerData &getPlayerData()
+				{ return mPlayer; }
 			//@}
 			
 		private:
 			BotFactory mBotFactory;
 			World mWorld;
-			SideData mSide;
+			PlayerData mPlayer;
 			
 			Simulation *mSim;
 	};

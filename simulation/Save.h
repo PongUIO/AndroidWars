@@ -24,17 +24,14 @@ namespace Sim {
 			~Save() {}
 			
 			uint32_t checksum();
-			uint32_t size() const { return data.size(); }
+			size_t size() const { return data.size(); }
 			void clear() { data.clear(); }
 			uint8_t const *getData() const { return &data[0]; }
 			
-			class Ptr {
+			class BasePtr {
 				private:
-					Save &file;
-					uint32_t readPtr;
-					
-					virtual void nanoWrite(const uint8_t *ptr, uint32_t bytes);
-					virtual void nanoRead(uint8_t *ptr, uint32_t bytes);
+					virtual void nanoWrite(const uint8_t *ptr, uint32_t bytes)=0;
+					virtual void nanoRead(uint8_t *ptr, uint32_t bytes)=0;
 					
 					template<class T>
 					static T toFormat(const T &val)
@@ -66,18 +63,8 @@ namespace Sim {
 						
 						return res;
 					}
-					
+				
 				public:
-					Ptr(Save &file) :
-						file(file)
-					{}
-					
-					bool eof() const
-					{ return readPtr >= file.data.size(); }
-					
-					void rewind()
-					{ readPtr = 0; }
-					
 					template<class T>
 					void writeInt(const T &v) {
 						T tmp = toFormat<T>(v);
@@ -114,12 +101,32 @@ namespace Sim {
 					{ writeFloat(v.x); writeFloat(v.y); }
 			};
 			
+			class FilePtr : public BasePtr {
+				private:
+					Save &file;
+					uint32_t readPtr;
+					
+					void nanoWrite(const uint8_t *ptr, uint32_t bytes);
+					void nanoRead(uint8_t *ptr, uint32_t bytes);
+					
+				public:
+					FilePtr(Save &file) :
+						file(file)
+					{}
+					
+					bool eof() const
+					{ return readPtr >= file.data.size(); }
+					
+					void rewind()
+					{ readPtr = 0; }
+			};
+			
 			/**
 			 * Specialization of an ordinary file pointer,
 			 * provides an equivalent interface to compute a
 			 * checksum without writing any data.
 			 */
-			class SyncPtr : public Ptr {
+			class SyncPtr : public BasePtr {
 				private:
 					void nanoWrite(const uint8_t *ptr, uint32_t bytes)
 					{
@@ -131,7 +138,7 @@ namespace Sim {
 					
 					boost::crc_32_type cksum;
 				public:
-					SyncPtr(Save &file) : Ptr(file)
+					SyncPtr()
 						{}
 					
 					uint32_t checksum()

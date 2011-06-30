@@ -1,7 +1,6 @@
 #include "Simulation.h"
 #include "Save.h"
 
-#include <stdio.h>
 namespace Sim {
 	Simulation::Simulation() :
 		mStateActive(this),
@@ -64,17 +63,28 @@ namespace Sim {
 	
 	uint32_t Simulation::checksumData()
 	{
-		Save dummy;
-		Save::SyncPtr sync = Save::SyncPtr(dummy);
+		Save::SyncPtr sync = Save::SyncPtr();
 		mData.checksum(sync);
 		return sync.checksum();
 	}
 	
 	uint32_t Simulation::checksumSim()
 	{
-		Save save;
-		mStateActive.save(save);
-		return save.checksum();
+		Save::SyncPtr sync = Save::SyncPtr();
+		mStateActive.save(sync);
+		return sync.checksum();
 	}
 	
+	Save Simulation::save()
+	{
+		Save tmp;
+		Save::FilePtr ptr = Save::FilePtr(tmp);
+		mStateActive.save(ptr);
+		return tmp;
+	}
+	
+	void Simulation::load(const Sim::Save& saveData)
+	{
+		/// @todo Implement this
+	}
 }

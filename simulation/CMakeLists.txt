@@ -21,7 +21,7 @@ add_library(AWSim
 	Bot.cpp
 	BotInput.cpp
 	Data.cpp
-	Side.cpp
+	Player.cpp
 	Simulation.cpp
 	State.cpp
 	Save.cpp

@@ -49,10 +49,13 @@ namespace Sim {
 				{ return mData; }
 			//@}
 			
-			/// @name Checksum
+			/// @name Checksum, saving, and loading
 			//@{
 				uint32_t checksumData();
 				uint32_t checksumSim();
+				
+				Save save();
+				void load(const Save &saveData);
 			//@}
 			
 		private:

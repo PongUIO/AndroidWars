@@ -47,7 +47,7 @@ namespace Sim {
 		
 	}
 	
-	void World::save(Save::Ptr &fp)
+	void World::save(Save::BasePtr &fp)
 	{
 		fp.writeInt(mWidth);
 		fp.writeInt(mHeight);

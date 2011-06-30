@@ -19,7 +19,7 @@ namespace Sim {
 			void addMomentum(const Vector &mom)
 			{ mVel += mom/mMass; }
 			
-			void save(Save::Ptr &fp);
+			void save(Save::BasePtr &fp);
 		private:
 			
 	};

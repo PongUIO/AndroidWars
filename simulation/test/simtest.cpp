@@ -13,10 +13,10 @@ int main(void)
 	sim.startup(config);
 	
 	// Create a test side
-	Sim::Side testSide;
+	Sim::Player testSide;
 	testSide.allyGroup = 0;
 	
-	sim.getState().getSideData().addSide(testSide);
+	sim.getState().getPlayerData().addPlayer(testSide);
 	
 	// Create a test bot
 	Sim::Bot::Config botCfg;
@@ -50,7 +50,9 @@ int main(void)
 		else
 			sim.rewindPhase();
 	}
-		
+	
+	printf("%X == %X\n", sim.checksumSim(), sim.save().checksum());
+	
 	// Shutdown the simulation
 	sim.shutdown();
 	

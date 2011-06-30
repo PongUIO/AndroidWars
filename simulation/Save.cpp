@@ -12,7 +12,7 @@ namespace Sim {
 		return checkSum.checksum();
 	}
 	
-	void Save::Ptr::nanoRead(uint8_t* ptr, uint32_t bytes)
+	void Save::FilePtr::nanoRead(uint8_t* ptr, uint32_t bytes)
 	{
 		uint32_t extraBytes = 0;
 		if(readPtr+bytes > file.size()) {
@@ -22,7 +22,7 @@ namespace Sim {
 		memcpy(ptr, &file.data[readPtr], bytes-extraBytes);
 	}
 	
-	void Save::Ptr::nanoWrite(const uint8_t* ptr, uint32_t bytes)
+	void Save::FilePtr::nanoWrite(const uint8_t* ptr, uint32_t bytes)
 	{
 		uint32_t oldSize = file.size();
 		file.data.resize(oldSize+bytes);

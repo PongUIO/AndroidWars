@@ -72,7 +72,7 @@ namespace Sim {
 				bool isDead() { return false; }
 				void step(double stepTime);
 				
-				void save(Save::Ptr &fp);
+				void save(Save::BasePtr &fp);
 			//@}
 			
 			/// @name Identification
@@ -129,8 +129,9 @@ namespace Sim {
 				
 				/// @name State
 				//@{
-					void save(Save::Ptr &fp);
 					void copyState(State &state);
+					
+					void save(Save::BasePtr &fp);
 				//@}
 			//@}
 			
