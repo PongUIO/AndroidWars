@@ -17,7 +17,7 @@ public:
         QImage data[2];
         GLuint texture[2];
         QImage characters[1];
-        GLuint chartex[1];
+        GLuint chartexture[1];
         Sim::Simulation *sim;
         Sim::World *wld;
         Camera *cam;
@@ -36,14 +36,14 @@ public:
 protected:
         // overridden
         void keyPressEvent (QKeyEvent *event) {
-                qDebug() << event->key();
+  //              qDebug() << event->key();
         }
 
         // overriden
         void mouseMoveEvent(QMouseEvent * event) {
                 lastX = event->pos().x();
                 lastY = event->pos().y();
-                qDebug() << event->pos().x() << " " << event->pos().y();
+//                qDebug() << event->pos().x() << " " << event->pos().y();
         }
 
         // overridden  
@@ -62,11 +62,11 @@ protected:
                 glClearColor( 0.0, 0.0, 0.0, 0.0 );
                 glEnable(GL_DEPTH_TEST | GL_DOUBLE);
                 data[0].load(":/graphics/tiles/metal.png");
-                texture[0] = bindTexture(data[0].scaled(128,128));
+                texture[0] = bindTexture(data[0].scaled(64,64));
                 data[1].load(":/graphics/tiles/metal2surf.png");
-                texture[1] = bindTexture(data[1].scaled(128,128));
+                texture[1] = bindTexture(data[1].scaled(64,64));
                 characters[0].load(":/graphics/characters/temp.png");
-                chartex[0] = bindTexture(data[1].scaled(64,160));
+                chartexture[0] = bindTexture(characters[0].scaled(128,320));
 
                 /*		glEnable(GL_TEXTURE_2D);
                 glGenTextures(3,&texture[0]);
@@ -132,6 +132,25 @@ protected:
                                 glEnd();
                         }
                 }
+                const Sim::BotFactory::ObjVec &bots =  sim->getState().getBotFactory().getBotVector();
+
+                for (i = 0; i < bots.size(); i++) {
+                        Sim::Bot *bot = bots[i];
+                        if (bot != NULL) {
+                                Sim::Vector vec = bot->getBody().mPos;
+                                glTexSubImage2D(GL_TEXTURE_2D, 0, 0,0 , characters[mt].width(), characters[mt].height(),  GL_RGBA, GL_UNSIGNED_BYTE, characters[mt].bits() );
+                                glBindTexture(GL_TEXTURE_2D, chartexture[0]);
+                                glBegin(GL_QUADS);
+                                glTexCoord2f(0,1); glVertex2f(vec.x,vec.y + 1.8);  // lower left
+                                glTexCoord2f(0,0); glVertex2f(vec.x,vec.y); // lower right
+                                glTexCoord2f(1,0); glVertex2f(vec.x+1,vec.y);// upper right
+                                glTexCoord2f(1,1); glVertex2f(vec.x+1,vec.y+1.8); // upper left
+                                glEnd();
+
+                        }
+                }
+
+
                 glDisable(GL_TEXTURE_2D);
                 glFlush();
                 swapBuffers();
