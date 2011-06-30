@@ -50,12 +50,11 @@ protected:
         void mousePressEvent(QMouseEvent * event) {
                 int w = width();
                 int h = height();
-                paintGL();
         }
 
 
 
-        // overridden
+                // overridden
         void initializeGL()
         {
                 // Set up the rendering context, define display lists etc.:
