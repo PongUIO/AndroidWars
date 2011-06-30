@@ -92,7 +92,7 @@ protected:
                 glClear(GL_COLOR_BUFFER_BIT);
                 glMatrixMode(GL_PROJECTION);
                 glLoadIdentity();
-                glOrtho(-cam->zoom, cam->zoom, -cam->zoom, cam->zoom, 0.01, 1000);
+                glOrtho(-cam->zoom, cam->zoom, -cam->zoom*cam->ratio, cam->zoom*cam->ratio, 0.01, 1000);
                 glTranslatef(cam->pos.x,cam->pos.y,-1);
                 glMatrixMode(GL_MODELVIEW);
                 glLoadIdentity();
