@@ -85,10 +85,17 @@ protected:
         // overridden
         void paintGL()
         {
+                cam->iter();
                 cx += 0.01;
                 cy += 0.01;
                 int i, j;
                 glClear(GL_COLOR_BUFFER_BIT);
+                glMatrixMode(GL_PROJECTION);
+                glLoadIdentity();
+                glOrtho(-cam->zoom, cam->zoom, -cam->zoom, cam->zoom, 0.01, 1000);
+                glTranslatef(cam->pos.x,cam->pos.y,-1);
+                glMatrixMode(GL_MODELVIEW);
+                glLoadIdentity();
                 // draw the scene:
                 //glRotatef( ... );
                 //glMaterialfv( ... );
@@ -102,17 +109,17 @@ protected:
                 glEnable(GL_TEXTURE_2D);
 
                 int mt;
-
+         //       glViewport(cam->pos.x, cam->pos.y, getWidth(), getHeight());
                 for (i = 0; i < wld->getHeight(); i++) {
                         for (j = 0; j < wld->getWidth(); j++) {
                                 mt = wld->getTile(i, j).mType;
                                 glTexSubImage2D(GL_TEXTURE_2D, 0, 0,0 , data[mt].width(), data[mt].height(),  GL_RGBA, GL_UNSIGNED_BYTE, data[mt].bits() );
                                 glBindTexture(GL_TEXTURE_2D, texture[mt]);
                                 glBegin(GL_QUADS);
-                                glTexCoord2f(0,1); glVertex2f((i*cam->zoom-1)*cam->ratio,(j+1)*cam->zoom-1);  // lower left
-                                glTexCoord2f(0,0); glVertex2f((i*cam->zoom-1)*cam->ratio,j*cam->zoom-1); // lower right
-                                glTexCoord2f(1,0); glVertex2f(((i+1)*cam->zoom-1)*cam->ratio,j*cam->zoom-1);// upper right
-                                glTexCoord2f(1,1); glVertex2f(((i+1)*cam->zoom-1)*cam->ratio,(j+1)*cam->zoom-1); // upper left
+                                glTexCoord2f(0,1); glVertex2f(i,j+1);  // lower left
+                                glTexCoord2f(0,0); glVertex2f(i,j); // lower right
+                                glTexCoord2f(1,0); glVertex2f(i+1,j);// upper right
+                                glTexCoord2f(1,1); glVertex2f(i+1,j+1); // upper left
                                 glEnd();
                         }
                 }

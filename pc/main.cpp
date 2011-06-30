@@ -24,8 +24,8 @@ int main(int argc, char *argv[]) {
 
         sim.startup(config);
 
-        Sim::Side testSide;
-        sim.getState().getSideData().addSide(testSide);
+        Sim::Player testSide;
+        sim.getState().getPlayerData().addPlayer(testSide);
         // Create a test bot
         Sim::Bot::Config botCfg;
         botCfg.side = 0;
@@ -34,18 +34,8 @@ int main(int argc, char *argv[]) {
 
         // Send some input to this bot
         Sim::BotFactory &botFact = sim.getState().getBotFactory();
-        Sim::BotInput bi;
-        bi.botId = botId;
-        bi.stepCount = 20;
-        bi.type = Sim::BotInput::Move;
 
-        Sim::BotInput::MoveP &biM = bi.move;
 
-        biM.dir = Sim::Vector(1,0);
-        botFact.getInput().addInput( bi );
-
-        biM.dir = Sim::Vector(-1,0);
-        botFact.getInput().addInput( bi );
         Sim::TileDatabase &db = sim.getData().getTileDb();
         Sim::TileD myTile;
         myTile.colMask = 0;
@@ -69,7 +59,7 @@ int main(int argc, char *argv[]) {
         glTimer->start(0);
 
         QTimer *timer = new QTimer(main);
-        main->connect(timer, SIGNAL(timeout()), &cam, SLOT(iter()));
+        //main->connect(timer, SIGNAL(timeout()), &cam, SLOT(iter()));
         timer->start(100);
 
         QHBoxLayout lower(main);
@@ -106,5 +96,3 @@ int main(int argc, char *argv[]) {
         return app.exec();
 
 }
-
-
