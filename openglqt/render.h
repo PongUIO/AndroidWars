@@ -13,37 +13,43 @@ public slots:
         }
 
 public:
-        int w, h;
-        double cx, cy;
+        int lastX, lastY;
         QImage data[2];
         GLuint texture[2];
+        QImage characters[1];
+        GLuint chartex[1];
         Sim::Simulation *sim;
         Sim::World *wld;
         Camera *cam;
         MyGLDrawer(Camera *cam, Sim::Simulation *simIn, QWidget *parent = 0)
 			: QGLWidget(QGLFormat(QGL::SampleBuffers), parent) {
                 this->cam = cam;
+                lastX = width()/2;
+                lastY = height()/2;
                 sim = simIn;
                 wld = &sim->getState().getWorld();
                 wld->getTile(5,0).mType = 1;
-                cx = 1; // Current x
-                cy = 1; // Current y
+
 
         }
 
 protected:
         // overridden
         void keyPressEvent (QKeyEvent *event) {
-                std::cout << event->key() << std::endl;
+                qDebug() << event->key();
         }
 
-        // overridden
+        // overriden
+        void mouseMoveEvent(QMouseEvent * event) {
+                lastX = event->pos().x();
+                lastY = event->pos().y();
+                qDebug() << event->pos().x() << " " << event->pos().y();
+        }
+
+        // overridden  
         void mousePressEvent(QMouseEvent * event) {
-                w = width();
-                h = height();
-                cx = getXPix(event->x());
-                cy = getYPix(event->y());
-                qDebug() << cx << " " << cy << " " << event->x() << " " << event->y();
+                int w = width();
+                int h = height();
                 paintGL();
         }
 
@@ -56,9 +62,11 @@ protected:
                 glClearColor( 0.0, 0.0, 0.0, 0.0 );
                 glEnable(GL_DEPTH_TEST | GL_DOUBLE);
                 data[0].load(":/graphics/tiles/metal.png");
-                texture[0] = bindTexture(data[0].scaled(32,32));
+                texture[0] = bindTexture(data[0].scaled(128,128));
                 data[1].load(":/graphics/tiles/metal2surf.png");
-                texture[1] = bindTexture(data[1].scaled(32,32));
+                texture[1] = bindTexture(data[1].scaled(128,128));
+                characters[0].load(":/graphics/characters/temp.png");
+                chartex[0] = bindTexture(data[1].scaled(64,160));
 
                 /*		glEnable(GL_TEXTURE_2D);
                 glGenTextures(3,&texture[0]);
@@ -82,12 +90,15 @@ protected:
                 //glFrustum( ... );
         }
 
+        void wheelEvent(QWheelEvent *event) {
+                cam->dzoom -= event->delta()/500000.0;//pow(10, cam->zoom);
+        }
+
         // overridden
         void paintGL()
         {
+                moveMouseCheck();
                 cam->iter();
-                cx += 0.01;
-                cy += 0.01;
                 int i, j;
                 glClear(GL_COLOR_BUFFER_BIT);
                 glMatrixMode(GL_PROJECTION);
@@ -99,19 +110,17 @@ protected:
                 // draw the scene:
                 //glRotatef( ... );
                 //glMaterialfv( ... );
-                glBegin( GL_TRIANGLES );
-                glColor3f(0.5,0.5,0.5);
-                glVertex2f(-1, -1);
-                glVertex2f(1, 1);
-                glVertex2f(cx,cy);
-                glEnd();
                 //glDrawPixels(data.width(), data.height(), GL_RGBA, GL_UNSIGNED_BYTE, gldata.bits());
                 glEnable(GL_TEXTURE_2D);
 
                 int mt;
-         //       glViewport(cam->pos.x, cam->pos.y, getWidth(), getHeight());
-                for (i = 0; i < wld->getHeight(); i++) {
-                        for (j = 0; j < wld->getWidth(); j++) {
+                //       glViewport(cam->pos.x, cam->pos.y, getWidth(), getHeight());
+                int fx = -cam->pos.x-cam->zoom-1;
+                int tx = -cam->pos.x+cam->zoom+1;
+                int fy = -cam->pos.y-cam->zoom*cam->ratio-1;
+                int ty = -cam->pos.y+cam->zoom*cam->ratio+1;
+                for (i = fx; i < tx; i++) {
+                        for (j = fy; j < ty; j++) {
                                 mt = wld->getTile(i, j).mType;
                                 glTexSubImage2D(GL_TEXTURE_2D, 0, 0,0 , data[mt].width(), data[mt].height(),  GL_RGBA, GL_UNSIGNED_BYTE, data[mt].bits() );
                                 glBindTexture(GL_TEXTURE_2D, texture[mt]);
@@ -137,4 +146,13 @@ protected:
         double getYPix(int y) {
                 return 1-(((double)y)/height())*2-cam->pos.y;
         }
+
+        void moveMouseCheck() {
+
+                cam->addVel((lastX > width() -10 ) * (-(lastX - width() + 10)*0.00001) +
+                            (lastX < 10) * (-(lastX-10)*0.00001),
+                            (lastY < 10) * ((lastY - 10)*0.00001) +
+                            (lastY > height() - 10) * ((lastY - height() + 10)* 0.00001));
+        }
+
 };

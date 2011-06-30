@@ -12,7 +12,8 @@ public:
                 dzoom = 0.001;
                 zoom = 1;
                 ratio = yres/xres;
-                panfriction = zoomfriction = 0.9;
+                zoomfriction = 0.99;
+                panfriction = 0.99;
         }
         virtual ~Camera() {}
 
@@ -26,8 +27,14 @@ public:
 
         void iter() {
                 pos += delta;
-                //delta *= panfriction;
+                delta *= panfriction;
                 zoom *= dzoom + 1;
+                dzoom *= zoomfriction;
+                if (zoom < 0.01) {
+                        zoom = 0.01;
+                } else if (zoom > 32) {
+                        zoom = 32;
+                }
         }
 
 
