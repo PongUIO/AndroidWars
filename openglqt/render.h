@@ -1,3 +1,6 @@
+#ifndef MYGLDRAWER_H
+#define MYGLDRAWER_H
+
 #include<QtGui>
 #include<qgl.h>
 #include<iostream>
@@ -10,6 +13,14 @@ class MyGLDrawer : public QGLWidget {
 public slots:
         void redraw() {
                 paintGL();
+        }
+
+        void moveMouseCheck() {
+
+                cam->addVel((lastX > width() -10 ) * (-(lastX - width() + 10)*0.00001) +
+                            (lastX < 10) * (-(lastX-10)*0.00001),
+                            (lastY < 10) * ((lastY - 10)*0.00001) +
+                            (lastY > height() - 10) * ((lastY - height() + 10)* 0.00001));
         }
 
 public:
@@ -165,12 +176,5 @@ protected:
                 return 1-(((double)y)/height())*2-cam->pos.y;
         }
 
-        void moveMouseCheck() {
-
-                cam->addVel((lastX > width() -10 ) * (-(lastX - width() + 10)*0.00001) +
-                            (lastX < 10) * (-(lastX-10)*0.00001),
-                            (lastY < 10) * ((lastY - 10)*0.00001) +
-                            (lastY > height() - 10) * ((lastY - height() + 10)* 0.00001));
-        }
-
 };
+#endif

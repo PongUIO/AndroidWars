@@ -5,5 +5,6 @@
         <file>graphics/temp/temp.png</file>
         <file>graphics/tiles/metal2surf.png</file>
         <file>graphics/characters/temp.png</file>
+        <file>graphics/menu/startgame.png</file>
     </qresource>
 </RCC>
