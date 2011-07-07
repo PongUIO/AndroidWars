@@ -5,11 +5,26 @@
 #include <set>
 
 #include "Collision.h"
+#include "ColMap.h"
 #include "Vector.h"
 
 namespace Sim {
 	class ColInfo {
-		
+		public:
+			ColInfo() : mSrcArg(0), mDstArg(0), mTargetPos(0,0)
+				{}
+			
+			void setArgSrc(void *ptr) { mSrcArg = ptr; }
+			void setArgDst(void *ptr) { mDstArg = ptr; }
+			
+			template<class T>
+			T *getArgSrc() { return static_cast<T*>(mSrcArg); }
+			template<class T>
+			T *getArgDst() { return static_cast<T*>(mDstArg); }
+			
+		private:
+			void *mSrcArg, *mDstArg;
+			Vector mTargetPos;
 	};
 	
 	class ColEntity {
@@ -21,6 +36,9 @@ namespace Sim {
 			
 			virtual void receive(ColInfo &info)=0;
 			virtual bool prepare(ColInfo &info)=0;
+			
+		private:
+			Collision *mSelfCol;
 	};
 	
 	class CollisionFunction {
@@ -65,12 +83,14 @@ namespace Sim {
 	
 	class ApplyCol {
 		public:
-			ApplyCol()  {}
-			~ApplyCol() {}
+			ApplyCol() : mColMap(0)
+				{}
+			~ApplyCol()
+				{}
 			
 			
 		private:
-			
+			ColMap<>
 	};
 	
 }

@@ -12,6 +12,13 @@ namespace Sim {
 	 */
 	class TileCol {
 		public:
+			/**
+			 * The datatype used to describe a collision tile.
+			 * The type is aligned as below:
+			 * 2-bits : Base side
+			 * 3-bits : Side 1
+			 * 3-bits : Side 2
+			 */
 			struct TileType {
 				/**
 				 * Defines the indexes for each base side.
@@ -26,14 +33,17 @@ namespace Sim {
 				};
 				
 				TileType(SideType side, uint8_t a, uint8_t b)
-					: side(side)
 					{
-						sl[0] = a;
-						sl[1] = b;
+						data  = side   & 0x03;
+						data |= (a<<2) & 0x1C;
+						data |= (b<<5) & 0xE0; 
 					}
 				
-				uint8_t side;
-				uint8_t sl[2];
+				uint8_t getSide()   const { return (data&0x03) >> 0; }
+				uint8_t getSlopeL() const { return (data&0x1C) >> 2; }
+				uint8_t getSlopeR() const { return (data&0xE0) >> 5; }
+				
+				uint8_t data;
 			};
 			
 			TileCol();

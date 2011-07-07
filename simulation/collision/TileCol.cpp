@@ -5,27 +5,11 @@
 
 namespace Sim {
 	bool operator==(TileCol::TileType const& a, TileCol::TileType const& b)
-	{
-		if(a.side != b.side)
-			return false;
-		
-		for(int i=0; i<2; i++)
-			if(a.sl[i] != b.sl[i])
-				return false;
-		
-		return true;
-	}
+	{	return a.data == b.data;	}
 
 	std::size_t hash_value(const TileCol::TileType &val)
 	{
-		std::size_t seed = 0;
-		
-		boost::hash_combine(seed, val.side);
-		for(int i=0; i<2; i++) {
-			boost::hash_combine(seed, val.sl[i]);
-		}
-		
-		return seed;
+		return boost::hash_value(val.data);
 	}
 	
 	
@@ -100,14 +84,14 @@ namespace Sim {
 	{
 		Collision::ColPoints points(4);
 		
-		Dir &act = dirMap[type.side];
+		Dir &act = dirMap[type.getSide()];
 		
 		points[act.basePt[0]] = act.off[0]*mTileSize;
 		points[act.basePt[1]] = act.off[1]*mTileSize;
 		points[act.modPt[0]] =
-			act.off[0]*mTileSize + act.dir*getSlope(type.sl[0]);
+			act.off[0]*mTileSize + act.dir*getSlope(type.getSlopeL());
 		points[act.modPt[1]] =
-			act.off[1]*mTileSize + act.dir*getSlope(type.sl[1]);
+			act.off[1]*mTileSize + act.dir*getSlope(type.getSlopeR());
 		
 		return new Collision(points);
 	}

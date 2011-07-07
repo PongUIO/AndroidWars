@@ -11,6 +11,9 @@ namespace Sim {
 				Vector n;    ///< The normal in which to escape collision
 				double dist; ///< The distance along the normal to escape
 				bool isCol;  ///< If true, collision occurred
+				
+				Vector getOrp()
+				{ return n*dist; }
 			};
 			
 			struct RayResult {
@@ -30,6 +33,9 @@ namespace Sim {
 				const Vector &theirpos, Collision *they, double dist);
 			RayResult checkRay(const Vector &mypos,
 				const Vector &rayStart, const Vector &rayEnd);
+			
+			Vector getBboxLow() { return bbLow; }
+			Vector getBboxHigh() { return bbHigh; }
 			
 		private:
 			bool pointOnCol(const Vector &pt, size_t ignoreAx,
