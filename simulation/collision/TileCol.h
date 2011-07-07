@@ -65,6 +65,10 @@ namespace Sim {
 			double mTileSize;
 			uint32_t mSlopeRes;    ///< Resolution of possible tile slopes
 	};
+	
+	/// Hash function for TileCol::TileType
+	inline std::size_t hash_value(const TileCol::TileType &val)
+	{	return boost::hash_value(val.data); }
 }
 
 #endif

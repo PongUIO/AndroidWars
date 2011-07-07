@@ -6,12 +6,6 @@
 namespace Sim {
 	bool operator==(TileCol::TileType const& a, TileCol::TileType const& b)
 	{	return a.data == b.data;	}
-
-	std::size_t hash_value(const TileCol::TileType &val)
-	{
-		return boost::hash_value(val.data);
-	}
-	
 	
 	TileCol::TileCol()
 	{}
