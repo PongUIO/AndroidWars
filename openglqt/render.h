@@ -24,8 +24,8 @@ public slots:
 
 public:
         int lastX, lastY;
-        QImage data[2];
-        GLuint texture[2];
+        QImage data[3];
+        GLuint texture[3];
         QImage characters[1];
         GLuint chartexture[1];
         Sim::Simulation *sim;
@@ -38,7 +38,7 @@ public:
                 lastY = height()/2;
                 sim = simIn;
                 wld = &sim->getState().getWorld();
-                wld->getTile(5,0).setType(1);
+                wld->getTile(3,0).setType(1);
 
 
         }
@@ -70,10 +70,12 @@ protected:
                 // Set up the rendering context, define display lists etc.:
                 glClearColor( 0.0, 0.0, 0.0, 0.0 );
                 glEnable(GL_DEPTH_TEST | GL_DOUBLE);
-                data[0].load(":/graphics/tiles/metal.png");
+                data[0].load(":/graphics/tiles/empty.png");
                 texture[0] = bindTexture(data[0].scaled(64,64));
-                data[1].load(":/graphics/tiles/metal2surf.png");
+                data[1].load(":/graphics/tiles/metal.png");
                 texture[1] = bindTexture(data[1].scaled(64,64));
+                data[2].load(":/graphics/tiles/metal2surf.png");
+                texture[2] = bindTexture(data[2].scaled(64,64));
                 characters[0].load(":/graphics/characters/temp.png");
                 chartexture[0] = bindTexture(characters[0].scaled(128,320));
 

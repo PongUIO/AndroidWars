@@ -3,7 +3,7 @@
 ######################################################################
 
 TEMPLATE = app
-TARGET = 
+TARGET = ./build
 DEPENDPATH += .
 INCLUDEPATH += . ../simulation
 LIBS += -L../build/ -lAWSim
