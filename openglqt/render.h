@@ -24,21 +24,21 @@ public slots:
 
 public:
         int lastX, lastY;
-        QImage data[3];
-        GLuint texture[3];
+	QImage data[3];
+	GLuint texture[3];
         QImage characters[1];
         GLuint chartexture[1];
         Sim::Simulation *sim;
         Sim::World *wld;
         Camera *cam;
         MyGLDrawer(Camera *cam, Sim::Simulation *simIn, QWidget *parent = 0)
-			: QGLWidget(QGLFormat(QGL::SampleBuffers), parent) {
+		: QGLWidget(QGLFormat(QGL::SampleBuffers), parent) {
                 this->cam = cam;
                 lastX = width()/2;
                 lastY = height()/2;
                 sim = simIn;
                 wld = &sim->getState().getWorld();
-                wld->getTile(3,0).setType(1);
+		wld->getTile(3,0).setType(1);
 
 
         }
@@ -46,14 +46,14 @@ public:
 protected:
         // overridden
         void keyPressEvent (QKeyEvent *event) {
-  //              qDebug() << event->key();
+		//              qDebug() << event->key();
         }
 
         // overriden
         void mouseMoveEvent(QMouseEvent * event) {
                 lastX = event->pos().x();
                 lastY = event->pos().y();
-//                qDebug() << event->pos().x() << " " << event->pos().y();
+		//                qDebug() << event->pos().x() << " " << event->pos().y();
         }
 
         // overridden  
@@ -64,18 +64,18 @@ protected:
 
 
 
-                // overridden
+	// overridden
         void initializeGL()
         {
                 // Set up the rendering context, define display lists etc.:
                 glClearColor( 0.0, 0.0, 0.0, 0.0 );
                 glEnable(GL_DEPTH_TEST | GL_DOUBLE);
-                data[0].load(":/graphics/tiles/empty.png");
-                texture[0] = bindTexture(data[0].scaled(64,64));
-                data[1].load(":/graphics/tiles/metal.png");
-                texture[1] = bindTexture(data[1].scaled(64,64));
-                data[2].load(":/graphics/tiles/metal2surf.png");
-                texture[2] = bindTexture(data[2].scaled(64,64));
+		data[0].load(":/graphics/tiles/empty.png");
+		texture[0] = bindTexture(data[0].scaled(64,64));
+		data[1].load(":/graphics/tiles/metal.png");
+		texture[1] = bindTexture(data[1].scaled(64,64));
+		data[2].load(":/graphics/tiles/metal2surf.png");
+		texture[2] = bindTexture(data[2].scaled(64,64));
                 characters[0].load(":/graphics/characters/temp.png");
                 chartexture[0] = bindTexture(characters[0].scaled(128,320));
 
@@ -163,7 +163,8 @@ protected:
 
 
                 glDisable(GL_TEXTURE_2D);
-                glFlush();
+		glFlush();
+		glFinish();
                 swapBuffers();
         }
         int getXBlock(double x) {
