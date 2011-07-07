@@ -1,5 +1,5 @@
-#ifndef GAMEWIDGET_H
-#define GAMEWIDGET_H
+#ifndef GAMECONTROLLER_H
+#define GAMECONTROLLER_H
 #include<QtGui>
 #include "Simulation.h"
 #include "../openglqt/render.h"
@@ -11,7 +11,7 @@ void something() {
         qDebug() << "works.";
 }
 
-class GameWidget : public QWidget {
+class GameController {
 public:
         QWidget *main;
         QTimer *glTimer, *camTimer, *timer;
@@ -23,7 +23,7 @@ public:
 #ifdef WIN32
         QPalette *p;
 #endif
-        GameWidget(QWidget *parent = 0) : QWidget(parent) {
+        GameController(QWidget *parent = 0) {
 
                 Sim::Configuration config;
 
@@ -55,7 +55,7 @@ public:
 
 
 
-                main = new QWidget();
+                main = new QWidget(parent);
                 main->showFullScreen();
                 main->resize(QApplication::desktop()->screenGeometry().width(), QApplication::desktop()->screenGeometry().height());
                 cam = new Camera(0, 0, main->width(), main->height());
@@ -76,7 +76,7 @@ public:
 #ifdef _WIN32
                 drawer->resize(main->width(), main->height()-1);
                 p = new QPalette( main->palette() );
-                p.setColor( QPalette::Window, Qt::black );
+                p->setColor( QPalette::Window, Qt::black );
                 main->setPalette( *p );
 #else
                 drawer->resize(main->width(), main->height());
@@ -98,6 +98,16 @@ public:
                 lower->insertWidget(1, label2);
                 lower->insertSpacerItem(2, space);
                 lower->setAlignment(Qt::AlignBottom);
+        }
+        void showAll() {
+                main->show();
+                label->show();
+                label2->show();
+        }
+        void hideAll() {
+                main->hide();
+                label->hide();
+                label2->hide();
         }
 };
 

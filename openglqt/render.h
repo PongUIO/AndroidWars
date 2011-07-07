@@ -1,6 +1,5 @@
-#ifndef MYGLDRAWER_H
-#define MYGLDRAWER_H
-
+#ifndef RENDER_H
+#define RENDER_H
 #include<QtGui>
 #include<qgl.h>
 #include<iostream>
@@ -39,7 +38,7 @@ public:
                 lastY = height()/2;
                 sim = simIn;
                 wld = &sim->getState().getWorld();
-                wld->getTile(5,0).mType = 1;
+                wld->getTile(5,0).setType(1);
 
 
         }
@@ -131,7 +130,7 @@ protected:
                 int ty = -cam->pos.y+cam->zoom*cam->ratio+1;
                 for (i = fx; i < tx; i++) {
                         for (j = fy; j < ty; j++) {
-                                mt = wld->getTile(i, j).mType;
+                                mt = wld->getTile(i, j).getType();
                                 glTexSubImage2D(GL_TEXTURE_2D, 0, 0,0 , data[mt].width(), data[mt].height(),  GL_RGBA, GL_UNSIGNED_BYTE, data[mt].bits() );
                                 glBindTexture(GL_TEXTURE_2D, texture[mt]);
                                 glBegin(GL_QUADS);

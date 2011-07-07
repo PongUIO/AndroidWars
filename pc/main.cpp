@@ -10,15 +10,16 @@
 #include "../util/camera.h"
 #include "menubutton.h"
 #include "Simulation.h"
-#include "gamewidget.h"
+#include "gamecontroller.h"
 
 #ifndef RATE
 #define RATE 60
 #endif
 
+GameController *test;
 
 void gameStart() {
-
+        test->showAll();
 }
 
 int main(int argc, char *argv[]) {
@@ -30,7 +31,8 @@ int main(int argc, char *argv[]) {
         gameButton->move(menu->geometry().width()/2, menu->geometry().width()/2);
         gameButton->show();
         menu->showFullScreen();
-        GameWidget *test = new GameWidget(menu);
+        test = new GameController(menu);
+        test->hideAll();
         app.exec();
         return 0;//main.exec();
 }
