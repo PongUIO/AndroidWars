@@ -9,7 +9,9 @@ INCLUDEPATH += . ../simulation
 LIBS += -L../build/ -lAWSim
 
 # Input
-HEADERS += main.h ../openglqt/render.h customlabel.h ../util/camera.h
+HEADERS += main.h ../openglqt/render.h customlabel.h ../util/camera.h \
+    menubutton.h \
+    gamewidget.h
 SOURCES += main.cpp
 QT += opengl
 
@@ -20,4 +22,6 @@ OTHER_FILES += \
     graphics/tiles/metal.png \
     graphics/temp/temp.png \
     graphics/temp/temp2.png \
-    graphics/tiles/metal2surf.png
+    graphics/tiles/metal2surf.png \
+    graphics/characters/temp.png \
+    graphics/menu/startgame.png

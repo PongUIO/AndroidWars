@@ -1,5 +1,6 @@
+#ifndef CUSTOMLABEL_H
+#define CUSTOMLABEL_H
 #include<QtGui>
-#include<iostream>
 class CustomLabel : public QLabel {
 	Q_OBJECT        // must include this if you use Qt signals/slots
 public:
@@ -14,3 +15,4 @@ protected:
                 funcPointer();
         }
 };
+#endif
