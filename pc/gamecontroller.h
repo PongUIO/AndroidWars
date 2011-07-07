@@ -55,7 +55,9 @@ public:
 		myTile.bounce = 0.0;
 		myTile.friction = 0.0;
 		db.addTile(myTile);
+		myTile.colMask = Sim::TileD::ColAll;
 		db.addTile(myTile);
+		myTile.colMask = Sim::TileD::ColAll;
 		db.addTile(myTile);
 		sim.prepareSim();
 

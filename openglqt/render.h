@@ -142,7 +142,9 @@ protected:
                                 glTexCoord2f(1,1); glVertex2f(i+1,j+1); // upper left
                                 glEnd();
                         }
+
                 }
+
                 const Sim::BotFactory::ObjVec &bots =  sim->getState().getBotFactory().getBotVector();
 
                 for (i = 0; i < bots.size(); i++) {
@@ -160,8 +162,11 @@ protected:
 
                         }
                 }
-
-
+		for (i = fx; i < tx; i++) {
+			glBegin(GL_LINES);
+			glVertex2f(i,fy); glVertex2f(i, ty);
+			glEnd();
+		}
                 glDisable(GL_TEXTURE_2D);
 		glFlush();
 		glFinish();
