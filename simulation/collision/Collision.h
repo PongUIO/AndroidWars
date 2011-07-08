@@ -8,6 +8,9 @@ namespace Sim {
 	class Collision {
 		public:
 			struct Result {
+				Result() : isCol(false)
+					{}
+				
 				Vector n;    ///< The normal in which to escape collision
 				double dist; ///< The distance along the normal to escape
 				bool isCol;  ///< If true, collision occurred

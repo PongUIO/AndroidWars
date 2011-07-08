@@ -1,8 +1,12 @@
 #include <math.h>
 
+#include "Simulation.h"
 #include "World.h"
+#include "Data.h"
+#include "data/TileD.h"
 #include "State.h"
 
+#include <stdio.h>
 namespace Sim {
 	
 	World::World(Simulation *sim) :
@@ -18,7 +22,7 @@ namespace Sim {
 		mWidth = mHeight = 32;
 		mTileSize = 1.0;
 		
-		mTileCol.startup(16.0, 4);
+		mTileCol.startup(mTileSize, 8);
 		
 		mOffScreen = Tile(0);
 		
@@ -98,18 +102,22 @@ namespace Sim {
 			for(int32_t ix = left; ix<=right; ix++) {
 				for(int32_t iy = top; iy<=bot; iy++) {
 					const Tile &t = getTile(ix,iy);
+					const TileD &tdata = mSim->getData().getTileDb().getTile(t.getType());
 					
-					Collision *tileCol = mTileCol.getTileCol(t.getColType());
+					Collision::Result cres;
 					
-					Collision::Result res = colObj->check(
-						pos+tmpRet.colRes.getOrp(), vel,
-						Vector(getCoord(ix),getCoord(iy)), colObj
-					);
+					if(tdata.colMask & TileD::ColBot) {
+						Collision *tileCol = mTileCol.getTileCol(t.getColType());
+						cres = colObj->check(
+							pos+tmpRet.colRes.getOrp(), vel,
+							Vector(getCoord(ix),getCoord(iy)), colObj
+						);
+					}
 					
-					if(res.isCol) {
+					if(cres.isCol) {
 						tmpRet.colRes.isCol = true;
-						tmpRet.colRes.n = res.n;
-						tmpRet.colRes.dist = res.dist;
+						tmpRet.colRes.n = cres.n;
+						tmpRet.colRes.dist = cres.dist;
 					}
 				} // for(iy)
 			} // for(ix)

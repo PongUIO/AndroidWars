@@ -1,15 +1,19 @@
 #include <stdio.h>
 
 #include "Bot.h"
+#include "World.h"
+#include "State.h"
 #include "Simulation.h"
 
 namespace Sim {
 	// Bot
 	//
 	//
-	Bot::Bot(uint32_t id, const Config &cfg) :
+	Bot::Bot(Simulation *sim, Collision *col, uint32_t id, const Config &cfg) :
 		mId(id),
-		mSide(cfg.side)
+		mSide(cfg.side),
+		mCol(col),
+		mSim(sim)
 	{
 		mBody.mPos = cfg.pos;
 	}
@@ -20,6 +24,13 @@ namespace Sim {
 	{
 		handleInput();
 		mBody.step(stepTime);
+		
+		World &world = mSim->getState().getWorld();
+		World::ColResult res;
+		res = world.collide(mBody.mPos, mBody.mVel, mCol);
+		if(res.colRes.isCol) {
+			mBody.mPos += res.colRes.getOrp();
+		}
 	}
 	
 	void Bot::save(Save::BasePtr &fp)
@@ -52,7 +63,13 @@ namespace Sim {
 	{
 		uint32_t id = newId();
 		
-		addObj(new Bot(id, cfg));
+		Collision::ColPoints pts;
+		pts.push_back( Vector(0,0) );
+		pts.push_back( Vector(0,1) );
+		pts.push_back( Vector(1,1) );
+		pts.push_back( Vector(1,0) );
+		
+		addObj(new Bot(mSim, new Collision(pts), id, cfg));
 		
 		return id;
 	}

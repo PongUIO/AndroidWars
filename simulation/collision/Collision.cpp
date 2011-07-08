@@ -133,7 +133,7 @@ namespace Sim {
 		Predicate predicate
 	) {
 		Collision::Result ret;
-		ret.isCol = false;
+		ret.isCol = true;
 		
 		// Relative distance between the two collision objects
 		Vector offset = mypos-theirpos;
@@ -183,7 +183,6 @@ namespace Sim {
 			}
 		} else {
 			// Normal polygon-polygon testing
-			
 			for(size_t ax=0; ax < src->mNpCount+they->mNpCount; ax++) {
 				// Select normal
 				n = Collision::getNormal(src, they, ax);
@@ -201,7 +200,6 @@ namespace Sim {
 					Collision::copyProjection(they, th_min,th_max, ax-src->mNpCount);
 				
 				Collision::computeDistance(dist, direction, my_min,my_max,th_min,th_max);
-				
 				if( predicate(dist) ) {
 					ret.isCol = false;
 					break;

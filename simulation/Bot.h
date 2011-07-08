@@ -14,6 +14,7 @@ namespace Sim {
 	class BotFactory;
 	class Bot;
 	class State;
+	class Collision;
 	
 	struct BotInput {
 		public:
@@ -64,7 +65,7 @@ namespace Sim {
 			const Body &getBody() const { return mBody; }
 			
 		private:
-			Bot(uint32_t id, const Config &cfg);
+			Bot(Simulation *sim, Collision *col, uint32_t id, const Config &cfg);
 			~Bot();
 			
 			/// @name Interaction
@@ -97,6 +98,9 @@ namespace Sim {
 			/// @name Physical
 			//@{
 				Body mBody;
+				
+				Collision *mCol;
+				Simulation *mSim;
 			//@}
 			
 			friend class BotFactory;

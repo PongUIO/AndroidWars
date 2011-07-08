@@ -32,16 +32,36 @@ namespace Sim {
 					MaxSide
 				};
 				
+				enum BitCount {
+					SideBits = 2,
+					SlopeBits = 3
+				};
+				
+				enum BitOffset {
+					SideBO = 0,
+					SlopeLBO = SideBits,
+					SlopeRBO = SideBits+SlopeBits
+				};
+				
+				enum BitMask {
+					SideBM   = 0x03,
+					SlopeLBM = 0x1C,
+					SlopeRBM = 0xE0,
+				};
+				
 				TileType(SideType side, uint8_t a, uint8_t b)
 					{
-						data  = side   & 0x03;
-						data |= (a<<2) & 0x1C;
-						data |= (b<<5) & 0xE0; 
+						data  = (side<<SideBO)   & SideBM;
+						data |= (a   <<SlopeLBO) & SlopeLBM;
+						data |= (b   <<SlopeRBO) & SlopeRBM; 
 					}
 				
-				uint8_t getSide()   const { return (data&0x03) >> 0; }
-				uint8_t getSlopeL() const { return (data&0x1C) >> 2; }
-				uint8_t getSlopeR() const { return (data&0xE0) >> 5; }
+				uint8_t getSide()   const
+				{ return (data&SideBM)   >> SideBO; }
+				uint8_t getSlopeL() const
+				{ return (data&SlopeLBM) >> SlopeLBO; }
+				uint8_t getSlopeR() const
+				{ return (data&SlopeRBM) >> SlopeRBO; }
 				
 				uint8_t data;
 			};
@@ -49,7 +69,7 @@ namespace Sim {
 			TileCol();
 			~TileCol();
 			
-			void startup(double tileSize, uint32_t slopeRes);
+			void startup(double tileSize, int slopeRes);
 			void shutdown();
 			
 			Collision *getTileCol(const TileType &type);
