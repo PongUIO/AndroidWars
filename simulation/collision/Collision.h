@@ -3,6 +3,7 @@
 
 #include <vector>
 #include "../Vector.h"
+#include "../Save.h"
 
 namespace Sim {
 	class Collision {
@@ -31,18 +32,20 @@ namespace Sim {
 			~Collision();
 			
 			Result check(const Vector &mypos, const Vector &myvel,
-				const Vector &theirpos, Collision *they);
+				const Vector &theirpos, const Collision *they) const;
 			Result checkClose(const Vector &mypos, const Vector &myvel,
-				const Vector &theirpos, Collision *they, double dist);
+				const Vector &theirpos, const Collision *they, double dist) const;
 			RayResult checkRay(const Vector &mypos,
-				const Vector &rayStart, const Vector &rayEnd);
+				const Vector &rayStart, const Vector &rayEnd) const;
 			
-			Vector getBboxLow() { return bbLow; }
-			Vector getBboxHigh() { return bbHigh; }
+			Vector getBboxLow() const { return bbLow; }
+			Vector getBboxHigh() const { return bbHigh; }
+			
+			void checksum(Save::SyncPtr& sync) const;
 			
 		private:
 			bool pointOnCol(const Vector &pt, size_t ignoreAx,
-				const Vector &dir);
+				const Vector &dir) const;
 			
 			void generateNormals();
 			void generateBbox();

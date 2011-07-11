@@ -3,12 +3,15 @@
 
 #include "Save.h"
 #include "data/TileD.h"
+#include "data/BotD.h"
+#include "collision/TileCol.h"
 
 namespace Sim {
+	class Simulation;
 	
 	class Data {
 		public:
-			Data();
+			Data(Simulation *sim);
 			~Data();
 			
 			void startup();
@@ -17,10 +20,20 @@ namespace Sim {
 			TileDatabase &getTileDb()
 			{ return mTile; }
 			
+			BotDatabase &getBotDb()
+			{ return mBot; }
+			
+			TileCol &getTileCol()
+			{ return mTileCol; }
+			
 			void checksum(Save::SyncPtr &sync);
 			
 		private:
 			TileDatabase mTile;
+			BotDatabase mBot;
+			TileCol mTileCol;
+			
+			Simulation *mSim;
 	};
 }
 

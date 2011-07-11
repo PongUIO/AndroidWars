@@ -236,7 +236,7 @@ namespace Sim {
 	
 	Collision::Result Collision::check(
 		const Vector& mypos, const Vector& myvel,
-		const Vector& theirpos, Collision* they)
+		const Vector& theirpos, const Collision* they) const
 	{
 		static GreaterEqPred pred;
 		return checkPredicate<>(this, mypos, myvel, theirpos, they, pred);
@@ -248,8 +248,8 @@ namespace Sim {
 	 */
 	Collision::Result Collision::checkClose(
 		const Vector& mypos, const Vector& myvel,
-		const Vector& theirpos, Collision* they,
-		double dist)
+		const Vector& theirpos, const Collision* they,
+		double dist) const
 	{
 		static DistancePred dpred(dist);
 		
@@ -261,7 +261,7 @@ namespace Sim {
 	 * use in determining if a ray intersection hits.
 	 */
 	bool Collision::pointOnCol(
-		const Vector& pt, size_t ignoreAx, const Vector& dir)
+		const Vector& pt, size_t ignoreAx, const Vector& dir) const
 	{
 		for(size_t ax=0; ax<mNpCount; ax++) {
 			if(ax == ignoreAx)
@@ -290,7 +290,7 @@ namespace Sim {
 	 */
 	Collision::RayResult Collision::checkRay(
 		const Vector& mypos,
-		const Vector& rayStart, const Vector& rayEnd)
+		const Vector& rayStart, const Vector& rayEnd) const
 	{
 		RayResult ret;
 		ret.isCol = false;
@@ -334,4 +334,11 @@ namespace Sim {
 		return ret;
 	}
 	
+	void Collision::checksum(Save::SyncPtr& sync) const
+	{
+		sync.writeInt(mNpCount);
+		for(size_t i=0; i<mNpCount; i++) {
+			sync.writeVec(mPoints[i]);
+		}
+	}
 }

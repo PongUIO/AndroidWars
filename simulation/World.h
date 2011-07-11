@@ -7,6 +7,7 @@
 
 #include "collision/Collision.h"
 #include "collision/TileCol.h"
+
 #include "Save.h"
 
 namespace Sim {
@@ -70,7 +71,7 @@ namespace Sim {
 				ColResult collide(
 					const Vector &pos,
 					const Vector &vel,
-					Collision *colObj);
+					const Collision *colObj);
 			//@}
 			
 			void startPhase();
@@ -96,8 +97,6 @@ namespace Sim {
 			
 			TileVec mData;
 			Tile mOffScreen;
-			
-			TileCol mTileCol;
 			
 			Simulation *mSim;
 	};

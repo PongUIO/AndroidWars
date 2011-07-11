@@ -27,6 +27,8 @@ add_library(AWSim
 	Save.cpp
 	World.cpp
 	
+	data/BotD.cpp
+	
 	collision/Collision.cpp
 	collision/TileCol.cpp
 	)

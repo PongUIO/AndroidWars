@@ -8,8 +8,18 @@
 
 namespace Sim {
 	struct Configuration {
+		Configuration() :
+			phaseLength(100),
+			stepTime(0.01),
+			
+			tileSize(1.0)
+			{}
+		
 		uint32_t phaseLength;  ///< Number of steps in a simulation phase
 		double stepTime;       ///< Duration of a single simulation step
+		
+		double tileSize;       ///< Size of each world tile
+		
 	};
 	
 	class Simulation {
@@ -47,6 +57,9 @@ namespace Sim {
 				
 				Data &getData()
 				{ return mData; }
+				
+				const Configuration &getConfig()
+				{ return config; }
 			//@}
 			
 			/// @name Checksum, saving, and loading

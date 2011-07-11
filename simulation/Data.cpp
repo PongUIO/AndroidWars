@@ -1,7 +1,8 @@
 #include "Data.h"
+#include "Simulation.h"
 
 namespace Sim {
-	Data::Data()
+	Data::Data(Simulation *sim) : mSim(sim)
 	{}
 	
 	Data::~Data()
@@ -9,11 +10,15 @@ namespace Sim {
 	
 	void Data::startup()
 	{
+		const Configuration &cfg = mSim->getConfig();
+		
 		mTile.startup();
+		mTileCol.startup(cfg.tileSize, 8);
 	}
 	
 	void Data::shutdown()
 	{
+		mTileCol.shutdown();
 		mTile.shutdown();
 	}
 	

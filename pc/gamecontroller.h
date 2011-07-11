@@ -36,9 +36,23 @@ public:
 
 		Sim::Player testSide;
 		sim.getState().getPlayerData().addPlayer(testSide);
+		
+		Sim::BotD myBot;
+		myBot.baseSpeed = 1.0;
+		myBot.baseWeight = 75.0;
+		
+		Sim::Collision::ColPoints cpts;
+		cpts.push_back(Sim::Vector(0,0));
+		cpts.push_back(Sim::Vector(0,1));
+		cpts.push_back(Sim::Vector(1,1));
+		cpts.push_back(Sim::Vector(1,0));
+		
+		sim.getData().getBotDb().addBot(myBot, cpts);
+		
 		// Create a test bot
 		Sim::Bot::Config botCfg;
 		botCfg.side = 0;
+		botCfg.type = 0;
 		botCfg.pos = Sim::Vector(0,0);
 		uint32_t botId = sim.getState().getBotFactory().createBot( botCfg );
 
@@ -47,7 +61,7 @@ public:
 		Sim::BotInput bi;
 		bi = Sim::BotInput::inMove(botId, 20, Sim::Vector(1,0) );
 		botFact.getInput().addInput( bi );
-
+		
 		Sim::TileDatabase &db = sim.getData().getTileDb();
 		Sim::TileD myTile;
 		myTile.colMask = 0;
@@ -59,6 +73,7 @@ public:
 		db.addTile(myTile);
 		myTile.colMask = Sim::TileD::ColAll;
 		db.addTile(myTile);
+		
 		sim.prepareSim();
 
 

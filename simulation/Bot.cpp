@@ -9,13 +9,15 @@ namespace Sim {
 	// Bot
 	//
 	//
-	Bot::Bot(Simulation *sim, Collision *col, uint32_t id, const Config &cfg) :
+	Bot::Bot(Simulation *sim, uint32_t id, const Config &cfg) :
 		mId(id),
 		mSide(cfg.side),
-		mCol(col),
+		mType(cfg.type),
 		mSim(sim)
 	{
 		mBody.mPos = cfg.pos;
+		
+		mTypePtr = &mSim->getData().getBotDb().getBot(mType);
 	}
 	
 	Bot::~Bot() {}
@@ -27,7 +29,7 @@ namespace Sim {
 		
 		World &world = mSim->getState().getWorld();
 		World::ColResult res;
-		res = world.collide(mBody.mPos, mBody.mVel, mCol);
+		res = world.collide(mBody.mPos, mBody.mVel, mTypePtr->getCollision());
 		if(res.colRes.isCol) {
 			mBody.mPos += res.colRes.getOrp();
 		}
@@ -63,13 +65,7 @@ namespace Sim {
 	{
 		uint32_t id = newId();
 		
-		Collision::ColPoints pts;
-		pts.push_back( Vector(0,0) );
-		pts.push_back( Vector(0,1) );
-		pts.push_back( Vector(1,1) );
-		pts.push_back( Vector(1,0) );
-		
-		addObj(new Bot(mSim, new Collision(pts), id, cfg));
+		addObj(new Bot(mSim, id, cfg));
 		
 		return id;
 	}

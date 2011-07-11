@@ -20,9 +20,7 @@ namespace Sim {
 	void World::startup()
 	{
 		mWidth = mHeight = 32;
-		mTileSize = 1.0;
-		
-		mTileCol.startup(mTileSize, 8);
+		mTileSize = mSim->getConfig().tileSize;
 		
 		mOffScreen = Tile(0);
 		
@@ -35,8 +33,6 @@ namespace Sim {
 	void World::shutdown()
 	{
 		mData.clear();
-		
-		mTileCol.shutdown();
 	}
 	
 	void World::startPhase()
@@ -73,9 +69,13 @@ namespace Sim {
 		}
 	}
 	
-	World::ColResult World::collide(const Vector& pos, const Vector& vel, Collision* colObj)
+	World::ColResult World::collide(
+		const Vector& pos, const Vector& vel,
+		const Collision* colObj)
 	{
 		static const int MaxIter = 4;
+		
+		TileCol &tcolData = mSim->getData().getTileCol();
 		
 		World::ColResult tmpRet, res;
 		tmpRet.colRes.isCol = false;
@@ -107,7 +107,7 @@ namespace Sim {
 					Collision::Result cres;
 					
 					if(tdata.colMask & TileD::ColBot) {
-						Collision *tileCol = mTileCol.getTileCol(t.getColType());
+						Collision *tileCol = tcolData.getTileCol(t.getColType());
 						cres = colObj->check(
 							pos+tmpRet.colRes.getOrp(), vel,
 							Vector(getCoord(ix),getCoord(iy)), colObj

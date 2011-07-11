@@ -13,6 +13,7 @@ namespace Sim {
 	class Simulation;
 	class BotFactory;
 	class Bot;
+	class BotD;
 	class State;
 	class Collision;
 	
@@ -57,6 +58,7 @@ namespace Sim {
 		public:
 			struct Config {
 				uint32_t side;
+				uint32_t type;
 				
 				Vector pos;
 			};
@@ -65,7 +67,7 @@ namespace Sim {
 			const Body &getBody() const { return mBody; }
 			
 		private:
-			Bot(Simulation *sim, Collision *col, uint32_t id, const Config &cfg);
+			Bot(Simulation *sim, uint32_t id, const Config &cfg);
 			~Bot();
 			
 			/// @name Interaction
@@ -80,6 +82,7 @@ namespace Sim {
 			//@{
 				uint32_t mId;
 				uint32_t mSide;
+				uint32_t mType;
 			//@}
 			
 			/// @name Input
@@ -99,7 +102,7 @@ namespace Sim {
 			//@{
 				Body mBody;
 				
-				Collision *mCol;
+				const BotD *mTypePtr;
 				Simulation *mSim;
 			//@}
 			

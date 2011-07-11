@@ -34,7 +34,7 @@ namespace Sim {
 			{ mData.clear(); }
 			
 			const TileD &getTile(uint16_t type) const
-			{ return mData[type]; }
+			{ return mData.at(type); }
 			
 			uint16_t addTile(const TileD &tile)
 			{ mData.push_back(tile); return mData.size()-1; }

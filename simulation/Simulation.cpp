@@ -5,7 +5,7 @@ namespace Sim {
 	Simulation::Simulation() :
 		mStateActive(this),
 		mStateCopy(this),
-		mData()
+		mData(this)
 		{}
 	
 	Simulation::~Simulation()
