@@ -99,6 +99,9 @@ namespace Sim {
 					
 					void writeVec(const Vector &v)
 					{ writeFloat(v.x); writeFloat(v.y); }
+					
+					Vector readVec()
+					{ return Vector(readFloat(),readFloat()); }
 			};
 			
 			class FilePtr : public BasePtr {

@@ -27,7 +27,7 @@ namespace Sim {
 			
 			sync.writeFloat(d.baseSpeed);
 			sync.writeFloat(d.baseWeight);
-			d.getCollision()->checksum(sync);
+			d.getCollision()->save(sync);
 		}
 	}
 }

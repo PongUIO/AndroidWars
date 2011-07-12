@@ -334,11 +334,24 @@ namespace Sim {
 		return ret;
 	}
 	
-	void Collision::checksum(Save::SyncPtr& sync) const
+	void Collision::save(Save::BasePtr& fp) const
 	{
-		sync.writeInt(mNpCount);
+		fp.writeInt(mNpCount);
 		for(size_t i=0; i<mNpCount; i++) {
-			sync.writeVec(mPoints[i]);
+			fp.writeVec(mPoints[i]);
 		}
 	}
+	
+	Collision::ColPoints Collision::load(Save::BasePtr& fp)
+	{
+		ColPoints pts;
+		size_t ptCount = fp.readInt<size_t>();
+		
+		pts.reserve(ptCount);
+		for(size_t i=0; i<ptCount; i++)
+			pts.push_back( fp.readVec() );
+		
+		return pts;
+	}
+	
 }

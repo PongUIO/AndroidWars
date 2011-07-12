@@ -41,7 +41,8 @@ namespace Sim {
 			Vector getBboxLow() const { return bbLow; }
 			Vector getBboxHigh() const { return bbHigh; }
 			
-			void checksum(Save::SyncPtr& sync) const;
+			void save(Save::BasePtr& fp) const;
+			static ColPoints load(Save::BasePtr& fp);
 			
 		private:
 			bool pointOnCol(const Vector &pt, size_t ignoreAx,
