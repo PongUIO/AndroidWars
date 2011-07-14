@@ -19,7 +19,8 @@ namespace Sim {
 	
 	void World::startup()
 	{
-		mWidth = mHeight = 32;
+		mWidth = 320;
+		mHeight = 64;
 		mTileSize = mSim->getConfig().tileSize;
 		
 		mOffScreen = Tile(0);

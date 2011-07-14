@@ -22,8 +22,8 @@ namespace Sim {
 		mTile.shutdown();
 	}
 	
-	void Data::checksum(Save::SyncPtr &sync)
+	void Data::save(Save::BasePtr &fp)
 	{
-		mTile.checksum(sync);
+		mTile.save(fp);
 	}
 }

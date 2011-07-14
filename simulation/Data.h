@@ -26,7 +26,7 @@ namespace Sim {
 			TileCol &getTileCol()
 			{ return mTileCol; }
 			
-			void checksum(Save::SyncPtr &sync);
+			void save(Save::BasePtr &sync);
 			
 		private:
 			TileDatabase mTile;

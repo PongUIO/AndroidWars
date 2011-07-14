@@ -39,14 +39,15 @@ namespace Sim {
 			uint16_t addTile(const TileD &tile)
 			{ mData.push_back(tile); return mData.size()-1; }
 			
-			void checksum(Save::SyncPtr &sync) {
+			void save(Save::BasePtr &fp) {
+				fp.writeInt<uint32_t>(mData.size());
 				for(TileVec::iterator i=mData.begin(); i!=mData.end(); i++) {
 					TileD &t = *i;
 					
-					sync.writeInt(t.colMask);
-					sync.writeFloat(t.blastResist);
-					sync.writeFloat(t.bounce);
-					sync.writeFloat(t.friction);
+					fp.writeInt(t.colMask);
+					fp.writeFloat(t.blastResist);
+					fp.writeFloat(t.bounce);
+					fp.writeFloat(t.friction);
 				}
 			}
 			

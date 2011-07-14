@@ -81,6 +81,7 @@ namespace Sim {
 			/// @name State
 			//@{
 				void save(Save::BasePtr &fp);
+				
 				void copyState(State &state);
 			//@}
 			

@@ -133,19 +133,24 @@ namespace Sim {
 				private:
 					void nanoWrite(const uint8_t *ptr, uint32_t bytes)
 					{
-						cksum.process_bytes(ptr, bytes);
+						mCksum.process_bytes(ptr, bytes);
+						mSize += bytes;
 					}
 					
 					void nanoRead(uint8_t *ptr, uint32_t bytes)
 						{}
 					
-					boost::crc_32_type cksum;
+					boost::crc_32_type mCksum;
+					uint32_t mSize;
 				public:
-					SyncPtr()
+					SyncPtr() : mSize(0)
 						{}
 					
 					uint32_t checksum()
-					{ return cksum.checksum(); }
+					{ return mCksum.checksum(); }
+					
+					uint32_t size()
+					{ return mSize; }
 			};
 		
 	};

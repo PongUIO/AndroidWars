@@ -64,7 +64,7 @@ namespace Sim {
 	uint32_t Simulation::checksumData()
 	{
 		Save::SyncPtr sync = Save::SyncPtr();
-		mData.checksum(sync);
+		mData.save(sync);
 		return sync.checksum();
 	}
 	
