@@ -6,6 +6,8 @@
 #include "../Save.h"
 #include "../collision/Collision.h"
 
+#include "BaseData.h"
+
 namespace Sim {
 	class Collision;
 	class BotDatabase;
@@ -26,25 +28,24 @@ namespace Sim {
 			friend class BotDatabase;
 	};
 	
-	class BotDatabase {
+	class BotDatabase : public DataT<BotD> {
 		public:
 			BotDatabase() {}
-			~BotDatabase() {}
+			virtual ~BotDatabase() {}
 			
-			void startup(uint32_t numTypes=1)
-			{ mData.reserve(numTypes); }
-			
-			void shutdown();
-			
-			const BotD &getBot(uint32_t type) const
-			{ return mData.at(type); }
-			
-			uint32_t addBot(const BotD &bot, const Collision::ColPoints &pts)
-			{	mData.push_back(bot);
-				BotD &newBot = mData.back();
-				newBot.collision = new Collision(pts);
-			
-				return mData.size()-1; }
+			/// @name Compatibility layer
+			//@{
+				const BotD &getBot(uint32_t type) const
+				{ return getType(type); }
+				
+				uint32_t addBot(const BotD &bot, const Collision::ColPoints &pts)
+				{	mData.push_back(bot);
+					BotD &newBot = mData.back();
+					newBot.collision = new Collision(pts);
+				
+					return addType(newBot);
+				}
+			//@}
 			
 			void checksum(Save::SyncPtr &sync);
 			

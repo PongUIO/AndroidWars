@@ -31,6 +31,8 @@ add_library(AWSim
 	
 	collision/Collision.cpp
 	collision/TileCol.cpp
+	
+	#bullet/BulletSys/Reference.cpp
 	)
 
 add_executable(SimTest

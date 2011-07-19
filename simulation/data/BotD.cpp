@@ -15,11 +15,6 @@ namespace Sim {
 			delete collision;
 	}
 	
-	void BotDatabase::shutdown()
-	{
-		mData.clear();
-	}
-
 	void BotDatabase::checksum(Save::SyncPtr& sync)
 	{
 		for(BotVec::iterator i=mData.begin(); i!=mData.end(); i++) {

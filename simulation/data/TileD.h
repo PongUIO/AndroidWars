@@ -5,6 +5,8 @@
 #include <stdint.h>
 #include "../Save.h"
 
+#include "BaseData.h"
+
 namespace Sim {
 	struct TileD {
 		enum ColMask {
@@ -22,22 +24,19 @@ namespace Sim {
 		double friction;     ///< The friction for the tile
 	};
 	
-	class TileDatabase {
+	class TileDatabase : public DataT<TileD,uint16_t> {
 		public:
 			TileDatabase() {}
-			~TileDatabase() {}
+			virtual ~TileDatabase() {}
 			
-			void startup(uint16_t numTypes=1)
-			{ mData.reserve(numTypes); }
-			
-			void shutdown()
-			{ mData.clear(); }
-			
-			const TileD &getTile(uint16_t type) const
-			{ return mData.at(type); }
-			
-			uint16_t addTile(const TileD &tile)
-			{ mData.push_back(tile); return mData.size()-1; }
+			/// @name Compatibility layer
+			//@{
+				const TileD &getTile(uint16_t type) const
+				{ return getType(type); }
+				
+				uint16_t addTile(const TileD &tile)
+				{ return addType(tile); }
+			//@}
 			
 			void save(Save::BasePtr &fp) {
 				fp.writeInt<uint32_t>(mData.size());
