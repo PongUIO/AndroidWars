@@ -24,7 +24,6 @@ void gameStart() {
 
 int main(int argc, char *argv[]) {
         QApplication app(argc, argv);
-        int *currentChoice = new int(0);
         QWidget *menu = new QWidget();
         CustomLabel *gameButton = new CustomLabel(&gameStart, menu);
         gameButton->setPixmap(QPixmap(":/graphics/menu/startgame.png"));
@@ -34,5 +33,8 @@ int main(int argc, char *argv[]) {
         test = new GameController(menu);
         test->hideAll();
         app.exec();
+        delete test;
+        delete gameButton;
+        delete menu;
         return 0;//main.exec();
 }

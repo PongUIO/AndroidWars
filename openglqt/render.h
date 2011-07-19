@@ -69,7 +69,7 @@ protected:
         {
                 // Set up the rendering context, define display lists etc.:
                 glClearColor( 0.0, 0.0, 0.0, 0.0 );
-                glEnable(GL_DEPTH_TEST | GL_DOUBLE);
+		glEnable(GL_DEPTH_TEST | GL_DOUBLE);
 		data[0].load(":/graphics/tiles/empty.png");
 		texture[0] = bindTexture(data[0].scaled(64,64));
 		data[1].load(":/graphics/tiles/metal.png");
@@ -133,6 +133,9 @@ protected:
                 for (i = fx; i < tx; i++) {
                         for (j = fy; j < ty; j++) {
                                 mt = wld->getTile(i, j).getType();
+                                if (mt == 0) {
+                                        continue;
+                                }
                                 glTexSubImage2D(GL_TEXTURE_2D, 0, 0,0 , data[mt].width(), data[mt].height(),  GL_RGBA, GL_UNSIGNED_BYTE, data[mt].bits() );
                                 glBindTexture(GL_TEXTURE_2D, texture[mt]);
                                 glBegin(GL_QUADS);
@@ -151,22 +154,33 @@ protected:
                         Sim::Bot *bot = bots[i];
                         if (bot != NULL) {
                                 Sim::Vector vec = bot->getBody().mPos;
-                                glTexSubImage2D(GL_TEXTURE_2D, 0, 0,0 , characters[mt].width(), characters[mt].height(),  GL_RGBA, GL_UNSIGNED_BYTE, characters[mt].bits() );
-                                glBindTexture(GL_TEXTURE_2D, chartexture[0]);
+				glTexSubImage2D(GL_TEXTURE_2D, 0, 0,0 , characters[mt].width(), characters[mt].height(),  GL_RGBA, GL_UNSIGNED_BYTE, characters[mt].bits() );
+				glBindTexture(GL_TEXTURE_2D, chartexture[0]);
                                 glBegin(GL_QUADS);
                                 glTexCoord2f(0,1); glVertex2f(vec.x,vec.y + 1.8);  // lower left
                                 glTexCoord2f(0,0); glVertex2f(vec.x,vec.y); // lower right
                                 glTexCoord2f(1,0); glVertex2f(vec.x+1,vec.y);// upper right
                                 glTexCoord2f(1,1); glVertex2f(vec.x+1,vec.y+1.8); // upper left
                                 glEnd();
+				glDisable(GL_TEXTURE_2D);
+				glEnable(GL_BLEND);
+				glBindTexture(GL_TEXTURE_2D, 0);
+				glBlendFunc(GL_ONE, GL_ONE);//GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+				glBegin(GL_QUADS);
+				glColor3f(0.0,1.0,1.0);
+				glVertex2f(vec.x,vec.y + 1.8);
+				glVertex2f(vec.x,vec.y);
+				glVertex2f(vec.x+1,vec.y);
+				glVertex2f(vec.x+1,vec.y+1.8);
+				glEnd();
+				glBlendFunc(GL_ONE, GL_ZERO);
+				glDisable(GL_BLEND);
+				glEnable(GL_TEXTURE_2D);
+				glColor3f(1.0,1.0,1.0);
 
                         }
                 }
-		for (i = fx; i < tx; i++) {
-			glBegin(GL_LINES);
-			glVertex2f(i,fy); glVertex2f(i, ty);
-			glEnd();
-		}
                 glDisable(GL_TEXTURE_2D);
 		glFlush();
 		glFinish();
