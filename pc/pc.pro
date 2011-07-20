@@ -25,4 +25,5 @@ OTHER_FILES += \
     graphics/temp/temp2.png \
     graphics/tiles/metal2surf.png \
     graphics/characters/temp.png \
-    graphics/menu/startgame.png
+    graphics/menu/startgame.png \
+    graphics/weapons/testweapon.png
