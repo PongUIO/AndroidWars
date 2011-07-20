@@ -13,7 +13,7 @@ public:
                 zoom = 1;
                 ratio = yres/xres;
                 zoomfriction = 0.99;
-                panfriction = 0.99;
+                panfriction = 0.97;
         }
         virtual ~Camera() {}
 

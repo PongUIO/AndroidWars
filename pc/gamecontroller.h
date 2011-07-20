@@ -6,7 +6,7 @@
 #include "customlabel.h"
 #include "gamebutton.h"
 
-#define RATE 60
+#define RATE 20
 
 void something() {
 	qDebug() << "works.";
@@ -88,7 +88,7 @@ public:
 		glTimer->start(0);
 
 		camTimer = new QTimer(main);
-		drawer->connect(camTimer, SIGNAL(timeout()), drawer, SLOT(moveMouseCheck()));
+                drawer->connect(camTimer, SIGNAL(timeout()), drawer, SLOT(moveMouseCheck()));
 		camTimer->start(1./RATE);
 
 		lower = new QHBoxLayout(main);

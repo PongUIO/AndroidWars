@@ -116,7 +116,6 @@ protected:
         // overridden
         void paintGL()
         {
-                moveMouseCheck();
                 cam->iter();
                 int i, j;
                 glClear(GL_COLOR_BUFFER_BIT);

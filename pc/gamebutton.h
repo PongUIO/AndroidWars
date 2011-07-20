@@ -14,8 +14,8 @@ public:
 	}
 protected:
 	// overridden
-	void mousePressEvent(QMouseEvent * event) {
-		if (func == 0) {
+        void mousePressEvent(QMouseEvent * event) {
+                if (func == 0) {
 			sim->startPhase();
 			while( sim->hasPhaseStep() ) {
 				sim->step();
