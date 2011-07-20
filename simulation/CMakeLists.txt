@@ -32,12 +32,19 @@ add_library(AWSim
 	collision/Collision.cpp
 	collision/TileCol.cpp
 	
+	statesys/StateSys.cpp
+	statesys/Reference.cpp
+	
 	#bullet/BulletSys/Reference.cpp
 	)
 
 add_executable(SimTest
 	test/simtest.cpp)
 
+add_executable(StateTest
+	test/statetest.cpp)
+
 target_link_libraries(SimTest AWSim)
+target_link_libraries(StateTest AWSim)
 
 set(CMAKE_EXE_LINKER_FLAGS ${LINKFLAGS})

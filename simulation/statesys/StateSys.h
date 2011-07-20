@@ -1,7 +1,10 @@
-#ifndef SIM_BULLETSYS_H
-#define SIM_BULLETSYS_H
+#ifndef SIM_STATESYS_H
+#define SIM_STATESYS_H
+
+#include <boost/any.hpp>
 
 #include <vector>
+#include <list>
 #include <stdint.h>
 
 namespace Sim {
@@ -9,17 +12,15 @@ namespace Sim {
 	class Simulation;
 	
 	/**
-	 * Defines a bullet state system.
-	 * 
-	 * This system stores behaviours for a bullet state
+	 * Defines a state system.
 	 */
-	class BulletSys {
+	class StateSys {
 		public:
 			class State;
-			class Thread;
 			class Reference;
+			typedef uint32_t IdType;
 			typedef std::vector<State*> StateVec;
-			typedef std::vector<uint32_t> EntryPointVec;
+			typedef std::vector<IdType> IdVec;
 			
 			/**
 			 * Defines a reference to a bullet state system.
@@ -28,12 +29,6 @@ namespace Sim {
 			 */
 			class Reference {
 				public:
-					Reference(Simulation *sim, BulletSys *sys);
-					~Reference();
-					
-					void startThread(uint32_t entryId);
-					
-				private:
 					/**
 					 * Defines a thread.
 					 * 
@@ -41,12 +36,31 @@ namespace Sim {
 					 * references.
 					 */
 					struct Thread {
+						Thread(Reference *ref=0, State *state=NULL,
+							   IdType type=0,
+							   const boost::any &arg=boost::any());
+						
+						Reference *mHost;
 						State *mActive;
+						double mDelay;
+						IdType mEntryType;
+						boost::any mArg;
 					};
+					typedef std::list<Thread> ThreadList;
 					
-					Simulation *mSim;
-					BulletSys *mSystem;
-					State *mActive;
+					// Functions
+					Reference(StateSys *sys);
+					~Reference();
+					
+					void startThread(
+						IdType entryId,
+						const boost::any &arg=boost::any()
+						);
+					void exec(double delta);
+					
+				private:
+					StateSys *mSystem;
+					ThreadList mThreads;
 					
 					friend class Thread;
 			};
@@ -60,70 +74,65 @@ namespace Sim {
 					State() {}
 					virtual ~State() {}
 					
-					/**
-					 * Executes this state for the input reference.
-					 */
-					virtual void exec(Reference &ref)=0;
+					/// Executes this state for the input thread.
+					virtual void exec(Reference::Thread &thread)=0;
 					
-					size_t insertChild(State *child)
-					{
-						mStates.push_back(child);
-						return mStates.size()-1;
-					}
+					IdType insertChild(State *child);
 					
 				protected:
-					void nextState(Reference &ref, size_t id=0)
-					{ ref.setActive(mStates[id]); }
+					State *nextState(IdType id=0)
+					{ return mStates.at(id); }
 					
 					StateVec mStates;
 					
 				private:
-					/**
-					 * Initializes this state, called by \c BulletSys
-					 * when it is initialized.
-					 */
-					virtual void init(BulletSys &sys) {}
+					/// Initializes this state, called by \c StateSys
+					/// when it is initialized.
+					virtual void init(StateSys &sys) {}
+					
+					friend class StateSys;
 			};
 			
 			// Functions
-			BulletSys();
-			~BulletSys();
+			StateSys();
+			~StateSys();
 			
 			/// Performs finishing touches when the system
 			/// is fully created.
 			void finalize();
 			
 			/// Registers a bullet state and returns its ID.
-			uint32_t registerState(State *state);
-			void registerEntryPoint(uint32_t entry);
+			IdType registerState(State *state);
 			
-			/**
-			 * Sets the root state for this state system.
-			 * 
-			 * The root state is the entry-node where new references
-			 * start processing.
-			 */
-			void setRoot(State *root) { mRoot = root; }
-			State *getRoot() { return mRoot; }
+			/// Registers a state as an entry point
+			/// @return The id of this entry point
+			IdType registerEntryPoint(IdType entry);
 			
-			State *getState(size_t id) { return mStates.at(id); }
+			State *getState(IdType id) { return mStates.at(id); }
+			State *getEntry(IdType entryId)
+			{ return mStates.at(mEntry.at(entryId)); }
 			
 		private:
-			State *mRoot;
 			StateVec mStates;
-			EntryPointVec mEntry;
+			IdVec mEntry;
 			
 			friend class State;
 	};
 	
 	// Default bullet system behaviours
-	namespace BSys {
+	namespace StdState {
 		/// @note Unfinished implementation
-		class Delay : public BulletSys::State {
+		class Delay : public StateSys::State {
 			public:
-				void exec(BulletSys::Reference &ref ) {
-					nextState(ref);
+				Delay(double t) : mTime(t) {}
+				
+				void exec(StateSys::Reference::Thread &thread ) {
+					thread.mDelay += mTime;
+					thread.mActive = nextState();
 				}
+				
+			private:
+				double mTime;
 		};
 		
 		/// @note Currently implemented states:
