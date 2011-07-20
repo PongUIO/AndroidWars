@@ -13,20 +13,20 @@ public:
                 zoom = 1;
                 ratio = yres/xres;
                 zoomfriction = 0.99;
-                panfriction = 0.97;
+                panfriction = 0.9;
         }
         virtual ~Camera() {}
 
 
         void addVel(double x, double y) {
-                delta += Sim::Vector(x, y);
+                delta += Sim::Vector(x, y)/2;
         }
         void modZoom(double mod) {
                 dzoom += mod;
         }
 
         void iter() {
-                pos += delta;
+                pos += delta*zoom;
                 delta *= panfriction;
                 zoom *= dzoom + 1;
                 dzoom *= zoomfriction;
