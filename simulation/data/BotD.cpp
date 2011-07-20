@@ -17,7 +17,7 @@ namespace Sim {
 	
 	void BotDatabase::checksum(Save::SyncPtr& sync)
 	{
-		for(BotVec::iterator i=mData.begin(); i!=mData.end(); i++) {
+		for(DataVec::iterator i=mData.begin(); i!=mData.end(); i++) {
 			BotD &d = *i;
 			
 			sync.writeFloat(d.baseSpeed);

@@ -39,20 +39,16 @@ namespace Sim {
 				{ return getType(type); }
 				
 				uint32_t addBot(const BotD &bot, const Collision::ColPoints &pts)
-				{	mData.push_back(bot);
-					BotD &newBot = mData.back();
+				{
+					uint32_t id = addType(bot);
+					BotD &newBot = rawGet(id);
 					newBot.collision = new Collision(pts);
-				
-					return addType(newBot);
+					
+					return id;
 				}
 			//@}
 			
 			void checksum(Save::SyncPtr &sync);
-			
-		private:
-			typedef std::vector<BotD> BotVec;
-			
-			BotVec mData;
 	};
 }
 

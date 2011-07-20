@@ -36,6 +36,9 @@ namespace Sim {
 			{ mData.push_back(type); return IdType(mData.size()-1); }
 			
 		protected:
+			T &rawGet(IdType type)
+			{ return mData.at(type); }
+			
 			typedef std::vector<T> DataVec;
 			
 			DataVec mData;
