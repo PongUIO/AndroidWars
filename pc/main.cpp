@@ -29,7 +29,9 @@ int main(int argc, char *argv[]) {
         gameButton->setPixmap(QPixmap(":/graphics/menu/startgame.png"));
         gameButton->move(menu->geometry().width()/2, menu->geometry().width()/2);
         gameButton->show();
-        menu->showFullScreen();
+ //       menu->showFullScreen();
+        menu->resize(600,600);
+        menu->show();
         test = new GameController(menu);
         test->hideAll();
         app.exec();

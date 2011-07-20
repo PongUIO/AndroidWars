@@ -165,7 +165,8 @@ protected:
 				glDisable(GL_TEXTURE_2D);
 				glEnable(GL_BLEND);
 				glBindTexture(GL_TEXTURE_2D, 0);
-				glBlendFunc(GL_ONE, GL_ONE);//GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+				glBlendFunc(GL_ONE, GL_ONE);
+				//glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
 				glBegin(GL_QUADS);
 				glColor3f(0.0,1.0,1.0);
