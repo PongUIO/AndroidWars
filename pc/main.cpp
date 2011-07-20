@@ -3,6 +3,7 @@
 #include <QAbstractButton>
 #include <QIcon>
 #include <QDebug>
+
 #include "main.h"
 #include "ui.h"
 #include "customlabel.h"
@@ -25,13 +26,14 @@ void gameStart() {
 int main(int argc, char *argv[]) {
         QApplication app(argc, argv);
         QWidget *menu = new QWidget();
+        //menu->showFullScreen();
+        //menu->resize(QApplication::desktop()->screenGeometry().width(),QApplication::desktop()->screenGeometry().height());
+        menu->resize(700,700);
+        menu->show();
         CustomLabel *gameButton = new CustomLabel(&gameStart, menu);
         gameButton->setPixmap(QPixmap(":/graphics/menu/startgame.png"));
-        gameButton->move(menu->geometry().width()/2, menu->geometry().width()/2);
+        gameButton->move(menu->geometry().width()/2-gameButton->pixmap()->width()/2, menu->geometry().height()/2-gameButton->pixmap()->height()/2);
         gameButton->show();
- //       menu->showFullScreen();
-        menu->resize(600,600);
-        menu->show();
         test = new GameController(menu);
         test->hideAll();
         app.exec();

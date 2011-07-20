@@ -79,7 +79,7 @@ public:
 
 		main = new QWidget(parent);
 		main->showFullScreen();
-		main->resize(QApplication::desktop()->screenGeometry().width(), QApplication::desktop()->screenGeometry().height());
+                main->resize(parent->geometry().width(), parent->geometry().height());
 		cam = new Camera(0, 0, main->width(), main->height());
 		MyGLDrawer *drawer = new MyGLDrawer(cam, &sim, main);
 
@@ -104,7 +104,6 @@ public:
 		drawer->resize(main->width(), main->height());
 #endif
 		drawer->show();
-		qDebug() << drawer->height();
 
 		label = new GameButton(&sim, 0, main);
 		label2 = new CustomLabel(&something, main);
