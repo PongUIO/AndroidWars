@@ -16,10 +16,7 @@ public slots:
 
         void moveMouseCheck() {
 
-                cam->addVel((lastX > width() -10 ) * (-(lastX - width() + 10)*0.00001) +
-                            (lastX < 10) * (-(lastX-10)*0.00001),
-                            (lastY < 10) * ((lastY - 10)*0.00001) +
-                            (lastY > height() - 10) * ((lastY - height() + 10)* 0.00001));
+                cam->addVel(lastX, lastY);
         }
 
 public:
