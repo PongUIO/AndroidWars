@@ -7,28 +7,27 @@
 
 namespace Sim {
 	State::State(Simulation* sim) :
-		CallGroup<State,StateObj>(this),
 		mBotFactory(sim),
 		mWorld(sim),
 		mPlayer(),
 		mSim(sim)
-	{}
+	{
+		registerCallObj(&mBotFactory);
+		registerCallObj(&mWorld);
+		registerCallObj(&mPlayer);
+	}
 	
 	State::~State()
 	{}
 	
 	void State::startup()
 	{
-		mBotFactory.startup();
-		mWorld.startup();
-		mPlayer.startup();
+		call(&StateObj::startup);
 	}
 
 	void State::shutdown()
 	{
-		mPlayer.shutdown();
-		mWorld.shutdown();
-		mBotFactory.shutdown();
+		rcall(&StateObj::shutdown);
 	}
 	
 	void State::startPhase()
@@ -39,8 +38,7 @@ namespace Sim {
 	
 	void State::step(double stepTime)
 	{
-		mBotFactory.step(stepTime);
-		mWorld.step(stepTime);
+		callArg(&StateObj::step, stepTime);
 	}
 	
 	void State::endPhase()

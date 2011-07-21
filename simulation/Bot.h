@@ -112,7 +112,7 @@ namespace Sim {
 			friend class Factory<BotFactory,Bot>;
 	};
 	
-	class BotFactory : public Factory<BotFactory,Bot>, private StateObj {
+	class BotFactory : public Factory<BotFactory,Bot>, public StateObj {
 		public:
 			/// @name Initialization
 			//@{

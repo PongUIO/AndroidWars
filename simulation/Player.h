@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <vector>
 
+#include "StateObj.h"
+
 #include "Save.h"
 
 namespace Sim {
@@ -15,15 +17,23 @@ namespace Sim {
 		
 	};
 	
-	class PlayerData {
+	class PlayerData : public StateObj {
 		public:
 			/// @name Initialization
 			//@{
 				PlayerData();
 				~PlayerData();
-				
+			//@}
+			
+			/// @name StateObj calls
+			//@{
 				void startup();
 				void shutdown();
+				
+				void step(double stepTime);
+				
+				void copyState(State &state);
+				void save(Save::BasePtr &fp);
 			//@}
 			
 			/// @name Interface
@@ -31,13 +41,6 @@ namespace Sim {
 				void addPlayer(Player &player);
 				const Player &getPlayer(uint32_t id) const
 				{ return mData[id]; }
-			//@}
-			
-			/// @name State
-			//@{
-				void copyState(State &state);
-				
-				void save(Save::BasePtr &fp);
 			//@}
 			
 		private:

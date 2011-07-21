@@ -13,7 +13,7 @@
 namespace Sim {
 	class Simulation;
 	
-	class State : private CallGroup<State,StateObj>{
+	class State : private CallGroup<StateObj>{
 		public:
 			/// @name Initialization
 			//@{

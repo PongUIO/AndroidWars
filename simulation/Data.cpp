@@ -3,7 +3,6 @@
 
 namespace Sim {
 	Data::Data(Simulation *sim) :
-		CallGroup<Data,BaseData>(this),
 		mSim(sim)
 	{
 		registerCallObj(&mTile);
@@ -18,7 +17,7 @@ namespace Sim {
 	{
 		const Configuration &cfg = mSim->getConfig();
 		
-		call(&Data::gStartup);
+		callArg(&BaseData::startup, mSim);
 		
 		mTileCol.startup(cfg.tileSize, 8);
 	}
@@ -27,7 +26,7 @@ namespace Sim {
 	{
 		mTileCol.shutdown();
 		
-		rcall(&Data::gShutdown);
+		rcall(&BaseData::shutdown);
 	}
 	
 	void Data::save(Save::BasePtr &fp)

@@ -8,6 +8,8 @@
 #include "collision/Collision.h"
 #include "collision/TileCol.h"
 
+#include "StateObj.h"
+
 #include "Save.h"
 
 namespace Sim {
@@ -46,13 +48,23 @@ namespace Sim {
 			friend class World;
 	};
 	
-	class World {
+	class World : public StateObj {
 		public:
 			World(Simulation *sim);
 			~World();
 			
-			void startup();
-			void shutdown();
+			/// @name StateObj calls
+			//@{
+				void startup();
+				void shutdown();
+				
+				void startPhase();
+				void step(double stepTime);
+				void endPhase();
+				
+				void copyState(State &state);
+				void save(Save::BasePtr &fp);
+			//@}
 			
 			/// @name Tile information
 			//@{
@@ -72,17 +84,6 @@ namespace Sim {
 					const Vector &pos,
 					const Vector &vel,
 					const Collision *colObj);
-			//@}
-			
-			void startPhase();
-			void step(double stepTime);
-			void endPhase();
-			
-			/// @name State
-			//@{
-				void save(Save::BasePtr &fp);
-				
-				void copyState(State &state);
 			//@}
 			
 		private:

@@ -13,7 +13,7 @@
 namespace Sim {
 	class Simulation;
 	
-	class Data : private CallGroup<Data,BaseData>  {
+	class Data : private CallGroup<BaseData>  {
 		public:
 			Data(Simulation *sim);
 			~Data();
@@ -35,12 +35,6 @@ namespace Sim {
 			//@}
 			
 		private:
-			/// @name Group calls
-			//@{
-				void gStartup(BaseData *d) { d->startup(mSim); }
-				void gShutdown(BaseData *d) { d->shutdown(); }
-			//@}
-			
 			TileDatabase mTile;
 			BotDatabase mBot;
 			BulletDatabase mBullet;

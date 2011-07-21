@@ -17,6 +17,11 @@ namespace Sim {
 		mData.clear();
 	}
 	
+	void PlayerData::step(double stepTime)
+	{
+		
+	}
+	
 	void PlayerData::addPlayer(Player& side)
 	{
 		side.sideId = mData.size();
