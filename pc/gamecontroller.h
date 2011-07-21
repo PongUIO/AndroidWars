@@ -2,6 +2,7 @@
 #define GAMECONTROLLER_H
 #include<QtGui>
 #include<stdlib.h>
+#include<typeinfo>
 
 #include "Simulation.h"
 #include "../openglqt/render.h"
@@ -131,6 +132,9 @@ public:
 		lower->insertSpacerItem(2, space);
                 lower->setAlignment(Qt::AlignBottom);
                 updateGUI();
+                botCfg.pos = Sim::Vector(0,2);
+                sim.getState().getBotFactory().createBot( botCfg );
+                updateGUI();
                 upper->setAlignment(Qt::AlignTop);
 	}
 	void showAll() {
@@ -145,14 +149,13 @@ public:
 	}
 
         void updateGUI() {
-                int i = 0;
-                CustomLabel *clabel;
-                while(!upper->isEmpty()) {
-                        clabel = (CustomLabel*) upper->itemAt(i);
-                        upper->removeWidget(clabel);
-                        i++;
+                QLayoutItem *temp;
+                while ((temp = upper->takeAt(0))) {
+                        delete temp->widget();
                 }
+                int i;
                 std::vector<Sim::Bot*> bots = sim.getState().getBotFactory().getBotVector();
+                CustomLabel *clabel;
                 for (i = 0; i < bots.size(); i++) {
                         clabel = new CustomLabel(&something, main);
                         clabel->setPixmap(profiles[0]);

@@ -80,9 +80,6 @@ protected:
                 chartextures[0] = bindTexture(characters[0].scaled(128,320));
 
                 weapons[0].load(":/graphics/weapons/testweapon.png");
-                qDebug() << qAlpha(weapons[0].pixel(1,1));
-
-                qDebug() << qAlpha(weapons[0].pixel(0,80));
                 weaponstextures[0] = bindTexture(weapons[0].scaled(32,64));
 
                 /*		glEnable(GL_TEXTURE_2D);
