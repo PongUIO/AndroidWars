@@ -35,7 +35,9 @@ int main(void)
 	botType.baseSpeed = 1.0;
 	botType.baseWeight = 75.0;
 	
-	sim.getData().getBotDb().addBot(botType, pts);
+	uint32_t AA = sim.getData().getBotDb().addBot(botType, pts);
+	printf("%d\n", AA);
+	
 	
 	// Create a test bot
 	Sim::Bot::Config botCfg;

@@ -7,6 +7,7 @@
 
 namespace Sim {
 	State::State(Simulation* sim) :
+		CallGroup<State,StateObj>(this),
 		mBotFactory(sim),
 		mWorld(sim),
 		mPlayer(),
