@@ -8,5 +8,6 @@
         <file>graphics/menu/startgame.png</file>
         <file>graphics/tiles/empty.png</file>
         <file>graphics/weapons/testweapon.png</file>
+        <file>graphics/profiles/test.xcf</file>
     </qresource>
 </RCC>

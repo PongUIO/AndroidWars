@@ -16,10 +16,11 @@ class GameController {
 public:
 	QWidget *main;
 	QTimer *glTimer, *camTimer, *timer;
-	QHBoxLayout *lower;
+        QHBoxLayout *lower, *upper;
+        QVBoxLayout *iconHolder;
 	QSpacerItem *space;
 	GameButton *label;
-	CustomLabel *label2;
+        CustomLabel *label2, *robot;
 	Sim::Simulation sim;
 	Camera *cam;
 #ifdef WIN32
@@ -91,8 +92,13 @@ public:
                 drawer->connect(camTimer, SIGNAL(timeout()), drawer, SLOT(moveMouseCheck()));
 		camTimer->start(1./RATE);
 
-		lower = new QHBoxLayout(main);
-		main->setWindowTitle(QApplication::translate("childwidget", "Child widget"));
+                iconHolder  = new QVBoxLayout(main);
+                lower = new QHBoxLayout();
+                upper = new QHBoxLayout();
+                iconHolder->insertLayout(0, lower);
+                iconHolder->insertSpacing(1, -1);
+                iconHolder->insertLayout(0, upper);
+                main->setWindowTitle(QApplication::translate("childwidget", "Child widget"));
 		drawer->setMouseTracking(true);
 
 #ifdef _WIN32
@@ -118,6 +124,8 @@ public:
 		lower->insertWidget(1, label2);
 		lower->insertSpacerItem(2, space);
 		lower->setAlignment(Qt::AlignBottom);
+                updateGUI();
+                upper->setAlignment(Qt::AlignTop);
 	}
 	void showAll() {
 		main->show();
@@ -130,6 +138,20 @@ public:
 		label2->hide();
 	}
 
+        void updateGUI() {
+                int i = 0;
+                robot = new CustomLabel(&something, main);
+                robot->setPixmap(QPixmap(":/graphics/profiles/test.xcf"));
+                robot->resize(60,60);
+                upper->insertWidget(0, robot);
+                upper->insertSpacerItem(2, space);
+                robot->show();
+        }
+
+        void changeBot(int bot) {
+
+        updateGUI();
+        }
 };
 
 #endif // GAMEWIDGET_H
