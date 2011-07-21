@@ -68,7 +68,8 @@ protected:
         {
                 // Set up the rendering context, define display lists etc.:
                 glClearColor( 0.0, 0.0, 0.0, 0.0 );
-		glEnable(GL_DEPTH_TEST | GL_DOUBLE);
+                //glEnable(GL_DEPTH_TEST);
+                glEnable(GL_DOUBLE);
 		data[0].load(":/graphics/tiles/empty.png");
                 textures[0] = bindTexture(data[0].scaled(64,64));
 		data[1].load(":/graphics/tiles/metal.png");
@@ -154,11 +155,12 @@ protected:
 
                 const Sim::BotFactory::ObjVec &bots =  sim->getState().getBotFactory().getBotVector();
 
+                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+                glEnable(GL_BLEND);
                 for (i = 0; i < bots.size(); i++) {
                         Sim::Bot *bot = bots[i];
                         if (bot != NULL) {
                                 Sim::Vector vec = bot->getBody().mPos;
-                                glEnable(GL_BLEND);
                                 glTexSubImage2D(GL_TEXTURE_2D, 0, 0,0 , characters[mt].width(), characters[mt].height(),  GL_RGBA, GL_UNSIGNED_BYTE, characters[mt].bits() );
                                 glBindTexture(GL_TEXTURE_2D, chartextures[0]);
                                 glBegin(GL_QUADS);
@@ -168,7 +170,6 @@ protected:
                                 glTexCoord2f(1,1); glVertex2f(vec.x+1,vec.y+1.8); // upper left
                                 glEnd();
                                 glTexSubImage2D(GL_TEXTURE_2D, 0, 0,0 , weapons[0].width(), weapons[0].height(),  GL_RGBA, GL_UNSIGNED_BYTE, weapons[0].bits() );
-                                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
                                 glBindTexture(GL_TEXTURE_2D, weaponstextures[0]);
                                 glBegin(GL_QUADS);
                                 glTexCoord2f(0,1); glVertex2f(vec.x+0.5,vec.y + 0.5);  // lower left
@@ -176,8 +177,6 @@ protected:
                                 glTexCoord2f(1,0); glVertex2f(vec.x+1.5,vec.y);// upper right
                                 glTexCoord2f(1,1); glVertex2f(vec.x+1.5,vec.y+0.5); // upper left
                                 glEnd();
-                                glDisable(GL_TEXTURE_2D);
-                                glEnable(GL_BLEND);
                                 glBindTexture(GL_TEXTURE_2D, 0);
                                 /*glBlendFunc(GL_ONE, GL_ONE);
 				//glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
@@ -189,14 +188,14 @@ protected:
 				glVertex2f(vec.x+1,vec.y);
 				glVertex2f(vec.x+1,vec.y+1.8);
 				glEnd();
-                                glEnable(GL_TEXTURE_2D);*/
-                                glBlendFunc(GL_ONE, GL_ZERO);
-                                glDisable(GL_BLEND);
-                                glColor3f(1.0,1.0,1.0);
+                                glEnable(GL_TEXTURE_2D);
+                                glColor3f(1.0,1.0,1.0);*/
 
                         }
                 }
+                glBlendFunc(GL_ONE, GL_ZERO);
                 glDisable(GL_TEXTURE_2D);
+                glDisable(GL_BLEND);
 		glFlush();
 		glFinish();
                 swapBuffers();

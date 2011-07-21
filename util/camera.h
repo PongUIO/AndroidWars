@@ -11,7 +11,7 @@ public:
         Camera(double x, double y, int xres, int yres) {
                 pos = Sim::Vector(x,y);
                 delta = Sim::Vector(-0.005,-0.005);
-                dzoom = 0.001;
+                dzoom = 0.0;
                 zoom = 1;
                 ratio = yres/((double)xres);
                 this->xres = xres;

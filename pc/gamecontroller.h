@@ -1,6 +1,8 @@
 #ifndef GAMECONTROLLER_H
 #define GAMECONTROLLER_H
 #include<QtGui>
+#include<stdlib.h>
+
 #include "Simulation.h"
 #include "../openglqt/render.h"
 #include "customlabel.h"
@@ -18,7 +20,8 @@ public:
 	QTimer *glTimer, *camTimer, *timer;
         QHBoxLayout *lower, *upper;
         QVBoxLayout *iconHolder;
-	QSpacerItem *space;
+        QSpacerItem *space;
+        QPixmap profiles[1];
 	GameButton *label;
         CustomLabel *label2, *robot;
 	Sim::Simulation sim;
@@ -55,7 +58,9 @@ public:
 		botCfg.side = 0;
 		botCfg.type = 0;
 		botCfg.pos = Sim::Vector(0,0);
-		uint32_t botId = sim.getState().getBotFactory().createBot( botCfg );
+                uint32_t botId = sim.getState().getBotFactory().createBot( botCfg );
+                botCfg.pos = Sim::Vector(0,1);
+                sim.getState().getBotFactory().createBot( botCfg );
 
 		// Send some input to this bot
 		Sim::BotFactory &botFact = sim.getState().getBotFactory();
@@ -117,13 +122,14 @@ public:
 		label->resize(60,60);
 		label2->setPixmap(QPixmap(":/graphics/temp/temp2.png"));
 		label2->resize(60,60);
+                profiles[0] = QPixmap(":/graphics/profiles/test.xcf");
 		space = new QSpacerItem(main->width(), 0, QSizePolicy::Expanding);
 		label->show();
 		label2->show();
 		lower->insertWidget(0, label);
 		lower->insertWidget(1, label2);
 		lower->insertSpacerItem(2, space);
-		lower->setAlignment(Qt::AlignBottom);
+                lower->setAlignment(Qt::AlignBottom);
                 updateGUI();
                 upper->setAlignment(Qt::AlignTop);
 	}
@@ -140,17 +146,25 @@ public:
 
         void updateGUI() {
                 int i = 0;
-                robot = new CustomLabel(&something, main);
-                robot->setPixmap(QPixmap(":/graphics/profiles/test.xcf"));
-                robot->resize(60,60);
-                upper->insertWidget(0, robot);
-                upper->insertSpacerItem(2, space);
-                robot->show();
+                CustomLabel *clabel;
+                while(!upper->isEmpty()) {
+                        clabel = (CustomLabel*) upper->itemAt(i);
+                        upper->removeWidget(clabel);
+                        i++;
+                }
+                std::vector<Sim::Bot*> bots = sim.getState().getBotFactory().getBotVector();
+                for (i = 0; i < bots.size(); i++) {
+                        clabel = new CustomLabel(&something, main);
+                        clabel->setPixmap(profiles[0]);
+                        clabel->resize(60,60);
+                        clabel->show();
+                        upper->insertWidget(i, clabel);
+                }
+                upper->insertSpacerItem(i, space);
         }
 
         void changeBot(int bot) {
-
-        updateGUI();
+                updateGUI();
         }
 };
 
