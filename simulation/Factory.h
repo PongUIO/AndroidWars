@@ -32,19 +32,20 @@ namespace Sim {
 	 * - step(double stepTime)
 	 * - getId() : Returns the ID of this object
 	 */
-	template<class T>
+	template<class Host, class T>
 	class Factory {
 		protected:
 			typedef std::stack<uint32_t> IdStack;
 			
 		public:
 			typedef std::vector<T*> ObjVec;
+			typedef void(Host::*CallFunc)(T *v);
 			
 			uint32_t NoId() const { return -1; }
 			
-			Factory(Simulation *sim) :
+			Factory(Host *host) :
 				mIdCounter(0),
-				mSim(sim)
+				mHost(host)
 				{}
 			~Factory() {}
 			
@@ -55,14 +56,17 @@ namespace Sim {
 				mData[obj->getId()] = obj;
 			}
 			
-			void step(double stepTime) {
+			void factoryCall(CallFunc f)
+			{
+				/// @note If new objects are created during this
+				/// it is unpredictable whether they are called or not.
 				for(uint32_t i = 0; i<mData.size(); i++) {
 					T *obj = mData[i];
 					
 					if(obj) {
 						// If the object is not dead, then process it
 						if(!obj->isDead())
-							obj->step(stepTime);
+							(mHost->*(f))(obj);
 						
 						// Free and disable this ID
 						// if the object is dead
@@ -75,7 +79,7 @@ namespace Sim {
 				}
 			}
 			
-			void copyFactory(const Factory<T> &other) {
+			void copyFactory(const Factory<Host,T> &other) {
 				// Make sure both vectors are of equal size
 				if(mData.size() < other.mData.size())
 					mData.resize(other.mData.size());
@@ -156,7 +160,7 @@ namespace Sim {
 			IdStack mFreeId;
 			uint32_t mIdCounter;
 			
-			Simulation *mSim;
+			Host *mHost;
 	};
 	
 }

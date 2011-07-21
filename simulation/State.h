@@ -7,10 +7,13 @@
 #include "Bot.h"
 #include "Player.h"
 
+#include "utility/CallGroup.h"
+#include "StateObj.h"
+
 namespace Sim {
 	class Simulation;
 	
-	class State {
+	class State : private CallGroup<State,StateObj>{
 		public:
 			/// @name Initialization
 			//@{

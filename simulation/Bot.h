@@ -8,6 +8,8 @@
 #include "Body.h"
 #include "Save.h"
 
+#include "StateObj.h"
+
 namespace Sim {
 	// Forward declarations
 	class Simulation;
@@ -107,15 +109,18 @@ namespace Sim {
 			//@}
 			
 			friend class BotFactory;
-			friend class Factory<Bot>;
+			friend class Factory<BotFactory,Bot>;
 	};
 	
-	class BotFactory : public Factory<Bot> {
+	class BotFactory : public Factory<BotFactory,Bot>, private StateObj {
 		public:
 			/// @name Initialization
 			//@{
 				BotFactory(Simulation *sim);
 				~BotFactory();
+				
+				void step(double stepTime)
+				{ mfStepTime=stepTime; factoryCall(&BotFactory::fStep); }
 				
 				void startup();
 				void shutdown();
@@ -129,7 +134,7 @@ namespace Sim {
 					return getObject(id);
 				}
 				
-				const Factory<Bot>::ObjVec &getBotVector() const {
+				const Factory<BotFactory,Bot>::ObjVec &getBotVector() const {
 					return mData;
 				}
 				
@@ -147,11 +152,19 @@ namespace Sim {
 			//@}
 			
 		private:
+			/// @name Factory calls
+			//@{
+				void fStep(Bot *b) { b->step(mfStepTime); }
+				
+				// Call parameters
+				double mfStepTime;
+			//@}
+			
 			void deleteInstance(Bot *obj) { delete obj; }
 			Bot *newCopyInstance(Bot *obj) { return new Bot(*obj); }
 			
 			InputBuffer<BotInput> mInput;
-			
+			Simulation *mSim;
 	};
 	
 }
