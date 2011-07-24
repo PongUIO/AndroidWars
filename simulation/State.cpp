@@ -47,17 +47,14 @@ namespace Sim {
 		mBotFactory.endPhase();
 	}
 	
-	void State::copyState(Sim::State& other)
-	{
-		mPlayer.copyState(other);
-		mWorld.copyState(other);
-		mBotFactory.copyState(other);
-	}
-	
 	void State::save(Save::BasePtr &fp)
 	{
 		mPlayer.save(fp);
 		mWorld.save(fp);
 		mBotFactory.save(fp);
+	}
+	
+	void State::load(Save::BasePtr& fp)
+	{
 	}
 }

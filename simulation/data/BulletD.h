@@ -20,6 +20,7 @@ namespace Sim {
 			virtual ~BulletDatabase() {}
 			
 			void save(Save::BasePtr &fp) {
+				(void)fp;
 			}
 			
 		private:

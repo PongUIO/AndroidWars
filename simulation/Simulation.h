@@ -75,7 +75,7 @@ namespace Sim {
 			/// @name Subsystems
 			//@{
 				State mStateActive;
-				State mStateCopy;
+				Save mStateCopy;
 				Data mData;
 				
 			//@}

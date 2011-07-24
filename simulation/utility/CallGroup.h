@@ -4,15 +4,23 @@
 #include <vector>
 
 namespace Sim {
-	#define CallGroup_Call(v,f) ((v)->*(f))
-	#define CallGroup_Iter(x) \
-		for(typename DataVec::iterator i=mData.begin(); i!=mData.end(); ++i) { \
-			x; \
-		}
-	#define CallGroup_RIter(x) \
-		for(typename DataVec::reverse_iterator i=mData.rbegin(); i!=mData.rend(); ++i) { \
-			x; \
-		}
+	#define CallObj_Call(v,f) ((v)->*(f))
+	
+	template<typename Obj>
+	class BaseObjCall {
+		public:
+			typedef void(Obj::*CallFunc)();
+			
+			template<typename Arg, typename T>
+			static void doCall( Obj *obj, T func, Arg a)
+				{ CallObj_Call(obj, func)(a); }
+			
+			template<typename Arg>
+			static void doCall( Obj *obj, CallFunc func, Arg a)
+				{ CallObj_Call(obj, func)(); }
+	};
+	
+	#undef CallObj_Call
 	
 	/**
 	 * Keeps an ordered group of a specific type.
@@ -20,43 +28,50 @@ namespace Sim {
 	 * containing object using variants of \c call().
 	 */
 	template<typename CallObj>
-	class CallGroup {
+	class CallGroup : private BaseObjCall<CallObj> {
 		private:
 			typedef std::vector<CallObj*> DataVec;
-			typedef void(CallObj::*CallFunc)();
-		
+			
 		public:
 			// Functions
 			CallGroup() {}
 			~CallGroup() {}
 			
-			/// Calls the group with no parameters
-			void call( CallFunc f )
-			{	CallGroup_Iter( CallGroup_Call(*i, f)() ) }
+			/// Calls the group in normal order with a single argument
+			template<typename Arg, typename Func>
+			void callArg( Func f, Arg a )
+			{
+				for(typename DataVec::iterator i=mData.begin(); i!=mData.end(); ++i) {
+					doCall(*i, f, a);
+				}
+			}
 			
-			void rcall( CallFunc f)
-			{	CallGroup_RIter( CallGroup_Call( (*i), f)() ) }
+			/// Calls the group in reverse order with a single argument
+			template<typename Arg, typename Func>
+			void rcallArg( Func f, Arg a )
+			{
+				for(typename DataVec::reverse_iterator i=mData.rbegin(); i!=mData.rend(); ++i) {
+					doCall(*i, f, a);
+				}
+			}
 			
-			/// Calls the group in normal order
-			template<typename Arg>
-			void callArg( void(CallObj::*f)(Arg a), Arg a )
-			{	CallGroup_Iter( CallGroup_Call(*i, f)(a) ) }
+			/// Calls the group in sequence with no parameters
+			template<typename Func>
+			void call( Func f )
+			{	callArg(f, 0); }
 			
-			/// Calls the group in reverse order
-			template<typename Arg>
-			void rcallArg( void(CallObj::*f)(Arg a), Arg a )
-			{	CallGroup_RIter( CallGroup_Call(*i, f)(a) ) }
+			/// Equivalent to \c call, but in reverse order
+			template<typename Func>
+			void rcall( Func f )
+			{	rcallArg(f, 0); }
 			
 			/// Registers a call object
 			void registerCallObj(CallObj *v)
 			{ mData.push_back(v); }
 			
-			
 		private:
 			DataVec mData;
 	};
-	
-	#undef CallGroup_Call
 }
 
 #endif

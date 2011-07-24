@@ -4,7 +4,6 @@
 namespace Sim {
 	Simulation::Simulation() :
 		mStateActive(this),
-		mStateCopy(this),
 		mData(this)
 		{}
 	
@@ -15,7 +14,6 @@ namespace Sim {
 	{
 		this->config = config;
 		
-		mStateCopy.startup();
 		mStateActive.startup();
 		mData.startup();
 	}
@@ -23,13 +21,12 @@ namespace Sim {
 	void Simulation::shutdown()
 	{
 		mStateActive.shutdown();
-		mStateCopy.shutdown();
 		mData.shutdown();
 	}
 	
 	void Simulation::prepareSim()
 	{
-		mStateCopy.copyState(mStateActive);
+		mStateCopy = save();
 		
 		mCurPhase = 0;
 	}
@@ -51,14 +48,15 @@ namespace Sim {
 	void Simulation::endPhase()
 	{
 		mStateActive.endPhase();
-		mStateCopy.copyState(mStateActive);
+		mStateCopy = save();
 		
 		mCurPhase++;
 	}
 	
 	void Simulation::rewindPhase()
 	{
-		mStateActive.copyState(mStateCopy);
+		Save::FilePtr fptr = Save::FilePtr(mStateCopy);
+		mStateActive.load( fptr );
 	}
 	
 	uint32_t Simulation::checksumData()

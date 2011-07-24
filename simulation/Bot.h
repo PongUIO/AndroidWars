@@ -120,7 +120,7 @@ namespace Sim {
 				~BotFactory();
 				
 				void step(double stepTime)
-				{ mfStepTime=stepTime; factoryCall(&BotFactory::fStep); }
+				{ factoryCall(&Bot::step, stepTime); }
 				
 				void startup();
 				void shutdown();
@@ -145,21 +145,11 @@ namespace Sim {
 				
 				/// @name State
 				//@{
-					void copyState(State &state);
-					
 					void save(Save::BasePtr &fp);
 				//@}
 			//@}
 			
 		private:
-			/// @name Factory calls
-			//@{
-				void fStep(Bot *b) { b->step(mfStepTime); }
-				
-				// Call parameters
-				double mfStepTime;
-			//@}
-			
 			void deleteInstance(Bot *obj) { delete obj; }
 			Bot *newCopyInstance(Bot *obj) { return new Bot(*obj); }
 			

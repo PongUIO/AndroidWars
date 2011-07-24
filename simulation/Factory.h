@@ -8,6 +8,8 @@
 
 #include <stdio.h>
 
+#include "utility/CallGroup.h"
+
 namespace Sim {
 	// Forward declarations
 	class Simulation;
@@ -33,13 +35,12 @@ namespace Sim {
 	 * - getId() : Returns the ID of this object
 	 */
 	template<class Host, class T>
-	class Factory {
+	class Factory : private BaseObjCall<T> {
 		protected:
 			typedef std::stack<uint32_t> IdStack;
 			
 		public:
 			typedef std::vector<T*> ObjVec;
-			typedef void(Host::*CallFunc)(T *v);
 			
 			uint32_t NoId() const { return -1; }
 			
@@ -50,13 +51,13 @@ namespace Sim {
 			~Factory() {}
 			
 			virtual void deleteInstance(T *obj)=0;
-			virtual T *newCopyInstance(T *obj)=0;
 			
 			void addObj(T *obj) {
 				mData[obj->getId()] = obj;
 			}
 			
-			void factoryCall(CallFunc f)
+			template<typename Func, typename Arg>
+			void factoryCall(Func func, Arg arg=Arg())
 			{
 				/// @note If new objects are created during this
 				/// it is unpredictable whether they are called or not.
@@ -66,7 +67,7 @@ namespace Sim {
 					if(obj) {
 						// If the object is not dead, then process it
 						if(!obj->isDead())
-							(mHost->*(f))(obj);
+							doCall(obj, func, arg);
 						
 						// Free and disable this ID
 						// if the object is dead
@@ -79,42 +80,9 @@ namespace Sim {
 				}
 			}
 			
-			void copyFactory(const Factory<Host,T> &other) {
-				// Make sure both vectors are of equal size
-				if(mData.size() < other.mData.size())
-					mData.resize(other.mData.size());
-				
-				// Purge extra elements
-				while(mData.size() > other.mData.size()) {
-					T *obj = mData.back();
-					mData.pop_back();
-					if(obj)
-						deleteInstance(obj);
-				}
-				
-				// Copy the data objects in the vector
-				for(uint32_t i = 0; i<other.mData.size(); i++) {
-					T *otherObj = other.getObject(i);
-					T *selfObj = getObject(i);
-					
-					if(otherObj) {
-						if(selfObj)
-							*selfObj = *otherObj;
-						else
-							setObject( newCopyInstance(otherObj), i );
-					} else {
-						if(selfObj) {
-							deleteInstance(selfObj);
-							setObject(NULL, i);
-						} else
-							; // Nothing to do
-					}
-				}
-				
-				// Copy other state variables
-				mFreeId = IdStack(other.mFreeId);
-				mIdCounter = other.mIdCounter;
-			}
+			template<typename Func>
+			void factoryCall(Func func, int arg=0)
+			{	factoryCall<Func,int>(func,arg); }
 			
 		protected:
 			void setObject(T *obj, uint32_t id) {

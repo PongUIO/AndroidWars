@@ -13,7 +13,7 @@
 namespace Sim {
 	class Simulation;
 	
-	class State : private CallGroup<StateObj>{
+	class State : private CallGroup<StateObj> {
 		public:
 			/// @name Initialization
 			//@{
@@ -33,9 +33,8 @@ namespace Sim {
 			
 			/// @name State interface
 			//@{
-				void copyState(State &other);
-				
 				void save(Save::BasePtr &fp);
+				void load(Save::BasePtr &fp);
 			//@}
 			
 			/// @name Module accessors

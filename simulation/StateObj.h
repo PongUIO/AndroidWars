@@ -17,9 +17,8 @@ namespace Sim {
 			
 			virtual void step(double stepTime)=0;
 			
-			virtual void copyState(State &other)=0;
-			virtual void save(Save::BasePtr &fp) {}
-			virtual void load(Save::BasePtr &fp) {}
+			virtual void save(Save::BasePtr &fp) { (void)fp; }
+			virtual void load(Save::BasePtr &fp) { (void)fp; }
 	};
 }
 

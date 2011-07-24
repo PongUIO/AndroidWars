@@ -138,7 +138,7 @@ namespace Sim {
 					}
 					
 					void nanoRead(uint8_t *ptr, uint32_t bytes)
-						{}
+						{ (void)ptr; (void)bytes; }
 					
 					boost::crc_32_type mCksum;
 					uint32_t mSize;

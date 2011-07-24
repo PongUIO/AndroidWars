@@ -94,11 +94,4 @@ namespace Sim {
 		}
 		fp.writeInt(NoId());
 	}
-	
-	void BotFactory::copyState(State& state)
-	{
-		BotFactory &other = state.getBotFactory();
-		copyFactory(other);
-		mInput = other.getInput();
-	}
 }
