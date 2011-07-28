@@ -36,12 +36,12 @@ namespace Sim {
 					 * references.
 					 */
 					struct Thread {
-						Thread(Reference *ref=0, State *state=NULL,
+						Thread(Reference *ref=0, const State *state=NULL,
 							   IdType type=0,
 							   const boost::any &arg=boost::any());
 						
 						Reference *mHost;
-						State *mActive;
+						const State *mActive;
 						double mDelay;
 						IdType mEntryType;
 						boost::any mArg;
@@ -49,7 +49,7 @@ namespace Sim {
 					typedef std::list<Thread> ThreadList;
 					
 					// Functions
-					Reference(StateSys *sys);
+					Reference(const StateSys *sys=NULL);
 					~Reference();
 					
 					void startThread(
@@ -59,7 +59,7 @@ namespace Sim {
 					void exec(double delta);
 					
 				private:
-					StateSys *mSystem;
+					const StateSys *mSystem;
 					ThreadList mThreads;
 					
 					friend class Thread;
@@ -75,12 +75,12 @@ namespace Sim {
 					virtual ~State() {}
 					
 					/// Executes this state for the input thread.
-					virtual void exec(Reference::Thread &thread)=0;
+					virtual void exec(Reference::Thread &thread) const =0;
 					
 					IdType insertChild(State *child);
 					
 				protected:
-					State *nextState(IdType id=0)
+					const State *nextState(IdType id=0) const
 					{ return mStates.at(id); }
 					
 					StateVec mStates;
@@ -109,7 +109,8 @@ namespace Sim {
 			IdType registerEntryPoint(IdType entry);
 			
 			State *getState(IdType id) { return mStates.at(id); }
-			State *getEntry(IdType entryId)
+			const State *getState(IdType id) const { return mStates.at(id); }
+			const State *getEntry(IdType entryId) const
 			{ return mStates.at(mEntry.at(entryId)); }
 			
 		private:
@@ -126,7 +127,7 @@ namespace Sim {
 			public:
 				Delay(double t) : mTime(t) {}
 				
-				void exec(StateSys::Reference::Thread &thread ) {
+				void exec(StateSys::Reference::Thread &thread ) const {
 					thread.mDelay += mTime;
 					thread.mActive = nextState();
 				}

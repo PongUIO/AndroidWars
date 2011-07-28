@@ -5,7 +5,11 @@ namespace Sim {
 	{}
 	
 	StateSys::~StateSys()
-	{}
+	{
+		for(StateVec::iterator i = mStates.begin(); i!=mStates.end(); ++i) {
+			delete *i;
+		}
+	}
 	
 	void StateSys::finalize()
 	{

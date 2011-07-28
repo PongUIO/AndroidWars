@@ -45,7 +45,7 @@ namespace Sim {
 	//
 	//
 	BotFactory::BotFactory(Simulation *sim)
-		: Factory<BotFactory,Bot>(this), mSim(sim)
+		: Factory<Bot>(), mSim(sim)
 	{}
 
 	BotFactory::~BotFactory()

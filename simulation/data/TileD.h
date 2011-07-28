@@ -40,7 +40,7 @@ namespace Sim {
 			
 			void save(Save::BasePtr &fp) {
 				fp.writeInt<uint32_t>(mData.size());
-				for(TileVec::iterator i=mData.begin(); i!=mData.end(); i++) {
+				for(DataVec::iterator i=mData.begin(); i!=mData.end(); i++) {
 					TileD &t = *i;
 					
 					fp.writeInt(t.colMask);
@@ -50,10 +50,6 @@ namespace Sim {
 				}
 			}
 			
-		private:
-			typedef std::vector<TileD> TileVec;
-			
-			TileVec mData;
 	};
 }
 

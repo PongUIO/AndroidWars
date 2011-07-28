@@ -31,10 +31,9 @@ namespace Sim {
 	 * The object this template uses is required to have the following
 	 * implemented:
 	 * - isDead() : Should return true when the object is to be purged.
-	 * - step(double stepTime)
 	 * - getId() : Returns the ID of this object
 	 */
-	template<class Host, class T>
+	template<class T>
 	class Factory : private BaseObjCall<T> {
 		protected:
 			typedef std::stack<uint32_t> IdStack;
@@ -44,9 +43,8 @@ namespace Sim {
 			
 			uint32_t NoId() const { return -1; }
 			
-			Factory(Host *host) :
-				mIdCounter(0),
-				mHost(host)
+			Factory() :
+				mIdCounter(0)
 				{}
 			~Factory() {}
 			
@@ -127,8 +125,6 @@ namespace Sim {
 			ObjVec mData;
 			IdStack mFreeId;
 			uint32_t mIdCounter;
-			
-			Host *mHost;
 	};
 	
 }

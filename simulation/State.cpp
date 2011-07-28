@@ -8,11 +8,13 @@
 namespace Sim {
 	State::State(Simulation* sim) :
 		mBotFactory(sim),
+		mBulletFactory(sim),
 		mWorld(sim),
 		mPlayer(),
 		mSim(sim)
 	{
 		registerCallObj(&mBotFactory);
+		registerCallObj(&mBulletFactory);
 		registerCallObj(&mWorld);
 		registerCallObj(&mPlayer);
 	}

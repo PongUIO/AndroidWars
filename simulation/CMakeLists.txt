@@ -22,20 +22,22 @@ add_library(AWSim
 	BotInput.cpp
 	Data.cpp
 	Player.cpp
+	Bullet.cpp
+	Weapon.cpp
 	Simulation.cpp
 	State.cpp
 	Save.cpp
 	World.cpp
 	
 	data/BotD.cpp
+	data/BulletD.cpp
+	data/WeaponD.cpp
 	
 	collision/Collision.cpp
 	collision/TileCol.cpp
 	
 	statesys/StateSys.cpp
 	statesys/Reference.cpp
-	
-	#bullet/BulletSys/Reference.cpp
 	)
 
 add_executable(SimTest

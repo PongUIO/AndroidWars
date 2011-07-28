@@ -2,7 +2,7 @@
 #include "StateSys.h"
 
 namespace Sim {
-	StateSys::Reference::Reference(StateSys* sys) :
+	StateSys::Reference::Reference(const StateSys* sys) :
 		mSystem(sys)
 	{}
 	
@@ -51,7 +51,7 @@ namespace Sim {
 	//
 	//
 	StateSys::Reference::Thread::Thread(
-		Reference *ref, State *state, IdType type, const boost::any &arg
+		Reference *ref, const State *state, IdType type, const boost::any &arg
 		) : mHost(ref), mActive(state), mDelay(0.0), mEntryType(type),
 			mArg(arg)
 	{}

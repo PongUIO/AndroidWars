@@ -5,7 +5,7 @@ class Test : public Sim::StateSys::State {
 	public:
 		Test() {}
 		
-		void exec(Sim::StateSys::Reference::Thread &t) {
+		void exec(Sim::StateSys::Reference::Thread &t) const {
 			printf("Hello at %p (from %p)!\n", t.mActive, &t);
 			printf("Our argument is %d\n", boost::any_cast<uint32_t>(t.mArg));
 			t.mActive = nextState();

@@ -27,17 +27,26 @@ namespace Sim {
 			{ mSim = sim; }
 			
 			virtual void shutdown()
-			{ mData.clear(); }
+			{}
 			
 			const T &getType(IdType type) const
 			{ return mData.at(type); }
 			
+			size_t debugSize() { return mData.size(); }
+			
+		protected:
 			IdType addType(const T &type)
 			{ mData.push_back(type); return IdType(mData.size()-1); }
 			
-		protected:
 			T &rawGet(IdType type)
 			{ return mData.at(type); }
+			
+			void clearData()
+			{
+				for(typename DataVec::iterator i=mData.begin();
+					i!=mData.end(); ++i)
+					delete *i;
+			}
 			
 			typedef std::vector<T> DataVec;
 			

@@ -109,10 +109,10 @@ namespace Sim {
 			//@}
 			
 			friend class BotFactory;
-			friend class Factory<BotFactory,Bot>;
+			friend class Factory<Bot>;
 	};
 	
-	class BotFactory : public Factory<BotFactory,Bot>, public StateObj {
+	class BotFactory : public Factory<Bot>, public StateObj {
 		public:
 			/// @name Initialization
 			//@{
@@ -134,7 +134,7 @@ namespace Sim {
 					return getObject(id);
 				}
 				
-				const Factory<BotFactory,Bot>::ObjVec &getBotVector() const {
+				const Factory<Bot>::ObjVec &getBotVector() const {
 					return mData;
 				}
 				
@@ -151,7 +151,7 @@ namespace Sim {
 			
 		private:
 			void deleteInstance(Bot *obj) { delete obj; }
-			Bot *newCopyInstance(Bot *obj) { return new Bot(*obj); }
+			//Bot *newCopyInstance(Bot *obj) { return new Bot(*obj); }
 			
 			InputBuffer<BotInput> mInput;
 			Simulation *mSim;
