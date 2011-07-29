@@ -6,6 +6,7 @@
 #include "World.h"
 #include "Bot.h"
 #include "Bullet.h"
+#include "Weapon.h"
 #include "Player.h"
 
 #include "utility/CallGroup.h"
@@ -46,6 +47,9 @@ namespace Sim {
 				BulletFactory &getBulletFactory()
 				{ return mBulletFactory; }
 				
+				WeaponFactory &getWeaponFactory()
+				{ return mWeaponFactory; }
+				
 				World &getWorld()
 				{ return mWorld; }
 				
@@ -56,6 +60,7 @@ namespace Sim {
 		private:
 			BotFactory mBotFactory;
 			BulletFactory mBulletFactory;
+			WeaponFactory mWeaponFactory;
 			World mWorld;
 			PlayerData mPlayer;
 			

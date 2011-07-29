@@ -5,34 +5,15 @@
 
 namespace Sim {
 	BulletFactory::BulletFactory(Simulation* sim) :
-		Factory<Bullet>()
+		DefaultFactory<Bullet>(sim)
 	{}
 	
 	BulletFactory::~BulletFactory()
 	{}
 	
-	void BulletFactory::startup()
-	{
-	}
-	
-	void BulletFactory::shutdown()
-	{
-		killAll();
-	}
-	
-	uint32_t BulletFactory::createBullet(const Sim::Bullet::Config& cfg)
-	{
-		uint32_t id = newId();
-		
-		addObj(new Bullet(mSim, id, cfg));
-		
-		return id;
-	}
-	
-	void BulletFactory::save(Save::BasePtr& fp)
-	{
-	}
-	
+	// Bullet class
+	//
+	//
 	Bullet::Bullet(Simulation* sim, uint32_t id, const Bullet::Config& cfg) :
 		mId(id),
 		mType(cfg.type),
@@ -47,5 +28,14 @@ namespace Sim {
 
 	Bullet::~Bullet()
 	{}
-
+	
+	void Bullet::step(double stepTime)
+	{
+		mBody.step(stepTime);
+	}
+	
+	void Bullet::save(Save::BasePtr& fp)
+	{
+		mBody.save(fp);
+	}
 }

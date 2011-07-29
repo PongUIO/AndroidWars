@@ -34,7 +34,9 @@ namespace Sim {
 			/// @name Interaction
 			//@{
 				bool isDead() { return false; }
+				void step(double stepTime);
 				
+				void save(Save::BasePtr &fp);
 			//@}
 			
 			/// @name Identification
@@ -60,45 +62,19 @@ namespace Sim {
 			
 			friend class BulletFactory;
 			friend class Factory<Bullet>;
+			friend class DefaultFactory<Bullet>;
 	};
 	
 	namespace BulletState {
 	}
 	
-	class BulletFactory : public Factory<Bullet>, public StateObj {
+	class BulletFactory : public DefaultFactory<Bullet> {
 		public:
 			/// @name Initialization
 			//@{
 				BulletFactory(Simulation *sim);
 				~BulletFactory();
-				
-				void step(double stepTime)
-				{ }
-				
-				void startup();
-				void shutdown();
 			//@}
-			
-			/// @name Interaction
-			//@{
-				uint32_t createBullet(const Bullet::Config &cfg);
-				
-				const Bullet *getBullet(uint32_t id) const
-					{ return getObject(id); }
-				
-				const Factory<Bullet>::ObjVec &getBulletVector() const
-					{ return mData; }
-			//@}
-			
-			/// @name State
-			//@{
-				void save(Save::BasePtr &fp);
-			//@}
-			
-		private:
-			void deleteInstance(Bullet *obj) { delete obj; }
-			
-			Simulation *mSim;
 	};
 }
 

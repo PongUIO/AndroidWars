@@ -9,6 +9,8 @@
 #include <stdio.h>
 
 #include "utility/CallGroup.h"
+#include "StateObj.h"
+#include "Save.h"
 
 namespace Sim {
 	// Forward declarations
@@ -26,7 +28,6 @@ namespace Sim {
 	 * Any class inheriting this template is required to have the
 	 * following implemented:
 	 * - deleteInstance(T *obj) : Called when an object is dead.
-	 * - newCopyInstance(T *obj) : Called when an object is copied
 	 * 
 	 * The object this template uses is required to have the following
 	 * implemented:
@@ -46,7 +47,7 @@ namespace Sim {
 			Factory() :
 				mIdCounter(0)
 				{}
-			~Factory() {}
+			virtual ~Factory() {}
 			
 			virtual void deleteInstance(T *obj)=0;
 			
@@ -127,6 +128,61 @@ namespace Sim {
 			uint32_t mIdCounter;
 	};
 	
+	/**
+	 * This template provides a default implementation
+	 * of the factory tailored to the simulation.
+	 */
+	template<typename T>
+	class DefaultFactory : public Factory<T>, public StateObj {
+		public:
+			/// @name Initialization
+			//@{
+				DefaultFactory(Simulation *sim) : mSim(sim) {}
+				virtual ~DefaultFactory() {}
+				
+				void startup() {}
+				void shutdown()
+					{ Factory<T>::killAll(); }
+			//@}
+			
+			/// @name Interaction
+			//@{
+				void step(double stepTime)
+				{ Factory<T>::factoryCall(&T::step, stepTime); }
+				
+				uint32_t create(const typename T::Config &cfg)
+				{
+					uint32_t id = Factory<T>::newId();
+					Factory<T>::addObj(new T(mSim, id, cfg));
+					return id;
+				}
+				
+				const T *getObj(uint32_t id) const
+					{ return Factory<T>::getObject(id); }
+				
+				const typename Factory<T>::ObjVec &getObjVector() const
+					{ return Factory<T>::mData; }
+			//@}
+			
+			/// Saving the state
+			void save(Save::BasePtr &fp)
+			{
+				fp.writeInt(Factory<T>::mData.size());
+				for(typename Factory<T>::ObjVec::iterator i
+						=Factory<T>::mData.begin();
+					i!=Factory<T>::mData.end(); ++i) {
+					
+					fp.writeInt<uint8_t>( (*i) != NULL );
+					if( *i )
+						(*i)->save(fp);
+				}
+			}
+			
+		protected:
+			virtual void deleteInstance(T *obj) { delete obj; }
+			
+			Simulation *mSim;
+	};
 }
 
 #endif
