@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 #include "Bot.h"
+#include "Weapon.h"
 #include "World.h"
 #include "State.h"
 #include "Simulation.h"
@@ -13,11 +14,18 @@ namespace Sim {
 		mId(id),
 		mSide(cfg.side),
 		mType(cfg.type),
-		mSim(sim)
+		mSim(sim),
+		
+		mWeaponBox()
 	{
 		mBody.mPos = cfg.pos;
 		
 		mTypePtr = &mSim->getData().getBotDb().getBot(mType);
+		
+		// Debug: Force a weapon
+		Weapon::Config wcfg;
+		wcfg.type = 0;
+		mWeaponBox.add( sim->getState().getWeaponFactory().create(wcfg) );
 	}
 	
 	Bot::~Bot() {}

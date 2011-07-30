@@ -7,6 +7,7 @@
 #include "Input.h"
 #include "Body.h"
 #include "Save.h"
+#include "Weapon.h"
 
 #include "StateObj.h"
 
@@ -37,6 +38,17 @@ namespace Sim {
 				BotInput tmp = BotInput(id, Move);
 				tmp.stepCount = stepCount;
 				tmp.dir = dir;
+				
+				return tmp;
+			}
+			
+			static BotInput inShoot(uint32_t id, uint32_t weapId,
+				const Vector &dir) {
+				BotInput tmp = BotInput(id, Shoot);
+				tmp.stepCount = 1;
+				tmp.dir = dir;
+				
+				tmp.iparam[0] = weapId;
 				
 				return tmp;
 			}
@@ -100,9 +112,10 @@ namespace Sim {
 				void handleInput();
 			//@}
 			
-			/// @name Physical
+			/// @name Behaviour
 			//@{
 				Body mBody;
+				WeaponBox mWeaponBox;
 				
 				const BotD *mTypePtr;
 				Simulation *mSim;

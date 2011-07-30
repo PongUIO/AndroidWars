@@ -1,3 +1,4 @@
+#include "Simulation.h"
 #include "Bot.h"
 
 namespace Sim {
@@ -14,6 +15,13 @@ namespace Sim {
 					break;
 				
 				case BotInput::Shoot:
+				{
+					Weapon *w = mSim->getState().getWeaponFactory().getObj(mWeaponBox.get(0));
+					Weapon::ShootArg sa;
+					sa.pos = mBody.mPos;
+					sa.dir = Vector(1,0);
+					w->shoot(sa, 0);
+				}
 					break;
 					
 				case BotInput::Ability:

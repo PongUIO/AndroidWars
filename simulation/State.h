@@ -14,6 +14,9 @@
 
 namespace Sim {
 	class Simulation;
+	class BotFactory;
+	class WeaponFactory;
+	class BulletFactory;
 	
 	class State : private CallGroup<StateObj> {
 		public:

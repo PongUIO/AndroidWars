@@ -159,6 +159,8 @@ namespace Sim {
 				
 				const T *getObj(uint32_t id) const
 					{ return Factory<T>::getObject(id); }
+				T *getObj(uint32_t id)
+					{ return Factory<T>::getObject(id); }
 				
 				const typename Factory<T>::ObjVec &getObjVector() const
 					{ return Factory<T>::mData; }

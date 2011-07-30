@@ -18,6 +18,7 @@ namespace Sim {
 				uint32_t type;
 				
 				Vector pos;
+				Vector vel;
 			};
 			
 			enum EntryType {
@@ -26,6 +27,7 @@ namespace Sim {
 			};
 			
 			uint32_t getId() const { return mId; }
+			const Body &getBody() const { return mBody; }
 			
 		private:
 			Bullet(Simulation *sim, uint32_t id, const Config &cfg);

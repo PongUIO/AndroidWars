@@ -20,6 +20,7 @@ namespace Sim {
 		mSim(sim)
 	{
 		mBody.mPos = cfg.pos;
+		mBody.mVel = cfg.vel;
 		
 		mTypePtr = mSim->getData().getBulletDb().getType(mType);
 		

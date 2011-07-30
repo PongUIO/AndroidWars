@@ -81,7 +81,8 @@ namespace Sim {
 					
 				protected:
 					const State *nextState(IdType id=0) const
-					{ return mStates.at(id); }
+					{ if(id<0 || id>=mStates.size()) return NULL;
+					  else return mStates[id]; }
 					
 					StateVec mStates;
 					

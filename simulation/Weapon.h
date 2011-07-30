@@ -1,6 +1,8 @@
 #ifndef SIM_WEAPON_H
 #define SIM_WEAPON_H
 
+#include <vector>
+
 #include "StateObj.h"
 #include "statesys/StateSys.h"
 #include "Factory.h"
@@ -17,6 +19,7 @@ namespace Sim {
 			
 			struct ShootArg {
 				Vector pos;
+				Vector dir;
 				
 				Weapon *ref;
 			};
@@ -30,7 +33,7 @@ namespace Sim {
 			
 			/// @name Interaction
 			//@{
-				bool isDead() { return false; }
+				bool isDead() { return mIsDead; }
 				void step(double stepTime);
 				
 				void shoot(ShootArg arg, uint32_t style);
@@ -50,6 +53,8 @@ namespace Sim {
 			/// @name Behaviour
 			//@{
 				double mReloadTimer;
+				
+				bool mIsDead;
 			//@}
 			
 			/// @name State system
@@ -68,9 +73,17 @@ namespace Sim {
 	 */
 	class WeaponBox {
 		public:
+			typedef std::vector<uint32_t> WeaponVec;
+			
+			uint32_t add(uint32_t wid) {
+				mData.push_back(wid);
+				return mData.size()-1;
+			}
+			uint32_t get(uint32_t index)
+				{ return mData.at(index); }
 			
 		private:
-			
+			WeaponVec mData;
 	};
 	
 	namespace WeaponState {

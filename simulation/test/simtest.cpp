@@ -62,6 +62,12 @@ void loadWeapons()
 	};
 	sys->registerState(new DemoState());
 	sys->registerEntryPoint(0);
+	
+	Sim::WeaponD *weaponType = sim.getData().getWeaponDb().createType();
+	
+	Sim::StateSys *wsys = weaponType->getStateSys();
+	wsys->registerState(new Sim::WeaponState::Shoot( bulletType->getId() ) );
+	wsys->registerEntryPoint(0);
 }
 
 // "Loads" simulation data
@@ -91,6 +97,9 @@ void setupWorld()
 	
 	bi = Sim::BotInput::inMove(botId, 20, Sim::Vector(-1,0) );
 	botFact.getInput().addInput( bi );
+	
+	bi = Sim::BotInput::inShoot(botId, 0, Sim::Vector(1,0) );
+	botFact.getInput().addInput( bi );
 }
 
 
@@ -105,9 +114,16 @@ int main(void)
 	for(int i = 0; i < 3; i++) {
 		sim.startPhase();
 		while( sim.hasPhaseStep() ) {
-			const Sim::Vector &pos = sim.getState().getBotFactory().
+			Sim::Vector pos = sim.getState().getBotFactory().
 				getBot(0)->getBody().mPos;
 			printf("%02d (%g, %g)\n", sim.getCurPhase(), pos.x, pos.y);
+			
+			const Sim::Bullet *bu = sim.getState().getBulletFactory().getObj(0);
+			if(bu) {
+				pos = bu->getBody().mPos;
+				printf("%02d (%g, %g, bullet)\n", sim.getCurPhase(), pos.x,pos.y);
+			}
+			
 			sim.step();
 		}
 		

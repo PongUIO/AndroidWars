@@ -19,7 +19,8 @@ namespace Sim {
 		mType(cfg.type),
 		mSim(sim),
 		
-		mReloadTimer(0.0)
+		mReloadTimer(0.0),
+		mIsDead(false)
 	{
 		mTypePtr = mSim->getData().getWeaponDb().getType(mType);
 		
@@ -47,6 +48,8 @@ namespace Sim {
 	}
 	
 	// State objects
+	//
+	//
 	namespace WeaponState {
 		void Shoot::exec(StateSys::Reference::Thread& t) const
 		{
@@ -56,8 +59,11 @@ namespace Sim {
 			Simulation *sim = arg.ref->getSim();
 			Bullet::Config cfg;
 			cfg.pos = arg.pos;
+			cfg.vel = arg.dir;
 			cfg.type = mType;
 			sim->getState().getBulletFactory().create(cfg);
+			
+			t.mActive = nextState();
 		}
 	}
 }
