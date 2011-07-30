@@ -23,7 +23,8 @@ namespace Sim {
 		StateSys::State* state)
 	{
 		mStates.push_back(state);
-		return mStates.size()-1;
+		state->setId(mStates.size()-1);
+		return state->getId();
 	}
 
 	StateSys::IdType StateSys::registerEntryPoint(
@@ -31,6 +32,35 @@ namespace Sim {
 	{
 		mEntry.push_back(entry);
 		return mEntry.size()-1;
+	}
+	
+	void StateSys::Reference::save(Save::BasePtr& fp, const ArgSave &argSave)
+	{
+		fp.writeInt<IdType>(mThreads.size());
+		for(ThreadList::iterator i=mThreads.begin(); i!=mThreads.end(); ++i) {
+			Thread &t = *i;
+			fp.writeInt<IdType>(t.mActive->getId());
+			fp.writeFloat(t.mDelay);
+			fp.writeInt<IdType>(t.mEntryType);
+			argSave.save(fp, t);
+		}
+	}
+	
+	void StateSys::Reference::load(Save::BasePtr& fp, const ArgSave &argSave,
+		StateSys* sys)
+	{
+		mSystem = sys;
+		
+		IdType size = fp.readInt<IdType>();
+		for(IdType i=0; i<size; ++i) {
+			mThreads.push_back(Thread(this));
+			Thread &t = mThreads.back();
+			
+			t.mActive = sys->getState(fp.readInt<IdType>());
+			t.mDelay = fp.readFloat();
+			t.mEntryType = fp.readInt<IdType>();
+			argSave.load(fp, t);
+		}
 	}
 	
 	// StateSys::State functions

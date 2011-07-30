@@ -7,6 +7,8 @@
 #include <list>
 #include <stdint.h>
 
+#include "../Save.h"
+
 namespace Sim {
 	// Forward declarations
 	class Simulation;
@@ -48,9 +50,27 @@ namespace Sim {
 					};
 					typedef std::list<Thread> ThreadList;
 					
+					/**
+					 * Class that handles saving/loading of
+					 * thread-specific values.
+					 */
+					struct ArgSave {
+						virtual void save(Save::BasePtr &fp,
+							const Thread &ref
+						)const =0;
+						virtual void load(Save::BasePtr &fp,
+							Thread &ref
+						)const =0;
+					};
+					
 					// Functions
 					Reference(const StateSys *sys=NULL);
 					~Reference();
+					
+					// Saving/loading
+					void save(Save::BasePtr &fp, const ArgSave &argSave);
+					void load(Save::BasePtr &fp, const ArgSave &argSave,
+							  StateSys *sys);
 					
 					void startThread(
 						IdType entryId,
@@ -78,6 +98,7 @@ namespace Sim {
 					virtual void exec(Reference::Thread &thread) const =0;
 					
 					IdType insertChild(State *child);
+					IdType getId() const { return mId; }
 					
 				protected:
 					const State *nextState(IdType id=0) const
@@ -85,8 +106,11 @@ namespace Sim {
 					  else return mStates[id]; }
 					
 					StateVec mStates;
+					IdType mId;
 					
 				private:
+					void setId(IdType id) { mId=id; }
+					
 					/// Initializes this state, called by \c StateSys
 					/// when it is initialized.
 					virtual void init(StateSys &sys) {}

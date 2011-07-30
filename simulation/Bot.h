@@ -164,7 +164,6 @@ namespace Sim {
 			
 		private:
 			void deleteInstance(Bot *obj) { delete obj; }
-			//Bot *newCopyInstance(Bot *obj) { return new Bot(*obj); }
 			
 			InputBuffer<BotInput> mInput;
 			Simulation *mSim;
