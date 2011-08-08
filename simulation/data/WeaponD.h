@@ -13,26 +13,20 @@ namespace Sim {
 			
 			StateSys *getStateSys() { return mSys; }
 			const StateSys *getStateSys() const { return mSys; }
-			uint32_t getId() { return mId; }
+			uint32_t getId() const { return mId; }
 			
 		private:
 			StateSys *mSys;
 			uint32_t mId;
 			
 			friend class WeaponDatabase;
+			friend class DataT<WeaponD>;
 	};
 	
-	class WeaponDatabase : public DataT<WeaponD*> {
+	class WeaponDatabase : public DataT<WeaponD> {
 		public:
 			WeaponDatabase() {}
 			virtual ~WeaponDatabase();
-			
-			WeaponD *createType() {
-				WeaponD *data = new WeaponD();
-				uint32_t id = addType(data);
-				data->mId = id;
-				return data;
-			}
 			
 		private:
 			

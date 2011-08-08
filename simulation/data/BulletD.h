@@ -26,22 +26,15 @@ namespace Sim {
 			uint32_t mId;
 			
 			friend class BulletDatabase;
+			friend class DataT<BulletD>;
 	};
 	
-	class BulletDatabase : public DataT<BulletD*> {
+	class BulletDatabase : public DataT<BulletD> {
 		public:
 			BulletDatabase() {}
 			virtual ~BulletDatabase();
 			
-			BulletD *createType() {
-				BulletD *data = new BulletD();
-				uint32_t id = addType(data);
-				data->mId = id;
-				return data;
-			}
-			
 			void save(Save::BasePtr &fp) {
-				(void)fp;
 			}
 			
 		private:

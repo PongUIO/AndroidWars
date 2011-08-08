@@ -29,16 +29,23 @@ namespace Sim {
 			virtual void shutdown()
 			{}
 			
-			const T &getType(IdType type) const
+			const T *getType(IdType type) const
 			{ return mData.at(type); }
+			
+			T *createType() {
+				T *data = new T();
+				IdType id = addType(data);
+				data->mId = id;
+				return data;
+			}
 			
 			size_t debugSize() { return mData.size(); }
 			
 		protected:
-			IdType addType(const T &type)
+			IdType addType(T *type)
 			{ mData.push_back(type); return IdType(mData.size()-1); }
 			
-			T &rawGet(IdType type)
+			T *rawGet(IdType type)
 			{ return mData.at(type); }
 			
 			void clearData()
@@ -48,7 +55,7 @@ namespace Sim {
 					delete *i;
 			}
 			
-			typedef std::vector<T> DataVec;
+			typedef std::vector<T*> DataVec;
 			
 			DataVec mData;
 			Simulation *mSim;

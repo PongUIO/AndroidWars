@@ -32,21 +32,21 @@ namespace Sim {
 			/// @name Compatibility layer
 			//@{
 				const TileD &getTile(uint16_t type) const
-				{ return getType(type); }
+				{ return *getType(type); }
 				
 				uint16_t addTile(const TileD &tile)
-				{ return addType(tile); }
+				{ return addType(new TileD(tile) ); }
 			//@}
 			
 			void save(Save::BasePtr &fp) {
 				fp.writeInt<uint32_t>(mData.size());
 				for(DataVec::iterator i=mData.begin(); i!=mData.end(); i++) {
-					TileD &t = *i;
+					TileD *t = *i;
 					
-					fp.writeInt(t.colMask);
-					fp.writeFloat(t.blastResist);
-					fp.writeFloat(t.bounce);
-					fp.writeFloat(t.friction);
+					fp.writeInt(t->colMask);
+					fp.writeFloat(t->blastResist);
+					fp.writeFloat(t->bounce);
+					fp.writeFloat(t->friction);
 				}
 			}
 			
