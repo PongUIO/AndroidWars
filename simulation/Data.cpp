@@ -18,7 +18,7 @@ namespace Sim {
 	{
 		const Configuration &cfg = mSim->getConfig();
 		
-		callArg(&BaseData::startup, mSim);
+		call( boost::bind(&BaseData::startup, _1, mSim) );
 		
 		mTileCol.startup(cfg.tileSize, 8);
 	}
@@ -27,7 +27,7 @@ namespace Sim {
 	{
 		mTileCol.shutdown();
 		
-		rcall(&BaseData::shutdown);
+		rcall( boost::bind(&BaseData::shutdown, _1) );
 	}
 	
 	void Data::save(Save::BasePtr &fp)

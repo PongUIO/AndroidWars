@@ -25,14 +25,10 @@ namespace Sim {
 	{}
 	
 	void State::startup()
-	{
-		call(&StateObj::startup);
-	}
+	{	call( boost::bind(&StateObj::startup, _1) ); }
 
 	void State::shutdown()
-	{
-		rcall(&StateObj::shutdown);
-	}
+	{	rcall( boost::bind(&StateObj::shutdown, _1) ); }
 	
 	void State::startPhase()
 	{
@@ -41,9 +37,7 @@ namespace Sim {
 	}
 	
 	void State::step(double stepTime)
-	{
-		callArg(&StateObj::step, stepTime);
-	}
+	{	call( boost::bind(&StateObj::step, _1, stepTime) ); }
 	
 	void State::endPhase()
 	{

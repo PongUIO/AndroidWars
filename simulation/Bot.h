@@ -2,6 +2,7 @@
 #define SIM_BOT_H
 
 #include <stdint.h>
+#include <boost/bind.hpp>
 
 #include "Factory.h"
 #include "Input.h"
@@ -133,7 +134,7 @@ namespace Sim {
 				~BotFactory();
 				
 				void step(double stepTime)
-				{ factoryCall(&Bot::step, stepTime); }
+				{ boost::bind(&Bot::step, _1, stepTime); }
 				
 				void startup();
 				void shutdown();

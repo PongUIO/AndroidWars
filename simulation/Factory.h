@@ -8,6 +8,8 @@
 
 #include <stdio.h>
 
+#include <boost/bind.hpp>
+
 #include "utility/CallGroup.h"
 #include "StateObj.h"
 #include "Save.h"
@@ -35,7 +37,7 @@ namespace Sim {
 	 * - getId() : Returns the ID of this object
 	 */
 	template<class T>
-	class Factory : private BaseObjCall<T> {
+	class Factory {
 		protected:
 			typedef std::stack<uint32_t> IdStack;
 			
@@ -55,8 +57,8 @@ namespace Sim {
 				mData[obj->getId()] = obj;
 			}
 			
-			template<typename Func, typename Arg>
-			void factoryCall(Func func, Arg arg=Arg())
+			template<typename Func>
+			void factoryCall(Func func)
 			{
 				/// @note If new objects are created during this
 				/// it is unpredictable whether they are called or not.
@@ -66,7 +68,7 @@ namespace Sim {
 					if(obj) {
 						// If the object is not dead, then process it
 						if(!obj->isDead())
-							doCall(obj, func, arg);
+							func(obj);
 						
 						// Free and disable this ID
 						// if the object is dead
@@ -148,7 +150,7 @@ namespace Sim {
 			/// @name Interaction
 			//@{
 				void step(double stepTime)
-				{ Factory<T>::factoryCall(&T::step, stepTime); }
+				{ boost::bind(&T::step, _1, stepTime); }
 				
 				uint32_t create(const typename T::Config &cfg)
 				{

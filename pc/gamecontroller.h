@@ -42,6 +42,8 @@ public:
 		Sim::Player testSide;
 		sim.getState().getPlayerData().addPlayer(testSide);
 		
+		sim.getData().getWeaponDb().createType();
+		
 		Sim::BotD myBot;
 		myBot.baseSpeed = 1.0;
 		myBot.baseWeight = 75.0;
