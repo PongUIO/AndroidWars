@@ -22,8 +22,10 @@ RESOURCES += \
 OTHER_FILES += \
     graphics/tiles/metal.png \
     graphics/temp/temp.png \
+    graphics/temp/character1.png \
     graphics/temp/temp2.png \
     graphics/tiles/metal2surf.png \
     graphics/characters/temp.png \
     graphics/menu/startgame.png \
-    graphics/weapons/testweapon.png
+    graphics/weapons/testweapon.png \
+    graphics/characters/character1.png

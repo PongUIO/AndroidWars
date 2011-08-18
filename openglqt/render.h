@@ -76,8 +76,8 @@ protected:
                 textures[1] = bindTexture(data[1].scaled(64,64));
 		data[2].load(":/graphics/tiles/metal2surf.png");
                 textures[2] = bindTexture(data[2].scaled(64,64));
-                characters[0].load(":/graphics/characters/temp.png");
-                chartextures[0] = bindTexture(characters[0].scaled(128,320));
+                characters[0].load(":/graphics/characters/character1.png");
+                chartextures[0] = bindTexture(characters[0].scaled(128,320).mirrored(true, false));
 
                 weapons[0].load(":/graphics/weapons/testweapon.png");
                 weaponstextures[0] = bindTexture(weapons[0].scaled(32,64));
@@ -158,7 +158,14 @@ protected:
                         Sim::Bot *bot = bots[i];
                         if (bot != NULL) {
                                 Sim::Vector vec = bot->getBody().mPos;
-                                glTexSubImage2D(GL_TEXTURE_2D, 0, 0,0 , characters[mt].width(), characters[mt].height(),  GL_RGBA, GL_UNSIGNED_BYTE, characters[mt].bits() );
+                                //glTexSubImage2D(GL_TEXTURE_2D, 0, 0,0 , characters[mt].width(), characters[mt].height(),  GL_RGBA, GL_UNSIGNED_BYTE, characters[mt].bits() );
+                                glBindTexture(GL_TEXTURE_2D, weaponstextures[0]);
+                                glBegin(GL_QUADS);
+                                glTexCoord2f(0,1); glVertex2f(vec.x+0.3,vec.y+1.8);  // lower left
+                                glTexCoord2f(0,0); glVertex2f(vec.x+0.3,vec.y+1.3); // lower right
+                                glTexCoord2f(1,0); glVertex2f(vec.x+1.3,vec.y+1.3);// upper right
+                                glTexCoord2f(1,1); glVertex2f(vec.x+1.3,vec.y+1.8); // upper left
+                                glEnd();
                                 glBindTexture(GL_TEXTURE_2D, chartextures[0]);
                                 glBegin(GL_QUADS);
                                 glTexCoord2f(0,1); glVertex2f(vec.x,vec.y + 1.8);  // lower left
@@ -166,14 +173,7 @@ protected:
                                 glTexCoord2f(1,0); glVertex2f(vec.x+1,vec.y);// upper right
                                 glTexCoord2f(1,1); glVertex2f(vec.x+1,vec.y+1.8); // upper left
                                 glEnd();
-                                glTexSubImage2D(GL_TEXTURE_2D, 0, 0,0 , weapons[0].width(), weapons[0].height(),  GL_RGBA, GL_UNSIGNED_BYTE, weapons[0].bits() );
-                                glBindTexture(GL_TEXTURE_2D, weaponstextures[0]);
-                                glBegin(GL_QUADS);
-                                glTexCoord2f(0,1); glVertex2f(vec.x+0.5,vec.y + 0.5);  // lower left
-                                glTexCoord2f(0,0); glVertex2f(vec.x+0.5,vec.y); // lower right
-                                glTexCoord2f(1,0); glVertex2f(vec.x+1.5,vec.y);// upper right
-                                glTexCoord2f(1,1); glVertex2f(vec.x+1.5,vec.y+0.5); // upper left
-                                glEnd();
+                                //glTexSubImage2D(GL_TEXTURE_2D, 0, 0,0 , weapons[0].width(), weapons[0].height(),  GL_RGBA, GL_UNSIGNED_BYTE, weapons[0].bits() );
                                 glBindTexture(GL_TEXTURE_2D, 0);
                                 /*glBlendFunc(GL_ONE, GL_ONE);
 				//glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);

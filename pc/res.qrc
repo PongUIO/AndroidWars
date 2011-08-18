@@ -9,5 +9,6 @@
         <file>graphics/tiles/empty.png</file>
         <file>graphics/weapons/testweapon.png</file>
         <file>graphics/profiles/test.xcf</file>
+        <file>graphics/characters/character1.png</file>
     </qresource>
 </RCC>
