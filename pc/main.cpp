@@ -39,6 +39,6 @@ int main(int argc, char *argv[]) {
         app.exec();
         delete test;
         delete gameButton;
-        delete menu;
+	//delete menu;
         return 0;//main.exec();
 }
