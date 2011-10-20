@@ -27,6 +27,8 @@ public:
         GLuint chartextures[1];
         QImage weapons[1];
         GLuint weaponstextures[1];
+        QImage bg[1];
+        GLuint bgtextures[1];
         Sim::Simulation *sim;
         Sim::World *wld;
         Camera *cam;
@@ -82,17 +84,6 @@ protected:
                 weapons[0].load(":/graphics/weapons/testweapon.png");
                 weaponstextures[0] = bindTexture(weapons[0].scaled(32,64));
 
-                /*		glEnable(GL_TEXTURE_2D);
-                glGenTextures(3,&texture[0]);
-                glBindTexture(GL_TEXTURE_2D,texture[0]);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-                glBindTexture(GL_TEXTURE_2D, texture[0]);
-                glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, gldata.width(),
-                              gldata.height(),
-                              0, GL_RGBA, GL_UNSIGNED_BYTE, gldata.bits() );
-
-                glDisable(GL_TEXTURE_2D);*/
 
         }
 
@@ -120,14 +111,9 @@ protected:
                 glTranslatef(cam->pos.x,cam->pos.y,-1);
                 glMatrixMode(GL_MODELVIEW);
                 glLoadIdentity();
-                // draw the scene:
-                //glRotatef( ... );
-                //glMaterialfv( ... );
-                //glDrawPixels(data.width(), data.height(), GL_RGBA, GL_UNSIGNED_BYTE, gldata.bits());
                 glEnable(GL_TEXTURE_2D);
 
                 int mt;
-                //       glViewport(cam->pos.x, cam->pos.y, getWidth(), getHeight());
                 int fx = -cam->pos.x-cam->zoom-1;
                 int tx = -cam->pos.x+cam->zoom+1;
                 int fy = -cam->pos.y-cam->zoom*cam->ratio-1;
@@ -154,6 +140,7 @@ protected:
 
                 glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
                 glEnable(GL_BLEND);
+
                 for (i = 0; i < bots.size(); i++) {
                         Sim::Bot *bot = bots[i];
                         if (bot != NULL) {
@@ -173,20 +160,11 @@ protected:
                                 glTexCoord2f(1,0); glVertex2f(vec.x+1,vec.y);// upper right
                                 glTexCoord2f(1,1); glVertex2f(vec.x+1,vec.y+1.8); // upper left
                                 glEnd();
-                                //glTexSubImage2D(GL_TEXTURE_2D, 0, 0,0 , weapons[0].width(), weapons[0].height(),  GL_RGBA, GL_UNSIGNED_BYTE, weapons[0].bits() );
                                 glBindTexture(GL_TEXTURE_2D, 0);
                                 /*glBlendFunc(GL_ONE, GL_ONE);
 				//glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
-				glBegin(GL_QUADS);
-				glColor3f(0.0,1.0,1.0);
-				glVertex2f(vec.x,vec.y + 1.8);
-				glVertex2f(vec.x,vec.y);
-				glVertex2f(vec.x+1,vec.y);
-				glVertex2f(vec.x+1,vec.y+1.8);
-				glEnd();
-                                glEnable(GL_TEXTURE_2D);
-                                glColor3f(1.0,1.0,1.0);*/
+				glEnable(GL_TEXTURE_2D);*/
 
                         }
                 }

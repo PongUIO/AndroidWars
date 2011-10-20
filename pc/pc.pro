@@ -28,4 +28,5 @@ OTHER_FILES += \
     graphics/characters/temp.png \
     graphics/menu/startgame.png \
     graphics/weapons/testweapon.png \
-    graphics/characters/character1.png
+    graphics/characters/character1.png \
+    graphics/bg/bg.xcf

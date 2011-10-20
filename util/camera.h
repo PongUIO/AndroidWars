@@ -16,7 +16,7 @@ public:
                 ratio = yres/((double)xres);
                 this->xres = xres;
                 this->yres = yres;
-                zoomfriction = 0.99;
+                zoomfriction = 0.994;
                 panfriction = 0.9;
         }
         virtual ~Camera() {}

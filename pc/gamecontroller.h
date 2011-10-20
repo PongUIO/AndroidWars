@@ -98,7 +98,7 @@ public:
 
 		camTimer = new QTimer(main);
                 drawer->connect(camTimer, SIGNAL(timeout()), drawer, SLOT(moveMouseCheck()));
-		camTimer->start(1./RATE);
+                camTimer->start(1000./RATE);
 
                 iconHolder  = new QVBoxLayout(main);
                 lower = new QHBoxLayout();
@@ -125,7 +125,7 @@ public:
 		label->resize(60,60);
 		label2->setPixmap(QPixmap(":/graphics/temp/temp2.png"));
 		label2->resize(60,60);
-                profiles[0] = QPixmap(":/graphics/profiles/test.xcf");
+		profiles[0] = QPixmap(":/graphics/profiles/test.png");
 		space = new QSpacerItem(main->width(), 0, QSizePolicy::Expanding);
 		label->show();
 		label2->show();
