@@ -15,6 +15,9 @@ namespace Sim {
 			virtual void startup()=0;
 			virtual void shutdown()=0;
 			
+			virtual void startPhase() {}
+			virtual void endPhase() {}
+			
 			virtual void step(double stepTime)=0;
 			
 			virtual void save(Save::BasePtr &fp) { (void)fp; }

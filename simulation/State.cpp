@@ -14,10 +14,10 @@ namespace Sim {
 		mPlayer(),
 		mSim(sim)
 	{
+		registerCallObj(&mWorld);
 		registerCallObj(&mBotFactory);
 		registerCallObj(&mWeaponFactory);
 		registerCallObj(&mBulletFactory);
-		registerCallObj(&mWorld);
 		registerCallObj(&mPlayer);
 	}
 	
@@ -31,28 +31,17 @@ namespace Sim {
 	{	rcall( boost::bind(&StateObj::shutdown, _1) ); }
 	
 	void State::startPhase()
-	{
-		mBotFactory.startPhase();
-		mWorld.startPhase();
-	}
+	{	call( boost::bind(&StateObj::startPhase, _1) ); }
 	
 	void State::step(double stepTime)
 	{	call( boost::bind(&StateObj::step, _1, stepTime) ); }
 	
 	void State::endPhase()
-	{
-		mWorld.endPhase();
-		mBotFactory.endPhase();
-	}
+	{	call( boost::bind(&StateObj::endPhase, _1) );	}
 	
 	void State::save(Save::BasePtr &fp)
-	{
-		mPlayer.save(fp);
-		mWorld.save(fp);
-		mBotFactory.save(fp);
-	}
+	{	call( boost::bind(&StateObj::save, _1, boost::ref(fp)) );	}
 	
 	void State::load(Save::BasePtr& fp)
-	{
-	}
+	{	call( boost::bind(&StateObj::load, _1, boost::ref(fp)) ); }
 }

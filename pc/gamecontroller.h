@@ -61,14 +61,29 @@ public:
 		botCfg.side = 0;
 		botCfg.type = 0;
 		botCfg.pos = Sim::Vector(0,0);
-                uint32_t botId = sim.getState().getBotFactory().createBot( botCfg );
-                botCfg.pos = Sim::Vector(0,1);
-                sim.getState().getBotFactory().createBot( botCfg );
-
+		uint32_t botId = sim.getState().getBotFactory().createBot( botCfg );
+		botCfg.pos = Sim::Vector(0,1);
+		sim.getState().getBotFactory().createBot( botCfg );
+		
+		// Create test weapon and bullet type
+		Sim::BulletD *bulletType = sim.getData().getBulletDb().createType();
+		
+		Sim::StateSys *sys = bulletType->getStateSys();
+		sys->registerState(new Sim::StdState::Delay(0.2));
+		sys->registerEntryPoint(0);
+		
+		Sim::WeaponD *weaponType = sim.getData().getWeaponDb().createType();
+		Sim::StateSys *wsys = weaponType->getStateSys();
+		wsys->registerState(new Sim::WeaponState::Shoot( bulletType->getId() ) );
+		wsys->registerEntryPoint(0);
+		
 		// Send some input to this bot
 		Sim::BotFactory &botFact = sim.getState().getBotFactory();
 		Sim::BotInput bi;
 		bi = Sim::BotInput::inMove(botId, 20, Sim::Vector(1,0) );
+		botFact.getInput().addInput( bi );
+		
+		bi = Sim::BotInput::inShoot(botId, 0, Sim::Vector(0,1));
 		botFact.getInput().addInput( bi );
 		
 		Sim::TileDatabase &db = sim.getData().getTileDb();
