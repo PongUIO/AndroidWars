@@ -96,7 +96,8 @@ protected:
         }
 
         void wheelEvent(QWheelEvent *event) {
-                cam->dzoom -= event->delta()/500000.0;//pow(10, cam->zoom);
+		cam->modZoom(event->delta());
+		//cam->dzoom -= event->delta()/500000.0;//pow(10, cam->zoom);
         }
 
         // overridden

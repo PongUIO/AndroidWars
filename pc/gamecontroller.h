@@ -34,7 +34,7 @@ public:
 
 		Sim::Configuration config;
 
-		config.phaseLength = 1;
+		config.phaseLength = 10;
 		config.stepTime = 0.01;
 
 		sim.startup(config);
@@ -43,9 +43,9 @@ public:
 		sim.getState().getPlayerData().addPlayer(testSide);
 		
 		sim.getData().getWeaponDb().createType();
-		
+
 		Sim::BotD myBot;
-		myBot.baseSpeed = 1.0;
+		myBot.baseSpeed = 100.0;
 		myBot.baseWeight = 75.0;
 		
 		Sim::Collision::ColPoints cpts;

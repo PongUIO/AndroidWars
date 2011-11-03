@@ -16,7 +16,7 @@ public:
                 ratio = yres/((double)xres);
                 this->xres = xres;
                 this->yres = yres;
-                zoomfriction = 0.994;
+		zoomfriction = 0.9;
                 panfriction = 0.9;
         }
         virtual ~Camera() {}
@@ -25,29 +25,29 @@ public:
         void addVel(int lastX, int lastY) {
                 this->lastX = lastX;
                 this->lastY = lastY;
-                delta += Sim::Vector((lastX > xres -10 ) * (-(lastX - xres + 10)*0.00001) +
-                            (lastX < 10) * (-(lastX-10)*0.00001),
-                            (lastY < 10) * ((lastY - 10)*0.00001) +
-                            (lastY > yres - 10) * ((lastY - yres + 10)* 0.00001))/2;
+		delta += Sim::Vector((lastX > xres -10 ) * (-(lastX - xres + 10)*0.001) +
+			    (lastX < 10) * (-(lastX-10)*0.001),
+			    (lastY < 10) * ((lastY - 10)*0.001) +
+			    (lastY > yres - 10) * ((lastY - yres + 10)* 0.001))/2;
         }
-        void modZoom(double mod) {
-                dzoom += mod;
+	void modZoom(double mod) {
+		dzoom -= mod/10000;
         }
 
         void iter() {
                 pos += delta*zoom;
                 delta *= panfriction;
-                zoom *= dzoom + 1;
                 dzoom *= zoomfriction;
+		zoom *= dzoom + 1;
 
                 Sim::Vector temp = Sim::Vector( xPixToDouble(lastX), yPixToDouble(lastY))*(-fabs(dzoom*5));
                 //qDebug("%4.4f %4.4f\n", temp.x, temp.y);
                 pos += temp;
-                if (zoom < 0.01) {
-                        zoom = 0.01;
+		if (zoom < 1) {
+			zoom = 1;
                 } else if (zoom > 32) {
                         zoom = 32;
-                }
+		}
         }
 
         double xPixToDouble(int x) {
