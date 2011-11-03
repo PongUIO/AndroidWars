@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "Simulation.h"
 #include "Bot.h"
 

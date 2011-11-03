@@ -81,10 +81,6 @@ namespace Sim {
 				}
 			}
 			
-			template<typename Func>
-			void factoryCall(Func func, int arg=0)
-			{	factoryCall<Func,int>(func,arg); }
-			
 		protected:
 			void setObject(T *obj, uint32_t id) {
 				if(id >= mData.size())
@@ -150,7 +146,7 @@ namespace Sim {
 			/// @name Interaction
 			//@{
 				void step(double stepTime)
-				{ boost::bind(&T::step, _1, stepTime); }
+				{ Factory<T>::factoryCall(boost::bind(&T::step, _1, stepTime)); }
 				
 				uint32_t create(const typename T::Config &cfg)
 				{
