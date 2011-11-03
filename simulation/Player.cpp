@@ -37,7 +37,7 @@ namespace Sim {
 	
 	void PlayerData::save(Save::BasePtr& fp)
 	{
-		fp.writeInt(mData.size());
+		fp.writeInt<uint32_t>(mData.size());
 		for(size_t i=0; i<mData.size(); i++) {
 			Player &pl = mData[i];
 			fp.writeInt(pl.sideId);

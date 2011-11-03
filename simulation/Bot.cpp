@@ -96,7 +96,7 @@ namespace Sim {
 	
 	void BotFactory::save(Save::BasePtr &fp)
 	{
-		fp.writeInt(mData.size());
+		fp.writeInt<uint32_t>(mData.size());
 		for(ObjVec::iterator i=mData.begin(); i!=mData.end(); i++) {
 			(*i)->save(fp);
 		}
