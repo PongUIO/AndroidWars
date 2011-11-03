@@ -136,6 +136,9 @@ int main(void)
 	printf("%X == %X\n", sim.checksumSim(), sim.save().checksum());
 	
 	printf("Savefile size: %g KiB\n", double(sim.save().size())/1024.0);
+	FILE *fp = fopen("save", "w");
+	fwrite(sim.save().getData(), sim.save().size(), 1, fp);
+	fclose(fp);
 	
 	// Shutdown the simulation
 	sim.shutdown();
