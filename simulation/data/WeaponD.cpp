@@ -9,8 +9,4 @@ namespace Sim {
 		if(mSys)
 			delete mSys;
 	}
-	
-	WeaponDatabase::~WeaponDatabase()
-	{	clearData(); }
-
 }

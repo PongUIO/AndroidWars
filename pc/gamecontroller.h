@@ -98,6 +98,8 @@ public:
 		myTile.colMask = Sim::TileD::ColAll;
 		db.addTile(myTile);
 		
+		sim.getState().getWorld().getTile(3,0).setType(1);
+		
 		sim.prepareSim();
 
 

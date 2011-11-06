@@ -10,7 +10,4 @@ namespace Sim {
 		if(mSys)
 			delete mSys;
 	}
-	
-	BulletDatabase::~BulletDatabase()
-	{	clearData(); }
 }

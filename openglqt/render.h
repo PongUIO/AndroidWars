@@ -39,7 +39,6 @@ public:
                 lastY = height()/2;
                 sim = simIn;
                 wld = &sim->getState().getWorld();
-		wld->getTile(3,0).setType(1);
 
 
         }

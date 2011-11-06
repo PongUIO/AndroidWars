@@ -1,4 +1,5 @@
 #include <math.h>
+#include <stdio.h>
 
 #include "Simulation.h"
 #include "World.h"
@@ -10,8 +11,8 @@
 namespace Sim {
 	
 	World::World(Simulation *sim) :
-		mOffScreen(0),
-		mSim(sim)
+		mWidth(0), mHeight(0), mTileSize(1.0),
+		mOffScreen(0), mSim(sim)
 	{}
 	
 	World::~World()

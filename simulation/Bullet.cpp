@@ -33,9 +33,7 @@ namespace Sim {
 	
 	void Bullet::step(double stepTime)
 	{
-		printf("%g %g\n", mBody.mPos.x, mBody.mPos.y);
 		mBody.step(stepTime);
-		printf("--> %g %g\n", mBody.mPos.x, mBody.mPos.y);
 	}
 	
 	void Bullet::save(Save::BasePtr& fp)

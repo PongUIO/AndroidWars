@@ -21,13 +21,13 @@ namespace Sim {
 	class DataT : public BaseData {
 		public:
 			DataT() {}
-			virtual ~DataT() {}
+			virtual ~DataT() { clearData(); }
 			
 			virtual void startup(Simulation *sim)
 			{ mSim = sim; }
 			
 			virtual void shutdown()
-			{}
+			{ clearData(); }
 			
 			const T *getType(IdType type) const
 			{ return mData.at(type); }
@@ -53,6 +53,7 @@ namespace Sim {
 				for(typename DataVec::iterator i=mData.begin();
 					i!=mData.end(); ++i)
 					delete *i;
+				mData.clear();
 			}
 			
 			typedef std::vector<T*> DataVec;

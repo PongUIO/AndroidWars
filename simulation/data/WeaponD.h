@@ -26,7 +26,7 @@ namespace Sim {
 	class WeaponDatabase : public DataT<WeaponD> {
 		public:
 			WeaponDatabase() {}
-			virtual ~WeaponDatabase();
+			virtual ~WeaponDatabase() {}
 			
 		private:
 			

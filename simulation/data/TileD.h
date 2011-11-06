@@ -9,6 +9,11 @@
 
 namespace Sim {
 	struct TileD {
+		TileD() :
+			colMask(0),
+			blastResist(0.0), bounce(0.0), friction(0.0)
+			{}
+		
 		enum ColMask {
 			ColBot =    0x1, // Collides with bots
 			ColBullet = 0x2, // Collides with bullets

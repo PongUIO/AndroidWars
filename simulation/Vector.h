@@ -15,6 +15,9 @@ namespace Sim {
 			Vector() : x(0), y(0)
 				{}
 			
+			inline double operator[] (const unsigned int i) const
+			{	return *(&x+i); }
+			
 			Vector &operator =(const Vector &b)
 			{ x=b.x; y=b.y; return *this; }
 			

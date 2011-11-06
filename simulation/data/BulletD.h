@@ -32,7 +32,7 @@ namespace Sim {
 	class BulletDatabase : public DataT<BulletD> {
 		public:
 			BulletDatabase() {}
-			virtual ~BulletDatabase();
+			virtual ~BulletDatabase() {}
 			
 			void save(Save::BasePtr &fp) {
 			}

@@ -28,6 +28,9 @@ void loadTiles()
 	tileType.colMask = Sim::TileD::ColNone;
 	
 	sim.getData().getTileDb().addTile(tileType);
+	
+	tileType.colMask = Sim::TileD::ColAll;
+	sim.getData().getTileDb().addTile(tileType);
 }
 
 void loadBots()
@@ -100,6 +103,8 @@ void setupWorld()
 	
 	bi = Sim::BotInput::inShoot(botId, 0, Sim::Vector(1,0) );
 	botFact.getInput().addInput( bi );
+	
+	sim.getState().getWorld().getTile(3,0).setType(1);
 }
 
 
