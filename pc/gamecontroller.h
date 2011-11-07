@@ -60,9 +60,9 @@ public:
 		Sim::Bot::Config botCfg;
 		botCfg.side = 0;
 		botCfg.type = 0;
-		botCfg.pos = Sim::Vector(0,0);
+		botCfg.body.mPos = Sim::Vector(0,0);
 		uint32_t botId = sim.getState().getBotFactory().createBot( botCfg );
-		botCfg.pos = Sim::Vector(0,1);
+		botCfg.body.mPos = Sim::Vector(0,1);
 		sim.getState().getBotFactory().createBot( botCfg );
 		
 		// Create test weapon and bullet type
@@ -151,7 +151,7 @@ public:
 		lower->insertSpacerItem(2, space);
                 lower->setAlignment(Qt::AlignBottom);
                 updateGUI();
-                botCfg.pos = Sim::Vector(0,2);
+                botCfg.body.mPos = Sim::Vector(0,2);
                 sim.getState().getBotFactory().createBot( botCfg );
                 updateGUI();
                 upper->setAlignment(Qt::AlignTop);

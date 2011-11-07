@@ -32,7 +32,6 @@ namespace Sim {
 				
 				void step(double stepTime);
 				
-				void copyState(State &state);
 				void save(Save::BasePtr &fp);
 			//@}
 			

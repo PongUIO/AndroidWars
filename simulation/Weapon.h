@@ -28,6 +28,7 @@ namespace Sim {
 			Simulation *getSim() const { return mSim; }
 			
 		private:
+			Weapon(Simulation *sim, uint32_t id) : mId(id), mSim(sim) {}
 			Weapon(Simulation *sim, uint32_t id, const Config &cfg);
 			~Weapon();
 			
@@ -39,6 +40,7 @@ namespace Sim {
 				void shoot(ShootArg arg, uint32_t style);
 				
 				void save(Save::BasePtr &fp);
+				void load(Save::BasePtr &fp);
 			//@}
 			
 			/// @name Identification
@@ -102,7 +104,9 @@ namespace Sim {
 		public:
 			WeaponFactory(Simulation *sim);
 			~WeaponFactory();
-		
+			
+			void save(Save::BasePtr &fp) {}
+			void load(Save::BasePtr &fp) {}
 	};
 }
 

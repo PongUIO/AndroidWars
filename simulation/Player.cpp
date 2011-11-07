@@ -28,13 +28,6 @@ namespace Sim {
 		mData.push_back(side);
 	}
 	
-	void PlayerData::copyState(State& state)
-	{
-		PlayerData &other = state.getPlayerData();
-		
-		mData = PlayerVec(other.mData);
-	}
-	
 	void PlayerData::save(Save::BasePtr& fp)
 	{
 		fp.writeInt<uint32_t>(mData.size());

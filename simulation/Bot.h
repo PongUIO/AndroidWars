@@ -75,13 +75,18 @@ namespace Sim {
 				uint32_t side;
 				uint32_t type;
 				
-				Vector pos;
+				Body body;
+				WeaponBox weaponBox;
+				
+				InputBuffer<BotInput> input;
+				BotInput curInput;
 			};
 			
 			uint32_t getId() const { return mId; }
 			const Body &getBody() const { return mBody; }
 			
 		private:
+			Bot(Simulation *sim, uint32_t id) : mId(id), mSim(sim) {}
 			Bot(Simulation *sim, uint32_t id, const Config &cfg);
 			~Bot();
 			
@@ -91,20 +96,13 @@ namespace Sim {
 				void step(double stepTime);
 				
 				void save(Save::BasePtr &fp);
-			//@}
-			
-			/// @name Identification
-			//@{
-				uint32_t mId;
-				uint32_t mSide;
-				uint32_t mType;
+				void load(Save::BasePtr &fp);
+				
+				void loadConfig(const Config &cfg);
 			//@}
 			
 			/// @name Input
 			//@{
-				InputBuffer<BotInput> mInput;
-				BotInput mCurInput;
-				
 				bool isIdle() {
 					return mCurInput.type==BotInput::None ||
 						mCurInput.stepCount==0;
@@ -113,13 +111,32 @@ namespace Sim {
 				void handleInput();
 			//@}
 			
-			/// @name Behaviour
+			/**
+			 * @name System data
+			 * Contains data for a bot that is
+			 * used for management of a bot.
+			 */
 			//@{
-				Body mBody;
-				WeaponBox mWeaponBox;
+				uint32_t mId;
 				
 				const BotD *mTypePtr;
 				Simulation *mSim;
+			//@}
+			
+			/**
+			 * @name Simulation data
+			 * Contains data that is directly related
+			 * to simulation. All these values are used in saving/loading.
+			 */
+			//@{
+				uint32_t mSide;
+				uint32_t mType;
+				
+				Body mBody;
+				WeaponBox mWeaponBox;
+				
+				InputBuffer<BotInput> mInput;
+				BotInput mCurInput;
 			//@}
 			
 			friend class BotFactory;
@@ -154,18 +171,12 @@ namespace Sim {
 				void endPhase();
 				
 				InputBuffer<BotInput> &getInput() { return mInput; }
-				
-				/// @name State
-				//@{
-					void save(Save::BasePtr &fp);
-				//@}
 			//@}
 			
 		private:
 			void deleteInstance(Bot *obj) { delete obj; }
 			
 			InputBuffer<BotInput> mInput;
-			Simulation *mSim;
 	};
 	
 }

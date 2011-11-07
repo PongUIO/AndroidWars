@@ -115,7 +115,7 @@ namespace Sim {
 					
 				public:
 					FilePtr(Save &file) :
-						file(file)
+						file(file), readPtr(0)
 					{}
 					
 					bool eof() const
@@ -123,6 +123,8 @@ namespace Sim {
 					
 					void rewind()
 					{ readPtr = 0; }
+					
+					uint32_t getPtrPos() const { return readPtr; }
 			};
 			
 			/**

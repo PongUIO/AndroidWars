@@ -11,21 +11,9 @@ namespace Sim {
 	//
 	//
 	Bot::Bot(Simulation *sim, uint32_t id, const Config &cfg) :
-		mId(id),
-		mSide(cfg.side),
-		mType(cfg.type),
-		mSim(sim),
-		
-		mWeaponBox()
+		mId(id), mSim(sim)
 	{
-		mBody.mPos = cfg.pos;
-		
-		mTypePtr = &mSim->getData().getBotDb().getBot(mType);
-		
-		// Debug: Force a weapon
-		Weapon::Config wcfg;
-		wcfg.type = 0;
-		mWeaponBox.add( sim->getState().getWeaponFactory().create(wcfg) );
+		loadConfig(cfg);
 	}
 	
 	Bot::~Bot() {}
@@ -45,15 +33,37 @@ namespace Sim {
 	
 	void Bot::save(Save::BasePtr &fp)
 	{
+		fp.writeInt<uint32_t>(mSide);
+		fp.writeInt<uint32_t>(mType);
+		
 		mBody.save(fp);
-		fp.writeInt(mSide);
+	}
+	
+	void Bot::load(Save::BasePtr& fp)
+	{
+		Config cfg;
+		
+		cfg.side = fp.readInt<uint32_t>();
+		cfg.type = fp.readInt<uint32_t>();
+		
+		cfg.body.load(fp);
+		
+		loadConfig(cfg);
+	}
+	
+	void Bot::loadConfig(const Sim::Bot::Config& cfg)
+	{
+		mBody = cfg.body;
+		
+		mType = cfg.type;
+		mTypePtr = mSim->getData().getBotDb().getType(mType);
 	}
 	
 	// BotFactory
 	//
 	//
 	BotFactory::BotFactory(Simulation *sim)
-		: DefaultFactory<Bot>(mSim), mSim(sim)
+		: DefaultFactory<Bot>(sim)
 	{}
 
 	BotFactory::~BotFactory()
@@ -92,14 +102,5 @@ namespace Sim {
 	
 	void BotFactory::endPhase()
 	{
-	}
-	
-	void BotFactory::save(Save::BasePtr &fp)
-	{
-		fp.writeInt<uint32_t>(mData.size());
-		for(ObjVec::iterator i=mData.begin(); i!=mData.end(); i++) {
-			(*i)->save(fp);
-		}
-		fp.writeInt(NoId());
 	}
 }

@@ -47,6 +47,10 @@ namespace Sim {
 	{
 	}
 	
+	void Weapon::load(Save::BasePtr& fp)
+	{
+	}
+	
 	// State objects
 	//
 	//

@@ -30,6 +30,7 @@ namespace Sim {
 			const Body &getBody() const { return mBody; }
 			
 		private:
+			Bullet(Simulation *sim, uint32_t id) : mId(id), mSim(sim) {}
 			Bullet(Simulation *sim, uint32_t id, const Config &cfg);
 			~Bullet();
 			
@@ -39,6 +40,7 @@ namespace Sim {
 				void step(double stepTime);
 				
 				void save(Save::BasePtr &fp);
+				void load(Save::BasePtr &fp);
 			//@}
 			
 			/// @name Identification
@@ -77,6 +79,9 @@ namespace Sim {
 				BulletFactory(Simulation *sim);
 				~BulletFactory();
 			//@}
+				
+				void save(Save::BasePtr &fp) {}
+			void load(Save::BasePtr &fp) {}
 	};
 }
 

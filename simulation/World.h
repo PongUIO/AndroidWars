@@ -62,8 +62,8 @@ namespace Sim {
 				void step(double stepTime);
 				void endPhase();
 				
-				void copyState(State &state);
 				void save(Save::BasePtr &fp);
+				void load(Save::BasePtr &fp);
 			//@}
 			
 			/// @name Tile information

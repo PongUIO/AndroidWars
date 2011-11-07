@@ -7,6 +7,16 @@ project(AndroidWars)
 find_package(Boost 1.34)
 find_package(Qt4 COMPONENTS QtCore QtOpenGL QtGui REQUIRED)
 
+find_package(Doxygen)
+if(DOXYGEN_FOUND)
+	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in
+		${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
+	add_custom_target(doc
+		${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
+		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+		COMMENT "Generating API documentation" VERBATIM)
+endif(DOXYGEN_FOUND)
+
 # Optional parameters
 set(CPPFLAGS "-g" CACHE STRING "Compiler flags to use")
 set(LINKFLAGS "" CACHE STRING "Linker flags to use")

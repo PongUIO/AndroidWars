@@ -40,4 +40,9 @@ namespace Sim {
 	{
 		mBody.save(fp);
 	}
+	
+	void Bullet::load(Save::BasePtr& fp)
+	{
+		mBody.load(fp);
+	}
 }

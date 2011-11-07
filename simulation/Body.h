@@ -20,6 +20,8 @@ namespace Sim {
 			{ mVel += mom/mMass; }
 			
 			void save(Save::BasePtr &fp);
+			void load(Save::BasePtr &fp);
+			
 		private:
 			
 	};

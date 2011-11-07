@@ -63,11 +63,20 @@ namespace Sim {
 		}
 	}
 	
-	void World::copyState(State& state)
+	void World::load(Save::BasePtr& fp)
 	{
-		World &otherWorld = state.getWorld();
+		mData.clear();
+		
+		mWidth = fp.readInt<uint32_t>();
+		mHeight = fp.readInt<uint32_t>();
+		
+		mOffScreen = Tile(0);
 		for(size_t i=0; i<mWidth*mHeight; i++) {
-			mData[i] = otherWorld.mData[i];
+			Tile t;
+			t.mType = fp.readInt<uint16_t>();
+			t.mColType.data = fp.readInt<uint8_t>();
+			
+			mData.push_back(t);
 		}
 	}
 	

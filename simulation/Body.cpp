@@ -23,4 +23,12 @@ namespace Sim {
 		fp.writeVec(mAcc);
 		fp.writeFloat(mMass);
 	}
+	
+	void Body::load(Save::BasePtr& fp)
+	{
+		mPos = fp.readVec();
+		mVel = fp.readVec();
+		mAcc = fp.readVec();
+		mMass = fp.readFloat();
+	}
 }
