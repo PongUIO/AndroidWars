@@ -87,12 +87,12 @@ void setupWorld()
 	// Create a test bot
 	Sim::Bot::Config botCfg;
 	Sim::Weapon::Config weapCfg;
-	botCfg.side = 0;
-	botCfg.type = 0;
-	botCfg.body.mPos = Sim::Vector(0,0);
+	botCfg.mSide = 0;
+	botCfg.mType = 0;
+	botCfg.mBody.mPos = Sim::Vector(0,0);
 	
 	weapCfg.type = 0;
-	botCfg.weaponBox.add( sim.getState().getWeaponFactory().create(weapCfg) );
+	botCfg.mWeaponBox.add( sim.getState().getWeaponFactory().create(weapCfg) );
 	uint32_t botId = sim.getState().getBotFactory().createBot( botCfg );
 	
 	// Send some input to this bot
@@ -105,8 +105,8 @@ void setupWorld()
 	bi = Sim::BotInput::inMove(botId, 20, Sim::Vector(-1,0) );
 	botFact.getInput().addInput( bi );
 	
-	/*bi = Sim::BotInput::inShoot(botId, 0, Sim::Vector(1,0) );
-	botFact.getInput().addInput( bi );*/
+	bi = Sim::BotInput::inShoot(botId, 0, Sim::Vector(1,0) );
+	botFact.getInput().addInput( bi );
 	
 	sim.getState().getWorld().getTile(3,0).setType(1);
 }

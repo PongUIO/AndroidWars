@@ -77,12 +77,17 @@ namespace Sim {
 		public:
 			typedef std::vector<uint32_t> WeaponVec;
 			
+			WeaponBox() {}
+			
 			uint32_t add(uint32_t wid) {
 				mData.push_back(wid);
 				return mData.size()-1;
 			}
 			uint32_t get(uint32_t index)
 				{ return mData.at(index); }
+			
+			void save(Save::BasePtr &fp);
+			void load(Save::BasePtr &fp);
 			
 		private:
 			WeaponVec mData;

@@ -102,7 +102,12 @@ namespace Sim {
 					{ writeFloat(v.x); writeFloat(v.y); }
 					
 					Vector readVec()
-					{ return Vector(readFloat(),readFloat()); }
+					{
+						Vector v;
+						v.x = readFloat();
+						v.y = readFloat();
+						return v;
+					}
 			};
 			
 			class FilePtr : public BasePtr {

@@ -51,6 +51,25 @@ namespace Sim {
 	{
 	}
 	
+	// WeaponBox
+	// 
+	// 
+	void WeaponBox::save(Save::BasePtr& fp)
+	{
+		fp.writeInt<uint32_t>(mData.size());
+		for(WeaponVec::iterator i=mData.begin(); i!=mData.end(); ++i) {
+			fp.writeInt<uint32_t>(*i);
+		}
+	}
+	
+	void WeaponBox::load(Save::BasePtr& fp)
+	{
+		uint32_t count = fp.readInt<uint32_t>();
+		while( (count--) > 0) {
+			mData.push_back(fp.readInt<uint32_t>());
+		}
+	}
+	
 	// State objects
 	//
 	//

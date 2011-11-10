@@ -53,7 +53,10 @@ namespace Sim {
 				
 				return tmp;
 			}
-		
+			
+			void save(Save::BasePtr &fp);
+			void load(Save::BasePtr &fp);
+			
 		private:
 			uint32_t botId;      ///< ID of bot to process this input
 			uint32_t stepCount;  ///< Number of steps to perform the action
@@ -71,7 +74,26 @@ namespace Sim {
 	
 	class Bot {
 		public:
-			struct Config {
+			struct State {
+				public:
+					uint32_t mSide;
+					uint32_t mType;
+					
+					Body mBody;
+					WeaponBox mWeaponBox;
+					
+					BotInput mCurInput;
+					InputBuffer<BotInput> mInput;
+					
+				private:
+					void save(Save::BasePtr &fp);
+					void load(Save::BasePtr &fp);
+					
+					friend class Bot;
+			};
+			typedef State Config;
+			
+			/* struct Config {
 				uint32_t side;
 				uint32_t type;
 				
@@ -80,15 +102,18 @@ namespace Sim {
 				
 				InputBuffer<BotInput> input;
 				BotInput curInput;
-			};
+			}; */
 			
 			uint32_t getId() const { return mId; }
-			const Body &getBody() const { return mBody; }
+			const Body &getBody() const { return getState().mBody; }
+			
+			State &getState() { return mState; }
+			const State &getState() const { return mState; }
 			
 		private:
-			Bot(Simulation *sim, uint32_t id) : mId(id), mSim(sim) {}
-			Bot(Simulation *sim, uint32_t id, const Config &cfg);
-			~Bot();
+			Bot(Simulation *sim, uint32_t id, const State &cfg=State()) :
+				mId(id), mSim(sim), mState(cfg) {}
+			~Bot() {}
 			
 			/// @name Interaction
 			//@{
@@ -97,15 +122,13 @@ namespace Sim {
 				
 				void save(Save::BasePtr &fp);
 				void load(Save::BasePtr &fp);
-				
-				void loadConfig(const Config &cfg);
 			//@}
 			
 			/// @name Input
 			//@{
 				bool isIdle() {
-					return mCurInput.type==BotInput::None ||
-						mCurInput.stepCount==0;
+					return mState.mCurInput.type==BotInput::None ||
+						mState.mCurInput.stepCount==0;
 				}
 				
 				void handleInput();
@@ -118,9 +141,9 @@ namespace Sim {
 			 */
 			//@{
 				uint32_t mId;
-				
-				const BotD *mTypePtr;
 				Simulation *mSim;
+				
+				const BotD *getTypePtr();
 			//@}
 			
 			/**
@@ -128,15 +151,16 @@ namespace Sim {
 			 * Contains data that is directly related
 			 * to simulation. All these values are used in saving/loading.
 			 */
+			State mState;
 			//@{
-				uint32_t mSide;
+				/*uint32_t mSide;
 				uint32_t mType;
 				
 				Body mBody;
 				WeaponBox mWeaponBox;
 				
 				InputBuffer<BotInput> mInput;
-				BotInput mCurInput;
+				BotInput mCurInput;*/
 			//@}
 			
 			friend class BotFactory;
@@ -153,6 +177,9 @@ namespace Sim {
 				
 				void startup();
 				void shutdown();
+				
+				void save(Save::BasePtr& fp);
+				void load(Save::BasePtr& fp);
 			//@}
 			
 			/// @name Interaction

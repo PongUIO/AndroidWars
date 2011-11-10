@@ -10,53 +10,52 @@ namespace Sim {
 	// Bot
 	//
 	//
-	Bot::Bot(Simulation *sim, uint32_t id, const Config &cfg) :
-		mId(id), mSim(sim)
-	{
-		loadConfig(cfg);
-	}
-	
-	Bot::~Bot() {}
-
 	void Bot::step(double stepTime)
 	{
 		handleInput();
-		mBody.step(stepTime);
+		mState.mBody.step(stepTime);
 		
 		World &world = mSim->getState().getWorld();
 		World::ColResult res;
-		res = world.collide(mBody.mPos, mBody.mVel, mTypePtr->getCollision());
+		res = world.collide(mState.mBody.mPos, mState.mBody.mVel, getTypePtr()->getCollision());
 		if(res.colRes.isCol) {
-			mBody.mPos += res.colRes.getOrp();
+			mState.mBody.mPos += res.colRes.getOrp();
 		}
 	}
 	
-	void Bot::save(Save::BasePtr &fp)
+	const Sim::BotD* Bot::getTypePtr()
+	{
+		return mSim->getData().getBotDb().getType(mState.mType);
+	}
+	
+	void Bot::save(Save::BasePtr& fp)
+	{	mState.save(fp);	}
+
+	void Bot::load(Save::BasePtr& fp)
+	{	mState.load(fp);	}
+	
+	void Bot::State::save(Save::BasePtr &fp)
 	{
 		fp.writeInt<uint32_t>(mSide);
 		fp.writeInt<uint32_t>(mType);
 		
 		mBody.save(fp);
+		mWeaponBox.save(fp);
+		
+		mCurInput.save(fp);
+		mInput.save(fp);
 	}
 	
-	void Bot::load(Save::BasePtr& fp)
+	void Bot::State::load(Save::BasePtr& fp)
 	{
-		Config cfg;
+		mSide = fp.readInt<uint32_t>();
+		mType = fp.readInt<uint32_t>();
 		
-		cfg.side = fp.readInt<uint32_t>();
-		cfg.type = fp.readInt<uint32_t>();
+		mBody.load(fp);
+		mWeaponBox.load(fp);
 		
-		cfg.body.load(fp);
-		
-		loadConfig(cfg);
-	}
-	
-	void Bot::loadConfig(const Sim::Bot::Config& cfg)
-	{
-		mBody = cfg.body;
-		
-		mType = cfg.type;
-		mTypePtr = mSim->getData().getBotDb().getType(mType);
+		mCurInput.load(fp);
+		mInput.load(fp);
 	}
 	
 	// BotFactory
@@ -96,11 +95,64 @@ namespace Sim {
 			
 			Bot *bot = getObject(input.botId);
 			if(bot)
-				bot->mInput.addInput(input);
+				bot->mState.mInput.addInput(input);
 		}
 	}
 	
 	void BotFactory::endPhase()
 	{
+	}
+	
+	void BotFactory::save(Save::BasePtr& fp)
+	{
+		mInput.save(fp);
+		Sim::DefaultFactory< Sim::Bot >::save(fp);
+	}
+
+	void BotFactory::load(Save::BasePtr& fp)
+	{
+		mInput.load(fp);
+		Sim::DefaultFactory< Sim::Bot >::load(fp);
+	}
+	
+	// BotInput
+	//
+	//
+	void BotInput::save(Save::BasePtr &fp)
+	{
+		fp.writeInt<uint32_t>(botId);
+		fp.writeInt<uint32_t>(stepCount);
+		fp.writeInt<uint32_t>(type);
+		
+		switch(type)
+		{
+			case Move:
+				fp.writeVec(dir);
+				break;
+				
+			case Shoot:
+				fp.writeVec(dir);
+				fp.writeInt<int32_t>(iparam[0]);
+				break;
+		}
+	}
+	
+	void BotInput::load(Save::BasePtr& fp)
+	{
+		botId = fp.readInt<uint32_t>();
+		stepCount = fp.readInt<uint32_t>();
+		type = (InputType)fp.readInt<uint32_t>();
+		
+		switch(type)
+		{
+			case Move:
+				dir = fp.readVec();
+				break;
+				
+			case Shoot:
+				dir = fp.readVec();
+				iparam[0] = fp.readInt<int32_t>();
+				break;
+		}
 	}
 }
