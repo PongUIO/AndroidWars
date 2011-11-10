@@ -58,11 +58,11 @@ public:
 		
 		// Create a test bot
 		Sim::Bot::Config botCfg;
-		botCfg.side = 0;
-		botCfg.type = 0;
-		botCfg.body.mPos = Sim::Vector(0,0);
+		botCfg.mSide = 0;
+		botCfg.mType = 0;
+		botCfg.mBody.mPos = Sim::Vector(0,0);
 		uint32_t botId = sim.getState().getBotFactory().createBot( botCfg );
-		botCfg.body.mPos = Sim::Vector(0,1);
+		botCfg.mBody.mPos = Sim::Vector(0,1);
 		sim.getState().getBotFactory().createBot( botCfg );
 		
 		// Create test weapon and bullet type
@@ -83,8 +83,8 @@ public:
 		bi = Sim::BotInput::inMove(botId, 20, Sim::Vector(1,0) );
 		botFact.getInput().addInput( bi );
 		
-		bi = Sim::BotInput::inShoot(botId, 0, Sim::Vector(0,1));
-		botFact.getInput().addInput( bi );
+		//bi = Sim::BotInput::inShoot(botId, 0, Sim::Vector(0,1));
+		//botFact.getInput().addInput( bi );
 		
 		Sim::TileDatabase &db = sim.getData().getTileDb();
 		Sim::TileD myTile;
@@ -151,7 +151,7 @@ public:
 		lower->insertSpacerItem(2, space);
                 lower->setAlignment(Qt::AlignBottom);
                 updateGUI();
-                botCfg.body.mPos = Sim::Vector(0,2);
+		botCfg.mBody.mPos = Sim::Vector(0,2);
                 sim.getState().getBotFactory().createBot( botCfg );
                 updateGUI();
                 upper->setAlignment(Qt::AlignTop);
