@@ -29,18 +29,22 @@ public:
         GLuint weaponstextures[1];
         QImage bg[1];
         GLuint bgtextures[1];
-        Sim::Simulation *sim;
+	QImage mouse[1];
+	GLuint mousetextures[1];
+	Sim::Simulation *sim;
         Sim::World *wld;
         Camera *cam;
+	double mouseSize;
         MyGLDrawer(Camera *cam, Sim::Simulation *simIn, QWidget *parent = 0)
 		: QGLWidget(QGLFormat(QGL::SampleBuffers), parent) {
                 this->cam = cam;
                 lastX = width()/2;
                 lastY = height()/2;
                 sim = simIn;
-                wld = &sim->getState().getWorld();
+		wld = &sim->getState().getWorld();
 
-
+		setCursor( QCursor( Qt::BlankCursor ) );
+		mouseSize = 0.07;
         }
 
 protected:
@@ -82,6 +86,8 @@ protected:
 
                 weapons[0].load(":/graphics/weapons/testweapon.png");
                 weaponstextures[0] = bindTexture(weapons[0].scaled(32,64));
+		mouse[0].load(":/graphics/mouse/attack.png");
+		mousetextures[0] = bindTexture(mouse[0]);
 
 
         }
@@ -168,9 +174,22 @@ protected:
 
                         }
                 }
-                glBlendFunc(GL_ONE, GL_ZERO);
-                glDisable(GL_TEXTURE_2D);
-                glDisable(GL_BLEND);
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		glOrtho(-1, 1, -1, 1, 0.01, 1000);
+		glTranslatef(0,0,-1);
+		glBindTexture(GL_TEXTURE_2D, mousetextures[0]);
+		float x = getGlXCoords(lastX);
+		float y = getGlYCoords(lastY);
+
+		glBegin(GL_QUADS);
+		glTexCoord2f(0,1); glVertex2f(x-mouseSize,y+mouseSize);  // lower left
+		glTexCoord2f(0,0); glVertex2f(x-mouseSize,y-mouseSize); // lower right
+		glTexCoord2f(1,0); glVertex2f(x+mouseSize,y-mouseSize);// upper right
+		glTexCoord2f(1,1); glVertex2f(x+mouseSize,y+mouseSize); // upper left
+		glEnd();
+		glDisable(GL_TEXTURE_2D);
+		glDisable(GL_BLEND);
 		glFlush();
 		glFinish();
                 swapBuffers();
@@ -178,12 +197,17 @@ protected:
         int getXBlock(double x) {
                 return 0;
         }
-
-        double getXPix(int x) {
-                return -1+(((double)x)/width())*2-cam->pos.x;
+	double getGlXCoords(int x) {
+		return -1+(((double)x)/width())*2;
+	}
+	double getGlYCoords(int y) {
+		return 1-(((double)y)/height())*2;
+	}
+	double getXPix(int x) {
+		return getGlXCoords(x)-cam->pos.x;
         }
         double getYPix(int y) {
-                return 1-(((double)y)/height())*2-cam->pos.y;
+		return getGlYCoords(y)-cam->pos.y;
         }
 
 };
