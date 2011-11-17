@@ -29,14 +29,16 @@ public:
         GLuint weaponstextures[1];
         QImage bg[1];
         GLuint bgtextures[1];
-	QImage mouse[1];
-	GLuint mousetextures[1];
+	QImage mouse[2];
+	GLuint mousetextures[2];
 	Sim::Simulation *sim;
         Sim::World *wld;
-        Camera *cam;
+	Camera *cam;
+	int cMouse;
 	double mouseSize;
         MyGLDrawer(Camera *cam, Sim::Simulation *simIn, QWidget *parent = 0)
 		: QGLWidget(QGLFormat(QGL::SampleBuffers), parent) {
+		cMouse = 0;
                 this->cam = cam;
                 lastX = width()/2;
                 lastY = height()/2;
@@ -56,13 +58,14 @@ protected:
         // overriden
         void mouseMoveEvent(QMouseEvent * event) {
                 lastX = event->pos().x();
-                lastY = event->pos().y();
+		lastY = event->pos().y();
+		// we need to ask the world what we're pointing at!
 		//                qDebug() << event->pos().x() << " " << event->pos().y();
         }
 
         // overridden  
         void mousePressEvent(QMouseEvent * event) {
-                int w = width();
+		int w = width();
                 int h = height();
         }
 
@@ -74,35 +77,37 @@ protected:
                 // Set up the rendering context, define display lists etc.:
                 glClearColor( 0.0, 0.0, 0.0, 0.0 );
                 //glEnable(GL_DEPTH_TEST);
-                glEnable(GL_DOUBLE);
-		data[0].load(":/graphics/tiles/empty.png");
-                textures[0] = bindTexture(data[0].scaled(64,64));
-		data[1].load(":/graphics/tiles/metal.png");
-                textures[1] = bindTexture(data[1].scaled(64,64));
-		data[2].load(":/graphics/tiles/metal2surf.png");
-                textures[2] = bindTexture(data[2].scaled(64,64));
-                characters[0].load(":/graphics/characters/character1.png");
-                chartextures[0] = bindTexture(characters[0].scaled(128,320).mirrored(true, false));
+		glEnable(GL_DOUBLE);
 
-                weapons[0].load(":/graphics/weapons/testweapon.png");
-                weaponstextures[0] = bindTexture(weapons[0].scaled(32,64));
-		mouse[0].load(":/graphics/mouse/attack.png");
-		mousetextures[0] = bindTexture(mouse[0]);
-
+		//Loading textures.
+		loadAndBind(":/graphics/tiles/empty.png", &data[0], &textures[0]);
+		loadAndBind(":/graphics/tiles/metal.png", &data[1], &textures[1]);
+		loadAndBind(":/graphics/tiles/metal2surf.png", &data[2], &textures[2]);
+		loadAndBind(":/graphics/characters/character1.png", &characters[0], &chartextures[0], 128, 320, false, true);
+		loadAndBind(":/graphics/weapons/testweapon.png", &weapons[0], &weaponstextures[0], 32, 64);
+		loadAndBind(":/graphics/mouse/default.png", &mouse[0], &mousetextures[0]);
+		loadAndBind(":/graphics/mouse/attack.png", &mouse[1], &mousetextures[1]);
 
         }
+
+	void loadAndBind(const char *path, QImage *img, GLuint *bind, GLuint xsize = -1, GLuint ysize = -1, bool vertFlip = false, bool horFlip = false) {
+		img->load(path);
+		if (xsize != -1) {
+			*bind = bindTexture(img->scaled(xsize, ysize).mirrored(horFlip, vertFlip));
+		} else {
+			*bind = bindTexture(img->mirrored(horFlip, vertFlip));
+		}
+	}
 
         // overridden
         void resizeGL( int w, int h )
         {
                 // setup viewport, projection etc.:
                 glViewport( 0, 0, (GLint)w, (GLint)h );
-                //glFrustum( ... );
         }
 
         void wheelEvent(QWheelEvent *event) {
 		cam->modZoom(event->delta());
-		//cam->dzoom -= event->delta()/500000.0;//pow(10, cam->zoom);
         }
 
         // overridden
@@ -119,7 +124,9 @@ protected:
                 glLoadIdentity();
                 glEnable(GL_TEXTURE_2D);
 
-                int mt;
+		float mx = getGlXCoords(lastX);
+		float my = getGlYCoords(lastY);
+		int mt;
                 int fx = -cam->pos.x-cam->zoom-1;
                 int tx = -cam->pos.x+cam->zoom+1;
                 int fy = -cam->pos.y-cam->zoom*cam->ratio-1;
@@ -129,8 +136,8 @@ protected:
                                 mt = wld->getTile(i, j).getType();
                                 if (mt == 0) {
                                         continue;
-                                }
-                                glTexSubImage2D(GL_TEXTURE_2D, 0, 0,0 , data[mt].width(), data[mt].height(),  GL_RGBA, GL_UNSIGNED_BYTE, data[mt].bits() );
+				}
+				//glTexSubImage2D(GL_TEXTURE_2D, 0, 0,0 , data[mt].width(), data[mt].height(),  GL_RGBA, GL_UNSIGNED_BYTE, data[mt].bits() );
                                 glBindTexture(GL_TEXTURE_2D, textures[mt]);
                                 glBegin(GL_QUADS);
                                 glTexCoord2f(0,1); glVertex2f(i,j+1);  // lower left
@@ -178,15 +185,13 @@ protected:
 		glLoadIdentity();
 		glOrtho(-1, 1, -1, 1, 0.01, 1000);
 		glTranslatef(0,0,-1);
-		glBindTexture(GL_TEXTURE_2D, mousetextures[0]);
-		float x = getGlXCoords(lastX);
-		float y = getGlYCoords(lastY);
+		glBindTexture(GL_TEXTURE_2D, mousetextures[cMouse]);
 
 		glBegin(GL_QUADS);
-		glTexCoord2f(0,1); glVertex2f(x-mouseSize,y+mouseSize);  // lower left
-		glTexCoord2f(0,0); glVertex2f(x-mouseSize,y-mouseSize); // lower right
-		glTexCoord2f(1,0); glVertex2f(x+mouseSize,y-mouseSize);// upper right
-		glTexCoord2f(1,1); glVertex2f(x+mouseSize,y+mouseSize); // upper left
+		glTexCoord2f(0,1); glVertex2f(mx-mouseSize,my+mouseSize);  // lower left
+		glTexCoord2f(0,0); glVertex2f(mx-mouseSize,my-mouseSize); // lower right
+		glTexCoord2f(1,0); glVertex2f(mx+mouseSize,my-mouseSize);// upper right
+		glTexCoord2f(1,1); glVertex2f(mx+mouseSize,my+mouseSize); // upper left
 		glEnd();
 		glDisable(GL_TEXTURE_2D);
 		glDisable(GL_BLEND);
