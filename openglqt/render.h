@@ -5,6 +5,8 @@
 #include<iostream>
 #include "Simulation.h"
 #include "../util/camera.h"
+#include "../util/client.h"
+#include "../util/cursordefines.h"
 
 class MyGLDrawer : public QGLWidget {
 	Q_OBJECT        // must include this if you use Qt signals/slots
@@ -31,12 +33,14 @@ public:
         GLuint bgtextures[1];
 	QImage mouse[2];
 	GLuint mousetextures[2];
-	Sim::Simulation *sim;
+        QPixmap m;
+        Sim::Simulation *sim;
         Sim::World *wld;
 	Camera *cam;
+	ClientStates *states;
 	int cMouse;
 	double mouseSize;
-        MyGLDrawer(Camera *cam, Sim::Simulation *simIn, QWidget *parent = 0)
+	MyGLDrawer(Camera *cam, Sim::Simulation *simIn, ClientStates *states, QWidget *parent = 0)
 		: QGLWidget(QGLFormat(QGL::SampleBuffers), parent) {
 		cMouse = 0;
                 this->cam = cam;
@@ -44,6 +48,7 @@ public:
                 lastY = height()/2;
                 sim = simIn;
 		wld = &sim->getState().getWorld();
+		this->states = states;
 
 		setCursor( QCursor( Qt::BlankCursor ) );
 		mouseSize = 0.07;
@@ -63,11 +68,11 @@ protected:
 		//                qDebug() << event->pos().x() << " " << event->pos().y();
         }
 
-        // overridden  
-        void mousePressEvent(QMouseEvent * event) {
+	// overridden
+	void mousePressEvent(QMouseEvent * event) {
 		int w = width();
-                int h = height();
-        }
+		int h = height();
+	}
 
 
 
@@ -85,26 +90,38 @@ protected:
 		loadAndBind(":/graphics/tiles/metal2surf.png", &data[2], &textures[2]);
 		loadAndBind(":/graphics/characters/character1.png", &characters[0], &chartextures[0], 128, 320, false, true);
 		loadAndBind(":/graphics/weapons/testweapon.png", &weapons[0], &weaponstextures[0], 32, 64);
-		loadAndBind(":/graphics/mouse/default.png", &mouse[0], &mousetextures[0]);
-		loadAndBind(":/graphics/mouse/attack.png", &mouse[1], &mousetextures[1]);
+		loadAndBind(":/graphics/mouse/default.png", &mouse[0], &mousetextures[0],16,16);
+		loadAndBind(":/graphics/mouse/attack.png", &mouse[1], &mousetextures[1],64,64);
+		this->setAttribute(Qt::WA_NoSystemBackground);
+		QPixmap m;
+		m.convertFromImage(mouse[MOUSE_ATTACK]);
+		this->setCursor(QCursor(m, -1, -1));
 
         }
 
 	void loadAndBind(const char *path, QImage *img, GLuint *bind, GLuint xsize = -1, GLuint ysize = -1, bool vertFlip = false, bool horFlip = false) {
-		img->load(path);
 		if (xsize != -1) {
-			*bind = bindTexture(img->scaled(xsize, ysize).mirrored(horFlip, vertFlip));
+			img->load(path);
+			*img = (*img).scaled(xsize, ysize).mirrored(horFlip, vertFlip);
 		} else {
-			*bind = bindTexture(img->mirrored(horFlip, vertFlip));
+			img->load(path);
 		}
+		*bind = bindTexture(*img);
 	}
 
         // overridden
         void resizeGL( int w, int h )
         {
                 // setup viewport, projection etc.:
-                glViewport( 0, 0, (GLint)w, (GLint)h );
-        }
+		glViewport( 0, 0, (GLint)w, (GLint)h );
+		cam->calcRatio(w, h);
+	}
+
+	void resizeEvent(QResizeEvent *event) {
+		qDebug() << "resize!!";
+		resizeGL(event->size().width(), event->size().height());
+		resize(event->size());
+	}
 
         void wheelEvent(QWheelEvent *event) {
 		cam->modZoom(event->delta());
@@ -185,14 +202,14 @@ protected:
 		glLoadIdentity();
 		glOrtho(-1, 1, -1, 1, 0.01, 1000);
 		glTranslatef(0,0,-1);
-		glBindTexture(GL_TEXTURE_2D, mousetextures[cMouse]);
+		/*glBindTexture(GL_TEXTURE_2D, mousetextures[cMouse]);
 
 		glBegin(GL_QUADS);
 		glTexCoord2f(0,1); glVertex2f(mx-mouseSize,my+mouseSize);  // lower left
 		glTexCoord2f(0,0); glVertex2f(mx-mouseSize,my-mouseSize); // lower right
 		glTexCoord2f(1,0); glVertex2f(mx+mouseSize,my-mouseSize);// upper right
 		glTexCoord2f(1,1); glVertex2f(mx+mouseSize,my+mouseSize); // upper left
-		glEnd();
+		glEnd();*/
 		glDisable(GL_TEXTURE_2D);
 		glDisable(GL_BLEND);
 		glFlush();

@@ -13,7 +13,8 @@ HEADERS += main.h ../openglqt/render.h customlabel.h ../util/camera.h \
     menubutton.h \
     gamecontroller.h \
     gamebutton.h \
-    ../openglqt/cursordefines.h
+    ../util/cursordefines.h \
+    ../util/client.h
 SOURCES += main.cpp
 QT += opengl
 

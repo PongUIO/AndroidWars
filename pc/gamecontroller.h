@@ -17,7 +17,8 @@ void something() {
 
 class GameController {
 public:
-	QWidget *main;
+	QWidget *parent;
+	MyGLDrawer *drawer;
 	QTimer *glTimer, *camTimer, *timer;
         QHBoxLayout *lower, *upper;
         QVBoxLayout *iconHolder;
@@ -32,7 +33,7 @@ public:
 	QPalette *p;
 #endif
 	GameController(QWidget *parent = 0) {
-
+		this->parent = parent;
                 Sim::Configuration config;
 
 		config.phaseLength = 10;
@@ -104,47 +105,46 @@ public:
 		sim.prepareSim();
 
 
-		main = new QWidget(parent);
-		main->showFullScreen();
-                main->resize(parent->geometry().width(), parent->geometry().height());
-		cam = new Camera(0, 0, main->width(), main->height());
-		MyGLDrawer *drawer = new MyGLDrawer(cam, &sim, main);
+		//main = new QWidget(parent);
+		//main->showFullScreen();
+		//main->resize(parent->geometry().width(), parent->geometry().height());
+		cam = new Camera(0, 0, parent->width(), parent->height());
+		drawer = new MyGLDrawer(cam, &sim, NULL, parent);
 
-		glTimer = new QTimer(main);
+		glTimer = new QTimer(parent);
 		drawer->connect(glTimer, SIGNAL(timeout()), drawer, SLOT(redraw()));
 		glTimer->start(0);
 
-		camTimer = new QTimer(main);
+		camTimer = new QTimer(parent);
                 drawer->connect(camTimer, SIGNAL(timeout()), drawer, SLOT(moveMouseCheck()));
                 camTimer->start(1000./RATE);
 
-                iconHolder  = new QVBoxLayout(main);
+		iconHolder  = new QVBoxLayout(parent);
                 lower = new QHBoxLayout();
                 upper = new QHBoxLayout();
                 iconHolder->insertLayout(0, lower);
                 iconHolder->insertSpacing(1, -1);
                 iconHolder->insertLayout(0, upper);
-                main->setWindowTitle(QApplication::translate("childwidget", "Child widget"));
+		parent->setWindowTitle(QApplication::translate("childwidget", "Child widget"));
 		drawer->setMouseTracking(true);
 
 #ifdef _WIN32
-		drawer->resize(main->width(), main->height()-1);
-		p = new QPalette( main->palette() );
+		drawer->resize(parent->width(), parent->height()-1);
+		p = new QPalette( parent->palette() );
 		p->setColor( QPalette::Window, Qt::black );
 		main->setPalette( *p );
 #else
-		drawer->resize(main->width(), main->height());
+		drawer->resize(parent->width(), parent->height());
 #endif
-		drawer->show();
 
-		label = new GameButton(&sim, 0, main);
-		label2 = new CustomLabel(&something, main);
+		label = new GameButton(&sim, 0, parent);
+		label2 = new CustomLabel(&something, parent);
 		label->setPixmap(QPixmap(":/graphics/temp/temp.png"));
 		label->resize(60,60);
 		label2->setPixmap(QPixmap(":/graphics/temp/temp2.png"));
 		label2->resize(60,60);
 		profiles[0] = QPixmap(":/graphics/profiles/test.png");
-		space = new QSpacerItem(main->width(), 0, QSizePolicy::Expanding);
+		space = new QSpacerItem(parent->width(), 0, QSizePolicy::Expanding);
 		label->show();
 		label2->show();
 		lower->insertWidget(0, label);
@@ -154,30 +154,30 @@ public:
                 updateGUI();
 		botCfg.mBody.mPos = Sim::Vector(0,2);
                 sim.getState().getBotFactory().createBot( botCfg );
-                updateGUI();
                 upper->setAlignment(Qt::AlignTop);
 	}
 	void showAll() {
-		main->show();
+		parent->show();
 		label->show();
 		label2->show();
+		drawer->show();
+		updateGUI();
 	}
 	void hideAll() {
-		main->hide();
+		parent->show();
 		label->hide();
 		label2->hide();
+		drawer->hide();
+		emptyGUI();
 	}
 
-        void updateGUI() {
-                QLayoutItem *temp;
-                while ((temp = upper->takeAt(0))) {
-                        delete temp->widget();
-                }
+	void updateGUI() {
+		emptyGUI();
                 int i;
-                std::vector<Sim::Bot*> bots = sim.getState().getBotFactory().getBotVector();
+		std::vector<Sim::Bot*> bots = sim.getState().getBotFactory().getBotVector();
                 CustomLabel *clabel;
-                for (i = 0; i < bots.size(); i++) {
-                        clabel = new CustomLabel(&something, main);
+		for (i = 0; i < bots.size(); i++) {
+			clabel = new CustomLabel(&something, parent);
                         clabel->setPixmap(profiles[0]);
                         clabel->resize(60,60);
                         clabel->show();
@@ -186,6 +186,12 @@ public:
                 upper->insertSpacerItem(i, space);
         }
 
+	void emptyGUI() {
+		QLayoutItem *temp;
+		while ((temp = upper->takeAt(0))) {
+			delete temp->widget();
+		}
+	}
         void changeBot(int bot) {
                 updateGUI();
         }

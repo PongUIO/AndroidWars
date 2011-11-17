@@ -17,32 +17,33 @@
 #define RATE 60
 #endif
 
-GameController *test;
+GameController *gc;
 
 void gameStart() {
-        test->showAll();
+	gc->showAll();
 }
 
 int main(int argc, char *argv[]) {
-        QApplication app(argc, argv);
-        QWidget *menu = new QWidget();
-        //menu->showFullScreen();
-        //menu->resize(QApplication::desktop()->screenGeometry().width(),QApplication::desktop()->screenGeometry().height());
-        menu->resize(700,700);
-        menu->show();
+	QApplication app(argc, argv);
+	MainWidget *menu = new MainWidget();
+	//menu->showFullScreen();
+	//menu->resize(QApplication::desktop()->screenGeometry().width(),QApplication::desktop()->screenGeometry().height());
+	menu->resize(700,700);
+	menu->show();
 	QPixmap m;
 	m.convertFromImage(QImage(":/graphics/mouse/default.png").scaled(64,64));
 	menu->setCursor(m);
 
-        CustomLabel *gameButton = new CustomLabel(&gameStart, menu);
-        gameButton->setPixmap(QPixmap(":/graphics/menu/startgame.png"));
-        gameButton->move(menu->geometry().width()/2-gameButton->pixmap()->width()/2, menu->geometry().height()/2-gameButton->pixmap()->height()/2);
-        gameButton->show();
-        test = new GameController(menu);
-        test->hideAll();
-        app.exec();
-        delete test;
+	CustomLabel *gameButton = new CustomLabel(&gameStart, menu);
+	gameButton->setPixmap(QPixmap(":/graphics/menu/startgame.png"));
+	gameButton->move(menu->geometry().width()/2-gameButton->pixmap()->width()/2, menu->geometry().height()/2-gameButton->pixmap()->height()/2);
+	gameButton->show();
+	gc = new GameController(menu);
+	gc->hideAll();
+	menu->registerForResize(gc->drawer);
+	app.exec();
+	delete gc;
         delete gameButton;
 	//delete menu;
-        return 0;//main.exec();
+	return 0;//main.exec();
 }

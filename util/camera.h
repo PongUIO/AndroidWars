@@ -12,16 +12,18 @@ public:
                 pos = Sim::Vector(x,y);
                 delta = Sim::Vector(-0.005,-0.005);
                 dzoom = 0.0;
-                zoom = 1;
-                ratio = yres/((double)xres);
-                this->xres = xres;
-                this->yres = yres;
+		zoom = 1;
+		calcRatio(xres, yres);
 		zoomfriction = 0.9;
                 panfriction = 0.9;
         }
         virtual ~Camera() {}
 
-
+	void calcRatio(double xres, double yres) {
+		ratio = yres/((double)xres);
+		this->xres = xres;
+		this->yres = yres;
+	}
         void addVel(int lastX, int lastY) {
                 this->lastX = lastX;
                 this->lastY = lastY;
