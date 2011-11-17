@@ -30,6 +30,10 @@ int main(int argc, char *argv[]) {
         //menu->resize(QApplication::desktop()->screenGeometry().width(),QApplication::desktop()->screenGeometry().height());
         menu->resize(700,700);
         menu->show();
+	QPixmap m;
+	m.convertFromImage(QImage(":/graphics/mouse/default.png").scaled(64,64));
+	menu->setCursor(m);
+
         CustomLabel *gameButton = new CustomLabel(&gameStart, menu);
         gameButton->setPixmap(QPixmap(":/graphics/menu/startgame.png"));
         gameButton->move(menu->geometry().width()/2-gameButton->pixmap()->width()/2, menu->geometry().height()/2-gameButton->pixmap()->height()/2);

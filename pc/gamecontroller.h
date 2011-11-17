@@ -27,12 +27,13 @@ public:
         CustomLabel *label2, *robot;
 	Sim::Simulation sim;
 	Camera *cam;
+        QPixmap m;
 #ifdef WIN32
 	QPalette *p;
 #endif
 	GameController(QWidget *parent = 0) {
 
-		Sim::Configuration config;
+                Sim::Configuration config;
 
 		config.phaseLength = 10;
 		config.stepTime = 0.01;

@@ -12,7 +12,8 @@ LIBS += -L../build/ -lAWSim
 HEADERS += main.h ../openglqt/render.h customlabel.h ../util/camera.h \
     menubutton.h \
     gamecontroller.h \
-    gamebutton.h
+    gamebutton.h \
+    ../openglqt/cursordefines.h
 SOURCES += main.cpp
 QT += opengl
 

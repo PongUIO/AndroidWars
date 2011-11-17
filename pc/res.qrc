@@ -11,5 +11,6 @@
         <file>graphics/characters/character1.png</file>
         <file>graphics/profiles/test.png</file>
         <file>graphics/mouse/attack.png</file>
+        <file>graphics/mouse/default.png</file>
     </qresource>
 </RCC>

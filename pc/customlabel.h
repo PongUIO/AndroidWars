@@ -2,7 +2,7 @@
 #define CUSTOMLABEL_H
 #include<QtGui>
 class CustomLabel : public QLabel {
-	Q_OBJECT        // must include this if you use Qt signals/slots
+	Q_OBJECT
 public:
 	void (*funcPointer)();
 	CustomLabel(void (*in)(), QWidget *parent = 0)
