@@ -21,13 +21,21 @@ endif(DOXYGEN_FOUND)
 set(CPPFLAGS "-g" CACHE STRING "Compiler flags to use")
 set(LINKFLAGS "" CACHE STRING "Linker flags to use")
 
+set(COMP_SIM_TEST false CACHE BOOL "Compile simulation tests")
+set(COMP_GUI true CACHE BOOL "Compile GUI")
+
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${LINKFLAGS}")
 
 # Add additional compiler flags
 add_definitions(${CPPFLAGS})
 include_directories(${Boost_INCLUDE_DIR})
 
-add_subdirectory(simulation/)
-add_subdirectory(pc/)
+if(COMP_SIM_TEST)
+	add_subdirectory(simulation/)
+endif(COMP_SIM_TEST)
+
+if(COMP_GUI)
+	add_subdirectory(pc/)
+endif(COMP_GUI)
 
 set(CMAKE_EXE_LINKER_FLAGS ${LINKFLAGS})
