@@ -11,6 +11,8 @@ add_library(AWSim
 	Save.cpp
 	World.cpp
 	
+	bot/BotCpu.cpp
+	
 	data/BotD.cpp
 	data/BulletD.cpp
 	data/WeaponD.cpp
