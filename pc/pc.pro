@@ -31,4 +31,5 @@ OTHER_FILES += \
     graphics/menu/startgame.png \
     graphics/weapons/testweapon.png \
     graphics/characters/character1.png \
-    graphics/bg/bg.xcf
+    graphics/bg/bg.xcf \
+    graphics/weapons/bullet.png

@@ -6,6 +6,7 @@
 
 #include "Simulation.h"
 #include "../openglqt/render.h"
+#include "../util/client.h"
 #include "customlabel.h"
 #include "gamebutton.h"
 
@@ -17,8 +18,9 @@ void something() {
 
 class GameController {
 public:
+	ClientStates *states;
 	QWidget *parent;
-	MyGLDrawer *drawer;
+	GameDrawer *drawer;
 	QTimer *glTimer, *camTimer, *timer;
         QHBoxLayout *lower, *upper;
         QVBoxLayout *iconHolder;
@@ -109,7 +111,8 @@ public:
 		//main->showFullScreen();
 		//main->resize(parent->geometry().width(), parent->geometry().height());
 		cam = new Camera(0, 0, parent->width(), parent->height());
-		drawer = new MyGLDrawer(cam, &sim, NULL, parent);
+		states = new ClientStates();
+		drawer = new GameDrawer(cam, &sim, states, parent);
 
 		glTimer = new QTimer(parent);
 		drawer->connect(glTimer, SIGNAL(timeout()), drawer, SLOT(redraw()));

@@ -8,7 +8,7 @@
 #include "../util/client.h"
 #include "../util/cursordefines.h"
 
-class MyGLDrawer : public QGLWidget {
+class GameDrawer : public QGLWidget {
 	Q_OBJECT        // must include this if you use Qt signals/slots
 
 public slots:
@@ -33,14 +33,16 @@ public:
         GLuint bgtextures[1];
 	QImage mouse[2];
 	GLuint mousetextures[2];
-        QPixmap m;
+	QImage bullet[1];
+	GLuint bullettextures[1];
+	QPixmap m;
         Sim::Simulation *sim;
         Sim::World *wld;
 	Camera *cam;
 	ClientStates *states;
 	int cMouse;
 	double mouseSize;
-	MyGLDrawer(Camera *cam, Sim::Simulation *simIn, ClientStates *states, QWidget *parent = 0)
+	GameDrawer(Camera *cam, Sim::Simulation *simIn, ClientStates *states, QWidget *parent = 0)
 		: QGLWidget(QGLFormat(QGL::SampleBuffers), parent) {
 		cMouse = 0;
                 this->cam = cam;
@@ -72,6 +74,7 @@ protected:
 	void mousePressEvent(QMouseEvent * event) {
 		int w = width();
 		int h = height();
+		states->registerClick(getGlXCoords(event->x()), getGlYCoords(event->y()), event->button());
 	}
 
 
@@ -92,6 +95,7 @@ protected:
 		loadAndBind(":/graphics/weapons/testweapon.png", &weapons[0], &weaponstextures[0], 32, 64);
 		loadAndBind(":/graphics/mouse/default.png", &mouse[0], &mousetextures[0],16,16);
 		loadAndBind(":/graphics/mouse/attack.png", &mouse[1], &mousetextures[1],64,64);
+		loadAndBind(":/graphics/weapons/bullet.png", &bullet[0], &bullettextures[0],16,16);
 		this->setAttribute(Qt::WA_NoSystemBackground);
 		QPixmap m;
 		m.convertFromImage(mouse[MOUSE_ATTACK]);
@@ -197,7 +201,26 @@ protected:
 				glEnable(GL_TEXTURE_2D);*/
 
                         }
-                }
+		}
+
+		const Sim::BulletFactory::ObjVec &bullets =  sim->getState().getBulletFactory().getObjVector();
+
+		for (i = 0; i < bullets.size(); i++) {
+			Sim::Bullet *bul = bullets[i];
+			if (bul != NULL) {
+				qDebug() << "working";
+				Sim::Vector vec = bul->getBody().mPos;
+				glBindTexture(GL_TEXTURE_2D, bullettextures[0]);
+				glBegin(GL_QUADS);
+				glTexCoord2f(0,1); glVertex2f(vec.x-0.005,vec.y+0.005);  // lower left
+				glTexCoord2f(0,0); glVertex2f(vec.x-0.005,vec.y-0.005); // lower right
+				glTexCoord2f(1,0); glVertex2f(vec.x+0.005,vec.y-0.005);// upper right
+				glTexCoord2f(1,1); glVertex2f(vec.x+0.005,vec.y+0.005); // upper left
+				glEnd();
+
+			}
+		}
+
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
 		glOrtho(-1, 1, -1, 1, 0.01, 1000);

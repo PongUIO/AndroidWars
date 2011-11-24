@@ -30,7 +30,7 @@ public:
 		delta += Sim::Vector((lastX > xres -10 ) * (-(lastX - xres + 10)*0.001) +
 			    (lastX < 10) * (-(lastX-10)*0.001),
 			    (lastY < 10) * ((lastY - 10)*0.001) +
-			    (lastY > yres - 10) * ((lastY - yres + 10)* 0.001))/2;
+			    ((lastY > yres - 10)) * ((lastY - yres + 10)* 0.001))/2;
         }
 	void modZoom(double mod) {
 		dzoom -= mod/10000;
