@@ -50,7 +50,15 @@ public:
                 } else if (zoom > 32) {
                         zoom = 32;
 		}
-        }
+        }	
+
+	double xToSimX(int x) {
+		return (xPixToDouble(x))*zoom-pos.x;
+	}
+
+	double yToSimY(int y) {
+		return ((yPixToDouble(y))*zoom-pos.y)*ratio;
+	}
 
         double xPixToDouble(int x) {
                 return ((x*2)/((double)xres)-1);
@@ -59,10 +67,10 @@ public:
                 return (1-(y*2)/((double)yres));
         }
         int xDoubleToPix(double x) {
-                return (-x+1)/xres;
+		return (-x+1)/xres-pos.x;
         }
         int yDoubleToPix(double y) {
-                return (y+1)/yres;
+		return (y+1)/yres-pos.y;
         }
 };
 #endif

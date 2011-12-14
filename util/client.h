@@ -8,25 +8,34 @@
 
 class ClientStates {
 	private:
-		boost::unordered_set<uint> bots;
+		boost::unordered_set<uint> selBots;
 		Sim::Simulation *sim;
 	public:
 		ClientStates() {
 		}
-		void setDrawer(Sim::Simulation *in) {
+		void setSim(Sim::Simulation *in) {
 			sim = in;
-			bots.empty();
+			selBots.empty();
 		}
 		bool isSelected(uint b) {
-			return bots.find(b) != bots.end();
+			return selBots.find(b) != selBots.end();
 		}
 		void registerClick(double x, double y, int button) {
+			qDebug() << x << y;
 			int i;
+			const Sim::BotFactory::ObjVec &bots =  sim->getState().getBotFactory().getBotVector();
 			if (sim != NULL) {
-				std::vector<Sim::Bot*> bots = sim->getState().getBotFactory().getBotVector();
 				for (i = 0; i < bots.size(); i++) {
-					bots.at(i);
 
+					Sim::Bot *bot = bots[i];
+					if (bot != NULL) {
+						Sim::Vector pos = bot->getBody().mPos;
+						qDebug() << pos.x << pos.y;
+						if ( pos.x < x && x < pos.x + 1.3 && pos.y < y && y < pos.y + 1.8) {
+							selBots.insert(i);
+							return;
+						}
+					}
 				}
 			}
 		}

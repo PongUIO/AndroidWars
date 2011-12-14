@@ -22,21 +22,21 @@ public:
 	QWidget *parent;
 	GameDrawer *drawer;
 	QTimer *glTimer, *camTimer, *timer;
-        QHBoxLayout *lower, *upper;
-        QVBoxLayout *iconHolder;
-        QSpacerItem *space;
-        QPixmap profiles[1];
+	QHBoxLayout *lower, *upper;
+	QVBoxLayout *iconHolder;
+	QSpacerItem *space;
+	QPixmap profiles[1];
 	GameButton *label;
-        CustomLabel *label2, *robot;
+	CustomLabel *label2, *robot;
 	Sim::Simulation sim;
 	Camera *cam;
-        QPixmap m;
+	QPixmap m;
 #ifdef WIN32
 	QPalette *p;
 #endif
 	GameController(QWidget *parent = 0) {
 		this->parent = parent;
-                Sim::Configuration config;
+		Sim::Configuration config;
 
 		config.phaseLength = 10;
 		config.stepTime = 0.01;
@@ -45,21 +45,21 @@ public:
 
 		Sim::Player testSide;
 		sim.getState().getPlayerData().addPlayer(testSide);
-		
+
 		sim.getData().getWeaponDb().createType();
 
 		Sim::BotD myBot;
 		myBot.baseSpeed = 100.0;
 		myBot.baseWeight = 75.0;
-		
+
 		Sim::Collision::ColPoints cpts;
 		cpts.push_back(Sim::Vector(0,0));
 		cpts.push_back(Sim::Vector(0,1));
 		cpts.push_back(Sim::Vector(1,1));
 		cpts.push_back(Sim::Vector(1,0));
-		
+
 		sim.getData().getBotDb().addBot(myBot, cpts);
-		
+
 		// Create a test bot
 		Sim::Bot::Config botCfg;
 		botCfg.mSide = 0;
@@ -68,28 +68,28 @@ public:
 		uint32_t botId = sim.getState().getBotFactory().createBot( botCfg );
 		botCfg.mBody.mPos = Sim::Vector(0,1);
 		sim.getState().getBotFactory().createBot( botCfg );
-		
+
 		// Create test weapon and bullet type
 		Sim::BulletD *bulletType = sim.getData().getBulletDb().createType();
-		
+
 		Sim::StateSys *sys = bulletType->getStateSys();
 		sys->registerState(new Sim::StdState::Delay(0.2));
 		sys->registerEntryPoint(0);
-		
+
 		Sim::WeaponD *weaponType = sim.getData().getWeaponDb().createType();
 		Sim::StateSys *wsys = weaponType->getStateSys();
 		wsys->registerState(new Sim::WeaponState::Shoot( bulletType->getId() ) );
 		wsys->registerEntryPoint(0);
-		
+
 		// Send some input to this bot
 		Sim::BotFactory &botFact = sim.getState().getBotFactory();
 		Sim::BotInput bi;
 		bi = Sim::BotInput::inMove(botId, 20, Sim::Vector(1,0) );
 		botFact.getInput().addInput( bi );
-		
+
 		//bi = Sim::BotInput::inShoot(botId, 0, Sim::Vector(0,1));
 		//botFact.getInput().addInput( bi );
-		
+
 		Sim::TileDatabase &db = sim.getData().getTileDb();
 		Sim::TileD myTile;
 		myTile.colMask = 0;
@@ -101,9 +101,9 @@ public:
 		db.addTile(myTile);
 		myTile.colMask = Sim::TileD::ColAll;
 		db.addTile(myTile);
-		
+
 		sim.getState().getWorld().getTile(3,0).setType(1);
-		
+
 		sim.prepareSim();
 
 
@@ -119,15 +119,15 @@ public:
 		glTimer->start(0);
 
 		camTimer = new QTimer(parent);
-                drawer->connect(camTimer, SIGNAL(timeout()), drawer, SLOT(moveMouseCheck()));
-                camTimer->start(1000./RATE);
+		drawer->connect(camTimer, SIGNAL(timeout()), drawer, SLOT(moveMouseCheck()));
+		camTimer->start(1000./RATE);
 
 		iconHolder  = new QVBoxLayout(parent);
-                lower = new QHBoxLayout();
-                upper = new QHBoxLayout();
-                iconHolder->insertLayout(0, lower);
-                iconHolder->insertSpacing(1, -1);
-                iconHolder->insertLayout(0, upper);
+		lower = new QHBoxLayout();
+		upper = new QHBoxLayout();
+		iconHolder->insertLayout(0, lower);
+		iconHolder->insertSpacing(1, -1);
+		iconHolder->insertLayout(0, upper);
 		parent->setWindowTitle(QApplication::translate("childwidget", "Child widget"));
 		drawer->setMouseTracking(true);
 
@@ -135,11 +135,10 @@ public:
 		drawer->resize(parent->width(), parent->height()-1);
 		p = new QPalette( parent->palette() );
 		p->setColor( QPalette::Window, Qt::black );
-		main->setPalette( *p );
+		drawer->setPalette( *p );
 #else
 		drawer->resize(parent->width(), parent->height());
 #endif
-
 		label = new GameButton(&sim, 0, parent);
 		label2 = new CustomLabel(&something, parent);
 		label->setPixmap(QPixmap(":/graphics/temp/temp.png"));
@@ -153,11 +152,11 @@ public:
 		lower->insertWidget(0, label);
 		lower->insertWidget(1, label2);
 		lower->insertSpacerItem(2, space);
-                lower->setAlignment(Qt::AlignBottom);
-                updateGUI();
+		lower->setAlignment(Qt::AlignBottom);
+		updateGUI();
 		botCfg.mBody.mPos = Sim::Vector(0,2);
-                sim.getState().getBotFactory().createBot( botCfg );
-                upper->setAlignment(Qt::AlignTop);
+		sim.getState().getBotFactory().createBot( botCfg );
+		upper->setAlignment(Qt::AlignTop);
 	}
 	void showAll() {
 		parent->show();
@@ -176,18 +175,18 @@ public:
 
 	void updateGUI() {
 		emptyGUI();
-                int i;
+		int i;
 		std::vector<Sim::Bot*> bots = sim.getState().getBotFactory().getBotVector();
-                CustomLabel *clabel;
+		CustomLabel *clabel;
 		for (i = 0; i < bots.size(); i++) {
 			clabel = new CustomLabel(&something, parent);
-                        clabel->setPixmap(profiles[0]);
-                        clabel->resize(60,60);
-                        clabel->show();
-                        upper->insertWidget(i, clabel);
-                }
-                upper->insertSpacerItem(i, space);
-        }
+			clabel->setPixmap(profiles[0]);
+			clabel->resize(60,60);
+			clabel->show();
+			upper->insertWidget(i, clabel);
+		}
+		upper->insertSpacerItem(i, space);
+	}
 
 	void emptyGUI() {
 		QLayoutItem *temp;
@@ -195,9 +194,9 @@ public:
 			delete temp->widget();
 		}
 	}
-        void changeBot(int bot) {
-                updateGUI();
-        }
+	void changeBot(int bot) {
+		updateGUI();
+	}
 };
 
-#endif // GAMEWIDGET_H
+#endif // GAMECONTROLLER_H
