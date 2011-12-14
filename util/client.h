@@ -19,6 +19,9 @@ class ClientStates {
 			sim = in;
 			selBots.clear();
 		}
+		void setShift(bool state) {
+			shift = state;
+		}
 		bool isSelected(uint b) {
 			return selBots.find(b) != selBots.end();
 		}

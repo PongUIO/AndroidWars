@@ -54,13 +54,23 @@ public:
 		this->states->setSim(sim);
 
 		setCursor( QCursor( Qt::BlankCursor ) );
+		grabKeyboard();
 		mouseSize = 0.07;
 	}
 
 protected:
 	// overridden
 	void keyPressEvent (QKeyEvent *event) {
-		//              qDebug() << event->key();
+		if (event->key() == Qt::Key_Shift) {
+			states->setShift(true);
+		}
+	}
+
+	// overridden
+	void keyReleaseEvent (QKeyEvent *event) {
+		if (event->key() == Qt::Key_Shift) {
+			states->setShift(false);
+		}
 	}
 
 	// overriden
