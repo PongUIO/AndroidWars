@@ -130,6 +130,24 @@ protected:
 		cam->modZoom(event->delta());
 	}
 
+	void drawTexObj(double xf, double yf, double xt, double yt) {
+		glBegin(GL_QUADS);
+		glTexCoord2f(0,1); glVertex2f(xf,yt);
+		glTexCoord2f(0,0); glVertex2f(xf,yf);
+		glTexCoord2f(1,0); glVertex2f(xt,yf);
+		glTexCoord2f(1,1); glVertex2f(xt,yt);
+		glEnd();
+	}
+
+	void drawObj(double xf, double yf, double xt, double yt) {
+		glBegin(GL_QUADS);
+		glVertex2f(xf,yt);
+		glVertex2f(xf,yf);
+		glVertex2f(xt,yf);
+		glVertex2f(xt,yt);
+		glEnd();
+	}
+
 	// overridden
 	void paintGL() {
 		cam->iter();
@@ -142,6 +160,7 @@ protected:
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
 		glEnable(GL_TEXTURE_2D);
+		glColor3f(1.0f, 1.0f, 1.0f);
 
 		float mx = cam->xPixToDouble(lastX);
 		float my = cam->yPixToDouble(lastY);
@@ -158,12 +177,7 @@ protected:
 				}
 				//glTexSubImage2D(GL_TEXTURE_2D, 0, 0,0 , data[mt].width(), data[mt].height(),  GL_RGBA, GL_UNSIGNED_BYTE, data[mt].bits() );
 				glBindTexture(GL_TEXTURE_2D, textures[mt]);
-				glBegin(GL_QUADS);
-				glTexCoord2f(0,1); glVertex2f(i,j+1);  // lower left
-				glTexCoord2f(0,0); glVertex2f(i,j); // lower right
-				glTexCoord2f(1,0); glVertex2f(i+1,j);// upper right
-				glTexCoord2f(1,1); glVertex2f(i+1,j+1); // upper left
-				glEnd();
+				drawTexObj(i, j, i+1, j+1);
 			}
 
 		}
@@ -177,21 +191,14 @@ protected:
 			Sim::Bot *bot = bots[i];
 			if (bot != NULL) {
 				Sim::Vector pos = bot->getBody().mPos;
+				Sim::Vector col = bot->getTypePtr()->getCollision()->getBboxHigh();
 				//glTexSubImage2D(GL_TEXTURE_2D, 0, 0,0 , characters[mt].width(), characters[mt].height(),  GL_RGBA, GL_UNSIGNED_BYTE, characters[mt].bits() );
 				glBindTexture(GL_TEXTURE_2D, weaponstextures[0]);
-				glBegin(GL_QUADS);
-				glTexCoord2f(0,1); glVertex2f(pos.x+0.3,pos.y+1.8);  // lower left
-				glTexCoord2f(0,0); glVertex2f(pos.x+0.3,pos.y+1.3); // lower right
-				glTexCoord2f(1,0); glVertex2f(pos.x+1.3,pos.y+1.3);// upper right
-				glTexCoord2f(1,1); glVertex2f(pos.x+1.3,pos.y+1.8); // upper left
-				glEnd();
+				drawTexObj(pos.x+0.3, pos.y+1.3, pos.x+1.3, pos.y+1.3);
+
 				glBindTexture(GL_TEXTURE_2D, chartextures[0]);
-				glBegin(GL_QUADS);
-				glTexCoord2f(0,1); glVertex2f(pos.x,pos.y + 1.8);  // lower left
-				glTexCoord2f(0,0); glVertex2f(pos.x,pos.y); // lower right
-				glTexCoord2f(1,0); glVertex2f(pos.x+1,pos.y);// upper right
-				glTexCoord2f(1,1); glVertex2f(pos.x+1,pos.y+1.8); // upper left
-				glEnd();
+				drawTexObj(pos.x, pos.y, pos.x+col.x, pos.y+col.y);
+
 				glBindTexture(GL_TEXTURE_2D, 0);
 				/*glBlendFunc(GL_ONE, GL_ONE);
 				//glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
@@ -200,11 +207,20 @@ protected:
 
 			}
 		}
+		glDisable(GL_TEXTURE_2D);
+		glColor3f(0.2f, 1.0f, 0.2f);
 		for (i = 0; i < bots.size(); i++) {
 			if (states->isSelected(i)) {
+				Sim::Bot *bot = bots[i];
+				if (bot != NULL) {
+					Sim::Vector pos = bot->getBody().mPos;
+					Sim::Vector col = bot->getTypePtr()->getCollision()->getBboxHigh();
+					drawObj(pos.x, pos.y, pos.x+col.x, pos.y+col.y);
 
+				}
 			}
 		}
+		glEnable(GL_TEXTURE_2D);
 
 		const Sim::BulletFactory::ObjVec &bullets =  sim->getState().getBulletFactory().getObjVector();
 
@@ -214,36 +230,17 @@ protected:
 				qDebug() << "working";
 				Sim::Vector pos = bul->getBody().mPos;
 				glBindTexture(GL_TEXTURE_2D, bullettextures[0]);
-				glBegin(GL_QUADS);
-				glTexCoord2f(0,1); glVertex2f(pos.x-0.005,pos.y+0.005);  // lower left
-				glTexCoord2f(0,0); glVertex2f(pos.x-0.005,pos.y-0.005); // lower right
-				glTexCoord2f(1,0); glVertex2f(pos.x+0.005,pos.y-0.005);// upper right
-				glTexCoord2f(1,1); glVertex2f(pos.x+0.005,pos.y+0.005); // upper left
-				glEnd();
-
+				drawTexObj(pos.x-0.005, pos.y-0.005, pos.x+0.005, pos.y+0.005);
 			}
 		}
 
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
-		glOrtho(-1, 1, -1, 1, 0.01, 1000);
-		glTranslatef(0,0,-1);
-		/*glBindTexture(GL_TEXTURE_2D, mousetextures[cMouse]);
-
-		glBegin(GL_QUADS);
-		glTexCoord2f(0,1); glVertex2f(mx-mouseSize,my+mouseSize);  // lower left
-		glTexCoord2f(0,0); glVertex2f(mx-mouseSize,my-mouseSize); // lower right
-		glTexCoord2f(1,0); glVertex2f(mx+mouseSize,my-mouseSize);// upper right
-		glTexCoord2f(1,1); glVertex2f(mx+mouseSize,my+mouseSize); // upper left
-		glEnd();*/
 		glDisable(GL_TEXTURE_2D);
 		glDisable(GL_BLEND);
 		glFlush();
 		glFinish();
 		swapBuffers();
-	}
-	int getXBlock(double x) {
-		return 0;
 	}
 
 };
