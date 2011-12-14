@@ -93,22 +93,13 @@ namespace Sim {
 			};
 			typedef State Config;
 			
-			/* struct Config {
-				uint32_t side;
-				uint32_t type;
-				
-				Body body;
-				WeaponBox weaponBox;
-				
-				InputBuffer<BotInput> input;
-				BotInput curInput;
-			}; */
-			
 			uint32_t getId() const { return mId; }
 			const Body &getBody() const { return getState().mBody; }
 			
 			State &getState() { return mState; }
 			const State &getState() const { return mState; }
+			
+			const BotD *getTypePtr();
 			
 		private:
 			Bot(Simulation *sim, uint32_t id, const State &cfg=State()) :
@@ -142,8 +133,6 @@ namespace Sim {
 			//@{
 				uint32_t mId;
 				Simulation *mSim;
-				
-				const BotD *getTypePtr();
 			//@}
 			
 			/**
