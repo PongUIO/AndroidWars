@@ -10,12 +10,14 @@ class ClientStates {
 	private:
 		boost::unordered_set<uint> selBots;
 		Sim::Simulation *sim;
+		bool shift;
 	public:
 		ClientStates() {
 		}
 		void setSim(Sim::Simulation *in) {
+			shift = false;
 			sim = in;
-			selBots.empty();
+			selBots.clear();
 		}
 		bool isSelected(uint b) {
 			return selBots.find(b) != selBots.end();
@@ -25,13 +27,16 @@ class ClientStates {
 			int i;
 			const Sim::BotFactory::ObjVec &bots =  sim->getState().getBotFactory().getBotVector();
 			if (sim != NULL) {
+				if (!shift) {
+					selBots.clear();
+				}
 				for (i = 0; i < bots.size(); i++) {
-
 					Sim::Bot *bot = bots[i];
 					if (bot != NULL) {
 						Sim::Vector pos = bot->getBody().mPos;
+						Sim::Vector col = bot->getTypePtr()->getCollision()->getBboxHigh();
 						qDebug() << pos.x << pos.y;
-						if ( pos.x < x && x < pos.x + 1.3 && pos.y < y && y < pos.y + 1.8) {
+						if ( pos.x < x && x < pos.x + col.x && pos.y < y && y < pos.y + col.y) {
 							selBots.insert(i);
 							return;
 						}
