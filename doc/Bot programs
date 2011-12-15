@@ -1,0 +1,130 @@
+==========================
+== Bot CPU and programs ==
+==========================
+
+== Abstract ==
+Each bot has a CPU which contain a program scheduler and program executer.
+
+Programs are used to alter the behaviour of a bot by activating internal
+commands or abilities.
+
+
+
+== Internal simulation behaviour ==
+Programs are created and destroyed using a factory independent of bots. Bots
+only keep an id reference to these programs in the CPU.
+
+This also means that input is given to bots by creating programs in the
+program factory, then scheduling these programs to the bots.
+
+
+
+== CPU behaviour ==
+Programs are run by a bot's CPU, which has a limit on the number of cycles it
+can perform per step. Each program consume a specific number of cycles per
+step. If the number of cycles consumed in one turn exceeds its production, the
+CPU will process as much as it can. This will result in some programs not
+being processed every step. However, no program is run more than twice per
+step.
+
+Some CPUs may have the ability to keep a storage of cycles greater
+than their production. This allows for shorter burst of high-load. The
+cost of such a CPU should possibly be calculated as a factor of both cycle
+production and cycle storage, meaning CPUs that produce few cycles per step
+will have cheap storage, and those with high production may not afford it.
+
+
+The CPU first processes the schedule list, then it process the running programs.
+The CPU will always process scheduled programs in the order they were added.
+
+Running programs are executed in the order they were inserted, counting from
+the last processed program. This means that if a running program schedules a
+new program with zero delay, this new program will be executed just after
+the running program. If more than one program is inserted in such a way, they
+are all executed in the sequence they were inserted.
+
+
+
+== Basic program system ==
+Programs are first scheduled to the bot CPU, with a delay before it
+is added to the list of running programs. When a program is active, it will
+run until its internal timer reaches zero (it might also be infinite).
+
+It is possible to have several running copies of any program, however this is
+not necessarily beneficial (in most cases the second running instance of a
+program will overwrite the previous instance's orders).
+
+
+
+== Scheduler ==
+When a program is added to the scheduler, it is given a delay before it is
+moved from the scheduler to the list of running programs.
+
+If a scheduled program is added without any delay, it is directly appended to
+the list of running programs.
+
+The schedule list is sorted first by delay, then by order added.
+
+
+== Bot commands ==
+A bot has various internal commands divided by components:
+
+(note: These are examples and ideas, to see what kinds of programs will be
+	running. It will be used as a guide for what the system needs to be able
+	to handle when it is developed.)
+
+Engine: (Manages movement)
+- Move towards target bot (various parameters dictate how close and which
+	direction in relation to the target to move to. This may, for example,
+	be used to create formations.)
+- Move towards target position.
+- Jump (may be given a jump strength as a parameter).
+- Adjust standing height (various levels of crouching, lying down)
+
+Weapon: (Manage gunfire)
+	(note: Some weapons may fire more than once per step by only being dependent
+	on the number of cycles a bot has. Other weapons need to reload.)
+- Fire towards target bot with given weapon. (This has two modes: The first is
+	to store the active target and only fire towards this, the second is to
+	switch targets whenever a new one is found.)
+- Fire towards target position with given weapon.
+
+Ability: (Manages special abilities that a bot may have)
+- Tracer (causes a specific weapon to base its targetting on the velocity of
+	the target)
+- Overclock (generates some cpu cycles by harming the bot)
+- Repair (sacrifice cpu cycles to heal the bot, the cost for overclocking+repair
+	should be carefully balanced)
+- Broadcast message (Sends a message to all friendly and/or hostile bots in
+	the vicinity. This message may contain custom data, or be copied from the
+	bots own information state.)
+- Firewall (Prevents messages from enemies to be received)
+- Overcharge jump (Allows a higher jump at the cost of some cycles)
+- Jetpack (Causes specific upwards movement for a short period)
+
+Sensors: (Alters programs due to external influences)
+- Schedule program(s) if harmed.
+- Schedule program(s) if within a specific distance of a hostile and/or friendly.
+- Schedule program(s) if colliding with a tile / specific tile type(s).
+- Schedule program(s) if health is below a specific value or percentage.
+- Schedule program(s) if caught in a momentum-giving explosion.
+- Schedule program(s) if a message is received with specific data. (This will
+	use the message's state in collaboration with any other sensor or program
+	as a replacement for the bots own state. This might be used to, for example
+	have bots guard a specific bot, attacking whoever hits that bot)
+- Schedule program(s) if bot destroyed its target.
+
+Metaprograms (Programs that alter other programs):
+- Kill (aborts target program, useful for sensors)
+- Adjust (alters parameters for an already running program)
+
+
+(Note: Messages will probably be full bot information states sent. These information
+	states are what a bot uses to know what happens around itself.
+	
+	For example, the sensor that activates if the bot is harmed will check the
+	bots own information state for the flag that indicates it has been hit.
+	
+	This internal state is updated every step. Not all of the internal state
+	is reset every step. For example: The active target will only be updated
+	if a new target is acquired.)
