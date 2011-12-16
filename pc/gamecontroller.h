@@ -54,9 +54,9 @@ public:
 
 		Sim::Collision::ColPoints cpts;
 		cpts.push_back(Sim::Vector(0,0));
-		cpts.push_back(Sim::Vector(0,1));
-		cpts.push_back(Sim::Vector(1,1));
-		cpts.push_back(Sim::Vector(1,0));
+		cpts.push_back(Sim::Vector(0,1.8));
+		cpts.push_back(Sim::Vector(1.3,1.8));
+		cpts.push_back(Sim::Vector(1.3,0));
 
 		sim.getData().getBotDb().addBot(myBot, cpts);
 
@@ -157,7 +157,7 @@ public:
 		botCfg.mBody.mPos = Sim::Vector(0,2);
 		sim.getState().getBotFactory().createBot( botCfg );
 		upper->setAlignment(Qt::AlignTop);
-	}
+    }
 	void showAll() {
 		parent->show();
 		label->show();
@@ -182,8 +182,8 @@ public:
 			clabel = new CustomLabel(&something, parent);
 			clabel->setPixmap(profiles[0]);
 			clabel->resize(60,60);
-			clabel->show();
 			upper->insertWidget(i, clabel);
+			clabel->show();
 		}
 		upper->insertSpacerItem(i, space);
 	}
