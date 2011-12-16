@@ -22,7 +22,11 @@ public slots:
 	}
 
 public:
-	int lastX, lastY;
+	int lastX, lastY, cMouse;
+	double mouseSize;
+	bool fullScreen;
+	float selAlpha;
+	bool dirAlpha;
 	QImage data[3];
 	GLuint textures[3];
 	QImage characters[1];
@@ -40,8 +44,6 @@ public:
 	Sim::World *wld;
 	Camera *cam;
 	ClientStates *states;
-	int cMouse;
-	double mouseSize;
 	GameDrawer(Camera *cam, Sim::Simulation *simIn, ClientStates *states, QWidget *parent = 0)
 		: QGLWidget(QGLFormat(QGL::SampleBuffers), parent) {
 		cMouse = 0;
@@ -52,24 +54,42 @@ public:
 		wld = &sim->getState().getWorld();
 		this->states = states;
 		this->states->setSim(sim);
-
 		setCursor( QCursor( Qt::BlankCursor ) );
 		grabKeyboard();
 		mouseSize = 0.07;
+		selAlpha = 0.3;
+		dirAlpha = false;
+		fullScreen = false;
 	}
 
 protected:
 	// overridden
 	void keyPressEvent (QKeyEvent *event) {
-		if (event->key() == Qt::Key_Shift) {
-			states->setShift(true);
+		int k = event->key();
+		if (k == Qt::Key_F11) {
+			if (fullScreen) {
+				showNormal();
+			} else {
+				showFullScreen();
+			}
+			fullScreen = !fullScreen;
 		}
+		modKey(k, true);
 	}
 
 	// overridden
 	void keyReleaseEvent (QKeyEvent *event) {
-		if (event->key() == Qt::Key_Shift) {
-			states->setShift(false);
+		modKey(event->key(), false);
+	}
+
+	void modKey(int k, bool state) {
+		if ( k == Qt::Key_Shift ) {
+			states->setShift(state);
+		} else if ( k == Qt::Key_Control ) {
+			states->setCtrl(state);
+			if (state) {
+
+			}
 		}
 	}
 
@@ -103,12 +123,12 @@ protected:
 		loadAndBind(":/graphics/tiles/metal2surf.png", &data[2], &textures[2]);
 		loadAndBind(":/graphics/characters/character1.png", &characters[0], &chartextures[0], 128, 320, false, true);
 		loadAndBind(":/graphics/weapons/testweapon.png", &weapons[0], &weaponstextures[0], 32, 64);
-		loadAndBind(":/graphics/mouse/default.png", &mouse[0], &mousetextures[0],16,16);
+		loadAndBind(":/graphics/mouse/default.png", &mouse[0], &mousetextures[0],64,64);
 		loadAndBind(":/graphics/mouse/attack.png", &mouse[1], &mousetextures[1],64,64);
 		loadAndBind(":/graphics/weapons/bullet.png", &bullet[0], &bullettextures[0],16,16);
 		this->setAttribute(Qt::WA_NoSystemBackground);
 		QPixmap m;
-		m.convertFromImage(mouse[MOUSE_ATTACK]);
+		m.convertFromImage(mouse[MOUSE_NORMAL]);
 		this->setCursor(QCursor(m, -1, -1));
 
 	}
@@ -161,6 +181,16 @@ protected:
 	// overridden
 	void paintGL() {
 		cam->iter();
+		if (dirAlpha) {
+			selAlpha += 0.003;
+		} else {
+			selAlpha -= 0.003;
+		}
+		if (selAlpha > 0.5) {
+			dirAlpha = false;
+		} else if ( selAlpha < 0.2) {
+			dirAlpha = true;
+		}
 		int i, j;
 		glClear(GL_COLOR_BUFFER_BIT);
 		glMatrixMode(GL_PROJECTION);
@@ -170,7 +200,7 @@ protected:
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
 		glEnable(GL_TEXTURE_2D);
-		glColor3f(1.0f, 1.0f, 1.0f);
+	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
 		float mx = cam->xPixToDouble(lastX);
 		float my = cam->yPixToDouble(lastY);
@@ -218,7 +248,7 @@ protected:
 			}
 		}
 		glDisable(GL_TEXTURE_2D);
-		glColor3f(0.2f, 1.0f, 0.2f);
+	glColor4f(0.2f, 1.0f, 0.2f, selAlpha);
 		for (i = 0; i < bots.size(); i++) {
 			if (states->isSelected(i)) {
 				Sim::Bot *bot = bots[i];
