@@ -45,6 +45,7 @@ namespace Sim {
 				virtual void load(Save::BasePtr &fp)=0;
 				
 				virtual void process(Bot *bot, BotCpu *cpu)=0;
+				virtual bool isFinished(Bot *bot, BotCpu *cpu)=0;
 			//@}
 				
 			/// @name System data
@@ -77,6 +78,10 @@ namespace Sim {
 				T *tmp = new T(mSim,id,cfg);
 				Factory<Program>::addObj(tmp);
 				return tmp;
+			}
+			
+			void destroyProgram(uint32_t id) {
+				removeObj(id);
 			}
 			
 			Program *getProgram(uint32_t id) { return getObject(id); }

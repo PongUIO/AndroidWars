@@ -29,9 +29,9 @@ namespace Sim {
 				{ return currentStep >= mActivateStep; }
 				
 				bool operator< (const Schedule &other) const
-				{ return mActivateStep<other.mActivateStep ||
+				{ return mActivateStep>other.mActivateStep ||
 					(mActivateStep==other.mActivateStep &&
-					mScheduleCounter<other.mScheduleCounter); }
+					mScheduleCounter>other.mScheduleCounter); }
 			};
 			
 			typedef std::priority_queue<Schedule> ScheduleQueue;
@@ -42,6 +42,8 @@ namespace Sim {
 			
 			void scheduleProgram(uint32_t progId, uint32_t stepDelay);
 			const ProgramRefList &getProgramList() { return mProgramList; }
+			
+			bool hasRunningProgram(uint32_t progId);
 			
 			void save(Save::BasePtr &fp);
 			void load(Save::BasePtr &fp);

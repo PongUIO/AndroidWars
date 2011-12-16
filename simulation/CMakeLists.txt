@@ -14,6 +14,7 @@ add_library(AWSim
 	bot/BotCpu.cpp
 	
 	program/MoveTowards.cpp
+	program/Kill.cpp
 	
 	data/BotD.cpp
 	data/BulletD.cpp

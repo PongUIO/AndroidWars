@@ -6,6 +6,13 @@
 
 namespace Sim {
 	namespace Prog {
+		/**
+		 * Turns on a bot's engine to move it towards a destination.
+		 * 
+		 * @note This will eventually also take into consideration the type of
+		 * engine a bot has. For example, if the engine only allows movement
+		 * on ground, the program will not try to move it into the air.
+		 */
 		class MoveTowards : public Program {
 			public:
 				/// @name Save system implementation
@@ -56,6 +63,7 @@ namespace Sim {
 				virtual void load(Save::BasePtr& fp);
 				
 				virtual void process(Bot* bot, BotCpu* cpu);
+				virtual bool isFinished(Bot*, BotCpu*) { return false; }
 				
 				DestinationType mType;
 				uint32_t mTarget;

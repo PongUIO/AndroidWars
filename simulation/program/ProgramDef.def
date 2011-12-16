@@ -1,1 +1,2 @@
 _SIM_PROGRAM_DEF(MoveTowards)
+_SIM_PROGRAM_DEF(Kill)

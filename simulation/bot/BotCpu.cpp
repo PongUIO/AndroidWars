@@ -46,13 +46,36 @@ namespace Sim {
 		
 		// Run programs
 		for(ProgramRefList::iterator i=mProgramList.begin();
-			i!=mProgramList.end(); i++) {
+			i!=mProgramList.end();) {
 			Program *prog = mHost->mSim->getState().
 				getProgramFactory().getProgram(*i);
 			
-			if(prog)
+			bool doErase = true;
+			if(prog) {
 				prog->process(mHost, this);
+				if(!prog->isFinished(mHost, this))
+					doErase = false;
+			}
+				
+			if(doErase)
+				i = mProgramList.erase(i);
+			else
+				i++;
 		}
+	}
+	
+	/**
+	 * Checks if the CPU has a running program with the given ID.
+	 */
+	bool BotCpu::hasRunningProgram(uint32_t progId)
+	{
+		for(ProgramRefList::iterator i=mProgramList.begin();
+			i!=mProgramList.end(); i++) {
+			if(*i == progId)
+				return true;
+		}
+		
+		return false;
 	}
 	
 	void BotCpu::save(Save::BasePtr& fp)

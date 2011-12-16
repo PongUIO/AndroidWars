@@ -11,8 +11,7 @@ namespace Sim {
 			const Config& cfg) :
 			Program(sim, id, getTypeId()), mType(cfg.mType),
 			mTarget(cfg.mTargetId), mTargetPos(cfg.mTargetPos)
-		{
-		}
+		{}
 		
 		MoveTowards::~MoveTowards()
 		{}

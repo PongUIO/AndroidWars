@@ -103,8 +103,11 @@ void setupWorld()
 	MoveTowards *move = progFact.createProgram<MoveTowards>(
 		MoveTowards::Config(MoveTowards::DtPosition, Sim::Vector(5,5)));
 	
+	Kill *kill = progFact.createProgram<Kill>(Kill::Config(move->getId()));
+	
 	Sim::Bot *bot = botFact.getBot(botId);
 	bot->getState().mCpu.scheduleProgram(move->getId(), 0);
+	bot->getState().mCpu.scheduleProgram(kill->getId(), 5);
 	
 	sim.getState().getWorld().getTile(3,0).setType(1);
 }
