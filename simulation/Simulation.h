@@ -5,6 +5,7 @@
 
 #include "Data.h"
 #include "State.h"
+#include "program/ProgramInclude.h"
 
 namespace Sim {
 	struct Configuration {
@@ -46,6 +47,9 @@ namespace Sim {
 				
 				uint32_t getCurPhase()
 				{ return mCurPhase; }
+				
+				uint32_t getCurTotalStep()
+				{ return mCurPhase*config.phaseLength+mCurPhaseStep; }
 				
 				void rewindPhase();
 			//@}

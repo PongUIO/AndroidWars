@@ -24,6 +24,12 @@ namespace Sim {
 			Vector &operator =(const double &d)
 			{ x=d; y=d; return *this; }
 			
+			bool operator ==(const Vector &b)
+			{ return (x==b.x) && (y==b.y); }
+			
+			bool operator !=(const Vector &b)
+			{ return !(*this == b); }
+			
 			// Vector operations
 			#define VECV_OPER(op) \
 				Vector operator op(const Vector &b) const \

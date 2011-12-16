@@ -95,18 +95,16 @@ void setupWorld()
 	botCfg.mWeaponBox.add( sim.getState().getWeaponFactory().create(weapCfg) );
 	uint32_t botId = sim.getState().getBotFactory().createBot( botCfg );
 	
-	// Send some input to this bot
+	// Give the bot some input
+	using namespace Sim::Prog;
 	Sim::BotFactory &botFact = sim.getState().getBotFactory();
-	Sim::BotInput bi;
+	Sim::ProgramFactory &progFact = sim.getState().getProgramFactory();
 	
-	bi = Sim::BotInput::inMove(botId, 20, Sim::Vector(1,0) );
-	botFact.getInput().addInput( bi );
+	MoveTowards *move = progFact.createProgram<MoveTowards>(
+		MoveTowards::Config(MoveTowards::DtPosition, Sim::Vector(5,5)));
 	
-	bi = Sim::BotInput::inMove(botId, 20, Sim::Vector(-1,0) );
-	botFact.getInput().addInput( bi );
-	
-	bi = Sim::BotInput::inShoot(botId, 0, Sim::Vector(1,0) );
-	botFact.getInput().addInput( bi );
+	Sim::Bot *bot = botFact.getBot(botId);
+	bot->getState().mCpu.scheduleProgram(move->getId(), 0);
 	
 	sim.getState().getWorld().getTile(3,0).setType(1);
 }
