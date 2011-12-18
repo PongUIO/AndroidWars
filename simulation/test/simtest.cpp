@@ -46,6 +46,9 @@ void loadBots()
 	botType.baseSpeed = 1.0;
 	botType.baseWeight = 75.0;
 	
+	botType.cpuCycleSpeed = 5;
+	botType.cpuStorage = 20;
+	
 	sim.getData().getBotDb().addBot(botType, pts);
 }
 
@@ -97,7 +100,7 @@ void setupWorld()
 	
 	// Give the bot some input
 	using namespace Sim::Prog;
-	Sim::BotFactory &botFact = sim.getState().getBotFactory();
+	Sim::InputManager &inMgr = sim.getState().getInputManager();
 	Sim::ProgramFactory &progFact = sim.getState().getProgramFactory();
 	
 	MoveTowards *move = progFact.createProgram<MoveTowards>(
@@ -105,9 +108,8 @@ void setupWorld()
 	
 	Kill *kill = progFact.createProgram<Kill>(Kill::Config(move->getId()));
 	
-	Sim::Bot *bot = botFact.getBot(botId);
-	bot->getState().mCpu.scheduleProgram(move->getId(), 0);
-	bot->getState().mCpu.scheduleProgram(kill->getId(), 5);
+	inMgr.registerInput(botId, move->getId(), 0);
+	inMgr.registerInput(botId, kill->getId(), 5);
 	
 	sim.getState().getWorld().getTile(3,0).setType(1);
 }
@@ -137,9 +139,24 @@ int main(void)
 			sim.step();
 		}
 		
-		if(i==1)
+		if(i==1) {
 			sim.endPhase();
-		else
+			
+			// Example of giving input after a phase
+			using namespace Sim::Prog;
+			Sim::InputManager &inMgr = sim.getState().getInputManager();
+			Sim::ProgramFactory &progFact = sim.getState().getProgramFactory();
+			
+			MoveTowards *move = progFact.createProgram<MoveTowards>(
+				MoveTowards::Config(MoveTowards::DtPosition, Sim::Vector(-50,0))
+			);
+			
+			Kill *kill = progFact.createProgram<Kill>(
+				Kill::Config(move->getId()));
+			
+			inMgr.registerInput(0, move->getId(), 3);
+			inMgr.registerInput(0, kill->getId(), 10);
+		} else
 			sim.rewindPhase();
 	}
 	

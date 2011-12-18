@@ -1,6 +1,7 @@
 add_library(AWSim
 	Body.cpp
 	Bot.cpp
+	Input.cpp
 	Program.cpp
 	Data.cpp
 	Player.cpp

@@ -115,7 +115,7 @@ namespace Sim {
 	{
 		uint32_t id = newId();
 		
-		addObj(new Bot(mSim, id, cfg));
+		addObj(new Bot(mSim, id, cfg), id);
 		
 		return id;
 	}

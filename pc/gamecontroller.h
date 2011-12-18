@@ -82,14 +82,22 @@ public:
 		wsys->registerEntryPoint(0);
 
 		// Send some input to this bot
-		Sim::BotFactory &botFact = sim.getState().getBotFactory();
-		Sim::BotInput bi;
-		bi = Sim::BotInput::inMove(botId, 20, Sim::Vector(1,0) );
-		botFact.getInput().addInput( bi );
-
-		//bi = Sim::BotInput::inShoot(botId, 0, Sim::Vector(0,1));
-		//botFact.getInput().addInput( bi );
-
+		{
+			Sim::InputManager &inMgr = sim.getState().getInputManager();
+			Sim::ProgramFactory &progFact = sim.getState().getProgramFactory();
+			
+			using namespace Sim::Prog;
+			MoveTowards *move = progFact.createProgram<MoveTowards>(
+				MoveTowards::Config(MoveTowards::DtPosition, Sim::Vector(5,0))
+			);
+			
+			Kill *kill = progFact.createProgram<Kill>(
+				Kill::Config(move->getId()));
+			
+			inMgr.registerInput(botId, move->getId(), 0);
+			inMgr.registerInput(botId, kill->getId(), 20);
+		}
+		
 		Sim::TileDatabase &db = sim.getData().getTileDb();
 		Sim::TileD myTile;
 		myTile.colMask = 0;

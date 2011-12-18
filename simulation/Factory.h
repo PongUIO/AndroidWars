@@ -36,7 +36,6 @@ namespace Sim {
 	 * The object this template uses is required to have the following
 	 * implemented:
 	 * - isDead() : Should return true when the object is to be purged.
-	 * - getId() : Returns the ID of this object
 	 */
 	template<class T>
 	class Factory {
@@ -55,8 +54,11 @@ namespace Sim {
 			virtual void saveObj(T*, Save::BasePtr &)=0;
 			virtual T *loadObj(uint32_t id, Save::BasePtr&)=0;
 			
-			void addObj(T *obj) {
-				mData[obj->getId()] = obj;
+			uint32_t addObj(T *obj, uint32_t idPos) {
+				if(idPos >= mData.size())
+					idPos = newId();
+				mData[idPos] = obj;
+				return idPos;
 			}
 			
 			void removeObj(uint32_t id) {
@@ -213,8 +215,7 @@ namespace Sim {
 				uint32_t create(const typename T::Config &cfg)
 				{
 					uint32_t id = Factory<T>::newId();
-					Factory<T>::addObj(new T(mSim, id, cfg));
-					return id;
+					return Factory<T>::addObj(new T(mSim, id, cfg), id);
 				}
 				
 				const T *getObj(uint32_t id) const

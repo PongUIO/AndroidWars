@@ -7,6 +7,7 @@
 
 namespace Sim {
 	State::State(Simulation* sim) :
+		mInputManager(sim),
 		mBotFactory(sim),
 		mProgramFactory(sim),
 		mBulletFactory(sim),
@@ -15,6 +16,7 @@ namespace Sim {
 		mPlayer(),
 		mSim(sim)
 	{
+		registerCallObj(&mInputManager);
 		registerCallObj(&mWorld);
 		registerCallObj(&mBotFactory);
 		registerCallObj(&mProgramFactory);

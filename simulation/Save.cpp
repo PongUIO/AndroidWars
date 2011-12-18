@@ -12,6 +12,11 @@ namespace Sim {
 		return checkSum.checksum();
 	}
 	
+	void Save::append(const Sim::Save& other)
+	{
+		data.insert(data.end(), other.data.begin(), other.data.end());
+	}
+	
 	void Save::FilePtr::nanoRead(uint8_t* ptr, uint32_t bytes)
 	{
 		uint32_t extraBytes = 0;

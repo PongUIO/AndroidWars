@@ -29,6 +29,8 @@ namespace Sim {
 			void clear() { data.clear(); }
 			uint8_t const *getData() const { return &data[0]; }
 			
+			void append(const Save &other);
+			
 			class BasePtr {
 				private:
 					virtual void nanoWrite(const uint8_t *ptr, uint32_t bytes)=0;
@@ -107,6 +109,24 @@ namespace Sim {
 						v.x = readFloat();
 						v.y = readFloat();
 						return v;
+					}
+					
+					void writeSave(const Save &save)
+					{	
+						uint32_t svSize = save.data.size();
+						writeInt<uint32_t>(svSize);
+						nanoWrite(&(save.data[0]), svSize);
+					}
+					
+					Save readSave()
+					{
+						Save tmp;
+						uint32_t svSize = readInt<uint32_t>();
+						
+						tmp.data.resize(svSize);
+						nanoRead(&(tmp.data[0]), svSize);
+						
+						return tmp;
 					}
 			};
 			

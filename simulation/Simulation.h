@@ -81,7 +81,6 @@ namespace Sim {
 				State mStateActive;
 				Save mStateCopy;
 				Data mData;
-				
 			//@}
 			
 			/// @name Phase variables

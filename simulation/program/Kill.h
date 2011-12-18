@@ -12,17 +12,7 @@ namespace Sim {
 		 */
 		class Kill : public Program {
 			public:
-				/// @name Save system implementation
-				//@{
-					static uint32_t getTypeId();
-					class SaveSys : public Program::SaveSystem {
-						public:
-							Program *createProgram(Simulation *sim,
-								uint32_t id) {
-								return new Kill(sim, id, Config());
-							}
-					};
-				//@}
+				_SIM_PROGRAM_HEADER
 				
 				struct Config {
 					uint32_t mTargetId;

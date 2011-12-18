@@ -44,6 +44,7 @@ namespace Sim {
 			const ProgramRefList &getProgramList() { return mProgramList; }
 			
 			bool hasRunningProgram(uint32_t progId);
+			bool isRunning() { return mIsRunning; }
 			
 			void save(Save::BasePtr &fp);
 			void load(Save::BasePtr &fp);
@@ -52,7 +53,11 @@ namespace Sim {
 			void setHost(Bot *host) { mHost=host; }
 			
 			void step(double stepTime);
-			void startProgram(const Schedule &sch);
+			void runScheduler(double stepTime);
+			void runPrograms(double stepTime);
+			
+			void autoSchedule(uint32_t progId);
+			void iterProgram(bool eraseCurrent=false);
 			
 			Bot *mHost;
 			
@@ -60,6 +65,12 @@ namespace Sim {
 			uint32_t mScheduleCounter;
 			
 			ProgramRefList mProgramList;
+			bool mIsEndIter;
+			bool mIsRunning;
+			ProgramRefList::iterator mCurProgram;
+			ProgramRefList::iterator mAutoScheduleIndex;
+			
+			uint32_t mCycleCount;
 			
 			friend class Bot;
 	};

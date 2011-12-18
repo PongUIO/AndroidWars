@@ -14,6 +14,14 @@ namespace Sim {
 	class Bot;
 	class BotCpu;
 	
+	/// Required for any program implementation
+#define _SIM_PROGRAM_HEADER \
+	static uint32_t getTypeId(); \
+	class SaveSys : public Program::SaveSystem { \
+		public: Program *createProgram(Simulation *sim, uint32_t id); \
+	};
+	
+	
 	class Program {
 		public:
 			enum ProgramTypeId {
@@ -55,54 +63,118 @@ namespace Sim {
 				Simulation *mSim;
 			//@}
 			
+		private:
+			/// Internal identifier pointing to its factory index
+			uint32_t mInternalFactoryId;
+			
 			friend class ProgramFactory;
 			friend class Factory<Program>;
 			
 			friend class BotCpu;
+			friend class BotInput;
 	};
 	
-	class ProgramFactory : public Factory<Program>, public StateObj {
+	/**
+	 * Factory manager for programs.
+	 * 
+	 * Programs behave slightly different from ordinary types in terms
+	 * of IDs. Program IDs are always unique through the runtime of the
+	 * simulation.
+	 * 
+	 * This is because bot input require exact and persistent identifiers to
+	 * preserve the concept that it should not matter to determinism whether
+	 * input is fed per-phase or in batch at the beginning of the simulation.
+	 * 
+	 * As a result of this, IDs used internally by the factory are hidden from
+	 * view as best as possible.
+	 * 
+	 * Unfortunately, the issue where cheksums are different whether
+	 * input is given per-phase or all at once is unavoidable.
+	 */
+	class ProgramFactory : private Factory<Program>, public StateObj {
 		public:
 			ProgramFactory(Simulation* sim);
 			virtual ~ProgramFactory();
 			
-			void startup();
-			void shutdown();
+			/// @name StateObj functions
+			//@{
+				void startup();
+				void shutdown();
+				
+				void save(Save::BasePtr& fp);
+				void load(Save::BasePtr& fp);
+				
+				void startPhase();
+				void endPhase();
+				
+				void step(double stepTime);
+			//@}
 			
-			void save(Save::BasePtr& fp);
-			void load(Save::BasePtr& fp);
-			
+			/**
+			 * Creates a program and inserts it into the factory.
+			 * May create any valid inheritor of \c Program.
+			 */
 			template<class T>
 			T *createProgram(const typename T::Config &cfg) {
-				uint32_t id = Factory<Program>::newId();
-				T *tmp = new T(mSim,id,cfg);
-				Factory<Program>::addObj(tmp);
+				uint32_t progId = mCurrentId++;
+				T *tmp = new T(mSim,progId,cfg);
+				uint32_t internalId = Factory<Program>::addObj(tmp,FactoryNoId);
+				tmp->mInternalFactoryId = internalId;
+				
+				insertResolve(progId, tmp);
 				return tmp;
 			}
 			
+			/**
+			 * Destroys a program given a valid ID.
+			 */
 			void destroyProgram(uint32_t id) {
-				removeObj(id);
+				Program *prog = getResolve(id);
+				if(prog) {
+					removeObj(prog->mInternalFactoryId);
+					removeResolve(id);
+				}
 			}
 			
-			Program *getProgram(uint32_t id) { return getObject(id); }
-			const Program *getProgram(uint32_t id) const
-				{ return getObject(id); }
-			
-			void startPhase();
-			void endPhase();
-			
-			void step(double stepTime);
+			Program *getProgram(uint32_t id) { return getResolve(id); }
 			
 		private:
-			typedef boost::unordered_map<uint32_t, Program::SaveSystem*>
-				ProgramTypeMap;
-			ProgramTypeMap mTypeMap;
+			/// @name Program saving system
+			//@{
+				typedef boost::unordered_map<uint32_t, Program::SaveSystem*>
+					ProgramTypeMap;
+				ProgramTypeMap mTypeMap;
+			//@}
 			
-			void deleteInstance(Program* obj) { delete obj; }
-			void saveObj(Program *obj , Save::BasePtr &fp);
-			Program* loadObj(uint32_t id, Save::BasePtr &fp);
+			/// @name Factory-required functions
+			//@{
+				void deleteInstance(Program* obj) { delete obj; }
+				void saveObj(Program *obj , Save::BasePtr &fp);
+				Program* loadObj(uint32_t internalId, Save::BasePtr &fp);
+			//@}
+			
+			/// @name Unique ID management
+			//@{
+				typedef boost::unordered_map<uint32_t, Program*> ProgramIdMap;
+				ProgramIdMap mProgramIdResolve;
+				uint32_t mCurrentId;
+				
+				void insertResolve(uint32_t progId, Program *prog)
+				{ mProgramIdResolve[progId] = prog; }
+				
+				void removeResolve(uint32_t progId)
+				{ mProgramIdResolve.erase(mProgramIdResolve.find(progId)); }
+				
+				Program *getResolve(uint32_t progId)
+				{
+					ProgramIdMap::iterator i=mProgramIdResolve.find(progId);
+					return (i==mProgramIdResolve.end()) ? 0 : i->second;
+				}
+			//@}
 			
 			Simulation *mSim;
+			
+			friend class BotInput;
 	};
 }
 

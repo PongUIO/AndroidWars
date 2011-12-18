@@ -46,6 +46,11 @@ namespace Sim {
 			
 			struct State {
 				public:
+					State() : mSide(0), mType(0),
+						mSensor(), mBody(), mWeaponBox(),
+						mCpu(), mEngine()
+						{}
+					
 					uint32_t mSide;
 					uint32_t mType;
 					
