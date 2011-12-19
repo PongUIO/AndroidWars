@@ -10,6 +10,8 @@
 #include "Save.h"
 #include "Weapon.h"
 
+#include "bot/BotCpu.h"
+
 #include "StateObj.h"
 
 namespace Sim {
@@ -21,69 +23,44 @@ namespace Sim {
 	class State;
 	class Collision;
 	
-	struct BotInput {
-		public:
-			enum InputType {
-				None=0,
-				Move,
-				Shoot,
-				Ability
-			};
-			
-			BotInput(uint32_t id=0, InputType type=None) :
-				botId(id), stepCount(0), type(type), dir(0)
-				{}
-			
-			static BotInput inMove(uint32_t id, uint32_t stepCount,
-				const Vector &dir) {
-				BotInput tmp = BotInput(id, Move);
-				tmp.stepCount = stepCount;
-				tmp.dir = dir;
-				
-				return tmp;
-			}
-			
-			static BotInput inShoot(uint32_t id, uint32_t weapId,
-				const Vector &dir) {
-				BotInput tmp = BotInput(id, Shoot);
-				tmp.stepCount = 1;
-				tmp.dir = dir;
-				
-				tmp.iparam[0] = weapId;
-				
-				return tmp;
-			}
-			
-			void save(Save::BasePtr &fp);
-			void load(Save::BasePtr &fp);
-			
-		private:
-			uint32_t botId;      ///< ID of bot to process this input
-			uint32_t stepCount;  ///< Number of steps to perform the action
-			InputType type;      ///< Type of action to perform
-			
-			Vector dir;          ///< Direction to apply the action
-			
-			int32_t iparam[3];
-			double dparam[3];
-			Vector vparam[3];
-			
-			friend class Bot;
-			friend class BotFactory;
-	};
-	
 	class Bot {
 		public:
+			struct Input {
+				uint32_t mStepDelay;
+				uint32_t mProgramId;
+			};
+			
+			struct SensorState {
+				uint32_t mTargetBot;
+				
+				bool mWasHit;
+				
+				void save(Save::BasePtr &fp);
+				void load(Save::BasePtr &fp);
+			};
+			
+			struct Engine {
+				double mStrength;
+				Vector mDirection;
+			};
+			
 			struct State {
 				public:
+					State() : mSide(0), mType(0),
+						mSensor(), mBody(), mWeaponBox(),
+						mCpu(), mEngine()
+						{}
+					
 					uint32_t mSide;
 					uint32_t mType;
+					
+					SensorState mSensor;
 					
 					Body mBody;
 					WeaponBox mWeaponBox;
 					
-					BotInput mCurInput;
-					InputBuffer<BotInput> mInput;
+					BotCpu mCpu;
+					Engine mEngine;
 					
 				private:
 					void save(Save::BasePtr &fp);
@@ -103,12 +80,16 @@ namespace Sim {
 			
 		private:
 			Bot(Simulation *sim, uint32_t id, const State &cfg=State()) :
-				mId(id), mSim(sim), mState(cfg) {}
+				mId(id), mSim(sim), mState(cfg)
+			{ mState.mCpu.setHost(this);}
 			~Bot() {}
 			
 			/// @name Interaction
 			//@{
 				bool isDead() { return false; }
+				
+				void prepareStep(double stepTime);
+				void updateCpu(double stepTime);
 				void step(double stepTime);
 				
 				void save(Save::BasePtr &fp);
@@ -118,8 +99,7 @@ namespace Sim {
 			/// @name Input
 			//@{
 				bool isIdle() {
-					return mState.mCurInput.type==BotInput::None ||
-						mState.mCurInput.stepCount==0;
+					return mState.mCpu.getProgramList().size()==0;
 				}
 				
 				void handleInput();
@@ -141,20 +121,11 @@ namespace Sim {
 			 * to simulation. All these values are used in saving/loading.
 			 */
 			State mState;
-			//@{
-				/*uint32_t mSide;
-				uint32_t mType;
-				
-				Body mBody;
-				WeaponBox mWeaponBox;
-				
-				InputBuffer<BotInput> mInput;
-				BotInput mCurInput;*/
-			//@}
 			
 			friend class BotFactory;
 			friend class Factory<Bot>;
 			friend class DefaultFactory<Bot>;
+			friend class BotCpu;
 	};
 	
 	class BotFactory : public DefaultFactory<Bot> {
@@ -162,7 +133,7 @@ namespace Sim {
 			/// @name Initialization
 			//@{
 				BotFactory(Simulation *sim);
-				~BotFactory();
+				virtual ~BotFactory();
 				
 				void startup();
 				void shutdown();
@@ -175,24 +146,18 @@ namespace Sim {
 			//@{
 				uint32_t createBot(const Bot::Config &cfg);
 				
-				const Bot *getBot(uint32_t id) const {
-					return getObject(id);
-				}
+				Bot *getBot(uint32_t id) { return getObject(id); }
+				const Bot *getBot(uint32_t id) const { return getObject(id); }
 				
 				const Factory<Bot>::ObjVec &getBotVector() const {
 					return mData;
 				}
 				
+				void step(double stepTime);
+				
 				void startPhase();
 				void endPhase();
-				
-				InputBuffer<BotInput> &getInput() { return mInput; }
 			//@}
-			
-		private:
-			void deleteInstance(Bot *obj) { delete obj; }
-			
-			InputBuffer<BotInput> mInput;
 	};
 	
 }

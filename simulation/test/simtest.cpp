@@ -46,6 +46,9 @@ void loadBots()
 	botType.baseSpeed = 1.0;
 	botType.baseWeight = 75.0;
 	
+	botType.cpuCycleSpeed = 5;
+	botType.cpuStorage = 20;
+	
 	sim.getData().getBotDb().addBot(botType, pts);
 }
 
@@ -95,18 +98,18 @@ void setupWorld()
 	botCfg.mWeaponBox.add( sim.getState().getWeaponFactory().create(weapCfg) );
 	uint32_t botId = sim.getState().getBotFactory().createBot( botCfg );
 	
-	// Send some input to this bot
-	Sim::BotFactory &botFact = sim.getState().getBotFactory();
-	Sim::BotInput bi;
+	// Give the bot some input
+	using namespace Sim::Prog;
+	Sim::InputManager &inMgr = sim.getState().getInputManager();
+	Sim::ProgramFactory &progFact = sim.getState().getProgramFactory();
 	
-	bi = Sim::BotInput::inMove(botId, 20, Sim::Vector(1,0) );
-	botFact.getInput().addInput( bi );
+	MoveTowards *move = progFact.createProgram<MoveTowards>(
+		MoveTowards::Config(MoveTowards::DtPosition, Sim::Vector(5,5)));
 	
-	bi = Sim::BotInput::inMove(botId, 20, Sim::Vector(-1,0) );
-	botFact.getInput().addInput( bi );
+	Kill *kill = progFact.createProgram<Kill>(Kill::Config(move->getId()));
 	
-	bi = Sim::BotInput::inShoot(botId, 0, Sim::Vector(1,0) );
-	botFact.getInput().addInput( bi );
+	inMgr.registerInput(botId, move->getId(), 0);
+	inMgr.registerInput(botId, kill->getId(), 5);
 	
 	sim.getState().getWorld().getTile(3,0).setType(1);
 }
@@ -136,9 +139,24 @@ int main(void)
 			sim.step();
 		}
 		
-		if(i==1)
+		if(i==1) {
 			sim.endPhase();
-		else
+			
+			// Example of giving input after a phase
+			using namespace Sim::Prog;
+			Sim::InputManager &inMgr = sim.getState().getInputManager();
+			Sim::ProgramFactory &progFact = sim.getState().getProgramFactory();
+			
+			MoveTowards *move = progFact.createProgram<MoveTowards>(
+				MoveTowards::Config(MoveTowards::DtPosition, Sim::Vector(-50,0))
+			);
+			
+			Kill *kill = progFact.createProgram<Kill>(
+				Kill::Config(move->getId()));
+			
+			inMgr.registerInput(0, move->getId(), 3);
+			inMgr.registerInput(0, kill->getId(), 10);
+		} else
 			sim.rewindPhase();
 	}
 	

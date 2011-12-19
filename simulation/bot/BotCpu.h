@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 #include <deque>
+#include <queue>
+#include <list>
 
 #include "../Factory.h"
 
@@ -13,30 +15,62 @@ namespace Sim {
 	class BotCpu {
 		public:
 			struct Schedule {
-				Schedule(uint32_t type, uint32_t delay) :
-					mType(type), mDelay(delay) {}
+				Schedule(uint32_t progId, uint32_t activateStep,
+					uint32_t scheduleCounter) :
+					mProgId(progId), mActivateStep(activateStep),
+					mScheduleCounter(scheduleCounter)
+				{}
 				
-				uint32_t mType;
-				uint32_t mDelay;
+				uint32_t mProgId;
+				uint32_t mActivateStep;
+				uint32_t mScheduleCounter;
+				
+				bool isReady(uint32_t currentStep) const
+				{ return currentStep >= mActivateStep; }
+				
+				bool operator< (const Schedule &other) const
+				{ return mActivateStep>other.mActivateStep ||
+					(mActivateStep==other.mActivateStep &&
+					mScheduleCounter>other.mScheduleCounter); }
 			};
-			typedef std::deque<Schedule> ScheduleQueue;
 			
-			struct Program {
-				uint32_t mId;
-			};
+			typedef std::priority_queue<Schedule> ScheduleQueue;
+			typedef std::list<uint32_t> ProgramRefList;
 			
-			
-			BotCpu(Bot *host);
+			BotCpu();
 			~BotCpu();
 			
-			void scheduleProgram(uint32_t typeId, uint32_t stepDelay);
+			void scheduleProgram(uint32_t progId, uint32_t stepDelay);
+			const ProgramRefList &getProgramList() { return mProgramList; }
+			
+			bool hasRunningProgram(uint32_t progId);
+			bool isRunning() { return mIsRunning; }
+			
+			void save(Save::BasePtr &fp);
+			void load(Save::BasePtr &fp);
 			
 		private:
+			void setHost(Bot *host) { mHost=host; }
+			
 			void step(double stepTime);
-			void startProgram(Schedule &sch);
+			void runScheduler(double stepTime);
+			void runPrograms(double stepTime);
+			
+			void autoSchedule(uint32_t progId);
+			void iterProgram(bool eraseCurrent=false);
 			
 			Bot *mHost;
-			ScheduleQueue mSchedule;
+			
+			ScheduleQueue mScheduleQueue;
+			uint32_t mScheduleCounter;
+			
+			ProgramRefList mProgramList;
+			bool mIsEndIter;
+			bool mIsRunning;
+			ProgramRefList::iterator mCurProgram;
+			ProgramRefList::iterator mAutoScheduleIndex;
+			
+			uint32_t mCycleCount;
 			
 			friend class Bot;
 	};

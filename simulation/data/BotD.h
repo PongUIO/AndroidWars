@@ -19,6 +19,9 @@ namespace Sim {
 		double baseSpeed;
 		double baseWeight;
 		
+		uint32_t cpuCycleSpeed;
+		uint32_t cpuStorage;
+		
 		const Collision *getCollision() const
 		{ return collision; }
 		

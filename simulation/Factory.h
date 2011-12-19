@@ -18,6 +18,8 @@ namespace Sim {
 	// Forward declarations
 	class Simulation;
 	
+	static const uint32_t FactoryNoId = -1;
+	
 	/**
 	 * This template provides an id-referenced grouping of
 	 * objects.
@@ -34,7 +36,6 @@ namespace Sim {
 	 * The object this template uses is required to have the following
 	 * implemented:
 	 * - isDead() : Should return true when the object is to be purged.
-	 * - getId() : Returns the ID of this object
 	 */
 	template<class T>
 	class Factory {
@@ -44,17 +45,20 @@ namespace Sim {
 		public:
 			typedef std::vector<T*> ObjVec;
 			
-			uint32_t NoId() const { return -1; }
-			
 			Factory() :
 				mIdCounter(0)
 				{}
 			virtual ~Factory() {}
 			
 			virtual void deleteInstance(T *obj)=0;
+			virtual void saveObj(T*, Save::BasePtr &)=0;
+			virtual T *loadObj(uint32_t id, Save::BasePtr&)=0;
 			
-			void addObj(T *obj) {
-				mData[obj->getId()] = obj;
+			uint32_t addObj(T *obj, uint32_t idPos) {
+				if(idPos >= mData.size())
+					idPos = newId();
+				mData[idPos] = obj;
+				return idPos;
 			}
 			
 			void removeObj(uint32_t id) {
@@ -85,6 +89,59 @@ namespace Sim {
 							removeObj(i);
 						}
 					}
+				}
+			}
+			
+			/**
+			 * Saves the factory into a savestate.
+			 */
+			void save(Save::BasePtr &fp)
+			{
+				// Save the data list
+				fp.writeInt<uint32_t>(mIdCounter);
+				for(typename ObjVec::iterator i=Factory<T>::mData.begin();
+					i!=mData.end(); ++i) {
+					
+					fp.writeInt<uint8_t>( (*i) != NULL );
+					if( *i )
+						saveObj(*i, fp);
+				}
+				
+				// Save the stack
+				fp.writeInt<uint32_t>(mFreeId.size());
+				for(uint32_t i=0; i<mFreeId.size(); ++i) {
+					fp.writeInt<uint32_t>(mFreeId[i]);
+				}
+			}
+			
+			/**
+			 * Loads the factory from a savestate.
+			 */
+			void load(Save::BasePtr &fp)
+			{
+				// Destroy all objects in the factory
+				killAll();
+				
+				// Load all objects
+				uint32_t facSize = fp.readInt<uint32_t>();
+				for(uint32_t id=0; id<facSize; ++id) {
+					mData.push_back(0);
+					uint8_t hasObj = fp.readInt<uint8_t>();
+					if(hasObj)
+						mData[id] = loadObj(id, fp);
+				}
+				
+				// Set the id counter to the factory size.
+				// This is because the id counter in effect points to
+				// the maximum unallocated id (neither on stack nor active)
+				Factory<T>::mIdCounter = facSize;
+				
+				// Load the id stack
+				uint32_t stkSize = fp.readInt<uint32_t>();
+				Factory<T>::mFreeId.resize(stkSize);
+				
+				for(uint32_t i=0; i<Factory<T>::mFreeId.size(); ++i) {
+					Factory<T>::mFreeId[i] = fp.readInt<uint32_t>();
 				}
 			}
 			
@@ -152,14 +209,13 @@ namespace Sim {
 			
 			/// @name Interaction
 			//@{
-				void step(double stepTime)
+				virtual void step(double stepTime)
 				{ Factory<T>::factoryCall(boost::bind(&T::step, _1, stepTime)); }
 				
 				uint32_t create(const typename T::Config &cfg)
 				{
 					uint32_t id = Factory<T>::newId();
-					Factory<T>::addObj(new T(mSim, id, cfg));
-					return id;
+					return Factory<T>::addObj(new T(mSim, id, cfg), id);
 				}
 				
 				const T *getObj(uint32_t id) const
@@ -169,67 +225,24 @@ namespace Sim {
 				
 				const typename Factory<T>::ObjVec &getObjVector() const
 					{ return Factory<T>::mData; }
+				
+				void save(Save::BasePtr &fp) { Factory<T>::save(fp); }
+				void load(Save::BasePtr &fp) { Factory<T>::load(fp); }
 			//@}
 			
-			/**
-			 * Saves the factory into a savestate.
-			 */
-			void save(Save::BasePtr &fp)
-			{
-				// Save the data list
-				fp.writeInt<uint32_t>(Factory<T>::mIdCounter);
-				for(typename Factory<T>::ObjVec::iterator i
-						=Factory<T>::mData.begin();
-					i!=Factory<T>::mData.end(); ++i) {
-					
-					fp.writeInt<uint8_t>( (*i) != NULL );
-					if( *i )
-						(*i)->save(fp);
-				}
-				
-				// Save the stack
-				fp.writeInt<uint32_t>(Factory<T>::mFreeId.size());
-				for(uint32_t i=0; i<Factory<T>::mFreeId.size(); ++i) {
-					fp.writeInt<uint32_t>(Factory<T>::mFreeId[i]);
-				}
-			}
 			
-			/**
-			 * Loads the factory from a savestate.
-			 */
-			void load(Save::BasePtr &fp)
-			{
-				// Destroy all objects in the factory
-				Factory<T>::killAll();
-				
-				// Load all objects
-				uint32_t facSize = fp.readInt<uint32_t>();
-				for(uint32_t id=0; id<facSize; ++id) {
-					Factory<T>::mData.push_back(0);
-					uint8_t hasObj = fp.readInt<uint8_t>();
-					if(hasObj) {
-						T * obj = new T(mSim, id);
-						Factory<T>::mData[id] = obj;
-						obj->load(fp);
-					}
-				}
-				
-				// Set the id counter to the factory size.
-				// This is because the id counter in effect points to
-				// the maximum unallocated id (neither on stack nor active)
-				Factory<T>::mIdCounter = facSize;
-				
-				// Load the id stack
-				uint32_t stkSize = fp.readInt<uint32_t>();
-				Factory<T>::mFreeId.resize(stkSize);
-				
-				for(uint32_t i=0; i<Factory<T>::mFreeId.size(); ++i) {
-					Factory<T>::mFreeId[i] = fp.readInt<uint32_t>();
-				}
-			}
 			
 		protected:
 			virtual void deleteInstance(T *obj) { delete obj; }
+			
+			virtual void saveObj(T *obj, Save::BasePtr &fp) {
+				obj->save(fp);
+			}
+			virtual T* loadObj(uint32_t id, Save::BasePtr &fp) {
+				T * obj = new T(mSim, id);
+				obj->load(fp);
+				return obj;
+			}
 			
 			Simulation *mSim;
 	};

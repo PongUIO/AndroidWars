@@ -8,6 +8,8 @@
 #include "Bullet.h"
 #include "Weapon.h"
 #include "Player.h"
+#include "Program.h"
+#include "Input.h"
 
 #include "utility/CallGroup.h"
 #include "StateObj.h"
@@ -44,8 +46,14 @@ namespace Sim {
 			
 			/// @name Module accessors
 			//@{
+				InputManager &getInputManager()
+				{ return mInputManager; }
+				
 				BotFactory &getBotFactory()
 				{ return mBotFactory; }
+				
+				ProgramFactory &getProgramFactory()
+				{ return mProgramFactory; }
 				
 				BulletFactory &getBulletFactory()
 				{ return mBulletFactory; }
@@ -61,7 +69,9 @@ namespace Sim {
 			//@}
 			
 		private:
+			InputManager mInputManager;
 			BotFactory mBotFactory;
+			ProgramFactory mProgramFactory;
 			BulletFactory mBulletFactory;
 			WeaponFactory mWeaponFactory;
 			World mWorld;

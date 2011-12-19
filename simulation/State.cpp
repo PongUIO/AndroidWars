@@ -7,15 +7,19 @@
 
 namespace Sim {
 	State::State(Simulation* sim) :
+		mInputManager(sim),
 		mBotFactory(sim),
+		mProgramFactory(sim),
 		mBulletFactory(sim),
 		mWeaponFactory(sim),
 		mWorld(sim),
 		mPlayer(),
 		mSim(sim)
 	{
+		registerCallObj(&mInputManager);
 		registerCallObj(&mWorld);
 		registerCallObj(&mBotFactory);
+		registerCallObj(&mProgramFactory);
 		registerCallObj(&mWeaponFactory);
 		registerCallObj(&mBulletFactory);
 		registerCallObj(&mPlayer);

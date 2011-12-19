@@ -1,7 +1,8 @@
 add_library(AWSim
 	Body.cpp
 	Bot.cpp
-	BotInput.cpp
+	Input.cpp
+	Program.cpp
 	Data.cpp
 	Player.cpp
 	Bullet.cpp
@@ -12,6 +13,9 @@ add_library(AWSim
 	World.cpp
 	
 	bot/BotCpu.cpp
+	
+	program/MoveTowards.cpp
+	program/Kill.cpp
 	
 	data/BotD.cpp
 	data/BulletD.cpp

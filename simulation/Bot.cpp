@@ -1,5 +1,3 @@
-#include <stdio.h>
-
 #include "Bot.h"
 #include "Weapon.h"
 #include "World.h"
@@ -10,9 +8,29 @@ namespace Sim {
 	// Bot
 	//
 	//
+	void Bot::prepareStep(double stepTime)
+	{
+		// Update the sensor with data
+		SensorState &sensor = mState.mSensor;
+		sensor.mTargetBot = FactoryNoId;
+		sensor.mWasHit = false;
+		
+		// Reset the engine
+		Engine &engine = mState.mEngine;
+		engine.mDirection = 0;
+		engine.mStrength = 0;
+	}
+	
+	void Bot::updateCpu(double stepTime)
+	{
+		mState.mCpu.step(stepTime);
+	}
+	
 	void Bot::step(double stepTime)
 	{
-		handleInput();
+		mState.mBody.addMomentum(
+			mState.mEngine.mDirection*(mState.mEngine.mStrength*stepTime) );
+		
 		mState.mBody.step(stepTime);
 		
 		World &world = mSim->getState().getWorld();
@@ -39,11 +57,12 @@ namespace Sim {
 		fp.writeInt<uint32_t>(mSide);
 		fp.writeInt<uint32_t>(mType);
 		
+		mSensor.save(fp);
+		
 		mBody.save(fp);
 		mWeaponBox.save(fp);
 		
-		mCurInput.save(fp);
-		mInput.save(fp);
+		mCpu.save(fp);
 	}
 	
 	void Bot::State::load(Save::BasePtr& fp)
@@ -51,12 +70,26 @@ namespace Sim {
 		mSide = fp.readInt<uint32_t>();
 		mType = fp.readInt<uint32_t>();
 		
+		mSensor.load(fp);
+		
 		mBody.load(fp);
 		mWeaponBox.load(fp);
 		
-		mCurInput.load(fp);
-		mInput.load(fp);
+		mCpu.load(fp);
 	}
+	
+	void Bot::SensorState::save(Save::BasePtr& fp)
+	{
+		fp.writeInt<uint32_t>(mTargetBot);
+		fp.writeInt<uint8_t>(mWasHit);
+	}
+
+	void Bot::SensorState::load(Save::BasePtr& fp)
+	{
+		mTargetBot = fp.readInt<uint32_t>();
+		mWasHit = fp.readInt<uint8_t>();
+	}
+
 	
 	// BotFactory
 	//
@@ -82,21 +115,21 @@ namespace Sim {
 	{
 		uint32_t id = newId();
 		
-		addObj(new Bot(mSim, id, cfg));
+		addObj(new Bot(mSim, id, cfg), id);
 		
 		return id;
 	}
 	
+	void BotFactory::step(double stepTime)
+	{
+		factoryCall(boost::bind(&Bot::prepareStep, _1, stepTime));
+		factoryCall(boost::bind(&Bot::updateCpu, _1, stepTime));
+		factoryCall(boost::bind(&Bot::step, _1, stepTime));
+	}
+	
+	
 	void BotFactory::startPhase()
 	{
-		// Feed our bots with input
-		while(mInput.hasInput()) {
-			BotInput input = mInput.nextInput();
-			
-			Bot *bot = getObject(input.botId);
-			if(bot)
-				bot->mState.mInput.addInput(input);
-		}
 	}
 	
 	void BotFactory::endPhase()
@@ -105,54 +138,11 @@ namespace Sim {
 	
 	void BotFactory::save(Save::BasePtr& fp)
 	{
-		mInput.save(fp);
 		Sim::DefaultFactory< Sim::Bot >::save(fp);
 	}
 
 	void BotFactory::load(Save::BasePtr& fp)
 	{
-		mInput.load(fp);
 		Sim::DefaultFactory< Sim::Bot >::load(fp);
-	}
-	
-	// BotInput
-	//
-	//
-	void BotInput::save(Save::BasePtr &fp)
-	{
-		fp.writeInt<uint32_t>(botId);
-		fp.writeInt<uint32_t>(stepCount);
-		fp.writeInt<uint32_t>(type);
-		
-		switch(type)
-		{
-			case Move:
-				fp.writeVec(dir);
-				break;
-				
-			case Shoot:
-				fp.writeVec(dir);
-				fp.writeInt<int32_t>(iparam[0]);
-				break;
-		}
-	}
-	
-	void BotInput::load(Save::BasePtr& fp)
-	{
-		botId = fp.readInt<uint32_t>();
-		stepCount = fp.readInt<uint32_t>();
-		type = (InputType)fp.readInt<uint32_t>();
-		
-		switch(type)
-		{
-			case Move:
-				dir = fp.readVec();
-				break;
-				
-			case Shoot:
-				dir = fp.readVec();
-				iparam[0] = fp.readInt<int32_t>();
-				break;
-		}
 	}
 }
