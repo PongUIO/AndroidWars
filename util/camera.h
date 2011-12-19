@@ -53,11 +53,11 @@ public:
         }	
 
 	double xToSimX(int x) {
-		return (xPixToDouble(x))*zoom-pos.x;
+		return ((xPixToDouble(x))*zoom-pos.x);
 	}
 
 	double yToSimY(int y) {
-		return ((yPixToDouble(y))*zoom-pos.y)*ratio;
+		return ((yPixToDouble(y))*zoom*ratio-pos.y);
 	}
 
         double xPixToDouble(int x) {
@@ -69,7 +69,7 @@ public:
         int xDoubleToPix(double x) {
 		return (-x+1)/xres-pos.x;
         }
-        int yDoubleToPix(double y) {
+	int yDoubleToPix(double y) {
 		return (y+1)/yres-pos.y;
         }
 };

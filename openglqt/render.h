@@ -188,7 +188,7 @@ protected:
 		}
 		if (selAlpha > 0.5) {
 			dirAlpha = false;
-		} else if ( selAlpha < 0.2) {
+		} else if (selAlpha < 0.2) {
 			dirAlpha = true;
 		}
 		int i, j;
@@ -200,7 +200,7 @@ protected:
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
 		glEnable(GL_TEXTURE_2D);
-	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
 		float mx = cam->xPixToDouble(lastX);
 		float my = cam->yPixToDouble(lastY);

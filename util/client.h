@@ -33,6 +33,7 @@ class ClientStates {
 		}
 
 		void registerClick(double x, double y, int button) {
+			qDebug() << x << y;
 			int i;
 			const Sim::BotFactory::ObjVec &bots =  sim->getState().getBotFactory().getBotVector();
 			if (sim != NULL) {
@@ -44,7 +45,6 @@ class ClientStates {
 					if (bot != NULL) {
 						Sim::Vector pos = bot->getBody().mPos;
 						Sim::Vector col = bot->getTypePtr()->getCollision()->getBboxHigh();
-						qDebug() << pos.x << pos.y;
 						if ( pos.x < x && x < pos.x + col.x && pos.y < y && y < pos.y + col.y) {
 							selBots.insert(i);
 							return;
