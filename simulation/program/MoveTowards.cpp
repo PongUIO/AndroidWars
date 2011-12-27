@@ -7,9 +7,9 @@
 
 namespace Sim {
 	namespace Prog {
-		MoveTowards::MoveTowards(Simulation *sim, uint32_t id,
+		MoveTowards::MoveTowards(Simulation *sim, uint32_t id, uint32_t typeId,
 			const Config& cfg) :
-			Program(sim, id, getTypeId()), mType(cfg.mType),
+			Program(sim, id, typeId), mType(cfg.mType),
 			mTarget(cfg.mTargetId), mTargetPos(cfg.mTargetPos)
 		{}
 		

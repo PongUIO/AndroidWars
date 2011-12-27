@@ -14,6 +14,11 @@ void startSim()
 	sim.startup(config);
 }
 
+void loadPrograms()
+{
+	sim.getData().getProgramDb().registerAllDefault();
+}
+
 void loadSides()
 {
 	Sim::Player testSide;
@@ -79,6 +84,7 @@ void loadWeapons()
 // "Loads" simulation data
 void loadData()
 {
+	loadPrograms();
 	loadSides();
 	loadTiles();
 	loadBots();

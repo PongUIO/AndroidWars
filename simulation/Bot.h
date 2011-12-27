@@ -11,6 +11,7 @@
 #include "Weapon.h"
 
 #include "bot/BotCpu.h"
+#include "bot/BotAbility.h"
 
 #include "StateObj.h"
 
@@ -22,6 +23,7 @@ namespace Sim {
 	class BotD;
 	class State;
 	class Collision;
+	class Player;
 	
 	class Bot {
 		public:
@@ -48,7 +50,7 @@ namespace Sim {
 				public:
 					State() : mSide(0), mType(0),
 						mSensor(), mBody(), mWeaponBox(),
-						mCpu(), mEngine()
+						mCpu(), mAbility(), mEngine()
 						{}
 					
 					uint32_t mSide;
@@ -60,6 +62,7 @@ namespace Sim {
 					WeaponBox mWeaponBox;
 					
 					BotCpu mCpu;
+					BotAbility mAbility;
 					Engine mEngine;
 					
 				private:
@@ -76,13 +79,15 @@ namespace Sim {
 			State &getState() { return mState; }
 			const State &getState() const { return mState; }
 			
-			const BotD *getTypePtr();
+			/// @name Shorthand references to related data
+			//@{
+				const BotD *getTypePtr();
+				const Player *getPlayerPtr();
+			//@}
 			
 		private:
-			Bot(Simulation *sim, uint32_t id, const State &cfg=State()) :
-				mId(id), mSim(sim), mState(cfg)
-			{ mState.mCpu.setHost(this);}
-			~Bot() {}
+			Bot(Simulation *sim, uint32_t id, const State &cfg=State());
+			~Bot();
 			
 			/// @name Interaction
 			//@{

@@ -1,0 +1,44 @@
+===================
+== Bot behaviour ==
+===================
+
+== Abstract ==
+To make bots process as simultaneous as possible, bots are processed through
+several phases. The order of processing is important in terms of how abilities
+will behave and how bots manage to interact with one another.
+
+Ideally, bots do not alter anything that directly relates to the current bot
+phase in such a way that the order of execution matter. For example, if two
+bots have the ability to destroy each other this step, it should not matter
+which is processed first. In practice this is difficult to implement, and as
+such it is an ideal rather than a requirement.
+
+== Phases ==
+Below are the phases that a bot processes during a step.
+
+prepareStep:
+- Clear all ability bits and ability parameters
+- Copy player shared bit abilities.
+- Copy bot shared bit abilities.
+- Perform ability prepareStep
+
+- Updating sensor data
+- Resetting input and bot components
+
+updateCpu:
+- Runs as many programs as possible on the cpu
+- Run ability updateCpu (used for abilities that depend on programs)
+
+step:
+- Run ability step.
+- Execute logic step for interactive components (weapons, engine,
+	message passing, shields, etc.)
+- Update physics
+- Update collision
+
+(postStep):
+- Run ability postStep
+- Execute logic postStep for interactive components.
+
+(cleanup):
+- 

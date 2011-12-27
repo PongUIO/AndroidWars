@@ -1,2 +1,2 @@
-_SIM_PROGRAM_DEF(MoveTowards)
-_SIM_PROGRAM_DEF(Kill)
+_SIM_PROGRAM_DEF(MoveTowards,	TypeBase,	"Base/MoveTowards")
+_SIM_PROGRAM_DEF(Kill,			TypeBase,	"Base/Kill")

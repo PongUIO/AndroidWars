@@ -62,6 +62,11 @@ namespace Sim {
 		}
 	}
 	
+	void BotCpu::initialize(Bot* host)
+	{
+		mHost = host;
+	}
+	
 	/**
 	 * Performs a single step on the CPU.
 	 */

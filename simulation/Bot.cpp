@@ -8,8 +8,22 @@ namespace Sim {
 	// Bot
 	//
 	//
+	Bot::Bot(Simulation* sim, uint32_t id, const Sim::Bot::State& cfg) :
+		mId(id), mSim(sim), mState(cfg)
+	{
+		mState.mAbility.initialize(this);
+		mState.mCpu.initialize(this);
+	}
+
+	Bot::~Bot()
+	{
+	}
+	
 	void Bot::prepareStep(double stepTime)
 	{
+		// Update abilties
+		mState.mAbility.prepareStep(stepTime);
+		
 		// Update the sensor with data
 		SensorState &sensor = mState.mSensor;
 		sensor.mTargetBot = FactoryNoId;
@@ -24,10 +38,13 @@ namespace Sim {
 	void Bot::updateCpu(double stepTime)
 	{
 		mState.mCpu.step(stepTime);
+		mState.mAbility.updateCpu(stepTime);
 	}
 	
 	void Bot::step(double stepTime)
 	{
+		mState.mAbility.step(stepTime);
+		
 		mState.mBody.addMomentum(
 			mState.mEngine.mDirection*(mState.mEngine.mStrength*stepTime) );
 		
@@ -44,6 +61,11 @@ namespace Sim {
 	const Sim::BotD* Bot::getTypePtr()
 	{
 		return mSim->getData().getBotDb().getType(mState.mType);
+	}
+	
+	const Sim::Player* Bot::getPlayerPtr()
+	{
+		return &mSim->getState().getPlayerData().getPlayer(mState.mSide);
 	}
 	
 	void Bot::save(Save::BasePtr& fp)

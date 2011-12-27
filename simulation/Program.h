@@ -7,6 +7,8 @@
 #include "Factory.h"
 #include "Save.h"
 
+#include "data/ProgramD.h"
+
 namespace Sim {
 	// Forward declarations
 	class ProgramFactory;
@@ -14,29 +16,22 @@ namespace Sim {
 	class Bot;
 	class BotCpu;
 	
-	/// Required for any program implementation
+	/**
+	 * Required for any program implementation.
+	 * 
+	 * This declares a nested data type \c ProgramD class, providing a typename
+	 * and a program allocator.
+	 */
 #define _SIM_PROGRAM_HEADER \
-	static uint32_t getTypeId(); \
-	class SaveSys : public Program::SaveSystem { \
-		public: Program *createProgram(Simulation *sim, uint32_t id); \
+	class DataSrc : public ProgramD { \
+		public: \
+			static const std::string &getTypeName(); \
+			const std::string &getTypeNameVirt() const; \
+			Program *createProgram(Simulation *sim, uint32_t id) const; \
 	};
-	
 	
 	class Program {
 		public:
-			enum ProgramTypeId {
-#define _SIM_PROGRAM_DEF(clsType) Pti##clsType,
-				#include "program/ProgramDef.def"
-#undef _SIM_PROGRAM_DEF
-
-				PtiMax
-			};
-			class SaveSystem {
-				public:
-					virtual Program *createProgram(Simulation *sim,
-						uint32_t id)=0;
-			};
-			
 			virtual uint32_t getCycleCost()=0;
 			
 			uint32_t getId() const { return mId; }
@@ -64,9 +59,6 @@ namespace Sim {
 			//@}
 			
 		private:
-			/// Internal identifier pointing to its factory index
-			uint32_t mInternalFactoryId;
-			
 			friend class ProgramFactory;
 			friend class Factory<Program>;
 			
@@ -91,7 +83,7 @@ namespace Sim {
 	 * Unfortunately, the issue where cheksums are different whether
 	 * input is given per-phase or all at once is unavoidable.
 	 */
-	class ProgramFactory : private Factory<Program>, public StateObj {
+	class ProgramFactory : private UidFactory<Program>, public StateObj {
 		public:
 			ProgramFactory(Simulation* sim);
 			virtual ~ProgramFactory();
@@ -116,36 +108,19 @@ namespace Sim {
 			 */
 			template<class T>
 			T *createProgram(const typename T::Config &cfg) {
-				uint32_t progId = mCurrentId++;
-				T *tmp = new T(mSim,progId,cfg);
-				uint32_t internalId = Factory<Program>::addObj(tmp,FactoryNoId);
-				tmp->mInternalFactoryId = internalId;
+				InsertData insData = insertObject();
 				
-				insertResolve(progId, tmp);
+				uint32_t typeId = getProgramTypeId(T::DataSrc::getTypeName());
+				T *tmp = new T(mSim,insData.first, typeId, cfg);
+				*insData.second = tmp;
+				
 				return tmp;
 			}
 			
-			/**
-			 * Destroys a program given a valid ID.
-			 */
-			void destroyProgram(uint32_t id) {
-				Program *prog = getResolve(id);
-				if(prog) {
-					removeObj(prog->mInternalFactoryId);
-					removeResolve(id);
-				}
-			}
-			
-			Program *getProgram(uint32_t id) { return getResolve(id); }
+			void destroyProgram(uint32_t id) { removeObj(id); }
+			Program *getProgram(uint32_t id) { return getObject(id); }
 			
 		private:
-			/// @name Program saving system
-			//@{
-				typedef boost::unordered_map<uint32_t, Program::SaveSystem*>
-					ProgramTypeMap;
-				ProgramTypeMap mTypeMap;
-			//@}
-			
 			/// @name Factory-required functions
 			//@{
 				void deleteInstance(Program* obj) { delete obj; }
@@ -153,24 +128,7 @@ namespace Sim {
 				Program* loadObj(uint32_t internalId, Save::BasePtr &fp);
 			//@}
 			
-			/// @name Unique ID management
-			//@{
-				typedef boost::unordered_map<uint32_t, Program*> ProgramIdMap;
-				ProgramIdMap mProgramIdResolve;
-				uint32_t mCurrentId;
-				
-				void insertResolve(uint32_t progId, Program *prog)
-				{ mProgramIdResolve[progId] = prog; }
-				
-				void removeResolve(uint32_t progId)
-				{ mProgramIdResolve.erase(mProgramIdResolve.find(progId)); }
-				
-				Program *getResolve(uint32_t progId)
-				{
-					ProgramIdMap::iterator i=mProgramIdResolve.find(progId);
-					return (i==mProgramIdResolve.end()) ? 0 : i->second;
-				}
-			//@}
+			uint32_t getProgramTypeId(const std::string &name);
 			
 			Simulation *mSim;
 			

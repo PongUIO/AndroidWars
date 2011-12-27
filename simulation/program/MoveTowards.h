@@ -43,7 +43,8 @@ namespace Sim {
 						mType(type), mTargetId(id), mTargetPos(pos) {}
 				};
 				
-				MoveTowards(Simulation *sim, uint32_t id, const Config &cfg);
+				MoveTowards(Simulation *sim, uint32_t id, uint32_t typeId,
+					const Config &cfg);
 				~MoveTowards();
 				
 				virtual uint32_t getCycleCost() { return 1; }

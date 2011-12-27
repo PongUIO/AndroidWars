@@ -7,6 +7,7 @@
 #include "StateObj.h"
 
 #include "Save.h"
+#include "bot/BotAbility.h"
 
 namespace Sim {
 	class State;
@@ -15,6 +16,7 @@ namespace Sim {
 		uint32_t sideId;
 		uint32_t allyGroup;
 		
+		BotAbility::AvailableProgram mBasePrograms;
 	};
 	
 	class PlayerData : public StateObj {
