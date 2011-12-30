@@ -19,7 +19,7 @@ void something() {
 class GameController {
 public:
 	ClientStates *states;
-	QWidget *parent;
+	MainWidget *parent;
 	GameDrawer *drawer;
 	QTimer *glTimer, *camTimer, *timer;
 	QHBoxLayout *lower, *upper;
@@ -34,7 +34,7 @@ public:
 #ifdef WIN32
 	QPalette *p;
 #endif
-	GameController(QWidget *parent = 0) {
+	GameController(MainWidget *parent = 0) {
 		this->parent = parent;
 		Sim::Configuration config;
 
