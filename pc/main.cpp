@@ -34,13 +34,14 @@ int main(int argc, char *argv[]) {
 	mainw->setCursor(m);
 
 	CustomLabel *gameButton = new CustomLabel(&gameStart, mainw);
-	gameButton->setPixmap(QPixmap(":/graphics/menu/startgame.png"));
-	gameButton->move(mainw->geometry().width()/2-gameButton->pixmap()->width()/2, mainw->geometry().height()/2-gameButton->pixmap()->height()/2);
-	gameButton->show();
 	gc = new GameController(mainw);
 	gc->hideAll();
 	mainw->registerForResize(gc->drawer);
 	mainw->resize(700,700);
+	gameButton->setPixmap(QPixmap(":/graphics/menu/startgame.png"));
+	gameButton->move(mainw->geometry().width()/2-gameButton->pixmap()->width()/2, mainw->geometry().height()/2-gameButton->pixmap()->height()/2);
+	gameButton->resize(gameButton->pixmap()->size());
+	gameButton->show();
 	app.exec();
 	delete gc;
         delete gameButton;
