@@ -31,9 +31,6 @@ public:
 	Sim::Simulation sim;
 	Camera *cam;
 	QPixmap m;
-#ifdef WIN32
-	QPalette *p;
-#endif
 	GameController(MainWidget *parent = 0) {
 		this->parent = parent;
 		Sim::Configuration config;
@@ -141,14 +138,6 @@ public:
 		parent->setWindowTitle(QApplication::translate("childwidget", "Child widget"));
 		drawer->setMouseTracking(true);
 
-#ifdef _WIN32
-		drawer->resize(parent->width(), parent->height()-1);
-		p = new QPalette( parent->palette() );
-		p->setColor( QPalette::Window, Qt::black );
-		drawer->setPalette( *p );
-#else
-		drawer->resize(parent->width(), parent->height());
-#endif
 		label = new GameButton(&sim, 0, parent);
 		label2 = new CustomLabel(&something, parent);
 		label->setPixmap(QPixmap(":/graphics/temp/temp.png"));

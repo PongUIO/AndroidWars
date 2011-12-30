@@ -33,7 +33,6 @@ class ClientStates {
 		}
 
 		void registerClick(double x, double y, int button) {
-			qDebug() << x << y;
 			int i;
 			const Sim::BotFactory::ObjVec &bots =  sim->getState().getBotFactory().getBotVector();
 			if (sim != NULL) {
