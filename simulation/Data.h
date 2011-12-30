@@ -6,6 +6,7 @@
 #include "data/BotD.h"
 #include "data/BulletD.h"
 #include "data/WeaponD.h"
+#include "data/ProgramD.h"
 #include "collision/TileCol.h"
 
 #include "data/BaseData.h"
@@ -31,6 +32,7 @@ namespace Sim {
 				BotDatabase &getBotDb() { return mBot; }
 				BulletDatabase &getBulletDb() { return mBullet; }
 				WeaponDatabase &getWeaponDb() { return mWeapon; }
+				ProgramDatabase &getProgramDb()  { return mProgram; }
 				
 				// Other constant data
 				TileCol &getTileCol() { return mTileCol; }
@@ -41,6 +43,7 @@ namespace Sim {
 			BotDatabase mBot;
 			BulletDatabase mBullet;
 			WeaponDatabase mWeapon;
+			ProgramDatabase mProgram;
 			
 			TileCol mTileCol;
 			

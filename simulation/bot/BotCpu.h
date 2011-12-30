@@ -50,7 +50,7 @@ namespace Sim {
 			void load(Save::BasePtr &fp);
 			
 		private:
-			void setHost(Bot *host) { mHost=host; }
+			void initialize(Bot *host);
 			
 			void step(double stepTime);
 			void runScheduler(double stepTime);

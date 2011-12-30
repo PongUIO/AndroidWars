@@ -20,7 +20,8 @@ namespace Sim {
 					explicit Config(uint32_t id=FactoryNoId) : mTargetId(id) {}
 				};
 				
-				Kill(Simulation* sim, uint32_t id, const Config &cfg);
+				Kill(Simulation* sim, uint32_t id, uint32_t typeId,
+					 const Config &cfg);
 				~Kill();
 				
 				uint32_t getCycleCost() { return 0; }

@@ -1,0 +1,58 @@
+===================
+== Bot abilities ==
+===================
+
+== Abstract ==
+Abilities supplement what actions and behaviours bots can do. Abilities behave
+somewhat like programs, and all active abilities run as programs on the CPU.
+
+Passive abilities are given to bots in three places: Player data (all
+bots use the owner's abilities), bot data (all bots of certain type use the
+bot type's abilities), and individual data (a single bot may be allocated its
+own unique abilities).
+
+
+== Ability types ==
+There are two base types of abilities, active and passive abilities.
+
+Active abilities are always run as programs, and the ability for a bot to run
+such a program relies on an internal bitset which denotes which programs a CPU
+supports. Some active abilities will spawn a passive ability.
+
+Passive abilities are always active for a bot. They provide special features
+like, for example, reduced damage, automatic repair, or reduced reloading times.
+These run like programs, but are always executed every frame.
+
+
+== Ability classes ==
+Abilities may also be part of one or more ability classes. These are used
+to make targetting groups of abilities simpler. For example, some behaviour
+may only target beneficial abilities.
+
+
+== Active abilities ==
+Active abilities are run as programs and behave according to their rules.
+
+The only real distinction between what could be considered a program and what
+could be considered an active ability is that the ability requires a program
+ability bit to be set to make it available to the CPU, and that an ability
+may execute several times during a bot's step.
+
+
+== Passive abilities ==
+Passive abilities will run every step, regardless of whether the bot wants to
+or not.
+
+However, passive abilities may be delayed, temporary, aborted, halted,
+or resumed during its run. If delayed the ability do not process until the
+delay runs out. If temporary, the ability will only run for the given number
+of steps. If aborted the ability is permanently removed (unless explicitly
+denoted as a permanent). If halted, the ability is turned idle until it is
+later resumed.
+
+Note that all of these behaviour modifiers may be overridden by the ability's
+behaviour to protect itself, and anything trying to cause any modifier may
+further force it to ignore the protection.
+
+Not all passive abilities have beneficial effects for a bot, and certain
+external events may modify the behaviour of the bot's passive abilities.

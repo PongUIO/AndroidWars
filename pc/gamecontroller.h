@@ -42,6 +42,8 @@ public:
 		config.stepTime = 0.01;
 
 		sim.startup(config);
+		
+		sim.getData().getProgramDb().registerAllDefault();
 
 		Sim::Player testSide;
 		sim.getState().getPlayerData().addPlayer(testSide);

@@ -9,6 +9,7 @@ namespace Sim {
 		registerCallObj(&mBot);
 		registerCallObj(&mBullet);
 		registerCallObj(&mWeapon);
+		registerCallObj(&mProgram);
 	}
 	
 	Data::~Data()

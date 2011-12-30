@@ -7,6 +7,7 @@
 #include "../collision/Collision.h"
 
 #include "BaseData.h"
+#include "../bot/BotAbility.h"
 
 namespace Sim {
 	class Collision;
@@ -21,6 +22,13 @@ namespace Sim {
 		
 		uint32_t cpuCycleSpeed;
 		uint32_t cpuStorage;
+		
+		/// Programs that this bot 
+		BotAbility::AvailableProgram baseProgram;
+		
+		/// Programs that this bot is excluded from running.
+		/// Overrides both \c baseProgram and \c Player::mBasePrograms
+		BotAbility::AvailableProgram excludeProgram;
 		
 		const Collision *getCollision() const
 		{ return collision; }
