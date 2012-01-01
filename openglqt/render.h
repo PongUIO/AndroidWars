@@ -7,6 +7,7 @@
 #include "../util/camera.h"
 #include "../util/client.h"
 #include "../util/cursordefines.h"
+#include "main.h"
 
 class GameDrawer : public QGLWidget {
 	Q_OBJECT        // must include this if you use Qt signals/slots
@@ -27,6 +28,7 @@ public:
 	bool fullScreen;
 	float selAlpha;
 	bool dirAlpha;
+	MainWidget *parent;
 	QImage data[3];
 	GLuint textures[3];
 	QImage characters[1];
@@ -37,15 +39,16 @@ public:
 	GLuint bgtextures[1];
 	QImage mouse[2];
 	GLuint mousetextures[2];
+	QPixmap mouseMaps[2];
 	QImage bullet[1];
 	GLuint bullettextures[1];
-	QPixmap m;
 	Sim::Simulation *sim;
 	Sim::World *wld;
 	Camera *cam;
 	ClientStates *states;
-	GameDrawer(Camera *cam, Sim::Simulation *simIn, ClientStates *states, QWidget *parent = 0)
+	GameDrawer(Camera *cam, Sim::Simulation *simIn, ClientStates *states, MainWidget *parent = 0)
 		: QGLWidget(QGLFormat(QGL::SampleBuffers), parent) {
+		this->parent = parent;
 		cMouse = 0;
 		this->cam = cam;
 		lastX = width()/2;
@@ -54,12 +57,11 @@ public:
 		wld = &sim->getState().getWorld();
 		this->states = states;
 		this->states->setSim(sim);
-		setCursor( QCursor( Qt::BlankCursor ) );
-		grabKeyboard();
 		mouseSize = 0.07;
 		selAlpha = 0.3;
 		dirAlpha = false;
 		fullScreen = false;
+		grabKeyboard();
 	}
 
 protected:
@@ -67,14 +69,11 @@ protected:
 	void keyPressEvent (QKeyEvent *event) {
 		int k = event->key();
 		if (k == Qt::Key_F11) {
-			if (fullScreen) {
-				showNormal();
-			} else {
-				showFullScreen();
-			}
 			fullScreen = !fullScreen;
+			parent->setFullScreen(fullScreen);
+		} else {
+			modKey(k, true);
 		}
-		modKey(k, true);
 	}
 
 	// overridden
@@ -97,8 +96,6 @@ protected:
 	void mouseMoveEvent(QMouseEvent * event) {
 		lastX = event->pos().x();
 		lastY = event->pos().y();
-		// we need to ask the world what we're pointing at!
-		//                qDebug() << event->pos().x() << " " << event->pos().y();
 	}
 
 	// overridden
@@ -146,14 +143,14 @@ protected:
 	// overridden
 	void resizeGL( int w, int h) {
 		// setup viewport, projection etc.:
-		glViewport( 0, 0, (GLint)w, (GLint)h );
+		glViewport( 0, 0, (GLint)w, (GLint)h);
 		cam->calcRatio(w, h);
 	}
 
 	void resizeEvent(QResizeEvent *event) {
 		qDebug() << "resize!!";
 		resizeGL(event->size().width(), event->size().height());
-		resize(event->size());
+		resize(event->size().width(), event->size().height());
 	}
 
 	void wheelEvent(QWheelEvent *event) {
@@ -248,7 +245,7 @@ protected:
 			}
 		}
 		glDisable(GL_TEXTURE_2D);
-	glColor4f(0.2f, 1.0f, 0.2f, selAlpha);
+		glColor4f(0.2f, 1.0f, 0.2f, selAlpha);
 		for (i = 0; i < bots.size(); i++) {
 			if (states->isSelected(i)) {
 				Sim::Bot *bot = bots[i];
