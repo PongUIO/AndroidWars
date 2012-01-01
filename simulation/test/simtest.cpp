@@ -19,6 +19,11 @@ void loadPrograms()
 	sim.getData().getProgramDb().registerAllDefault();
 }
 
+void loadAbilities()
+{
+	sim.getData().getAbilityDb().registerAllDefault();
+}
+
 void loadSides()
 {
 	Sim::Player testSide;
@@ -85,6 +90,7 @@ void loadWeapons()
 void loadData()
 {
 	loadPrograms();
+	loadAbilities();
 	loadSides();
 	loadTiles();
 	loadBots();
@@ -99,6 +105,11 @@ void setupWorld()
 	botCfg.mSide = 0;
 	botCfg.mType = 0;
 	botCfg.mBody.mPos = Sim::Vector(0,0);
+	
+	using namespace Sim::Abil;
+	uint32_t abilId = sim.getState().getAbilityFactory()
+		.createAbility<CpuBoost>(CpuBoost::Config(0, 10))->getId();
+	botCfg.mAbility.addAbility(abilId);
 	
 	weapCfg.type = 0;
 	botCfg.mWeaponBox.add( sim.getState().getWeaponFactory().create(weapCfg) );

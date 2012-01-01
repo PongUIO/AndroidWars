@@ -2,7 +2,6 @@
 #define SIM_PROGRAM_H
 
 #include <stdint.h>
-#include <boost/unordered_map.hpp>
 
 #include "Factory.h"
 #include "Save.h"
@@ -19,16 +18,9 @@ namespace Sim {
 	/**
 	 * Required for any program implementation.
 	 * 
-	 * This declares a nested data type \c ProgramD class, providing a typename
-	 * and a program allocator.
+	 * This declares a function for the typename of the program.
 	 */
-#define _SIM_PROGRAM_HEADER \
-	class DataSrc : public ProgramD { \
-		public: \
-			static const std::string &getTypeName(); \
-			const std::string &getTypeNameVirt() const; \
-			Program *createProgram(Simulation *sim, uint32_t id) const; \
-	};
+#define _SIM_PROGRAM_HEADER static const std::string &getTypeName();
 	
 	class Program {
 		public:
@@ -110,7 +102,7 @@ namespace Sim {
 			T *createProgram(const typename T::Config &cfg) {
 				InsertData insData = insertObject();
 				
-				uint32_t typeId = getProgramTypeId(T::DataSrc::getTypeName());
+				uint32_t typeId = getProgramTypeId(T::getTypeName());
 				T *tmp = new T(mSim,insData.first, typeId, cfg);
 				*insData.second = tmp;
 				
@@ -131,8 +123,6 @@ namespace Sim {
 			uint32_t getProgramTypeId(const std::string &name);
 			
 			Simulation *mSim;
-			
-			friend class BotInput;
 	};
 }
 

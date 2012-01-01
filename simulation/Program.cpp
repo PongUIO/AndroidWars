@@ -5,6 +5,21 @@
 #include "program/ProgramInclude.h"
 
 namespace Sim {
+	// Program
+	//
+	//
+	/**
+	 * This implements the getTypeName() function for all
+	 * internal program types.
+	 */
+#define _SIM_PROGRAM_DEF(baseClass,		type,	name) \
+	const std::string &Prog::baseClass::getTypeName() {\
+		static std::string typeName = name; \
+		return typeName; \
+	}
+#include "program/ProgramDef.def"
+#undef _SIM_PROGRAM_DEF
+	
 	// ProgramFactory
 	//
 	//
@@ -57,10 +72,10 @@ namespace Sim {
 	{
 		uint32_t progType = fp.readInt<uint32_t>();
 		
-		const ProgramD *progData =
-			mSim->getData().getProgramDb().getProgramType(progType);
+		const ProgramDatabase::Behaviour *progData =
+			mSim->getData().getProgramDb().getType(progType);
 		
-		Program *prog = progData->createProgram(mSim, internalId);
+		Program *prog = progData->createObj(mSim, internalId);
 		prog->load(fp);
 		
 		return prog;

@@ -3,13 +3,14 @@
 
 namespace Sim {
 	Data::Data(Simulation *sim) :
-		mSim(sim)
+		mSim(sim), mProgram(), mAbility()
 	{
 		registerCallObj(&mTile);
 		registerCallObj(&mBot);
 		registerCallObj(&mBullet);
 		registerCallObj(&mWeapon);
 		registerCallObj(&mProgram);
+		registerCallObj(&mAbility);
 	}
 	
 	Data::~Data()

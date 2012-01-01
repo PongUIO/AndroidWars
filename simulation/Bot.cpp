@@ -58,12 +58,12 @@ namespace Sim {
 		}
 	}
 	
-	const Sim::BotD* Bot::getTypePtr()
+	const Sim::BotD* Bot::getTypePtr() const
 	{
 		return mSim->getData().getBotDb().getType(mState.mType);
 	}
 	
-	const Sim::Player* Bot::getPlayerPtr()
+	Sim::Player* Bot::getPlayerPtr() const
 	{
 		return &mSim->getState().getPlayerData().getPlayer(mState.mSide);
 	}
@@ -85,6 +85,7 @@ namespace Sim {
 		mWeaponBox.save(fp);
 		
 		mCpu.save(fp);
+		mAbility.save(fp);
 	}
 	
 	void Bot::State::load(Save::BasePtr& fp)
@@ -98,6 +99,7 @@ namespace Sim {
 		mWeaponBox.load(fp);
 		
 		mCpu.load(fp);
+		mAbility.load(fp);
 	}
 	
 	void Bot::SensorState::save(Save::BasePtr& fp)

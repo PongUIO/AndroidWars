@@ -2,6 +2,8 @@
 #define SIM_BOTABILITY_H
 
 #include <boost/dynamic_bitset.hpp>
+#include <boost/bind.hpp>
+
 #include "../Program.h"
 
 namespace Sim {
@@ -63,8 +65,13 @@ namespace Sim {
 					EnabledProgramSet mEnabledProgram;
 			};
 			
+			typedef std::list<uint32_t> AbilityList;
+			
 			bool checkProgramEnabled(uint32_t type)
 			{ return mAvailProgram.checkProgramEnabled(type); }
+			
+			void addAbility(uint32_t id)
+			{ mAbilityList.push_back(id); }
 			
 		private:
 			void initialize(Bot *host);
@@ -73,8 +80,25 @@ namespace Sim {
 			void updateCpu(double delta);
 			void step(double delta);
 			
-			Bot *mHost;
-			AvailableProgram mAvailProgram;
+			void save(Save::BasePtr &fp);
+			void load(Save::BasePtr &fp);
+			
+			template<class Func>
+			void executeStepPart(Func f);
+			
+			template<class Func>
+			void executeStepPartList(AbilityList &abl, Func f);
+			
+			/// @name Constant/temporary data
+			//@{
+				Bot *mHost;
+				AvailableProgram mAvailProgram;
+			//@}
+			
+			/// @name Dynamic data
+			//@{
+				AbilityList mAbilityList;
+			//@}
 			
 			friend class Bot;
 	};

@@ -1,0 +1,1 @@
+_SIM_ABILITY_DEF(CpuBoost,	TypeBase, "Base/CpuBoost")

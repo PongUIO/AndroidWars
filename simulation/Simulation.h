@@ -6,6 +6,7 @@
 #include "Data.h"
 #include "State.h"
 #include "program/ProgramInclude.h"
+#include "ability/AbilityInclude.h"
 
 namespace Sim {
 	struct Configuration {

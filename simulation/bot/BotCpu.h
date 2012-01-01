@@ -40,11 +40,15 @@ namespace Sim {
 			BotCpu();
 			~BotCpu();
 			
+			int32_t getCycles() const { return mCycleCount; }
+			
 			void scheduleProgram(uint32_t progId, uint32_t stepDelay);
 			const ProgramRefList &getProgramList() { return mProgramList; }
 			
 			bool hasRunningProgram(uint32_t progId);
 			bool isRunning() { return mIsRunning; }
+			
+			void feedCycles(int32_t cycleCount);
 			
 			void save(Save::BasePtr &fp);
 			void load(Save::BasePtr &fp);
@@ -70,7 +74,7 @@ namespace Sim {
 			ProgramRefList::iterator mCurProgram;
 			ProgramRefList::iterator mAutoScheduleIndex;
 			
-			uint32_t mCycleCount;
+			int32_t mCycleCount;
 			
 			friend class Bot;
 	};

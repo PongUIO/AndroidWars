@@ -67,6 +67,18 @@ namespace Sim {
 		mHost = host;
 	}
 	
+	void Sim::BotCpu::feedCycles(int32_t cycleCount)
+	{
+		int32_t newCycles = mCycleCount+cycleCount;
+		
+		if(newCycles < 0)
+			newCycles = 0;
+		else if(newCycles > mHost->getTypePtr()->cpuStorage)
+			newCycles = mHost->getTypePtr()->cpuStorage;
+		
+		mCycleCount = newCycles;
+	}
+	
 	/**
 	 * Performs a single step on the CPU.
 	 */
@@ -75,9 +87,7 @@ namespace Sim {
 		const BotD *typePtr = mHost->getTypePtr();
 		
 		// Add cycles to the CPU
-		mCycleCount += typePtr->cpuCycleSpeed;
-		if(mCycleCount > typePtr->cpuStorage)
-			mCycleCount = typePtr->cpuStorage;
+		feedCycles(typePtr->cpuCycleSpeed);
 		
 		runScheduler(stepTime);
 		runPrograms(stepTime);
@@ -247,7 +257,7 @@ namespace Sim {
 			fp.writeInt<uint32_t>(iterPos);
 		}
 		
-		fp.writeInt<uint32_t>(mCycleCount);
+		fp.writeInt<int32_t>(mCycleCount);
 	}
 	
 	void BotCpu::load(Save::BasePtr& fp)
@@ -286,7 +296,7 @@ namespace Sim {
 				mCurProgram++;
 		}
 		
-		mCycleCount = fp.readInt<uint32_t>();
+		mCycleCount = fp.readInt<int32_t>();
 	}
 	
 }

@@ -17,6 +17,7 @@ namespace Sim {
 		uint32_t allyGroup;
 		
 		BotAbility::AvailableProgram mBasePrograms;
+		BotAbility::AbilityList mGlobalAbilities;
 	};
 	
 	class PlayerData : public StateObj {
@@ -40,7 +41,7 @@ namespace Sim {
 			/// @name Interface
 			//@{
 				void addPlayer(Player &player);
-				const Player &getPlayer(uint32_t id) const
+				Player &getPlayer(uint32_t id)
 				{ return mData[id]; }
 			//@}
 			

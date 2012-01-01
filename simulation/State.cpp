@@ -10,6 +10,7 @@ namespace Sim {
 		mInputManager(sim),
 		mBotFactory(sim),
 		mProgramFactory(sim),
+		mAbilityFactory(sim),
 		mBulletFactory(sim),
 		mWeaponFactory(sim),
 		mWorld(sim),
@@ -20,6 +21,7 @@ namespace Sim {
 		registerCallObj(&mWorld);
 		registerCallObj(&mBotFactory);
 		registerCallObj(&mProgramFactory);
+		registerCallObj(&mAbilityFactory);
 		registerCallObj(&mWeaponFactory);
 		registerCallObj(&mBulletFactory);
 		registerCallObj(&mPlayer);

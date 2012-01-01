@@ -1,7 +1,9 @@
 #ifndef SIM_BASEDATA_H
 #define SIM_BASEDATA_H
 
+#include <boost/unordered_map.hpp>
 #include <vector>
+#include <string>
 #include <stdint.h>
 
 namespace Sim {
@@ -17,6 +19,10 @@ namespace Sim {
 		
 	};
 	
+	/**
+	 * Implements a basic database system.
+	 * Registers new types by an ID.
+	 */
 	template<typename T, typename IdType=uint32_t>
 	class DataT : public BaseData {
 		public:
@@ -60,6 +66,84 @@ namespace Sim {
 			
 			DataVec mData;
 			Simulation *mSim;
+	};
+	
+	/**
+	 * Implements a database for behaviour implementation classes.
+	 * 
+	 * @param T Base class for behaviour.
+	 * @param Impl Class that implements behaviour, needs getTypeName().
+	 */
+	template<class T>
+	class DataBehaviourT : public BaseData {
+		public:
+			/**
+			 * This class implements the function that is used to create
+			 * the behaviour class.
+			 */
+			class Behaviour {
+				public:
+					virtual T *createObj(Simulation *sim, uint32_t id) const=0;
+					uint32_t mId;
+			};
+			
+			DataBehaviourT() : mInternal(), mTypeMap() {}
+			virtual ~DataBehaviourT() {}
+			
+			void startup(Simulation* sim) { mInternal.startup(sim); }
+			void shutdown() { mInternal.shutdown(); }
+			
+			const Behaviour *getType(uint32_t type) const
+			{	return mInternal.getType(type); }
+			
+			template<class Impl>
+			uint32_t registerCustom() {
+				Behaviour *data = new BehaviourImpl<Impl>();
+				
+				uint32_t id = mInternal.addTypeExt(data);
+				data->mId = id;
+				
+				mTypeMap[Impl::getTypeName()] = id;
+				mIdMap[id] = Impl::getTypeName();
+				
+				return id;
+			}
+			
+			static uint32_t NoId() { return -1; }
+			uint32_t getTypeIdOf(const std::string &type) const {
+				TypeMap::const_iterator i=mTypeMap.find(type);
+				return (i==mTypeMap.end()) ? NoId() : i->second;
+			}
+			
+			const std::string &getTypeOf(uint32_t id) const {
+				IdMap::const_iterator i=mIdMap.find(id);
+				return (i==mIdMap.end()) ? "" : i->second;
+			}
+			
+		private:
+			/**
+			 * Automatically provides an implementation for object creation.
+			 */
+			template<class Impl>
+			class BehaviourImpl : public Behaviour {
+				public:
+					T *createObj(Simulation *sim, uint32_t id) const
+					{ return new Impl(sim, id, Behaviour::mId,
+						typename Impl::Config()); }
+			};
+			
+			class InternalDatabase : public DataT<Behaviour> {
+				public:
+					uint32_t addTypeExt(Behaviour *b) { addType(b); }
+					
+			};
+			
+			InternalDatabase mInternal;
+			
+			typedef boost::unordered_map<std::string,uint32_t> TypeMap;
+			typedef boost::unordered_map<uint32_t, std::string> IdMap;
+			TypeMap mTypeMap;
+			IdMap mIdMap;
 	};
 }
 

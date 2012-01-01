@@ -9,6 +9,7 @@
 #include "Weapon.h"
 #include "Player.h"
 #include "Program.h"
+#include "Ability.h"
 #include "Input.h"
 
 #include "utility/CallGroup.h"
@@ -55,6 +56,9 @@ namespace Sim {
 				ProgramFactory &getProgramFactory()
 				{ return mProgramFactory; }
 				
+				AbilityFactory &getAbilityFactory()
+				{ return mAbilityFactory; }
+				
 				BulletFactory &getBulletFactory()
 				{ return mBulletFactory; }
 				
@@ -72,6 +76,7 @@ namespace Sim {
 			InputManager mInputManager;
 			BotFactory mBotFactory;
 			ProgramFactory mProgramFactory;
+			AbilityFactory mAbilityFactory;
 			BulletFactory mBulletFactory;
 			WeaponFactory mWeaponFactory;
 			World mWorld;

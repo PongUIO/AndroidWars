@@ -81,8 +81,8 @@ namespace Sim {
 			
 			/// @name Shorthand references to related data
 			//@{
-				const BotD *getTypePtr();
-				const Player *getPlayerPtr();
+				const BotD *getTypePtr() const;
+				Player *getPlayerPtr() const;
 			//@}
 			
 		private:
@@ -131,6 +131,7 @@ namespace Sim {
 			friend class Factory<Bot>;
 			friend class DefaultFactory<Bot>;
 			friend class BotCpu;
+			friend class BotAbility;
 	};
 	
 	class BotFactory : public DefaultFactory<Bot> {
