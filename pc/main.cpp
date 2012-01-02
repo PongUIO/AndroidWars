@@ -26,8 +26,6 @@ void gameStart() {
 int main(int argc, char *argv[]) {
 	QApplication app(argc, argv);
 	MainWidget *mainw = new MainWidget();
-	//menu->showFullScreen();
-	//menu->resize(QApplication::desktop()->screenGeometry().width(),QApplication::desktop()->screenGeometry().height());
 	mainw->show();
 	QPixmap m;
 	m.convertFromImage(QImage(":/graphics/mouse/default.png").scaled(64,64));

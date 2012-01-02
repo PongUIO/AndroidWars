@@ -28,11 +28,12 @@ public:
 	QPixmap m;
 	GameController(MainWidget *parent = 0) {
 		this->parent = parent;
+
+		//init sim - note: currently test only.
 		Sim::Configuration config;
 
 		config.phaseLength = 10;
 		config.stepTime = 0.01;
-
 		sim.startup(config);
 		
 		sim.getData().getProgramDb().registerAllDefault();
@@ -40,11 +41,11 @@ public:
 		Sim::Player testSide;
 		sim.getState().getPlayerData().addPlayer(testSide);
 
-		sim.getData().getWeaponDb().createType();
-
 		Sim::BotD myBot;
 		myBot.baseSpeed = 100.0;
 		myBot.baseWeight = 75.0;
+		myBot.cpuCycleSpeed = 100;
+		myBot.cpuStorage = 100;
 
 		Sim::Collision::ColPoints cpts;
 		cpts.push_back(Sim::Vector(0,0));
@@ -62,18 +63,6 @@ public:
 		uint32_t botId = sim.getState().getBotFactory().createBot( botCfg );
 		botCfg.mBody.mPos = Sim::Vector(0,1);
 		sim.getState().getBotFactory().createBot( botCfg );
-
-		// Create test weapon and bullet type
-		Sim::BulletD *bulletType = sim.getData().getBulletDb().createType();
-
-		Sim::StateSys *sys = bulletType->getStateSys();
-		sys->registerState(new Sim::StdState::Delay(0.2));
-		sys->registerEntryPoint(0);
-
-		Sim::WeaponD *weaponType = sim.getData().getWeaponDb().createType();
-		Sim::StateSys *wsys = weaponType->getStateSys();
-		wsys->registerState(new Sim::WeaponState::Shoot( bulletType->getId() ) );
-		wsys->registerEntryPoint(0);
 
 		// Send some input to this bot
 		{
@@ -107,11 +96,9 @@ public:
 		sim.getState().getWorld().getTile(3,0).setType(1);
 
 		sim.prepareSim();
+		//end of sim init
 
 
-		//main = new QWidget(parent);
-		//main->showFullScreen();
-		//main->resize(parent->geometry().width(), parent->geometry().height());
 		cam = new Camera(0, 0, parent->width(), parent->height());
 		states = new ClientStates();
 		drawer = new GameDrawer(cam, &sim, states, parent);
@@ -170,10 +157,11 @@ public:
 	void updateGUI() {
 		emptyGUI();
 		int i;
-		std::vector<Sim::Bot*> bots = sim.getState().getBotFactory().getBotVector();
+		std::list<Sim::Bot*> bots = sim.getState().getBotFactory().getBotList();
+		std::list<Sim::Bot*>::iterator it;
 		BotSelector *clabel;
-		for (i = 0; i < bots.size(); i++) {
-			clabel = new BotSelector(bots[i]->getId(), states, parent);
+		for (it = bots.begin(); it != bots.end(); it++) {
+			clabel = new BotSelector((*it)->getId(), states, parent);
 			clabel->setPixmap(profiles[0]);
 			clabel->resize(60,60);
 			upper->insertWidget(i, clabel);

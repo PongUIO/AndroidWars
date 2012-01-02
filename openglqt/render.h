@@ -7,7 +7,7 @@
 #include "../util/camera.h"
 #include "../util/client.h"
 #include "../util/cursordefines.h"
-#include "main.h"
+#include "../pc/main.h"
 
 class GameDrawer : public QGLWidget {
 	Q_OBJECT        // must include this if you use Qt signals/slots
@@ -148,7 +148,6 @@ protected:
 	}
 
 	void resizeEvent(QResizeEvent *event) {
-		qDebug() << "resize!!";
 		resizeGL(event->size().width(), event->size().height());
 		resize(event->size().width(), event->size().height());
 	}
@@ -219,57 +218,40 @@ protected:
 
 		}
 
-		const Sim::BotFactory::ObjVec &bots =  sim->getState().getBotFactory().getBotVector();
+
+		std::list<Sim::Bot*> bots = sim->getState().getBotFactory().getBotList();
+		std::list<Sim::Bot*>::iterator bot;
 
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glEnable(GL_BLEND);
 
-		for (i = 0; i < bots.size(); i++) {
-			Sim::Bot *bot = bots[i];
-			if (bot != NULL) {
-				Sim::Vector pos = bot->getBody().mPos;
-				Sim::Vector col = bot->getTypePtr()->getCollision()->getBboxHigh();
-				//glTexSubImage2D(GL_TEXTURE_2D, 0, 0,0 , characters[mt].width(), characters[mt].height(),  GL_RGBA, GL_UNSIGNED_BYTE, characters[mt].bits() );
-				glBindTexture(GL_TEXTURE_2D, weaponstextures[0]);
-				drawTexObj(pos.x+0.3, pos.y+1.3, pos.x+1.3, pos.y+1.3);
+		for (bot = bots.begin(); bot != bots.end(); bot++) {
+			Sim::Vector pos = (*bot)->getBody().mPos;
+			Sim::Vector col = (*bot)->getTypePtr()->getCollision()->getBboxHigh();
+			//glTexSubImage2D(GL_TEXTURE_2D, 0, 0,0 , characters[mt].width(), characters[mt].height(),  GL_RGBA, GL_UNSIGNED_BYTE, characters[mt].bits() );
+			glBindTexture(GL_TEXTURE_2D, weaponstextures[0]);
+			drawTexObj(pos.x+0.3, pos.y+1.3, pos.x+1.3, pos.y+1.3);
 
-				glBindTexture(GL_TEXTURE_2D, chartextures[0]);
-				drawTexObj(pos.x, pos.y, pos.x+col.x, pos.y+col.y);
+			glBindTexture(GL_TEXTURE_2D, chartextures[0]);
+			drawTexObj(pos.x, pos.y, pos.x+col.x, pos.y+col.y);
 
-				glBindTexture(GL_TEXTURE_2D, 0);
-				/*glBlendFunc(GL_ONE, GL_ONE);
-				//glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+			glBindTexture(GL_TEXTURE_2D, 0);
+			/*glBlendFunc(GL_ONE, GL_ONE);
+			//glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
-				glEnable(GL_TEXTURE_2D);*/
+			glEnable(GL_TEXTURE_2D);*/
 
-			}
 		}
 		glDisable(GL_TEXTURE_2D);
 		glColor4f(0.2f, 1.0f, 0.2f, selAlpha);
-		for (i = 0; i < bots.size(); i++) {
-			if (states->isSelected(i)) {
-				Sim::Bot *bot = bots[i];
-				if (bot != NULL) {
-					Sim::Vector pos = bot->getBody().mPos;
-					Sim::Vector col = bot->getTypePtr()->getCollision()->getBboxHigh();
-					drawObj(pos.x, pos.y, pos.x+col.x, pos.y+col.y);
-
-				}
+		for (bot = bots.begin(); bot != bots.end(); bot++) {
+			if (states->isSelected((*bot)->getId())) {
+				Sim::Vector pos = (*bot)->getBody().mPos;
+				Sim::Vector col = (*bot)->getTypePtr()->getCollision()->getBboxHigh();
+				drawObj(pos.x, pos.y, pos.x+col.x, pos.y+col.y);
 			}
 		}
 		glEnable(GL_TEXTURE_2D);
-
-		const Sim::BulletFactory::ObjVec &bullets =  sim->getState().getBulletFactory().getObjVector();
-
-		for (i = 0; i < bullets.size(); i++) {
-			Sim::Bullet *bul = bullets[i];
-			if (bul != NULL) {
-				qDebug() << "working";
-				Sim::Vector pos = bul->getBody().mPos;
-				glBindTexture(GL_TEXTURE_2D, bullettextures[0]);
-				drawTexObj(pos.x-0.005, pos.y-0.005, pos.x+0.005, pos.y+0.005);
-			}
-		}
 
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();

@@ -41,20 +41,18 @@ class ClientStates {
 
 		void registerClick(double x, double y, int button) {
 			int i;
-			const Sim::BotFactory::ObjVec &bots =  sim->getState().getBotFactory().getBotVector();
 			if (sim != NULL) {
+				std::list<Sim::Bot*> bots = sim->getState().getBotFactory().getBotList();
+				std::list<Sim::Bot*>::iterator bot;
 				if (!shift) {
 					selBots.clear();
 				}
-				for (i = 0; i < bots.size(); i++) {
-					Sim::Bot *bot = bots[i];
-					if (bot != NULL) {
-						Sim::Vector pos = bot->getBody().mPos;
-						Sim::Vector col = bot->getTypePtr()->getCollision()->getBboxHigh();
-						if ( pos.x < x && x < pos.x + col.x && pos.y < y && y < pos.y + col.y) {
-							selBots.insert(i);
-							return;
-						}
+				for (bot = bots.begin(); bot != bots.end(); bot++) {
+					Sim::Vector pos = (*bot)->getBody().mPos;
+					Sim::Vector col = (*bot)->getTypePtr()->getCollision()->getBboxHigh();
+					if ( pos.x < x && x < pos.x + col.x && pos.y < y && y < pos.y + col.y) {
+						selBots.insert((*bot)->getId());
+						return;
 					}
 				}
 			}
