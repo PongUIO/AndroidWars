@@ -119,7 +119,7 @@ namespace Sim {
 	//
 	//
 	BotFactory::BotFactory(Simulation *sim)
-		: DefaultFactory<Bot>(sim)
+		: DefaultUidFactory<Bot>(sim)
 	{}
 
 	BotFactory::~BotFactory()
@@ -127,21 +127,22 @@ namespace Sim {
 	
 	void BotFactory::startup()
 	{
-		
+		DefaultUidFactory<Bot>::startup();
 	}
 	
 	void BotFactory::shutdown()
 	{
-		killAll();
+		DefaultUidFactory<Bot>::shutdown();
 	}
 	
 	uint32_t BotFactory::createBot(const Bot::Config &cfg)
 	{
-		uint32_t id = newId();
+		BotFactory::InsertData insData = insertObject();
 		
-		addObj(new Bot(mSim, id, cfg), id);
+		Bot *bot = new Bot(mSim, insData.first, cfg);
+		*insData.second = bot;
 		
-		return id;
+		return insData.first;
 	}
 	
 	void BotFactory::step(double stepTime)
@@ -161,12 +162,19 @@ namespace Sim {
 	}
 	
 	void BotFactory::save(Save::BasePtr& fp)
-	{
-		Sim::DefaultFactory< Sim::Bot >::save(fp);
-	}
+	{	DefaultUidFactory<Bot>::save(fp); }
 
-	void BotFactory::load(Save::BasePtr& fp)
+	void Sim::BotFactory::load(Save::BasePtr& fp)
+	{	DefaultUidFactory<Bot>::load(fp); }
+
+	
+	void BotFactory::saveObj(Bot* bot, Save::BasePtr& fp)
+	{	bot->save(fp); }
+
+	Bot* BotFactory::loadObj(uint32_t id, Save::BasePtr& fp)
 	{
-		Sim::DefaultFactory< Sim::Bot >::load(fp);
+		Bot *bot = new Bot(mSim, id);
+		bot->load(fp);
+		return bot;
 	}
 }

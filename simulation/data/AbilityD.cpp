@@ -8,7 +8,7 @@ namespace Sim {
 	};
 	
 #define _SIM_ABILITY_DEF(baseClass,		type, name)  \
-	if(type == TYPE) registerCustom<Abil::baseClass>();
+	if(type == TYPE) registerType<Abil::baseClass>();
 	
 	void AbilityDatabase::registerAllDefault()
 	{

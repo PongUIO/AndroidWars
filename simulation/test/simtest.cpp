@@ -4,6 +4,30 @@
 // Main simulation object
 Sim::Simulation sim;
 
+/**
+ * Simple test implementation of a weapon
+ */
+class DemoWeapon : public Sim::Weapon {
+	public:
+		SIM_WEAPON_HEADER("Test/DemoWeapon")
+		
+		struct Config {
+			Config() {}
+		};
+		
+		DemoWeapon(Sim::Simulation* sim, uint32_t id, uint32_t typeId,
+			const Config &cfg) : Weapon(sim, id, typeId) {}
+		~DemoWeapon() {}
+		
+	protected:
+		void save(Sim::Save::BasePtr& fp) {}
+		void load(Sim::Save::BasePtr& fp) {}
+		
+		void step(double stepTime) {}
+		
+		void shoot() { printf("Bang!\n"); }
+};
+
 // Starts the simulation
 void startSim()
 {
@@ -64,26 +88,7 @@ void loadBots()
 
 void loadWeapons()
 {
-	Sim::BulletD *bulletType = sim.getData().getBulletDb().createType();
-	
-	Sim::StateSys *sys = bulletType->getStateSys();
-	sys->registerState(new Sim::StdState::Delay(0.2));
-	
-	class DemoState : public Sim::StateSys::State {
-		public:
-			void exec(Sim::StateSys::Reference::Thread &t) const {
-				printf("%p: DemoState called\n", this);
-				t.mActive = nextState();
-			}
-	};
-	sys->registerState(new DemoState());
-	sys->registerEntryPoint(0);
-	
-	Sim::WeaponD *weaponType = sim.getData().getWeaponDb().createType();
-	
-	Sim::StateSys *wsys = weaponType->getStateSys();
-	wsys->registerState(new Sim::WeaponState::Shoot( bulletType->getId() ) );
-	wsys->registerEntryPoint(0);
+	sim.getData().getWeaponDb().registerType<DemoWeapon>();
 }
 
 // "Loads" simulation data
@@ -101,7 +106,7 @@ void setupWorld()
 {
 	// Create a test bot
 	Sim::Bot::Config botCfg;
-	Sim::Weapon::Config weapCfg;
+	DemoWeapon::Config weapCfg;
 	botCfg.mSide = 0;
 	botCfg.mType = 0;
 	botCfg.mBody.mPos = Sim::Vector(0,0);
@@ -111,8 +116,8 @@ void setupWorld()
 		.createAbility<CpuBoost>(CpuBoost::Config(0, 10))->getId();
 	botCfg.mAbility.addAbility(abilId);
 	
-	weapCfg.type = 0;
-	botCfg.mWeaponBox.add( sim.getState().getWeaponFactory().create(weapCfg) );
+	Sim::Weapon *weapon = sim.getState().getWeaponFactory().createType<DemoWeapon>(weapCfg);
+	botCfg.mWeaponBox.add( weapon->getId() );
 	uint32_t botId = sim.getState().getBotFactory().createBot( botCfg );
 	
 	// Give the bot some input
@@ -146,12 +151,6 @@ int main(void)
 			Sim::Vector pos = sim.getState().getBotFactory().
 				getBot(0)->getBody().mPos;
 			printf("%02d (%g, %g)\n", sim.getCurPhase(), pos.x, pos.y);
-			
-			const Sim::Bullet *bu = sim.getState().getBulletFactory().getObj(0);
-			if(bu) {
-				pos = bu->getBody().mPos;
-				printf("%02d (%g, %g, bullet)\n", sim.getCurPhase(), pos.x,pos.y);
-			}
 			
 			sim.step();
 		}

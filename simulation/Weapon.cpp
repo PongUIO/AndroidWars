@@ -5,51 +5,17 @@
 
 namespace Sim {
 	WeaponFactory::WeaponFactory(Simulation *sim) :
-		DefaultFactory<Weapon>(sim)
+		DefaultUidFactory<Weapon>(sim)
 	{}
 	
 	WeaponFactory::~WeaponFactory()
 	{}
 	
-	// Weapon class
-	//
-	//
-	Weapon::Weapon(Simulation* sim, uint32_t id, const Sim::Weapon::Config& cfg) :
-		mId(id),
-		mType(cfg.type),
-		mSim(sim),
-		
-		mReloadTimer(0.0),
-		mIsDead(false)
-	{
-		mTypePtr = mSim->getData().getWeaponDb().getType(mType);
-		
-		mStateRef = StateSys::Reference(mTypePtr->getStateSys());
-	}
+	const DataBehaviourT<Weapon>::Behaviour* WeaponFactory::getBehaviourFromId(uint32_t id) const
+	{	return mSim->getData().getWeaponDb().getType(id); }
 	
-	Weapon::~Weapon()
-	{}
-	
-	void Weapon::shoot(ShootArg arg, uint32_t style)
-	{
-		arg.ref = this;
-		mStateRef.startThread(style, arg);
-	}
-	
-	void Weapon::step(double stepTime)
-	{
-		mStateRef.exec(stepTime);
-		if(mReloadTimer > 0.0)
-			mReloadTimer -= stepTime;
-	}
-	
-	void Weapon::save(Save::BasePtr& fp)
-	{
-	}
-	
-	void Weapon::load(Save::BasePtr& fp)
-	{
-	}
+	const DataBehaviourT<Weapon>::Behaviour* WeaponFactory::getBehaviourFromName(const std::string& name) const
+	{	return mSim->getData().getWeaponDb().getType(name); }
 	
 	// WeaponBox
 	// 
@@ -67,26 +33,6 @@ namespace Sim {
 		uint32_t count = fp.readInt<uint32_t>();
 		while( (count--) > 0) {
 			mData.push_back(fp.readInt<uint32_t>());
-		}
-	}
-	
-	// State objects
-	//
-	//
-	namespace WeaponState {
-		void Shoot::exec(StateSys::Reference::Thread& t) const
-		{
-			const Weapon::ShootArg &arg =
-				boost::any_cast<const Weapon::ShootArg>(t.mArg);
-			
-			Simulation *sim = arg.ref->getSim();
-			Bullet::Config cfg;
-			cfg.pos = arg.pos;
-			cfg.vel = arg.dir;
-			cfg.type = mType;
-			sim->getState().getBulletFactory().create(cfg);
-			
-			t.mActive = nextState();
 		}
 	}
 }

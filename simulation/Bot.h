@@ -74,7 +74,10 @@ namespace Sim {
 			typedef State Config;
 			
 			uint32_t getId() const { return mId; }
+			uint32_t getTypeId() const { return getState().mType; }
 			const Body &getBody() const { return getState().mBody; }
+			
+			bool isDead() { return false; }
 			
 			State &getState() { return mState; }
 			const State &getState() const { return mState; }
@@ -91,8 +94,6 @@ namespace Sim {
 			
 			/// @name Interaction
 			//@{
-				bool isDead() { return false; }
-				
 				void prepareStep(double stepTime);
 				void updateCpu(double stepTime);
 				void step(double stepTime);
@@ -128,13 +129,12 @@ namespace Sim {
 			State mState;
 			
 			friend class BotFactory;
-			friend class Factory<Bot>;
-			friend class DefaultFactory<Bot>;
+			friend class DefaultUidFactory<Bot>;
 			friend class BotCpu;
 			friend class BotAbility;
 	};
 	
-	class BotFactory : public DefaultFactory<Bot> {
+	class BotFactory : public DefaultUidFactory<Bot> {
 		public:
 			/// @name Initialization
 			//@{
@@ -153,16 +153,22 @@ namespace Sim {
 				uint32_t createBot(const Bot::Config &cfg);
 				
 				Bot *getBot(uint32_t id) { return getObject(id); }
-				const Bot *getBot(uint32_t id) const { return getObject(id); }
 				
-				const Factory<Bot>::ObjVec &getBotVector() const {
-					return mData;
-				}
+				const UidFactory<Bot>::DataList &getBotList() const
+					{ return getData(); }
 				
 				void step(double stepTime);
 				
 				void startPhase();
 				void endPhase();
+			//@}
+			
+		private:
+			/// @name Factory-required functions
+			//@{
+				void deleteInstance(Bot* obj) { delete obj; }
+				void saveObj(Bot *bot, Save::BasePtr &fp);
+				Bot* loadObj(uint32_t id, Save::BasePtr &fp);
 			//@}
 	};
 	

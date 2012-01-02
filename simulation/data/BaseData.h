@@ -96,15 +96,38 @@ namespace Sim {
 			const Behaviour *getType(uint32_t type) const
 			{	return mInternal.getType(type); }
 			
+			const Behaviour *getType(const std::string &name) const
+			{	return mInternal.getType(getTypeIdOf(name)); }
+			
+			
+			/**
+			 * Registers an implementation type.
+			 * 
+			 * This automatically implements a \c Behaviour class for
+			 * the type. Suitable for implementations with only one
+			 * interpretation.
+			 */
 			template<class Impl>
-			uint32_t registerCustom() {
-				Behaviour *data = new BehaviourImpl<Impl>();
+			uint32_t registerType() {
+				return registerCustom(new BehaviourImpl<Impl>(),
+					Impl::getTypeName());
+			}
+			
+			/**
+			 * Registers a implemented behaviour class.
+			 * 
+			 * @note Use this if the base class has several interpretations
+			 * (such as for scripted behaviour using only one implemented class)
+			 * 
+			 * @warning At present this should not be used, as types using this
+			 * rely on Impl::getTypeName(). This will be fixed soon.
+			 */
+			uint32_t registerCustom(Behaviour *type, const std::string &name) {
+				uint32_t id = mInternal.addTypeExt(type);
+				type->mId = id;
 				
-				uint32_t id = mInternal.addTypeExt(data);
-				data->mId = id;
-				
-				mTypeMap[Impl::getTypeName()] = id;
-				mIdMap[id] = Impl::getTypeName();
+				mTypeMap[name] = id;
+				mIdMap[id] = name;
 				
 				return id;
 			}

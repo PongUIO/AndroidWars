@@ -6,82 +6,67 @@
 #include "Save.h"
 
 #include "StateObj.h"
-#include "statesys/StateSys.h"
 
 namespace Sim {
 	class Simulation;
-	class BulletD;
+	
+#define SIM_BULLET_HEADER(name) \
+	static const std::string &getTypeName() \
+	{ static std::string typeName = name; return typeName; }
 	
 	class Bullet {
 		public:
-			struct Config {
-				uint32_t type;
-				
-				Vector pos;
-				Vector vel;
-			};
-			
-			enum EntryType {
-				EGroundCol = 0,
-				EUser
-			};
-			
 			uint32_t getId() const { return mId; }
+			uint32_t getTypeId() const { return mTypeId; }
 			const Body &getBody() const { return mBody; }
 			
-		private:
-			Bullet(Simulation *sim, uint32_t id) : mId(id), mSim(sim) {}
-			Bullet(Simulation *sim, uint32_t id, const Config &cfg);
-			~Bullet();
+			bool isDead() { return false; }
+			
+		protected:
+			Bullet(Simulation *sim, uint32_t id, uint32_t typeId) :
+				mId(id), mTypeId(typeId), mSim(sim) {}
+			virtual ~Bullet() {}
 			
 			/// @name Interaction
 			//@{
-				bool isDead() { return false; }
-				void step(double stepTime);
+				virtual void save(Save::BasePtr &fp);
+				virtual void load(Save::BasePtr &fp);
 				
-				void save(Save::BasePtr &fp);
-				void load(Save::BasePtr &fp);
+				virtual void step(double stepTime);
 			//@}
 			
 			/// @name Identification
 			//@{
 				uint32_t mId;
-				uint32_t mType;
-				
+				uint32_t mTypeId;
+				Simulation *mSim;
 			//@}
 			
 			/// @name Physical
 			//@{
 				Body mBody;
-				
-				const BulletD *mTypePtr;
-				Simulation *mSim;
-			//@}
-			
-			
-			/// @name State system
-			//@{
-				StateSys::Reference mStateRef;
 			//@}
 			
 			friend class BulletFactory;
-			friend class Factory<Bullet>;
-			friend class DefaultFactory<Bullet>;
+			friend class DefaultUidFactory<Bullet>;
 	};
 	
-	namespace BulletState {
-	}
-	
-	class BulletFactory : public DefaultFactory<Bullet> {
+	class BulletFactory : public DefaultUidFactory<Bullet> {
 		public:
-			/// @name Initialization
+			BulletFactory(Simulation *sim);
+			~BulletFactory();
+			
+			void destroyBullet(uint32_t id) { removeObj(id); }
+			Bullet *getBullet(uint32_t id) { return getObject(id); }
+			
+		private:
+			/// @name Factory-required functions
 			//@{
-				BulletFactory(Simulation *sim);
-				~BulletFactory();
-			//@}
+				void deleteInstance(Bullet* obj) { delete obj; }
 				
-				void save(Save::BasePtr &fp) {}
-			void load(Save::BasePtr &fp) {}
+				const DataBehaviourT<Bullet>::Behaviour* getBehaviourFromId(uint32_t id) const;
+				const DataBehaviourT<Bullet>::Behaviour* getBehaviourFromName(const std::string& name) const;
+			//@}
 	};
 }
 

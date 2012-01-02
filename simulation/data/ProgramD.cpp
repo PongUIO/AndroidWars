@@ -9,7 +9,7 @@ namespace Sim {
 	};
 
 #define _SIM_PROGRAM_DEF(baseClass,		type,	name) \
-	if(type == TYPE) registerCustom<Prog::baseClass>();
+	if(type == TYPE) registerType<Prog::baseClass>();
 	
 	/**
 	 * Registers all of the simulation's base program types.

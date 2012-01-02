@@ -52,7 +52,6 @@ namespace Sim {
 			
 		private:
 			friend class ProgramFactory;
-			friend class Factory<Program>;
 			
 			friend class BotCpu;
 			friend class BotInput;

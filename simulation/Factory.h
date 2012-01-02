@@ -13,6 +13,7 @@
 #include <boost/unordered_map.hpp>
 
 #include "utility/CallGroup.h"
+#include "data/BaseData.h"
 #include "StateObj.h"
 #include "Save.h"
 
@@ -21,178 +22,6 @@ namespace Sim {
 	class Simulation;
 	
 	static const uint32_t FactoryNoId = -1;
-	
-	/**
-	 * This template provides an id-referenced grouping of
-	 * objects.
-	 * 
-	 * When calling specific functions (like step()),
-	 * every single object is applied the same function ordered
-	 * by their ID in ascending order (eg. the object with id 1
-	 * is always called before id 2).
-	 * 
-	 * Any class inheriting this template is required to have the
-	 * following implemented:
-	 * - deleteInstance(T *obj) : Called when an object is dead.
-	 * - saveObj(T* obj, Save::BasePtr &fp) : Called when an object is saved
-	 * - loadObj(uint32_t id, Save::BasePtr &fp) : Called when an object is
-	 * 			loaded
-	 * 
-	 * The object this template uses is required to have the following
-	 * implemented:
-	 * - isDead() : Should return true when the object is to be purged.
-	 */
-	template<class T>
-	class Factory {
-		protected:
-			typedef std::vector<uint32_t> IdStack;
-			
-		public:
-			typedef std::vector<T*> ObjVec;
-			
-			Factory() : mIdCounter(0)
-				{}
-			virtual ~Factory() {}
-			
-			virtual void deleteInstance(T *obj)=0;
-			virtual void saveObj(T*, Save::BasePtr &)=0;
-			virtual T *loadObj(uint32_t id, Save::BasePtr&)=0;
-			
-			uint32_t addObj(T *obj, uint32_t idPos) {
-				if(idPos >= mData.size())
-					idPos = newId();
-				mData[idPos] = obj;
-				return idPos;
-			}
-			
-			void removeObj(uint32_t id) {
-				T *obj = getObject(id);
-				if(obj) {
-					deleteInstance(mData[id]);
-					freeId(id);
-					mData[id] = 0;
-				}
-			}
-			
-			template<typename Func>
-			void factoryCall(Func func)
-			{
-				/// @note If new objects are created during this
-				/// it is unpredictable whether they are called or not.
-				for(uint32_t i = 0; i<mData.size(); i++) {
-					T *obj = mData[i];
-					
-					if(obj) {
-						// If the object is not dead, then process it
-						if(!obj->isDead())
-							func(obj);
-						
-						// Free and disable this ID
-						// if the object is dead
-						if(obj->isDead()) {
-							removeObj(i);
-						}
-					}
-				}
-			}
-			
-			/**
-			 * Saves the factory into a savestate.
-			 */
-			virtual void save(Save::BasePtr &fp)
-			{
-				// Save the data list
-				fp.writeInt<uint32_t>(mIdCounter);
-				for(typename ObjVec::iterator i=mData.begin();
-					i!=mData.end(); ++i) {
-					
-					fp.writeInt<uint8_t>( (*i) != NULL );
-					if( *i )
-						saveObj(*i, fp);
-				}
-				
-				// Save the stack
-				fp.writeInt<uint32_t>(mFreeId.size());
-				for(uint32_t i=0; i<mFreeId.size(); ++i) {
-					fp.writeInt<uint32_t>(mFreeId[i]);
-				}
-			}
-			
-			/**
-			 * Loads the factory from a savestate.
-			 */
-			virtual void load(Save::BasePtr &fp)
-			{
-				// Destroy all objects in the factory
-				killAll();
-				
-				// Load all objects
-				uint32_t facSize = fp.readInt<uint32_t>();
-				for(uint32_t id=0; id<facSize; ++id) {
-					mData.push_back(0);
-					uint8_t hasObj = fp.readInt<uint8_t>();
-					if(hasObj)
-						mData[id] = loadObj(id, fp);
-				}
-				
-				// Set the id counter to the factory size.
-				// This is because the id counter in effect points to
-				// the maximum unallocated id (neither on stack nor active)
-				mIdCounter = facSize;
-				
-				// Load the id stack
-				uint32_t stkSize = fp.readInt<uint32_t>();
-				mFreeId.resize(stkSize);
-				
-				for(uint32_t i=0; i<mFreeId.size(); ++i) {
-					mFreeId[i] = fp.readInt<uint32_t>();
-				}
-			}
-			
-		protected:
-			void setObject(T *obj, uint32_t id) {
-				if(id >= mData.size())
-					mData.resize(id+1);
-				
-				mData[id] = obj;
-			}
-			
-			T *getObject(uint32_t id) const {
-				if(id >= mData.size())
-					return NULL;
-				else
-					return mData[id];
-			}
-			
-			uint32_t newId() {
-				if(mFreeId.empty()) {
-					// Creates a new slot in the vector
-					mData.push_back(NULL);
-					return mIdCounter++;
-				} else {
-					uint32_t id = mFreeId.back();
-					mFreeId.pop_back();
-					return id;
-				}
-			}
-			
-			void freeId(uint32_t id) {
-				mFreeId.push_back(id);
-			}
-			
-			void killAll() {
-				for(uint32_t i = 0; i<mData.size(); i++) {
-					deleteInstance(mData[i]);
-				}
-				mData.clear();
-				mFreeId = IdStack(); // Clears the free ID list
-				mIdCounter = 0;
-			}
-			
-			ObjVec mData;
-			IdStack mFreeId;
-			uint32_t mIdCounter;
-	};
 	
 	/**
 	 * This template provides a variant of factories that provide
@@ -317,7 +146,7 @@ namespace Sim {
 				}
 			}
 			
-			const DataList &getData() { return mData; }
+			const DataList &getData() const { return mData; }
 			
 		private:
 			uint32_t mCurrentUniqueId;
@@ -327,58 +156,108 @@ namespace Sim {
 	};
 	
 	/**
-	 * This template provides a default implementation
-	 * of the factory tailored to the simulation.
+	 * Provides a default implementation of a UidFactory, tailored to the
+	 * simulation.
 	 */
 	template<typename T>
-	class DefaultFactory : public Factory<T>, public StateObj {
+	class DefaultUidFactory : public UidFactory<T>, public StateObj {
 		public:
-			/// @name Initialization
+			DefaultUidFactory(Simulation *sim) : UidFactory<T>(), mSim(sim) {}
+			virtual ~DefaultUidFactory() {}
+			
+			/// @name StateObj functions
 			//@{
-				DefaultFactory(Simulation *sim) : mSim(sim) {}
-				virtual ~DefaultFactory() {}
+				virtual void startup() {}
+				virtual void shutdown()
+				{ UidFactory<T>::killAll(); }
 				
-				void startup() {}
-				void shutdown()
-					{ Factory<T>::killAll(); }
+				virtual void save(Save::BasePtr& fp)
+				{ UidFactory<T>::save(fp); }
+				virtual void load(Save::BasePtr& fp)
+				{ UidFactory<T>::load(fp); }
+				
+				virtual void startPhase() {}
+				virtual void endPhase() {}
+				
+				virtual void step(double stepTime) {}
 			//@}
 			
-			/// @name Interaction
+			/// @name Object creation
 			//@{
-				virtual void step(double stepTime)
-				{ Factory<T>::factoryCall(boost::bind(&T::step, _1, stepTime)); }
+				virtual const typename DataBehaviourT<T>::Behaviour *
+					getBehaviourFromName(const std::string &name) const
+				{ throw std::string("UidFactory::getBehaviourFromName() unimplemented"); }
+				virtual const typename DataBehaviourT<T>::Behaviour *
+					getBehaviourFromId(uint32_t id) const
+				{ throw std::string("UidFactory::getBehaviourFromId() unimplemented"); }
 				
-				uint32_t create(const typename T::Config &cfg)
-				{
-					uint32_t id = Factory<T>::newId();
-					return Factory<T>::addObj(new T(mSim, id, cfg), id);
+				/**
+				 * Creates a type based on an implementation, and
+				 * inserts it into the factory. May create any valid inheritor
+				 * of the type this factory uses.
+				 * 
+				 * This function uses Impl::getTypeName() to find the
+				 * typeid of the new object.
+				 * 
+				 * @return A pointer to the new object if successful, or NULL if
+				 * the type is not registered to the simulation.
+				 */
+				template<typename Impl>
+				Impl *createType(const typename Impl::Config &cfg) {
+					const typename DataBehaviourT<T>::Behaviour *b =
+						getBehaviourFromName(Impl::getTypeName());
+					if(!b)
+						return 0;
+					
+					typename UidFactory<T>::InsertData insData =
+						UidFactory<T>::insertObject();
+					Impl *tmp = new Impl(mSim, insData.first, b->mId, cfg);
+					*insData.second = tmp;
+					
+					return tmp;
 				}
 				
-				const T *getObj(uint32_t id) const
-					{ return Factory<T>::getObject(id); }
-				T *getObj(uint32_t id)
-					{ return Factory<T>::getObject(id); }
-				
-				const typename Factory<T>::ObjVec &getObjVector() const
-					{ return Factory<T>::mData; }
-				
-				void save(Save::BasePtr &fp) { Factory<T>::save(fp); }
-				void load(Save::BasePtr &fp) { Factory<T>::load(fp); }
+				/**
+				 * Creates an abstract type based on a type ID.
+				 * 
+				 * As the ID of the created type is know, it should be
+				 * trivial to cast the abstract pointer to the proper type.
+				 */
+				T *createObjFromTypeName(const std::string &name) {
+					typename DataBehaviourT<T>::Behaviour *b =
+						getBehaviourFromName(name);
+					if(!b)
+						return 0;
+					
+					typename UidFactory<T>::InsertData insData =
+						UidFactory<T>::insertObject();
+					T *obj = b->createObj(mSim, insData.first);
+					*insData.second = obj;
+					
+					return obj;
+				}
 			//@}
 			
-			
-			
 		protected:
-			virtual void deleteInstance(T *obj) { delete obj; }
-			
-			virtual void saveObj(T *obj, Save::BasePtr &fp) {
-				obj->save(fp);
-			}
-			virtual T* loadObj(uint32_t id, Save::BasePtr &fp) {
-				T * obj = new T(mSim, id);
-				obj->load(fp);
-				return obj;
-			}
+			/// @name Factory-required default functions
+			//@{
+				virtual void saveObj(T *obj, Save::BasePtr &fp) {
+					fp.writeInt<uint32_t>(obj->getTypeId());
+					obj->save(fp);
+				}
+				
+				virtual T *loadObj(uint32_t internalId, Save::BasePtr &fp) {
+					uint32_t type = fp.readInt<uint32_t>();
+					
+					const typename DataBehaviourT<T>::Behaviour *b =
+						getBehaviourFromId(type);
+					
+					T *obj = b->createObj(mSim, internalId);
+					obj->load(fp);
+					
+					return obj;
+				}
+			//@}
 			
 			Simulation *mSim;
 	};
