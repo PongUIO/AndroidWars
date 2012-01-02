@@ -32,6 +32,13 @@ class ClientStates {
 			return selBots.find(b) != selBots.end();
 		}
 
+		void select(uint i) {
+			if (!shift) {
+				selBots.clear();
+			}
+			selBots.insert(i);
+		}
+
 		void registerClick(double x, double y, int button) {
 			int i;
 			const Sim::BotFactory::ObjVec &bots =  sim->getState().getBotFactory().getBotVector();

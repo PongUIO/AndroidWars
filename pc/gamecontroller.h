@@ -7,14 +7,10 @@
 #include "Simulation.h"
 #include "../openglqt/render.h"
 #include "../util/client.h"
-#include "customlabel.h"
+#include "botselector.h"
 #include "gamebutton.h"
 
 #define RATE 20
-
-void something() {
-	qDebug() << "works.";
-}
 
 class GameController {
 public:
@@ -26,8 +22,7 @@ public:
 	QVBoxLayout *iconHolder;
 	QSpacerItem *space;
 	QPixmap profiles[1];
-	GameButton *label;
-	CustomLabel *label2, *robot;
+	GameButton *label, *label2;
 	Sim::Simulation sim;
 	Camera *cam;
 	QPixmap m;
@@ -139,7 +134,7 @@ public:
 		drawer->setMouseTracking(true);
 
 		label = new GameButton(&sim, 0, parent);
-		label2 = new CustomLabel(&something, parent);
+		label2 = new GameButton(&sim, 0, parent);
 		label->setPixmap(QPixmap(":/graphics/temp/temp.png"));
 		label->resize(60,60);
 		label2->setPixmap(QPixmap(":/graphics/temp/temp2.png"));
@@ -176,9 +171,9 @@ public:
 		emptyGUI();
 		int i;
 		std::vector<Sim::Bot*> bots = sim.getState().getBotFactory().getBotVector();
-		CustomLabel *clabel;
+		BotSelector *clabel;
 		for (i = 0; i < bots.size(); i++) {
-			clabel = new CustomLabel(&something, parent);
+			clabel = new BotSelector(bots[i]->getId(), states, parent);
 			clabel->setPixmap(profiles[0]);
 			clabel->resize(60,60);
 			upper->insertWidget(i, clabel);
