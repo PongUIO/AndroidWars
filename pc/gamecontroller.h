@@ -14,7 +14,6 @@
 
 class GameController {
 public:
-	ClientStates *states;
 	MainWidget *parent;
 	GameDrawer *drawer;
 	QTimer *glTimer, *camTimer, *timer;
@@ -24,7 +23,6 @@ public:
 	QPixmap profiles[1];
 	GameButton *label, *label2;
 	Sim::Simulation sim;
-	Camera *cam;
 	QPixmap m;
 	GameController(MainWidget *parent = 0) {
 		this->parent = parent;
@@ -98,10 +96,9 @@ public:
 		sim.prepareSim();
 		//end of sim init
 
+		parent->states->setSim(&sim);
 
-		cam = new Camera(0, 0, parent->width(), parent->height());
-		states = new ClientStates();
-		drawer = new GameDrawer(cam, &sim, states, parent);
+		drawer = new GameDrawer(parent);
 
 		glTimer = new QTimer(parent);
 		drawer->connect(glTimer, SIGNAL(timeout()), drawer, SLOT(redraw()));
@@ -161,7 +158,7 @@ public:
 		std::list<Sim::Bot*>::iterator it;
 		BotSelector *clabel;
 		for (it = bots.begin(); it != bots.end(); it++) {
-			clabel = new BotSelector((*it)->getId(), states, parent);
+			clabel = new BotSelector((*it)->getId(), parent->states, parent);
 			clabel->setPixmap(profiles[0]);
 			clabel->resize(60,60);
 			upper->insertWidget(i, clabel);

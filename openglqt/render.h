@@ -42,56 +42,23 @@ public:
 	QPixmap mouseMaps[2];
 	QImage bullet[1];
 	GLuint bullettextures[1];
-	Sim::Simulation *sim;
-	Sim::World *wld;
 	Camera *cam;
 	ClientStates *states;
-	GameDrawer(Camera *cam, Sim::Simulation *simIn, ClientStates *states, MainWidget *parent = 0)
+	GameDrawer(MainWidget *parent = 0)
 		: QGLWidget(QGLFormat(QGL::SampleBuffers), parent) {
 		this->parent = parent;
 		cMouse = 0;
-		this->cam = cam;
+		this->cam = new Camera(0, 0, parent->width(), parent->height());
 		lastX = width()/2;
 		lastY = height()/2;
-		sim = simIn;
-		wld = &sim->getState().getWorld();
-		this->states = states;
-		this->states->setSim(sim);
+		this->states = parent->states;
 		mouseSize = 0.07;
 		selAlpha = 0.3;
 		dirAlpha = false;
 		fullScreen = false;
-		grabKeyboard();
 	}
 
 protected:
-	// overridden
-	void keyPressEvent (QKeyEvent *event) {
-		int k = event->key();
-		if (k == Qt::Key_F11) {
-			fullScreen = !fullScreen;
-			parent->setFullScreen(fullScreen);
-		} else {
-			modKey(k, true);
-		}
-	}
-
-	// overridden
-	void keyReleaseEvent (QKeyEvent *event) {
-		modKey(event->key(), false);
-	}
-
-	void modKey(int k, bool state) {
-		if ( k == Qt::Key_Shift ) {
-			states->setShift(state);
-		} else if ( k == Qt::Key_Control ) {
-			states->setCtrl(state);
-			if (state) {
-
-			}
-		}
-	}
-
 	// overriden
 	void mouseMoveEvent(QMouseEvent * event) {
 		lastX = event->pos().x();
@@ -176,6 +143,8 @@ protected:
 
 	// overridden
 	void paintGL() {
+		Sim::Simulation *sim = states->getSim();
+		Sim::World *wld = &(states->getSim()->getState().getWorld());
 		cam->iter();
 		if (dirAlpha) {
 			selAlpha += 0.003;

@@ -14,11 +14,20 @@ class ClientStates {
 	public:
 		ClientStates() {
 		}
+
+		Sim::Simulation* getSim() {
+			return sim;
+		}
+
 		void setSim(Sim::Simulation *in) {
 			shift = false;
 			ctrl = false;
 			sim = in;
 			selBots.clear();
+		}
+		void releaseMods() {
+			shift = false;
+			ctrl = false;
 		}
 		void setShift(bool state) {
 			shift = state;
