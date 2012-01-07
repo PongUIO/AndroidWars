@@ -65,6 +65,7 @@ namespace Sim {
 	void InputManager::load(Save::BasePtr& fp)
 	{
 		mBotInput.load(fp);
+		
 	}
 
 }

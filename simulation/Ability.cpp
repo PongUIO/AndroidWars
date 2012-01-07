@@ -20,7 +20,7 @@ namespace Sim {
 	//
 	//
 	AbilityFactory::AbilityFactory(Simulation *sim) :
-		UidFactory<Ability>(), mSim(sim)
+		DefaultUidFactory<Ability>(sim)
 	{}
 	
 	AbilityFactory::~AbilityFactory()
@@ -30,14 +30,15 @@ namespace Sim {
 	{}
 	
 	void AbilityFactory::shutdown()
-	{}
+	{
+		killAll();
+	}
 	
-	uint32_t AbilityFactory::getAbilityTypeId(const std::string& name)
-	{ return mSim->getData().getAbilityDb().getTypeIdOf(name); }
+	const DataBehaviourT< Ability >::Behaviour* AbilityFactory::getBehaviourFromId(uint32_t id) const
+	{	return mSim->getData().getAbilityDb().getType(id); }
 	
-	uint32_t AbilityFactory::getAbilityTypeNoId()
-	{ return mSim->getData().getAbilityDb().NoId(); }
-
+	const DataBehaviourT< Ability >::Behaviour* AbilityFactory::getBehaviourFromName(const std::string& name) const
+	{	return mSim->getData().getAbilityDb().getType(name); }
 	
 	void AbilityFactory::startPhase()
 	{}
@@ -53,23 +54,4 @@ namespace Sim {
 
 	void AbilityFactory::load(Save::BasePtr& fp)
 	{	UidFactory<Ability>::load(fp); }
-	
-	void AbilityFactory::saveObj(Ability *obj, Save::BasePtr& fp)
-	{
-		fp.writeInt<uint32_t>(obj->getTypeId());
-		obj->save(fp);
-	}
-	
-	Ability* AbilityFactory::loadObj(uint32_t internalId, Save::BasePtr& fp)
-	{
-		uint32_t abilType = fp.readInt<uint32_t>();
-		
-		const AbilityDatabase::Behaviour *abilData =
-			mSim->getData().getAbilityDb().getType(abilType);
-		
-		Ability *ability = abilData->createObj(mSim, internalId);
-		ability->load(fp);
-		
-		return ability;
-	}
 }

@@ -46,10 +46,11 @@ namespace Sim {
 			
 		private:
 			friend class AbilityFactory;
+			friend class DefaultUidFactory<Ability>;
 			friend class BotAbility;
 	};
 	
-	class AbilityFactory : private UidFactory<Ability>, public StateObj {
+	class AbilityFactory : public DefaultUidFactory<Ability> {
 		public:
 			AbilityFactory(Simulation *sim);
 			virtual ~AbilityFactory();
@@ -77,17 +78,8 @@ namespace Sim {
 			 * if the ability type is not registered.
 			 */
 			template<class T>
-			T *createAbility(const typename T::Config &cfg) {
-				uint32_t typeId = getAbilityTypeId(T::getTypeName());
-				if(typeId == getAbilityTypeNoId())
-					return 0;
-				
-				InsertData insData = insertObject();
-				T *tmp = new T(mSim, insData.first, typeId, cfg);
-				*insData.second = tmp;
-				
-				return tmp;
-			}
+			T *createAbility(const typename T::Config &cfg)
+			{	return createType<T>(cfg); }
 			
 			Ability *getAbility(uint32_t id) { return getObject(id); }
 			
@@ -95,14 +87,10 @@ namespace Sim {
 			/// @name Factory-required functions
 			//@{
 				void deleteInstance(Ability *obj) { delete obj; }
-				void saveObj(Ability* , Save::BasePtr &fp);
-				Ability* loadObj(uint32_t internalId, Save::BasePtr &fp);
+				
+				const DataBehaviourT<Ability>::Behaviour* getBehaviourFromId(uint32_t id) const;
+				const DataBehaviourT<Ability>::Behaviour* getBehaviourFromName(const std::string& name) const;
 			//@}
-			
-			uint32_t getAbilityTypeId(const std::string &name);
-			uint32_t getAbilityTypeNoId();
-			
-			Simulation *mSim;
 	};
 }
 

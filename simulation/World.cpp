@@ -121,8 +121,7 @@ namespace Sim {
 						Collision *tileCol = tcolData.getTileCol(t.getColType());
 						cres = colObj->check(
 							pos+tmpRet.colRes.getOrp(), vel,
-							Vector(getCoord(ix),getCoord(iy)), colObj
-						);
+							Vector(getCoord(ix),getCoord(iy)), tileCol);
 					}
 					
 					if(cres.isCol) {

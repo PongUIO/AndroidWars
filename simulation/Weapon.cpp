@@ -17,6 +17,7 @@ namespace Sim {
 	const DataBehaviourT<Weapon>::Behaviour* WeaponFactory::getBehaviourFromName(const std::string& name) const
 	{	return mSim->getData().getWeaponDb().getType(name); }
 	
+	
 	// WeaponBox
 	// 
 	// 
@@ -31,8 +32,9 @@ namespace Sim {
 	void WeaponBox::load(Save::BasePtr& fp)
 	{
 		uint32_t count = fp.readInt<uint32_t>();
-		while( (count--) > 0) {
-			mData.push_back(fp.readInt<uint32_t>());
+		for(uint32_t i=0; i<count; i++) {
+			uint32_t id = fp.readInt<uint32_t>();
+			mData.push_back(id);
 		}
 	}
 }

@@ -147,6 +147,7 @@ namespace Sim {
 			}
 			
 			const DataList &getData() const { return mData; }
+			uint32_t getCurrentUniqueId() const { return mCurrentUniqueId;}
 			
 		private:
 			uint32_t mCurrentUniqueId;

@@ -32,7 +32,7 @@ class DemoWeapon : public Sim::Weapon {
 void startSim()
 {
 	Sim::Configuration config;
-	config.phaseLength = 25;
+	config.phaseLength = 5;
 	config.stepTime = 0.01;
 	
 	sim.startup(config);
@@ -126,14 +126,14 @@ void setupWorld()
 	Sim::ProgramFactory &progFact = sim.getState().getProgramFactory();
 	
 	MoveTowards *move = progFact.createProgram<MoveTowards>(
-		MoveTowards::Config(MoveTowards::DtPosition, Sim::Vector(5,5)));
+		MoveTowards::Config(MoveTowards::DtPosition, Sim::Vector(10,0)));
 	
 	Kill *kill = progFact.createProgram<Kill>(Kill::Config(move->getId()));
 	
 	inMgr.registerInput(botId, move->getId(), 0);
-	inMgr.registerInput(botId, kill->getId(), 5);
+	inMgr.registerInput(botId, kill->getId(), 3);
 	
-	sim.getState().getWorld().getTile(3,0).setType(1);
+	sim.getState().getWorld().getTile(3,5).setType(1);
 }
 
 
@@ -145,19 +145,31 @@ int main(void)
 	
 	// Run a test phase
 	sim.prepareSim();
-	for(int i = 0; i < 3; i++) {
+	for(int i = 0; i < 4; i++) {
 		sim.startPhase();
+		
 		while( sim.hasPhaseStep() ) {
 			Sim::Vector pos = sim.getState().getBotFactory().
 				getBot(0)->getBody().mPos;
-			printf("%02d (%g, %g)\n", sim.getCurPhase(), pos.x, pos.y);
+			printf("%02d %03d (%g, %g)\n",
+				sim.getCurPhase(), sim.getCurPhaseStep(),
+				pos.x, pos.y);
 			
 			sim.step();
 		}
 		
-		if(i==1) {
-			sim.endPhase();
+		// For iteration 0, only run a non-final 
+		if(i == 1) {
+			sim.endPhase(false);
 			
+			// This loads the 'present' time, or what is internally
+			// considered the real simulation state by the replay manager
+			sim.getReplayManager().gotoPresent();
+		} else {
+			sim.endPhase(true);
+		}
+		
+		if(i==1) {
 			// Example of giving input after a phase
 			using namespace Sim::Prog;
 			Sim::InputManager &inMgr = sim.getState().getInputManager();
@@ -170,10 +182,9 @@ int main(void)
 			Kill *kill = progFact.createProgram<Kill>(
 				Kill::Config(move->getId()));
 			
-			inMgr.registerInput(0, move->getId(), 3);
-			inMgr.registerInput(0, kill->getId(), 10);
-		} else
-			sim.rewindPhase();
+			inMgr.registerInput(0, move->getId(), 2);
+			inMgr.registerInput(0, kill->getId(), 8);
+		}
 	}
 	
 	printf("%X == %X\n", sim.checksumSim(), sim.save().checksum());
@@ -182,6 +193,22 @@ int main(void)
 	FILE *fp = fopen("save", "w");
 	fwrite(sim.save().getData(), sim.save().size(), 1, fp);
 	fclose(fp);
+	
+	// Test rewinding
+#define REWIND_COUNT 5
+	double timeUnit[REWIND_COUNT] = {0.26, 0.2, 0.1, 0.4, 3000.0};
+	
+	for(uint32_t i=0; i<REWIND_COUNT; i++) {
+		printf("Rewinding the simulation to timeunit %g\n", timeUnit[i]);
+		
+		sim.getReplayManager().rewind(timeUnit[i]);
+		Sim::Vector pos = sim.getState().getBotFactory().
+			getBot(0)->getBody().mPos;
+			
+		printf("Bot had position (%g, %g)\n", pos.x, pos.y);
+		printf("\tat phase %d, step %d\n", sim.getCurPhase(),
+			sim.getCurPhaseStep());
+	}
 	
 	// Shutdown the simulation
 	sim.shutdown();

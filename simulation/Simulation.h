@@ -5,6 +5,7 @@
 
 #include "Data.h"
 #include "State.h"
+#include "Replay.h"
 #include "program/ProgramInclude.h"
 #include "ability/AbilityInclude.h"
 
@@ -21,7 +22,6 @@ namespace Sim {
 		double stepTime;       ///< Duration of a single simulation step
 		
 		double tileSize;       ///< Size of each world tile
-		
 	};
 	
 	class Simulation {
@@ -33,6 +33,8 @@ namespace Sim {
 				
 				void startup(const Configuration &config);
 				void shutdown();
+				
+				void clear();
 			//@}
 			
 			/// @name Phase/simulation interface
@@ -41,18 +43,24 @@ namespace Sim {
 				
 				void startPhase();
 				void step();
-				void endPhase();
+				void endPhase(bool finalize);
+				
+				void gotoPresent() { mReplay.gotoPresent(); }
 				
 				bool hasPhaseStep()
-				{ return mCurPhaseStep<config.phaseLength; }
+				{ return getCurPhaseStep()<config.phaseLength; }
 				
 				uint32_t getCurPhase()
-				{ return mCurPhase; }
+				{ return getState().getCurPhase(); }
+				
+				uint32_t getCurPhaseStep()
+				{ return getState().getCurPhaseStep(); }
 				
 				uint32_t getCurTotalStep()
-				{ return mCurPhase*config.phaseLength+mCurPhaseStep; }
+				{ return getCurPhase()*config.phaseLength+getCurPhaseStep(); }
 				
-				void rewindPhase();
+				double getCurTime()
+				{ return double(getCurTotalStep())*config.stepTime; }
 			//@}
 			
 			/// @name Module accessors
@@ -62,6 +70,9 @@ namespace Sim {
 				
 				Data &getData()
 				{ return mData; }
+				
+				ReplayManager &getReplayManager()
+				{ return mReplay; }
 				
 				const Configuration &getConfig()
 				{ return config; }
@@ -73,21 +84,18 @@ namespace Sim {
 				uint32_t checksumSim();
 				
 				Save save();
-				void load(const Save &saveData);
+				void load(Save &saveData);
+				
+				void save(Save::BasePtr &fp);
 			//@}
 			
 		private:
 			/// @name Subsystems
 			//@{
 				State mStateActive;
-				Save mStateCopy;
 				Data mData;
-			//@}
-			
-			/// @name Phase variables
-			//@{
-				uint32_t mCurPhaseStep;
-				uint32_t mCurPhase;
+				
+				ReplayManager mReplay;
 			//@}
 			
 			/// @name Other variables

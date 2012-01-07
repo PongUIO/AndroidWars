@@ -36,6 +36,7 @@ namespace Sim {
 				void step(double stepTime);
 				
 				void save(Save::BasePtr &fp);
+				void load(Save::BasePtr& fp);
 			//@}
 			
 			/// @name Interface

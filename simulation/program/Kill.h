@@ -27,11 +27,11 @@ namespace Sim {
 				uint32_t getCycleCost() { return 0; }
 				
 			private:
-				virtual void save(Save::BasePtr& fp);
-				virtual void load(Save::BasePtr& fp);
+				void save(Save::BasePtr& fp);
+				void load(Save::BasePtr& fp);
 
-				virtual void process(Bot* bot, BotCpu* cpu);
-				virtual bool isFinished(Bot* bot, BotCpu* cpu) { return true; }
+				void process(Bot* bot, BotCpu* cpu);
+				bool isFinished(Bot* bot, BotCpu* cpu) { return true; }
 				
 				uint32_t mTargetId;
 		};

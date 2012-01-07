@@ -52,6 +52,7 @@ namespace Sim {
 			
 		private:
 			friend class ProgramFactory;
+			friend class DefaultUidFactory<Program>;
 			
 			friend class BotCpu;
 			friend class BotInput;
@@ -74,7 +75,7 @@ namespace Sim {
 	 * Unfortunately, the issue where cheksums are different whether
 	 * input is given per-phase or all at once is unavoidable.
 	 */
-	class ProgramFactory : private UidFactory<Program>, public StateObj {
+	class ProgramFactory : public DefaultUidFactory<Program> {
 		public:
 			ProgramFactory(Simulation* sim);
 			virtual ~ProgramFactory();
@@ -98,30 +99,30 @@ namespace Sim {
 			 * May create any valid inheritor of \c Program.
 			 */
 			template<class T>
-			T *createProgram(const typename T::Config &cfg) {
-				InsertData insData = insertObject();
-				
-				uint32_t typeId = getProgramTypeId(T::getTypeName());
-				T *tmp = new T(mSim,insData.first, typeId, cfg);
-				*insData.second = tmp;
-				
-				return tmp;
-			}
+			T *createProgram(const typename T::Config &cfg)
+			{	return createType<T>(cfg); }
+			
+			Program *createFromSerialized(Save::BasePtr &fp);
 			
 			void destroyProgram(uint32_t id) { removeObj(id); }
 			Program *getProgram(uint32_t id) { return getObject(id); }
+			
+			uint32_t getLastPhaseId() { return mLastPhaseInputId; }
+			uint32_t getCurrentUniqueId()
+			{ return UidFactory<Program>::getCurrentUniqueId(); }
 			
 		private:
 			/// @name Factory-required functions
 			//@{
 				void deleteInstance(Program* obj) { delete obj; }
-				void saveObj(Program *obj , Save::BasePtr &fp);
-				Program* loadObj(uint32_t internalId, Save::BasePtr &fp);
+				
+				const DataBehaviourT<Program>::Behaviour* getBehaviourFromName(const std::string& name) const;
+				const DataBehaviourT<Program>::Behaviour* getBehaviourFromId(uint32_t id) const;
 			//@}
 			
-			uint32_t getProgramTypeId(const std::string &name);
+			uint32_t mLastPhaseInputId;
 			
-			Simulation *mSim;
+			friend class ReplayManager;
 	};
 }
 

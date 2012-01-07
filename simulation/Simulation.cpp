@@ -4,7 +4,8 @@
 namespace Sim {
 	Simulation::Simulation() :
 		mStateActive(this),
-		mData(this)
+		mData(this),
+		mReplay(this)
 		{}
 	
 	Simulation::~Simulation()
@@ -14,26 +15,44 @@ namespace Sim {
 	{
 		this->config = config;
 		
-		mStateActive.startup();
 		mData.startup();
+		clear();
+		mReplay.startup();
 	}
 	
 	void Simulation::shutdown()
 	{
+		mReplay.shutdown();
 		mStateActive.shutdown();
 		mData.shutdown();
 	}
 	
-	void Simulation::prepareSim()
+	/**
+	 * Erase the current simulation world state.
+	 * 
+	 * @note This puts the world in a state as if \c startup() was just called,
+	 * as such \c prepareSim still has to be called.
+	 */
+	void Simulation::clear()
 	{
-		mStateCopy = save();
-		
-		mCurPhase = 0;
+		mStateActive = State(this);
+		mStateActive.startup();
 	}
 	
+	void Simulation::prepareSim()
+	{
+		mReplay.prepareSim();
+	}
+	
+	/**
+	 * Starts a new simulation phase.
+	 * 
+	 * \param doTrialRun If false, all steps will be reverted when
+	 * \c endPhase() is called.
+	 */
 	void Simulation::startPhase()
 	{
-		mCurPhaseStep = 0;
+		mReplay.startPhase();
 		
 		mStateActive.startPhase();
 	}
@@ -41,22 +60,18 @@ namespace Sim {
 	void Simulation::step()
 	{
 		mStateActive.step(config.stepTime);
-		
-		mCurPhaseStep++;
 	}
 	
-	void Simulation::endPhase()
+	/**
+	 * Ends a simulation phase.
+	 * 
+	 * @param finalize See \c ReplayManager::endPhase().
+	 */
+	void Simulation::endPhase(bool finalize)
 	{
 		mStateActive.endPhase();
-		mStateCopy = save();
 		
-		mCurPhase++;
-	}
-	
-	void Simulation::rewindPhase()
-	{
-		Save::FilePtr fptr = Save::FilePtr(mStateCopy);
-		mStateActive.load( fptr );
+		mReplay.endPhase(finalize);
 	}
 	
 	uint32_t Simulation::checksumData()
@@ -69,20 +84,41 @@ namespace Sim {
 	uint32_t Simulation::checksumSim()
 	{
 		Save::SyncPtr sync = Save::SyncPtr();
-		mStateActive.save(sync);
+		save(sync);
 		return sync.checksum();
 	}
 	
+	/**
+	 * Saves the simulation state along with some other simulation settings.
+	 * This must only be called outside of \c startPhase()/\c endPhase(), as
+	 * doing so is undefined behaviour.
+	 * 
+	 * Will not save anything in \c Data.
+	 */
 	Save Simulation::save()
 	{
 		Save tmp;
-		Save::FilePtr ptr = Save::FilePtr(tmp);
-		mStateActive.save(ptr);
+		Save::FilePtr fp = Save::FilePtr(tmp);
+		save(fp);
+		
 		return tmp;
 	}
 	
-	void Simulation::load(const Sim::Save& saveData)
+	void Simulation::save(Save::BasePtr& fp)
 	{
-		/// @todo Implement this
+		mStateActive.save(fp);
+	}
+	
+	/**
+	 * Loads a simulation state from a corresponding \c Simulation::save()
+	 * state.
+	 * 
+	 * \param saveData The savestate to load from.
+	 */
+	void Simulation::load(Save& saveData)
+	{
+		Save::FilePtr fp = Save::FilePtr(saveData);
+		
+		mStateActive.load(fp);
 	}
 }

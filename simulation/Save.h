@@ -12,6 +12,11 @@
 #include "Vector.h"
 
 namespace Sim {
+	/**
+	 * @brief Holds a data stream akin to a file in memory.
+	 * 
+	 * This class is used to save and load serialized data.
+	 */
 	class Save {
 		private:
 			typedef std::vector<uint8_t> DataArray;
@@ -128,6 +133,9 @@ namespace Sim {
 						
 						return tmp;
 					}
+					
+					virtual uint32_t debugReadPos() { return 0; }
+					virtual uint32_t debugWritePos() { return 0; }
 			};
 			
 			class FilePtr : public BasePtr {
@@ -150,6 +158,9 @@ namespace Sim {
 					{ readPtr = 0; }
 					
 					uint32_t getPtrPos() const { return readPtr; }
+					
+					uint32_t debugReadPos() { return readPtr; }
+					uint32_t debugWritePos() { return file.data.size(); }
 			};
 			
 			/**

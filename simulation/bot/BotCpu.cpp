@@ -73,7 +73,7 @@ namespace Sim {
 		
 		if(newCycles < 0)
 			newCycles = 0;
-		else if(newCycles > mHost->getTypePtr()->cpuStorage)
+		else if(newCycles > int32_t(mHost->getTypePtr()->cpuStorage))
 			newCycles = mHost->getTypePtr()->cpuStorage;
 		
 		mCycleCount = newCycles;
@@ -180,7 +180,7 @@ namespace Sim {
 				if(prog) {
 					// Abort the loop if the CPU can't afford to run the next
 					// program
-					if(mCycleCount >= prog->getCycleCost()) {
+					if(uint32_t(mCycleCount) >= prog->getCycleCost()) {
 						// Note: The CPU immediately eat the cycles
 						// in case the program yields a different cycle
 						// cost after it has processed.

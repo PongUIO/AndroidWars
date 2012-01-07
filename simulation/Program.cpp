@@ -24,7 +24,7 @@ namespace Sim {
 	//
 	//
 	ProgramFactory::ProgramFactory(Simulation* sim)
-		: UidFactory<Program>(), mSim(sim)
+		: DefaultUidFactory<Program>(sim)
 	{
 	}
 	
@@ -32,52 +32,49 @@ namespace Sim {
 	{}
 	
 	void ProgramFactory::startup()
-	{}
+	{
+		mLastPhaseInputId = getCurrentUniqueId();
+	}
 	
 	void ProgramFactory::shutdown()
 	{
 		killAll();
 	}
 	
-	/**
-	 * Special support function for program template creation.
-	 * This translates a program type name into the internal ID for that type.
-	 */
-	uint32_t ProgramFactory::getProgramTypeId(const std::string& name)
-	{ return mSim->getData().getProgramDb().getTypeIdOf(name); }
+	Program* ProgramFactory::createFromSerialized(Save::BasePtr& fp)
+	{
+		InsertData insData = insertObject();
+		
+		Program *prog = loadObj(insData.first, fp);
+		*insData.second = prog;
+		
+		return prog;
+	}
+	
+	const DataBehaviourT<Program>::Behaviour* ProgramFactory::getBehaviourFromId(uint32_t id) const
+	{	return mSim->getData().getProgramDb().getType(id); }
+
+	const DataBehaviourT<Program>::Behaviour* ProgramFactory::getBehaviourFromName(const std::string& name) const
+	{	return mSim->getData().getProgramDb().getType(name); }
+
 	
 	
 	void ProgramFactory::startPhase()
 	{}
 	
 	void ProgramFactory::endPhase()
-	{}
+	{
+		mLastPhaseInputId = getCurrentUniqueId();
+	}
 	
 	void ProgramFactory::step(double stepTime)
 	{}
 	
 	void ProgramFactory::save(Save::BasePtr& fp)
-	{	UidFactory<Program>::save(fp); }
+	{	fp.writeInt<uint32_t>(mLastPhaseInputId);
+		UidFactory<Program>::save(fp); }
 	
 	void ProgramFactory::load(Save::BasePtr& fp)
-	{	UidFactory<Program>::load(fp); }
-	
-	void ProgramFactory::saveObj(Program *obj, Save::BasePtr&fp)
-	{
-		fp.writeInt<uint32_t>(obj->getTypeId());
-		obj->save(fp);
-	}
-	
-	Program* ProgramFactory::loadObj(uint32_t internalId, Save::BasePtr &fp)
-	{
-		uint32_t progType = fp.readInt<uint32_t>();
-		
-		const ProgramDatabase::Behaviour *progData =
-			mSim->getData().getProgramDb().getType(progType);
-		
-		Program *prog = progData->createObj(mSim, internalId);
-		prog->load(fp);
-		
-		return prog;
-	}
+	{	mLastPhaseInputId = fp.readInt<uint32_t>();
+		UidFactory<Program>::load(fp); }
 }

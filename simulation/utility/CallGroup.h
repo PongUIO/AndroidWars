@@ -40,6 +40,9 @@ namespace Sim {
 			void registerCallObj(CallObj *v)
 			{ mData.push_back(v); }
 			
+		protected:
+			void clear() { mData.clear(); }
+			
 		private:
 			DataVec mData;
 	};

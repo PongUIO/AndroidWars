@@ -3,9 +3,9 @@
 
 namespace Sim {
 	BotD::BotD() :
-		collision(NULL),
 		baseSpeed(1.0),
-		baseWeight(1.0)
+		baseWeight(1.0),
+		collision(NULL)
 	{
 	}
 	

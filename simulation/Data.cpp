@@ -3,7 +3,7 @@
 
 namespace Sim {
 	Data::Data(Simulation *sim) :
-		mSim(sim), mProgram(), mAbility()
+		mSim(sim)
 	{
 		registerCallObj(&mTile);
 		registerCallObj(&mBot);

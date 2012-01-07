@@ -27,7 +27,7 @@ namespace Sim {
 			
 		protected:
 			Weapon(Simulation *sim, uint32_t id, uint32_t typeId) :
-				mSim(sim), mId(id), mTypeId(typeId) {}
+				mId(id), mTypeId(typeId), mSim(sim) {}
 			virtual ~Weapon() {}
 			
 			/// @name Interaction

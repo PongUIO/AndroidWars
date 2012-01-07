@@ -33,9 +33,20 @@ namespace Sim {
 		fp.writeInt<uint32_t>(mData.size());
 		for(size_t i=0; i<mData.size(); i++) {
 			Player &pl = mData[i];
-			fp.writeInt(pl.sideId);
-			fp.writeInt(pl.allyGroup);
+			fp.writeInt<uint32_t>(pl.sideId);
+			fp.writeInt<uint32_t>(pl.allyGroup);
 		}
 	}
 	
+	void PlayerData::load(Save::BasePtr& fp)
+	{
+		mData.clear();
+		
+		uint32_t count = fp.readInt<uint32_t>();
+		for(uint32_t i=0; i<count; i++) {
+			Player pl;
+			pl.sideId = fp.readInt<uint32_t>();
+			pl.allyGroup = fp.readInt<uint32_t>();
+		}
+	}
 }

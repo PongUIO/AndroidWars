@@ -11,6 +11,7 @@
 #include "Program.h"
 #include "Ability.h"
 #include "Input.h"
+#include "Replay.h"
 
 #include "utility/CallGroup.h"
 #include "StateObj.h"
@@ -27,6 +28,8 @@ namespace Sim {
 			//@{
 				State(Simulation *sim);
 				~State();
+				
+				void operator=(const State &other);
 				
 				void startup();
 				void shutdown();
@@ -70,17 +73,37 @@ namespace Sim {
 				
 				PlayerData &getPlayerData()
 				{ return mPlayer; }
+				
+				uint32_t getCurPhaseStep() { return mCtrl.mCurPhaseStep; }
+				uint32_t getCurPhase() { return mCtrl.mCurPhase; }
 			//@}
 			
 		private:
-			InputManager mInputManager;
-			BotFactory mBotFactory;
-			ProgramFactory mProgramFactory;
-			AbilityFactory mAbilityFactory;
-			BulletFactory mBulletFactory;
-			WeaponFactory mWeaponFactory;
-			World mWorld;
-			PlayerData mPlayer;
+			/// @name State objects
+			//@{
+				void registerStateObj();
+				
+				InputManager mInputManager;
+				BotFactory mBotFactory;
+				ProgramFactory mProgramFactory;
+				AbilityFactory mAbilityFactory;
+				BulletFactory mBulletFactory;
+				WeaponFactory mWeaponFactory;
+				World mWorld;
+				PlayerData mPlayer;
+			//@}
+			
+			/// @name State control
+			//@{
+				uint32_t &curPhaseStep() { return mCtrl.mCurPhaseStep; }
+				uint32_t &curPhase() { return mCtrl.mCurPhase; }
+				
+				struct StateControl {
+					uint32_t mCurPhaseStep;
+					uint32_t mCurPhase;
+				};
+				StateControl mCtrl;
+			//@}
 			
 			Simulation *mSim;
 	};

@@ -1,5 +1,6 @@
 set(qtgui_SOURCES main.cpp)
-set(qtgui_HEADERS customlabel.h gamebutton.h gamecontroller.h menubutton.h ui.h ../openglqt/render.h)
+set(qtgui_HEADERS customlabel.h
+	botselector.h gamebutton.h gamecontroller.h menubutton.h ui.h ../openglqt/render.h)
 set(qtgui_FORMS ui.ui)
 set(qtgui_RESOURCES res.qrc)
 

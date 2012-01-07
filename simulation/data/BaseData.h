@@ -118,9 +118,6 @@ namespace Sim {
 			 * 
 			 * @note Use this if the base class has several interpretations
 			 * (such as for scripted behaviour using only one implemented class)
-			 * 
-			 * @warning At present this should not be used, as types using this
-			 * rely on Impl::getTypeName(). This will be fixed soon.
 			 */
 			uint32_t registerCustom(Behaviour *type, const std::string &name) {
 				uint32_t id = mInternal.addTypeExt(type);
@@ -138,7 +135,7 @@ namespace Sim {
 				return (i==mTypeMap.end()) ? NoId() : i->second;
 			}
 			
-			const std::string &getTypeOf(uint32_t id) const {
+			const std::string getTypeOf(uint32_t id) const {
 				IdMap::const_iterator i=mIdMap.find(id);
 				return (i==mIdMap.end()) ? "" : i->second;
 			}
@@ -157,7 +154,8 @@ namespace Sim {
 			
 			class InternalDatabase : public DataT<Behaviour> {
 				public:
-					uint32_t addTypeExt(Behaviour *b) { addType(b); }
+					uint32_t addTypeExt(Behaviour *b)
+					{ return addType(b); }
 					
 			};
 			

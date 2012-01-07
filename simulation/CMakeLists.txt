@@ -12,6 +12,7 @@ add_library(AWSim
 	State.cpp
 	Save.cpp
 	World.cpp
+	Replay.cpp
 	
 	bot/BotCpu.cpp
 	bot/BotAbility.cpp
