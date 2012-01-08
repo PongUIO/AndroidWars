@@ -15,8 +15,8 @@ HEADERS += main.h ../openglqt/render.h ../util/camera.h \
     gamebutton.h \
     ../util/cursordefines.h \
     ../util/client.h \
-    customlabel.h \
-    botselector.h
+    botselector.h \
+    main.h
 SOURCES += main.cpp
 QT += opengl
 

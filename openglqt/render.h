@@ -7,7 +7,6 @@
 #include "../util/camera.h"
 #include "../util/client.h"
 #include "../util/cursordefines.h"
-#include "../pc/main.h"
 
 class GameDrawer : public QGLWidget {
 	Q_OBJECT        // must include this if you use Qt signals/slots
@@ -28,7 +27,7 @@ public:
 	bool fullScreen;
 	float selAlpha;
 	bool dirAlpha;
-	MainWidget *parent;
+	QWidget *parent;
 	QImage data[3];
 	GLuint textures[3];
 	QImage characters[1];
@@ -44,14 +43,14 @@ public:
 	GLuint bullettextures[1];
 	Camera *cam;
 	ClientStates *states;
-	GameDrawer(MainWidget *parent = 0)
+	GameDrawer(ClientStates *states, QWidget *parent = 0)
 		: QGLWidget(QGLFormat(QGL::SampleBuffers), parent) {
 		this->parent = parent;
 		cMouse = 0;
 		this->cam = new Camera(0, 0, parent->width(), parent->height());
 		lastX = width()/2;
 		lastY = height()/2;
-		this->states = parent->states;
+		this->states = states;
 		mouseSize = 0.07;
 		selAlpha = 0.3;
 		dirAlpha = false;
