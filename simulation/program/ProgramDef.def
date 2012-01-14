@@ -1,2 +1,3 @@
 _SIM_PROGRAM_DEF(MoveTowards,	TypeBase,	"Base/MoveTowards")
 _SIM_PROGRAM_DEF(Kill,			TypeBase,	"Base/Kill")
+_SIM_PROGRAM_DEF(Shoot,			TypeBase,	"Base/Shoot")

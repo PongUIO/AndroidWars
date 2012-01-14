@@ -7,11 +7,13 @@
 #include "Factory.h"
 #include "Input.h"
 #include "Body.h"
+#include "Health.h"
 #include "Save.h"
 #include "Weapon.h"
 
 #include "bot/BotCpu.h"
 #include "bot/BotAbility.h"
+#include "bot/BotWeapon.h"
 
 #include "StateObj.h"
 
@@ -49,7 +51,7 @@ namespace Sim {
 			struct State {
 				public:
 					State() : mSide(0), mType(0),
-						mSensor(), mBody(), mWeaponBox(),
+						mSensor(), mBody(), mWeapon(),
 						mCpu(), mAbility(), mEngine()
 						{}
 					
@@ -59,8 +61,9 @@ namespace Sim {
 					SensorState mSensor;
 					
 					Body mBody;
-					WeaponBox mWeaponBox;
+					Health mHealth;
 					
+					BotWeapon mWeapon;
 					BotCpu mCpu;
 					BotAbility mAbility;
 					Engine mEngine;
@@ -75,7 +78,8 @@ namespace Sim {
 			
 			uint32_t getId() const { return mId; }
 			uint32_t getTypeId() const { return getState().mType; }
-			const Body &getBody() const { return getState().mBody; }
+			Body &getBody() { return getState().mBody; }
+			Health &getHealth() { return getState().mHealth; }
 			
 			bool isDead() { return false; }
 			
@@ -132,6 +136,7 @@ namespace Sim {
 			friend class DefaultUidFactory<Bot>;
 			friend class BotCpu;
 			friend class BotAbility;
+			friend class BotWeapon;
 	};
 	
 	class BotFactory : public DefaultUidFactory<Bot> {

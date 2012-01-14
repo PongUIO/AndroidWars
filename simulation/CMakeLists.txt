@@ -4,6 +4,7 @@ add_library(AWSim
 	Input.cpp
 	Program.cpp
 	Ability.cpp
+	Health.cpp
 	Data.cpp
 	Player.cpp
 	Bullet.cpp
@@ -16,9 +17,12 @@ add_library(AWSim
 	
 	bot/BotCpu.cpp
 	bot/BotAbility.cpp
+	bot/BotWeapon.cpp
 	
 	program/MoveTowards.cpp
 	program/Kill.cpp
+	program/Sensor.cpp
+	program/Shoot.cpp
 	
 	ability/CpuBoost.cpp
 	

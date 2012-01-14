@@ -25,7 +25,12 @@ class DemoWeapon : public Sim::Weapon {
 		
 		void step(double stepTime) {}
 		
-		void shoot() { printf("Bang!\n"); }
+		void shoot(Sim::Bot *bot, Sim::Save &arg) {
+			Sim::Health::Hull &core = bot->getHealth().getCore();
+			printf("Before: %d / %d\n", core.getHealth(), core.getMaxHealth());
+			bot->getHealth().causeDamage(mSim, 20, 1);
+			printf("Bang! %d / %d\n", core.getHealth(), core.getMaxHealth());
+		}
 };
 
 // Starts the simulation
@@ -46,6 +51,21 @@ void loadPrograms()
 void loadAbilities()
 {
 	sim.getData().getAbilityDb().registerAllDefault();
+}
+
+void loadDamageArmor()
+{
+	Sim::ArmorDatabase &armorDb = sim.getData().getArmorDb();
+	Sim::DamageDatabase &damageDb = sim.getData().getDamageDb();
+	
+	damageDb.newDamage("Normal");
+	damageDb.newDamage("AntiLight");
+	
+	Sim::ArmorD *armor = armorDb.newArmor("Light");
+	Sim::ArmorD *shield = armorDb.newArmor("Shield");
+	
+	armor->registerRule(1, Sim::ArmorD::DamageRule(2.0) );
+	shield->registerRule(1, Sim::ArmorD::DamageRule(0.3) );
 }
 
 void loadSides()
@@ -83,6 +103,9 @@ void loadBots()
 	botType.cpuCycleSpeed = 5;
 	botType.cpuStorage = 20;
 	
+	botType.coreHealth.getCore() = Sim::Health::Hull(0, 50);
+	botType.coreHealth.addAttachment( Sim::Health::Hull(1, 5) );
+	
 	sim.getData().getBotDb().addBot(botType, pts);
 }
 
@@ -96,6 +119,7 @@ void loadData()
 {
 	loadPrograms();
 	loadAbilities();
+	loadDamageArmor();
 	loadSides();
 	loadTiles();
 	loadBots();
@@ -117,7 +141,7 @@ void setupWorld()
 	botCfg.mAbility.addAbility(abilId);
 	
 	Sim::Weapon *weapon = sim.getState().getWeaponFactory().createType<DemoWeapon>(weapCfg);
-	botCfg.mWeaponBox.add( weapon->getId() );
+	botCfg.mWeapon.addWeapon( weapon->getId() );
 	uint32_t botId = sim.getState().getBotFactory().createBot( botCfg );
 	
 	// Give the bot some input
@@ -130,8 +154,12 @@ void setupWorld()
 	
 	Kill *kill = progFact.createProgram<Kill>(Kill::Config(move->getId()));
 	
+	Shoot *shoot = progFact.createProgram<Shoot>(Shoot::Config(0, Sim::Save()));
+	shoot->setRunningTime(2);
+	
 	inMgr.registerInput(botId, move->getId(), 0);
 	inMgr.registerInput(botId, kill->getId(), 3);
+	inMgr.registerInput(botId, shoot->getId(), 5);
 	
 	sim.getState().getWorld().getTile(3,5).setType(1);
 }

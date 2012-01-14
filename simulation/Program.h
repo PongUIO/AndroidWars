@@ -2,11 +2,13 @@
 #define SIM_PROGRAM_H
 
 #include <stdint.h>
+#include <limits>
 
 #include "Factory.h"
 #include "Save.h"
 
 #include "data/ProgramD.h"
+#include "program/Sensor.h"
 
 namespace Sim {
 	// Forward declarations
@@ -29,18 +31,27 @@ namespace Sim {
 			uint32_t getId() const { return mId; }
 			uint32_t getTypeId() const { return mTypeId; }
 			
+			Prog::Sensor &getEndSensor() { return mEndSensor; }
+			
+			void setForceFinished() { mFinished=true; }
+			void setRunningTime(uint32_t steps) { mRunningTime=steps; }
+			
 		protected:
 			Program(Simulation *sim, uint32_t id, uint32_t typeId) :
-				mId(id), mTypeId(typeId), mSim(sim) {}
+				mId(id), mTypeId(typeId), mSim(sim),
+				mEndSensor(), mRunningTime(-1), mFinished(false) {}
 			virtual ~Program() {}
 			
 			/// @name Interaction
 			//@{
-				virtual void save(Save::BasePtr &fp)=0;
-				virtual void load(Save::BasePtr &fp)=0;
+				virtual void save(Save::BasePtr &fp);
+				virtual void load(Save::BasePtr &fp);
 				
 				virtual void process(Bot *bot, BotCpu *cpu)=0;
 				virtual bool isFinished(Bot *bot, BotCpu *cpu)=0;
+				
+				virtual void start(Bot *bot, BotCpu *cpu);
+				virtual void end(Bot *bot, BotCpu *cpu);
 			//@}
 				
 			/// @name System data
@@ -51,6 +62,31 @@ namespace Sim {
 			//@}
 			
 		private:
+			/// @name Core program
+			//@{
+				Prog::Sensor mEndSensor;
+				uint32_t mRunningTime;
+				bool mFinished;
+				
+				void tickRunningTime()
+				{	if(mRunningTime != uint32_t(-1) && mRunningTime>0)
+						mRunningTime--; }
+				
+				/**
+				 * Returns true when the program is finished executing.
+				 * 
+				 * This may be due to one of three events:
+				 * - The program has been forced to quit, as due to a Kill
+				 * 		program.
+				 * - The running time has reached zero
+				 * - The actual program code has decided it is finished.
+				 * 
+				 * A program will never execute if this returns true.
+				 */
+				bool isCompletelyFinished(Bot *bot, BotCpu *cpu)
+				{ return mFinished || mRunningTime<=0 || isFinished(bot,cpu); }
+			//@}
+			
 			friend class ProgramFactory;
 			friend class DefaultUidFactory<Program>;
 			

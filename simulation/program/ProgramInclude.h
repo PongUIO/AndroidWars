@@ -3,5 +3,6 @@
 
 #include "MoveTowards.h"
 #include "Kill.h"
+#include "Shoot.h"
 
 #endif

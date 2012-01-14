@@ -36,7 +36,7 @@ namespace Sim {
 			{ clearData(); }
 			
 			const T *getType(IdType type) const
-			{ return mData.at(type); }
+			{ return (type>=mData.size()) ? 0 : mData[type]; }
 			
 			T *createType() {
 				T *data = new T();
@@ -66,6 +66,41 @@ namespace Sim {
 			
 			DataVec mData;
 			Simulation *mSim;
+	};
+	
+	/**
+	 * Simple utility class to associate string names with integer ids.
+	 */
+	class NameIdMgr {
+		public:
+			NameIdMgr() {}
+			~NameIdMgr() {}
+			
+			void connect(uint32_t id, const std::string &name)
+			{
+				mNameMap[name] = id;
+				mIdMap[id] = name;
+			}
+			
+			uint32_t getIdOf(const std::string &name) const
+			{
+				NameMap::const_iterator i=mNameMap.find(name);
+				return (i==mNameMap.end()) ? NoId() : i->second;
+			}
+			
+			std::string getNameOf(uint32_t id) const
+			{
+				IdMap::const_iterator i=mIdMap.find(id);
+				return (i==mIdMap.end()) ? "" : i->second;
+			}
+			
+			static uint32_t NoId() { return -1; }
+			
+		private:
+			typedef boost::unordered_map<std::string,uint32_t> NameMap;
+			typedef boost::unordered_map<uint32_t, std::string> IdMap;
+			NameMap mNameMap;
+			IdMap mIdMap;
 	};
 	
 	/**

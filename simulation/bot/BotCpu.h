@@ -76,6 +76,10 @@ namespace Sim {
 			
 			int32_t mCycleCount;
 			
+			/// Internal temporary counter that makes sure
+			/// all programs are only processed once per step.
+			uint32_t mMaxProcessCount;
+			
 			friend class Bot;
 	};
 };

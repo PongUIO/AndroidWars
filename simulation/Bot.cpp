@@ -11,8 +11,12 @@ namespace Sim {
 	Bot::Bot(Simulation* sim, uint32_t id, const Sim::Bot::State& cfg) :
 		mId(id), mSim(sim), mState(cfg)
 	{
+		mState.mWeapon.initialize(this);
 		mState.mAbility.initialize(this);
 		mState.mCpu.initialize(this);
+		const BotD *data = getTypePtr();
+		if(data)
+			mState.mHealth = data->coreHealth;
 	}
 
 	Bot::~Bot()
@@ -56,6 +60,8 @@ namespace Sim {
 		if(res.colRes.isCol) {
 			mState.mBody.mPos += res.colRes.getOrp();
 		}
+		
+		mState.mWeapon.step(stepTime);
 	}
 	
 	const Sim::BotD* Bot::getTypePtr() const
@@ -82,8 +88,9 @@ namespace Sim {
 		mSensor.save(fp);
 		
 		mBody.save(fp);
-		mWeaponBox.save(fp);
+		mHealth.save(fp);
 		
+		mWeapon.save(fp);
 		mCpu.save(fp);
 		mAbility.save(fp);
 	}
@@ -96,8 +103,9 @@ namespace Sim {
 		mSensor.load(fp);
 		
 		mBody.load(fp);
-		mWeaponBox.load(fp);
+		mHealth.load(fp);
 		
+		mWeapon.load(fp);
 		mCpu.load(fp);
 		mAbility.load(fp);
 	}

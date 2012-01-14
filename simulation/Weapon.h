@@ -8,11 +8,15 @@
 
 namespace Sim {
 	class Simulation;
+	class Bot;
 	
 #define SIM_WEAPON_HEADER(name) \
 	static const std::string &getTypeName() \
 	{ static std::string typeName = name; return typeName; }
 	
+	/**
+	 * Base class for a weapon.
+	 */
 	class Weapon {
 		public:
 			uint32_t getId() const { return mId; }
@@ -21,9 +25,7 @@ namespace Sim {
 			
 			bool isDead() { return mIsDead; }
 			
-			/// @name Type information
-			//@{
-			//@}
+			uint32_t getReloadTime() { return mReloadTimer; }
 			
 		protected:
 			Weapon(Simulation *sim, uint32_t id, uint32_t typeId) :
@@ -36,7 +38,8 @@ namespace Sim {
 				virtual void load(Save::BasePtr &fp)=0;
 				
 				virtual void step(double stepTime)=0;
-				virtual void shoot()=0;
+				
+				virtual void shoot(Bot *bot, Save &weapArg)=0;
 			//@}
 			
 			/// @name Identification
@@ -48,13 +51,14 @@ namespace Sim {
 			
 			/// @name Behaviour
 			//@{
-				double mReloadTimer;
+				uint32_t mReloadTimer;
 				
 				bool mIsDead;
 			//@}
 			
 			// Bots have access to internal calls
 			friend class Bot;
+			friend class BotWeapon;
 			friend class DefaultUidFactory<Weapon>;
 			friend class WeaponFactory;
 	};
@@ -72,8 +76,11 @@ namespace Sim {
 				mData.push_back(wid);
 				return mData.size()-1;
 			}
-			uint32_t get(uint32_t index)
-				{ return mData.at(index); }
+			uint32_t get(uint32_t i)
+				{ return (i<mData.size()) ? mData[i] : FactoryNoId; }
+			
+			uint32_t size()
+				{ return mData.size(); }
 			
 			void save(Save::BasePtr &fp);
 			void load(Save::BasePtr &fp);

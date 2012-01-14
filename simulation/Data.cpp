@@ -11,6 +11,8 @@ namespace Sim {
 		registerCallObj(&mWeapon);
 		registerCallObj(&mProgram);
 		registerCallObj(&mAbility);
+		registerCallObj(&mArmor);
+		registerCallObj(&mDamage);
 	}
 	
 	Data::~Data()

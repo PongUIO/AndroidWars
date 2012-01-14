@@ -20,6 +20,38 @@ namespace Sim {
 #include "program/ProgramDef.def"
 #undef _SIM_PROGRAM_DEF
 	
+	/**
+	 * Called just as a program is added to the CPU of a bot.
+	 */
+	void Program::start(Bot* bot, BotCpu* cpu)
+	{}
+	
+	/**
+	 * Called when a program is removed from a bot's CPU.
+	 * 
+	 * This is only called by the bot's CPU, if the program is removed
+	 * any other way then this is not called.
+	 */
+	void Program::end(Bot* bot, BotCpu* cpu)
+	{
+		mEndSensor.execute(bot,cpu);
+	}
+	
+	void Program::save(Save::BasePtr& fp)
+	{
+		mEndSensor.save(fp);
+		fp.writeInt<uint32_t>(mRunningTime);
+		fp.writeInt<uint8_t>(mFinished);
+	}
+	
+	void Program::load(Save::BasePtr& fp)
+	{
+		mEndSensor.load(fp);
+		mRunningTime = fp.readInt<uint32_t>();
+		mFinished = fp.readInt<uint8_t>();
+	}
+	
+	
 	// ProgramFactory
 	//
 	//

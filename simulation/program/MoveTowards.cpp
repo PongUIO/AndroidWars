@@ -38,6 +38,8 @@ namespace Sim {
 			fp.writeInt<uint8_t>(mType);
 			fp.writeInt<uint32_t>(mTarget);
 			fp.writeVec(mTargetPos);
+			
+			return Program::save(fp);
 		}
 		
 		void MoveTowards::load(Save::BasePtr& fp)
@@ -45,6 +47,8 @@ namespace Sim {
 			mType = (DestinationType)fp.readInt<uint8_t>();
 			mTarget = fp.readInt<uint32_t>();
 			mTargetPos = fp.readVec();
+			
+			return Program::load(fp);
 		}
 	}
 }

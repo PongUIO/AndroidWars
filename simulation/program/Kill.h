@@ -31,7 +31,7 @@ namespace Sim {
 				void load(Save::BasePtr& fp);
 
 				void process(Bot* bot, BotCpu* cpu);
-				bool isFinished(Bot* bot, BotCpu* cpu) { return true; }
+				bool isFinished(Bot* bot, BotCpu* cpu) { return false; }
 				
 				uint32_t mTargetId;
 		};

@@ -134,6 +134,41 @@ namespace Sim {
 						return tmp;
 					}
 					
+					/**
+					 * Writes a vector container to the stream.
+					 * 
+					 * @param writeFunc A function object, takes two
+					 * parameters: A reference to the object to be written,
+					 * and a reference to this write pointer object.
+					 */
+					template<class C, class Func>
+					void writeCtr(const C &data, Func writeFunc)
+					{
+						writeInt<uint32_t>(data.size());
+						for(typename C::const_iterator i=data.begin();
+							i!=data.end(); i++)
+							writeFunc(*i, *this);
+					}
+					
+					/**
+					 * Reads a vector container from the stream.
+					 * 
+					 * @param readFunc A function object taking the parameters:
+					 * An input data object, and a referece to this read
+					 * pointer object.
+					 */
+					template<class C, class Func>
+					void readCtr(C &data, Func readFunc)
+					{
+						data.clear();
+						
+						uint32_t count = readInt<uint32_t>();
+						data.resize(count);
+						for(uint32_t i=0; i<count; i++) {
+							readFunc(data[i], *this);
+						}
+					}
+					
 					virtual uint32_t debugReadPos() { return 0; }
 					virtual uint32_t debugWritePos() { return 0; }
 			};
@@ -191,7 +226,6 @@ namespace Sim {
 					uint32_t size()
 					{ return mSize; }
 			};
-		
 	};
 }
 

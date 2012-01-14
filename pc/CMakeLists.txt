@@ -1,8 +1,12 @@
 set(qtgui_SOURCES main.cpp)
-set(qtgui_HEADERS customlabel.h
-	botselector.h gamebutton.h gamecontroller.h menubutton.h ui.h ../openglqt/render.h)
+set(qtgui_HEADERS main.h ../openglqt/render.h ../util/camera.h
+	menubutton.h gamecontroller.h gamebutton.h
+	../util/cursordefines.h ../util/client.h
+	botselector.h main.h)
 set(qtgui_FORMS ui.ui)
 set(qtgui_RESOURCES res.qrc)
+
+set(QT_USE_QTOPENGL TRUE)
 
 qt4_wrap_cpp(qtgui_HEADERS_MOC ${qtgui_HEADERS})
 qt4_wrap_ui(qtgui_FORMS_HEADERS ${qtgui_FORMS})

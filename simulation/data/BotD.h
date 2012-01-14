@@ -8,6 +8,7 @@
 
 #include "BaseData.h"
 #include "../bot/BotAbility.h"
+#include "../Health.h"
 
 namespace Sim {
 	class Collision;
@@ -23,7 +24,9 @@ namespace Sim {
 		uint32_t cpuCycleSpeed;
 		uint32_t cpuStorage;
 		
-		/// Programs that this bot 
+		Health coreHealth;
+		
+		/// Programs that this bot has
 		BotAbility::AvailableProgram baseProgram;
 		
 		/// Programs that this bot is excluded from running.

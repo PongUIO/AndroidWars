@@ -8,6 +8,8 @@
 #include "data/WeaponD.h"
 #include "data/ProgramD.h"
 #include "data/AbilityD.h"
+#include "data/ArmorD.h"
+#include "data/DamageD.h"
 #include "collision/TileCol.h"
 
 #include "data/BaseData.h"
@@ -35,6 +37,8 @@ namespace Sim {
 				WeaponDatabase &getWeaponDb() { return mWeapon; }
 				ProgramDatabase &getProgramDb()  { return mProgram; }
 				AbilityDatabase &getAbilityDb() { return mAbility; }
+				ArmorDatabase &getArmorDb() { return mArmor; }
+				DamageDatabase &getDamageDb() { return mDamage; }
 				
 				// Other constant data
 				TileCol &getTileCol() { return mTileCol; }
@@ -47,6 +51,8 @@ namespace Sim {
 			WeaponDatabase mWeapon;
 			ProgramDatabase mProgram;
 			AbilityDatabase mAbility;
+			ArmorDatabase mArmor;
+			DamageDatabase mDamage;
 			
 			TileCol mTileCol;
 			

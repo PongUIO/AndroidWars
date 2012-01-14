@@ -18,19 +18,28 @@ namespace Sim {
 		void Kill::process(Bot* bot, BotCpu* cpu)
 		{
 			if(cpu->hasRunningProgram(mTargetId)) {
-				mSim->getState().getProgramFactory().
-					destroyProgram(mTargetId);
+				Program *p = mSim->getState().getProgramFactory().
+					getProgram(mTargetId);
+				if(p)
+					p->setForceFinished();
 			}
+			
+			// Kill always runs once
+			setForceFinished();
 		}
 		
 		void Kill::save(Save::BasePtr& fp)
 		{
 			fp.writeInt<uint32_t>(mTargetId);
+			
+			return Program::save(fp);
 		}
 		
 		void Kill::load(Save::BasePtr& fp)
 		{
 			mTargetId = fp.readInt<uint32_t>();
+			
+			return Program::load(fp);
 		}
 	}
 }

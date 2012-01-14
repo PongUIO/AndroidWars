@@ -142,10 +142,19 @@ namespace Sim {
 	 * This bypasses the scheduler and immediately adds a new running program.
 	 * The programs scheduled like this will be the next running programs in
 	 * sequence after the active program is finished.
+	 * 
+	 * This triggers any \c Program::start() if the program has one, and
+	 * also updates the number of processes that may be processed this
+	 * step.
 	 */
 	void BotCpu::autoSchedule(uint32_t progId)
 	{
 		mProgramList.insert(mAutoScheduleIndex, progId);
+		mMaxProcessCount++;
+		
+		Program *prog = mHost->mSim->getState().getProgramFactory().
+			getProgram(progId);
+		prog->start(mHost, this);
 	}
 	
 	/**
@@ -165,7 +174,7 @@ namespace Sim {
 		if(mIsEndIter)
 			iterProgram();
 		
-		uint32_t maxProcess = mProgramList.size();
+		mMaxProcessCount = mProgramList.size();
 		if(mCurProgram != mProgramList.end()) {
 			// Flag the CPU as running its main loop
 			mIsRunning = true;
@@ -189,9 +198,15 @@ namespace Sim {
 						// it will probably not occur in practice.
 						mCycleCount -= prog->getCycleCost();
 						
-						prog->process(mHost, this);
-						if(prog->isFinished(mHost,this))
+						if(!prog->isCompletelyFinished(mHost, this))
+							prog->process(mHost, this);
+						
+						prog->tickRunningTime();
+						
+						if(prog->isCompletelyFinished(mHost,this)) {
+							prog->end(mHost, this);
 							doErase = true;
+						}
 					} else
 						doAbort = true;
 					
@@ -203,7 +218,7 @@ namespace Sim {
 					break;
 				
 				iterProgram(doErase);
-			} while( (--maxProcess) > 0 );
+			} while( (--mMaxProcessCount) > 0 );
 			
 			// Flag the CPU as not running its main loop
 			mIsRunning = false;

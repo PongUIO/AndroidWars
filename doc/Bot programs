@@ -54,6 +54,11 @@ It is possible to have several running copies of any program, however this is
 not necessarily beneficial (in most cases the second running instance of a
 program will overwrite the previous instance's orders).
 
+All programs are partially sensors by scheduling new programs when they
+end. This easily allows chaining of several programs without the need for
+specific sensors to guide behaviour. This also allows for quite accurate
+timing.
+
 
 
 == Scheduler ==
@@ -92,6 +97,7 @@ Weapon: (Manage gunfire)
 Ability: (Manages special abilities that a bot may have)
 - Tracer (causes a specific weapon to base its targetting on the velocity of
 	the target)
+- Phaser (causes a specific weapon to shoot phasing through health attachments)
 - Overclock (generates some cpu cycles by harming the bot)
 - Repair (sacrifice cpu cycles to heal the bot, the cost for overclocking+repair
 	should be carefully balanced)
@@ -101,6 +107,7 @@ Ability: (Manages special abilities that a bot may have)
 - Firewall (Prevents messages from enemies to be received)
 - Overcharge jump (Allows a higher jump at the cost of some cycles)
 - Jetpack (Causes specific upwards movement for a short period)
+- Hack (Enables the bot to start a single program on any target CPU)
 
 Sensors: (Alters programs due to external influences)
 - Schedule program(s) if harmed.
@@ -115,8 +122,10 @@ Sensors: (Alters programs due to external influences)
 - Schedule program(s) if bot destroyed its target.
 
 Metaprograms (Programs that alter other programs):
-- Kill (aborts target program, useful for sensors)
+- Kill (aborts target program(s), useful for sensors, may also abort all running programs on a CPU.
+	Note that aborting all running programs is an immediate action when the program is added to the CPU.)
 - Adjust (alters parameters for an already running program)
+- Repeat (assures a series of programs are executed in sequence, forming a loop)
 
 
 (Note: Messages will probably be full bot information states sent. These information
