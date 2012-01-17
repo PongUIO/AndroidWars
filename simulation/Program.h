@@ -28,8 +28,8 @@ namespace Sim {
 		public:
 			virtual uint32_t getCycleCost()=0;
 			
-			uint32_t getId() const { return mId; }
-			uint32_t getTypeId() const { return mTypeId; }
+			IdType getId() const { return mId; }
+			IdType getTypeId() const { return mTypeId; }
 			
 			Prog::Sensor &getEndSensor() { return mEndSensor; }
 			
@@ -37,7 +37,7 @@ namespace Sim {
 			void setRunningTime(uint32_t steps) { mRunningTime=steps; }
 			
 		protected:
-			Program(Simulation *sim, uint32_t id, uint32_t typeId) :
+			Program(Simulation *sim, IdType id, IdType typeId) :
 				mId(id), mTypeId(typeId), mSim(sim),
 				mEndSensor(), mRunningTime(-1), mFinished(false) {}
 			virtual ~Program() {}
@@ -56,8 +56,8 @@ namespace Sim {
 				
 			/// @name System data
 			//@{
-				uint32_t mId;
-				uint32_t mTypeId;
+				IdType mId;
+				IdType mTypeId;
 				Simulation *mSim;
 			//@}
 			
@@ -140,11 +140,11 @@ namespace Sim {
 			
 			Program *createFromSerialized(Save::BasePtr &fp);
 			
-			void destroyProgram(uint32_t id) { removeObj(id); }
-			Program *getProgram(uint32_t id) { return getObject(id); }
+			void destroyProgram(IdType id) { removeObj(id); }
+			Program *getProgram(IdType id) { return getObject(id); }
 			
-			uint32_t getLastPhaseId() { return mLastPhaseInputId; }
-			uint32_t getCurrentUniqueId()
+			IdType getLastPhaseId() { return mLastPhaseInputId; }
+			IdType getCurrentUniqueId()
 			{ return UidFactory<Program>::getCurrentUniqueId(); }
 			
 		private:
@@ -153,10 +153,10 @@ namespace Sim {
 				void deleteInstance(Program* obj) { delete obj; }
 				
 				const DataBehaviourT<Program>::Behaviour* getBehaviourFromName(const std::string& name) const;
-				const DataBehaviourT<Program>::Behaviour* getBehaviourFromId(uint32_t id) const;
+				const DataBehaviourT<Program>::Behaviour* getBehaviourFromId(IdType id) const;
 			//@}
 			
-			uint32_t mLastPhaseInputId;
+			IdType mLastPhaseInputId;
 			
 			friend class ReplayManager;
 	};

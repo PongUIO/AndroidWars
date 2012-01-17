@@ -6,6 +6,8 @@
 #include <string>
 #include <stdint.h>
 
+#include "../Common.h"
+
 namespace Sim {
 	class Simulation;
 	
@@ -23,7 +25,7 @@ namespace Sim {
 	 * Implements a basic database system.
 	 * Registers new types by an ID.
 	 */
-	template<typename T, typename IdType=uint32_t>
+	template<typename T>
 	class DataT : public BaseData {
 		public:
 			DataT() {}
@@ -76,29 +78,27 @@ namespace Sim {
 			NameIdMgr() {}
 			~NameIdMgr() {}
 			
-			void connect(uint32_t id, const std::string &name)
+			void connect(IdType id, const std::string &name)
 			{
 				mNameMap[name] = id;
 				mIdMap[id] = name;
 			}
 			
-			uint32_t getIdOf(const std::string &name) const
+			IdType getIdOf(const std::string &name) const
 			{
 				NameMap::const_iterator i=mNameMap.find(name);
-				return (i==mNameMap.end()) ? NoId() : i->second;
+				return (i==mNameMap.end()) ? NoId : i->second;
 			}
 			
-			std::string getNameOf(uint32_t id) const
+			std::string getNameOf(IdType id) const
 			{
 				IdMap::const_iterator i=mIdMap.find(id);
 				return (i==mIdMap.end()) ? "" : i->second;
 			}
 			
-			static uint32_t NoId() { return -1; }
-			
 		private:
-			typedef boost::unordered_map<std::string,uint32_t> NameMap;
-			typedef boost::unordered_map<uint32_t, std::string> IdMap;
+			typedef boost::unordered_map<std::string,IdType> NameMap;
+			typedef boost::unordered_map<IdType, std::string> IdMap;
 			NameMap mNameMap;
 			IdMap mIdMap;
 	};
@@ -118,21 +118,21 @@ namespace Sim {
 			 */
 			class Behaviour {
 				public:
-					virtual T *createObj(Simulation *sim, uint32_t id) const=0;
-					uint32_t mId;
+					virtual T *createObj(Simulation *sim, IdType id) const=0;
+					IdType mId;
 			};
 			
-			DataBehaviourT() : mInternal(), mTypeMap() {}
+			DataBehaviourT() : mInternal(), mNameIdMgr() {}
 			virtual ~DataBehaviourT() {}
 			
 			void startup(Simulation* sim) { mInternal.startup(sim); }
 			void shutdown() { mInternal.shutdown(); }
 			
-			const Behaviour *getType(uint32_t type) const
+			const Behaviour *getType(IdType type) const
 			{	return mInternal.getType(type); }
 			
 			const Behaviour *getType(const std::string &name) const
-			{	return mInternal.getType(getTypeIdOf(name)); }
+			{	return mInternal.getType(getIdOf(name)); }
 			
 			
 			/**
@@ -143,7 +143,7 @@ namespace Sim {
 			 * interpretation.
 			 */
 			template<class Impl>
-			uint32_t registerType() {
+			IdType registerType() {
 				return registerCustom(new BehaviourImpl<Impl>(),
 					Impl::getTypeName());
 			}
@@ -154,26 +154,20 @@ namespace Sim {
 			 * @note Use this if the base class has several interpretations
 			 * (such as for scripted behaviour using only one implemented class)
 			 */
-			uint32_t registerCustom(Behaviour *type, const std::string &name) {
-				uint32_t id = mInternal.addTypeExt(type);
+			IdType registerCustom(Behaviour *type, const std::string &name) {
+				IdType id = mInternal.addTypeExt(type);
 				type->mId = id;
 				
-				mTypeMap[name] = id;
-				mIdMap[id] = name;
+				mNameIdMgr.connect(id, name);
 				
 				return id;
 			}
 			
-			static uint32_t NoId() { return -1; }
-			uint32_t getTypeIdOf(const std::string &type) const {
-				TypeMap::const_iterator i=mTypeMap.find(type);
-				return (i==mTypeMap.end()) ? NoId() : i->second;
-			}
+			IdType getIdOf(const std::string &name) const
+			{ return mNameIdMgr.getIdOf(name); }
 			
-			const std::string getTypeOf(uint32_t id) const {
-				IdMap::const_iterator i=mIdMap.find(id);
-				return (i==mIdMap.end()) ? "" : i->second;
-			}
+			const std::string getNameOf(IdType id) const
+			{ return mNameIdMgr.getNameOf(id); }
 			
 		private:
 			/**
@@ -182,24 +176,20 @@ namespace Sim {
 			template<class Impl>
 			class BehaviourImpl : public Behaviour {
 				public:
-					T *createObj(Simulation *sim, uint32_t id) const
+					T *createObj(Simulation *sim, IdType id) const
 					{ return new Impl(sim, id, Behaviour::mId,
 						typename Impl::Config()); }
 			};
 			
 			class InternalDatabase : public DataT<Behaviour> {
 				public:
-					uint32_t addTypeExt(Behaviour *b)
+					IdType addTypeExt(Behaviour *b)
 					{ return addType(b); }
 					
 			};
 			
 			InternalDatabase mInternal;
-			
-			typedef boost::unordered_map<std::string,uint32_t> TypeMap;
-			typedef boost::unordered_map<uint32_t, std::string> IdMap;
-			TypeMap mTypeMap;
-			IdMap mIdMap;
+			NameIdMgr mNameIdMgr;
 	};
 }
 

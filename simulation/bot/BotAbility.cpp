@@ -21,7 +21,7 @@ namespace Sim {
 	 * Executes a function for a single ability list.
 	 */
 	template<class Func>
-	void BotAbility::executeStepPartList(BotAbility::AbilityList& abl, Func F)
+	void BotAbility::executeStepPartList(BotAbility::AbilityList& abl, Func F, bool canRemove)
 	{
 		for(AbilityList::iterator i=abl.begin(); i!=abl.end();) {
 			Ability *ability = mHost->mSim->getState().getAbilityFactory()
@@ -31,9 +31,12 @@ namespace Sim {
 				F(ability);
 			}
 			
-			if(!ability || ability->isDead())
-				i = abl.erase(i);
-			else
+			if(!ability || ability->isFinished()) {
+				if(canRemove)
+					i = abl.erase(i);
+				else
+					i++;
+			} else
 				i++;
 		}
 	}
@@ -46,8 +49,8 @@ namespace Sim {
 	template<class Func>
 	void BotAbility::executeStepPart(Func f)
 	{
-		executeStepPartList(mHost->getPlayerPtr()->mGlobalAbilities, f);
-		executeStepPartList(mAbilityList, f);
+		executeStepPartList(mHost->getPlayerPtr()->mGlobalAbilities, f, false);
+		executeStepPartList(mAbilityList, f, true);
 	}
 	
 	void BotAbility::prepareStep(double delta)
@@ -58,8 +61,28 @@ namespace Sim {
 		mAvailProgram.mergeWith(mHost->getTypePtr()->baseProgram);
 		mAvailProgram.excludeSet(mHost->getTypePtr()->excludeProgram);
 		
+		executeStepPart(boost::bind(&BotAbility::startAbility, this, _1));
 		executeStepPart(boost::bind(&Ability::prepareStep, _1, delta, mHost) );
 	}
+	
+	void BotAbility::startAbility(Ability* ability)
+	{
+		if(mAbilityHasInit.find(ability->getId()) == mAbilityHasInit.end()) {
+			ability->reference();
+			ability->start(mHost);
+			
+			mAbilityHasInit.insert(ability->getId());
+		}
+	}
+	
+	void BotAbility::endAbility(Ability* ability)
+	{
+		if(ability->isFinished()) {
+			ability->end(mHost);
+			ability->dereference();
+		}
+	}
+
 	
 	void BotAbility::updateCpu(double delta)
 	{
@@ -69,22 +92,19 @@ namespace Sim {
 	void BotAbility::step(double delta)
 	{
 		executeStepPart(boost::bind(&Ability::step, _1, delta, mHost) );
+		
+		executeStepPart(boost::bind(&BotAbility::endAbility, this, _1) );
 	}
 	
-	void BotAbility::save(Save::BasePtr& fp)
+	void BotAbility::save(Save::BasePtr& fp) const
 	{
-		fp.writeInt<uint32_t>(mAbilityList.size());
-		for(AbilityList::iterator i=mAbilityList.begin();
-			i!=mAbilityList.end(); i++) {
-			fp.writeInt<uint32_t>(*i);
-		}
+		fp.writeCtr(mAbilityList);
+		fp.writeUnorderedSet(mAbilityHasInit);
 	}
 	
 	void BotAbility::load(Save::BasePtr& fp)
 	{
-		uint32_t count = fp.readInt<uint32_t>();
-		while( (count--) > 0) {
-			mAbilityList.push_back(fp.readInt<uint32_t>());
-		}
+		fp.readCtr(mAbilityList);
+		fp.readUnorderedSet(mAbilityHasInit);
 	}
 }

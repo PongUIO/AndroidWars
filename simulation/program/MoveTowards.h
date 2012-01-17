@@ -33,17 +33,17 @@ namespace Sim {
 				};
 				
 				struct Config {
-					DestinationType mType;
-					uint32_t mTargetId;
+					uint8_t mType;
+					IdType mTargetId;
 					Vector mTargetPos;
 					
 					Config(DestinationType type=DtBotLock,
 						   const Vector &pos=Vector(),
-						   uint32_t id=FactoryNoId) :
+						   IdType id=NoId) :
 						mType(type), mTargetId(id), mTargetPos(pos) {}
 				};
 				
-				MoveTowards(Simulation *sim, uint32_t id, uint32_t typeId,
+				MoveTowards(Simulation *sim, IdType id, IdType typeId,
 					const Config &cfg);
 				~MoveTowards();
 				
@@ -56,8 +56,8 @@ namespace Sim {
 				virtual void process(Bot* bot, BotCpu* cpu);
 				virtual bool isFinished(Bot*, BotCpu*) { return false; }
 				
-				DestinationType mType;
-				uint32_t mTarget;
+				uint8_t mType;
+				IdType mTarget;
 				Vector mTargetPos;
 		};
 	}

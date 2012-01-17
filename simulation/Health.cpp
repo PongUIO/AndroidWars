@@ -20,25 +20,24 @@ namespace Sim {
 	 */
 	void Health::addAttachment(const Hull& data)
 	{
-		AttachmentVec::iterator pos = findType(data.getType());
+		AttachmentVec::iterator pos = findOrCreateType(data.getType());
+		*pos += data;
 		
-		if(pos == mAttachments.end()) {
-			mAttachments.push_back(data);
-			pos = mAttachments.begin()+mAttachments.size()-1;
-		} else {
-			Hull &internal = *pos;
-			
-			internal.addHealth(data.getHealth());
-			internal.addMaxHealth(data.getMaxHealth());
-		}
-		
-		if(pos != mAttachments.end()) {
-			if((*pos).isDead())
-				mAttachments.erase(pos);
-		}
+		if((*pos).isRemovable())
+			mAttachments.erase(pos);
 	}
 	
-	Health::AttachmentVec::iterator Health::findType(uint32_t type)
+	void Health::removeAttachment(const Hull& data)
+	{
+		AttachmentVec::iterator pos = findOrCreateType(data.getType());
+		*pos -= data;
+		
+		if((*pos).isRemovable())
+			mAttachments.erase(pos);
+	}
+
+	
+	Health::AttachmentVec::iterator Health::findType(IdType type)
 	{
 		for(AttachmentVec::iterator i=mAttachments.begin();
 			i!=mAttachments.end(); i++) {
@@ -48,6 +47,19 @@ namespace Sim {
 		
 		return mAttachments.end();
 	}
+	
+	Health::AttachmentVec::iterator Health::findOrCreateType(IdType type)
+	{
+		AttachmentVec::iterator pos = findType(type);
+		
+		if(pos == mAttachments.end()) {
+			mAttachments.push_back(Hull(type));
+			pos = mAttachments.begin()+(mAttachments.size()-1);
+		}
+		
+		return pos;
+	}
+
 	
 	/**
 	 * Causes damage based on a given damage type.
@@ -67,7 +79,7 @@ namespace Sim {
 	 * 
 	 * @param damage How much health loss to cause.
 	 */
-	void Health::causeDamage(Simulation* sim, int32_t damage, uint32_t dmgType,
+	void Health::causeDamage(Simulation* sim, int32_t damage, IdType dmgType,
 		bool ignoreAttachments)
 	{
 		ArmorDatabase &armorDatabase = sim->getData().getArmorDb();
@@ -120,7 +132,7 @@ namespace Sim {
 	{
 		for(AttachmentVec::iterator i=mAttachments.begin();
 			i!=mAttachments.end();) {
-			if( (*i).isDead() )
+			if( (*i).isRemovable() )
 				i = mAttachments.erase(i);
 			else
 				i++;
@@ -134,7 +146,7 @@ namespace Sim {
 	 * If no attachment is affected by the damage type, then
 	 * the core is returned.
 	 */
-	Health::Hull& Health::selectBestHull(Simulation *sim, uint32_t dmgType)
+	Health::Hull& Health::selectBestHull(Simulation *sim, IdType dmgType)
 	{
 		ArmorDatabase &armorDatabase = sim->getData().getArmorDb();
 		
@@ -167,16 +179,16 @@ namespace Sim {
 			return (*bestAtm);
 	}
 	
-	void Health::save(Save::BasePtr& fp)
+	void Health::save(Save::BasePtr& fp) const
 	{
-		fp.writeCtr(mAttachments, boost::bind(&Hull::save, _1, _2) );
-		mCore.save(fp);
+		fp.writeCtr(mAttachments);
+		fp << mCore;
 	}
 
 	void Health::load(Save::BasePtr& fp)
 	{
-		fp.readCtr(mAttachments, boost::bind(&Hull::load, _1, _2) );
-		mCore.load(fp);
+		fp.readCtr(mAttachments);
+		fp >> mCore;
 	}
 	
 	

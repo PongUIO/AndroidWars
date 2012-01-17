@@ -13,7 +13,7 @@ namespace Sim {
 	{}
 	
 	const DataBehaviourT< Bullet >::Behaviour* BulletFactory::
-		getBehaviourFromId(uint32_t id) const
+		getBehaviourFromId(IdType id) const
 	{	return mSim->getData().getBulletDb().getType(id); }
 
 	const DataBehaviourT< Bullet >::Behaviour* BulletFactory::
@@ -29,13 +29,9 @@ namespace Sim {
 		mBody.step(stepTime);
 	}
 	
-	void Bullet::save(Save::BasePtr& fp)
-	{
-		mBody.save(fp);
-	}
+	void Bullet::save(Save::BasePtr& fp) const
+	{	fp << mBody; }
 	
 	void Bullet::load(Save::BasePtr& fp)
-	{
-		mBody.load(fp);
-	}
+	{	fp >> mBody; }
 }

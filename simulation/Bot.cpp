@@ -8,7 +8,7 @@ namespace Sim {
 	// Bot
 	//
 	//
-	Bot::Bot(Simulation* sim, uint32_t id, const Sim::Bot::State& cfg) :
+	Bot::Bot(Simulation* sim, IdType id, const Sim::Bot::State& cfg) :
 		mId(id), mSim(sim), mState(cfg)
 	{
 		mState.mWeapon.initialize(this);
@@ -30,7 +30,7 @@ namespace Sim {
 		
 		// Update the sensor with data
 		SensorState &sensor = mState.mSensor;
-		sensor.mTargetBot = FactoryNoId;
+		sensor.mTargetBot = NoId;
 		sensor.mWasHit = false;
 		
 		// Reset the engine
@@ -74,52 +74,30 @@ namespace Sim {
 		return &mSim->getState().getPlayerData().getPlayer(mState.mSide);
 	}
 	
-	void Bot::save(Save::BasePtr& fp)
-	{	mState.save(fp);	}
+	void Bot::save(Save::BasePtr& fp) const
+	{	fp << mState; }
 
 	void Bot::load(Save::BasePtr& fp)
-	{	mState.load(fp);	}
+	{	fp >> mState; }
 	
-	void Bot::State::save(Save::BasePtr &fp)
+	void Bot::State::save(Save::BasePtr &fp) const
 	{
-		fp.writeInt<uint32_t>(mSide);
-		fp.writeInt<uint32_t>(mType);
+		// Base variables
+		fp << mSide << mType;
+		fp << mSensor << mBody << mHealth;
 		
-		mSensor.save(fp);
-		
-		mBody.save(fp);
-		mHealth.save(fp);
-		
-		mWeapon.save(fp);
-		mCpu.save(fp);
-		mAbility.save(fp);
+		// Components
+		fp << mWeapon << mCpu << mAbility;
 	}
 	
 	void Bot::State::load(Save::BasePtr& fp)
 	{
-		mSide = fp.readInt<uint32_t>();
-		mType = fp.readInt<uint32_t>();
+		// Base variables
+		fp >> mSide >> mType;
+		fp >> mSensor >> mBody >> mHealth;
 		
-		mSensor.load(fp);
-		
-		mBody.load(fp);
-		mHealth.load(fp);
-		
-		mWeapon.load(fp);
-		mCpu.load(fp);
-		mAbility.load(fp);
-	}
-	
-	void Bot::SensorState::save(Save::BasePtr& fp)
-	{
-		fp.writeInt<uint32_t>(mTargetBot);
-		fp.writeInt<uint8_t>(mWasHit);
-	}
-
-	void Bot::SensorState::load(Save::BasePtr& fp)
-	{
-		mTargetBot = fp.readInt<uint32_t>();
-		mWasHit = fp.readInt<uint8_t>();
+		// Components
+		fp >> mWeapon >> mCpu >> mAbility;
 	}
 
 	
@@ -143,7 +121,7 @@ namespace Sim {
 		DefaultUidFactory<Bot>::shutdown();
 	}
 	
-	uint32_t BotFactory::createBot(const Bot::Config &cfg)
+	IdType BotFactory::createBot(const Bot::Config &cfg)
 	{
 		BotFactory::InsertData insData = insertObject();
 		
@@ -179,7 +157,7 @@ namespace Sim {
 	void BotFactory::saveObj(Bot* bot, Save::BasePtr& fp)
 	{	bot->save(fp); }
 
-	Bot* BotFactory::loadObj(uint32_t id, Save::BasePtr& fp)
+	Bot* BotFactory::loadObj(IdType id, Save::BasePtr& fp)
 	{
 		Bot *bot = new Bot(mSim, id);
 		bot->load(fp);

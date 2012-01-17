@@ -25,6 +25,7 @@ add_library(AWSim
 	program/Shoot.cpp
 	
 	ability/CpuBoost.cpp
+	ability/ArmorAttachment.cpp
 	
 	data/BotD.cpp
 	data/BulletD.cpp

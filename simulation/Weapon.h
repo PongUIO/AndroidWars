@@ -19,8 +19,8 @@ namespace Sim {
 	 */
 	class Weapon {
 		public:
-			uint32_t getId() const { return mId; }
-			uint32_t getTypeId() const { return mTypeId; }
+			IdType getId() const { return mId; }
+			IdType getTypeId() const { return mTypeId; }
 			Simulation *getSim() const { return mSim; }
 			
 			bool isDead() { return mIsDead; }
@@ -28,7 +28,7 @@ namespace Sim {
 			uint32_t getReloadTime() { return mReloadTimer; }
 			
 		protected:
-			Weapon(Simulation *sim, uint32_t id, uint32_t typeId) :
+			Weapon(Simulation *sim, IdType id, IdType typeId) :
 				mId(id), mTypeId(typeId), mSim(sim) {}
 			virtual ~Weapon() {}
 			
@@ -44,14 +44,14 @@ namespace Sim {
 			
 			/// @name Identification
 			//@{
-				uint32_t mId;
-				uint32_t mTypeId;
+				IdType mId;
+				IdType mTypeId;
 				Simulation *mSim;
 			//@}
 			
 			/// @name Behaviour
 			//@{
-				uint32_t mReloadTimer;
+				uint32_t mReloadTimer; /// @todo Save basic weapon data
 				
 				bool mIsDead;
 			//@}
@@ -66,23 +66,23 @@ namespace Sim {
 	/**
 	 * Contains a vector of weapons.
 	 */
-	class WeaponBox {
+	class WeaponBox : private Save::OperatorImpl<WeaponBox> {
 		public:
-			typedef std::vector<uint32_t> WeaponVec;
+			typedef std::vector<IdType> WeaponVec;
 			
 			WeaponBox() {}
 			
-			uint32_t add(uint32_t wid) {
+			IdType add(IdType wid) {
 				mData.push_back(wid);
 				return mData.size()-1;
 			}
-			uint32_t get(uint32_t i)
-				{ return (i<mData.size()) ? mData[i] : FactoryNoId; }
+			IdType get(IdType i)
+				{ return (i<mData.size()) ? mData[i] : NoId; }
 			
-			uint32_t size()
+			IdType size()
 				{ return mData.size(); }
 			
-			void save(Save::BasePtr &fp);
+			void save(Save::BasePtr &fp) const;
 			void load(Save::BasePtr &fp);
 			
 		private:
@@ -99,15 +99,15 @@ namespace Sim {
 				// All functions use the standard implementation
 			//@}
 			
-			void destroyWeapon(uint32_t id) { removeObj(id); }
-			Weapon *getWeapon(uint32_t id) { return getObject(id); }
+			void destroyWeapon(IdType id) { removeObj(id); }
+			Weapon *getWeapon(IdType id) { return getObject(id); }
 			
 		private:
 			/// @name Factory-required functions
 			//@{
 				void deleteInstance(Weapon* obj) { delete obj; }
 				
-				const DataBehaviourT<Weapon>::Behaviour* getBehaviourFromId(uint32_t id) const;
+				const DataBehaviourT<Weapon>::Behaviour* getBehaviourFromId(IdType id) const;
 				const DataBehaviourT<Weapon>::Behaviour* getBehaviourFromName(const std::string& name) const;
 			//@}
 	};

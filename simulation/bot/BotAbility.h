@@ -3,11 +3,13 @@
 
 #include <boost/dynamic_bitset.hpp>
 #include <boost/bind.hpp>
+#include <boost/unordered_set.hpp>
 
 #include "../Program.h"
 
 namespace Sim {
 	class Bot;
+	class Ability;
 	
 	/**
 	 * Manages both passive and active abilities for bots.
@@ -26,7 +28,7 @@ namespace Sim {
 	 * running active abilities do not force abilities to start in the middle
 	 * of the bot phase, unless the passive ability explicitly states so.
 	 */
-	class BotAbility {
+	class BotAbility : private Save::OperatorImpl<BotAbility> {
 		public:
 			BotAbility();
 			~BotAbility();
@@ -48,7 +50,7 @@ namespace Sim {
 					void clear()
 					{ mEnabledProgram.clear(); }
 					
-					void enableProgram(uint32_t type)
+					void enableProgram(IdType type)
 					{ mEnabledProgram.set(type); }
 					
 					void mergeWith(const AvailableProgram &other)
@@ -57,7 +59,7 @@ namespace Sim {
 					void excludeSet(const AvailableProgram &other)
 					{	mEnabledProgram -= other.mEnabledProgram; }
 					
-					bool checkProgramEnabled(uint32_t type)
+					bool checkProgramEnabled(IdType type)
 					{ return mEnabledProgram[type]; }
 					
 				private:
@@ -65,13 +67,16 @@ namespace Sim {
 					EnabledProgramSet mEnabledProgram;
 			};
 			
-			typedef std::list<uint32_t> AbilityList;
+			typedef std::list<IdType> AbilityList;
 			
-			bool checkProgramEnabled(uint32_t type)
+			bool checkProgramEnabled(IdType type)
 			{ return mAvailProgram.checkProgramEnabled(type); }
 			
-			void addAbility(uint32_t id)
+			void addAbility(IdType id)
 			{ mAbilityList.push_back(id); }
+			
+			void save(Save::BasePtr &fp) const;
+			void load(Save::BasePtr &fp);
 			
 		private:
 			void initialize(Bot *host);
@@ -80,14 +85,14 @@ namespace Sim {
 			void updateCpu(double delta);
 			void step(double delta);
 			
-			void save(Save::BasePtr &fp);
-			void load(Save::BasePtr &fp);
+			void startAbility(Ability *ability);
+			void endAbility(Ability *ability);
 			
 			template<class Func>
 			void executeStepPart(Func f);
 			
 			template<class Func>
-			void executeStepPartList(AbilityList &abl, Func f);
+			void executeStepPartList(AbilityList &abl, Func f, bool canRemove=true);
 			
 			/// @name Constant/temporary data
 			//@{
@@ -98,6 +103,9 @@ namespace Sim {
 			/// @name Dynamic data
 			//@{
 				AbilityList mAbilityList;
+				
+				typedef boost::unordered_set<IdType> AbilityHasInitSet;
+				AbilityHasInitSet mAbilityHasInit;
 			//@}
 			
 			friend class Bot;

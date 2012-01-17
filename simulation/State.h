@@ -98,9 +98,15 @@ namespace Sim {
 				uint32_t &curPhaseStep() { return mCtrl.mCurPhaseStep; }
 				uint32_t &curPhase() { return mCtrl.mCurPhase; }
 				
-				struct StateControl {
+				struct StateControl :
+					private Save::OperatorImpl<StateControl> {
 					uint32_t mCurPhaseStep;
 					uint32_t mCurPhase;
+					
+					void save(Save::BasePtr &fp) const
+					{ fp << mCurPhaseStep << mCurPhase; }
+					void load(Save::BasePtr &fp)
+					{ fp >> mCurPhaseStep >> mCurPhase; }
 				};
 				StateControl mCtrl;
 			//@}

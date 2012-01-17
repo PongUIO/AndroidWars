@@ -49,12 +49,12 @@ namespace Sim {
 			
 			/// @name Compatibility layer
 			//@{
-				const BotD &getBot(uint32_t type) const
+				const BotD &getBot(IdType type) const
 				{ return *getType(type); }
 				
-				uint32_t addBot(const BotD &bot, const Collision::ColPoints &pts)
+				IdType addBot(const BotD &bot, const Collision::ColPoints &pts)
 				{
-					uint32_t id = addType(new BotD(bot) );
+					IdType id = addType(new BotD(bot) );
 					BotD &newBot = *rawGet(id);
 					newBot.collision = new Collision(pts);
 					

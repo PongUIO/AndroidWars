@@ -17,11 +17,11 @@
 #include "StateObj.h"
 #include "Save.h"
 
+#include "Common.h"
+
 namespace Sim {
 	// Forward declarations
 	class Simulation;
-	
-	static const uint32_t FactoryNoId = -1;
 	
 	/**
 	 * This template provides a variant of factories that provide
@@ -40,7 +40,7 @@ namespace Sim {
 	 * inserting/removing elements, and has only a finite number of ids.
 	 * 
 	 * Objects of type \c T need the following implemented:
-	 * - uint32_t getId()
+	 * - IdType getId()
 	 * - bool isDead()
 	 */
 	template<class T>
@@ -52,35 +52,45 @@ namespace Sim {
 			
 			virtual void deleteInstance(T *obj)=0;
 			virtual void saveObj(T*, Save::BasePtr &)=0;
-			virtual T *loadObj(uint32_t id, Save::BasePtr &)=0;
+			virtual T *loadObj(IdType id, Save::BasePtr &)=0;
 			
-			uint32_t addObj(T *obj) { return insertObject(obj)->first; }
-			void removeObj(uint32_t id) { deleteObject(id); }
+			IdType addObj(T *obj) { return insertObject(obj)->first; }
+			void removeObj(IdType id) { deleteObject(id); }
 			
 			template<typename Func>
 			void factoryCall(Func func)
 			{
 				for(typename DataList::iterator i=mData.begin();
-					i!=mData.end(); i++) {
+					i!=mData.end();) {
 					T *obj = *i;
 					
 					if(!obj->isDead())
 						func(obj);
 					
-					if(obj->isDead())
+					// Increment the iterator pre-emptively
+					// this is to avoid iterator invalidation when
+					// removeObj() is called
+					i++;
+					if(obj->isDead()) {
 						removeObj(obj->getId());
+					}
 				}
+			}
+			
+			void cleanDead()
+			{
+				factoryCall(boost::bind(&T::isDead, _1));
 			}
 			
 			virtual void save(Save::BasePtr &fp)
 			{
-				fp.writeInt<uint32_t>(mCurrentUniqueId);
+				fp << mCurrentUniqueId;
 				
-				fp.writeInt<uint32_t>(mData.size());
+				fp << IdType(mData.size());
 				for(typename DataList::iterator i=mData.begin();
 					i!=mData.end(); i++) {
 					T *obj = *i;
-					fp.writeInt<uint32_t>(obj->getId());
+					fp << obj->getId();
 					saveObj(obj, fp);
 				}
 			}
@@ -89,11 +99,13 @@ namespace Sim {
 			{
 				killAll();
 				
-				mCurrentUniqueId = fp.readInt<uint32_t>();
+				fp >> mCurrentUniqueId;
 				
-				uint32_t objCount = fp.readInt<uint32_t>();
-				for(uint32_t i=0; i<objCount; i++) {
-					uint32_t uid = fp.readInt<uint32_t>();
+				IdType objCount;
+				fp >> objCount;
+				for(IdType i=0; i<objCount; i++) {
+					IdType uid;
+					fp >> uid;
 					T *obj = loadObj(uid, fp);
 					
 					insertObject(obj, uid);
@@ -102,12 +114,12 @@ namespace Sim {
 			
 		protected:
 			typedef std::list<T*> DataList;
-			typedef boost::unordered_map<uint32_t, typename DataList::iterator>
+			typedef boost::unordered_map<IdType, typename DataList::iterator>
 				IdResolveMap;
-			typedef std::pair<uint32_t,typename DataList::iterator>
+			typedef std::pair<IdType,typename DataList::iterator>
 				InsertData;
 			
-			T *getObject(uint32_t id) {
+			T *getObject(IdType id) {
 				typename IdResolveMap::iterator i = mIdResolve.find(id);
 				return (i==mIdResolve.end()) ? 0 : *i->second;
 			}
@@ -124,9 +136,9 @@ namespace Sim {
 			}
 			
 			InsertData insertObject(
-				T *obj=0, uint32_t uid=FactoryNoId) {
+				T *obj=0, IdType uid=NoId) {
 				
-				if(uid == FactoryNoId)
+				if(uid == NoId)
 					uid = mCurrentUniqueId++;
 				
 				mData.push_back(obj);
@@ -137,7 +149,7 @@ namespace Sim {
 				return insertPair;
 			}
 			
-			void deleteObject(uint32_t id) {
+			void deleteObject(IdType id) {
 				typename IdResolveMap::iterator i= mIdResolve.find(id);
 				if(i != mIdResolve.end()) {
 					deleteInstance(*i->second);
@@ -147,10 +159,10 @@ namespace Sim {
 			}
 			
 			const DataList &getData() const { return mData; }
-			uint32_t getCurrentUniqueId() const { return mCurrentUniqueId;}
+			IdType getCurrentUniqueId() const { return mCurrentUniqueId;}
 			
 		private:
-			uint32_t mCurrentUniqueId;
+			IdType mCurrentUniqueId;
 			
 			DataList mData;
 			IdResolveMap mIdResolve;
@@ -189,7 +201,7 @@ namespace Sim {
 					getBehaviourFromName(const std::string &name) const
 				{ throw std::string("UidFactory::getBehaviourFromName() unimplemented"); }
 				virtual const typename DataBehaviourT<T>::Behaviour *
-					getBehaviourFromId(uint32_t id) const
+					getBehaviourFromId(IdType id) const
 				{ throw std::string("UidFactory::getBehaviourFromId() unimplemented"); }
 				
 				/**
@@ -243,12 +255,13 @@ namespace Sim {
 			/// @name Factory-required default functions
 			//@{
 				virtual void saveObj(T *obj, Save::BasePtr &fp) {
-					fp.writeInt<uint32_t>(obj->getTypeId());
+					fp << obj->getTypeId();
 					obj->save(fp);
 				}
 				
-				virtual T *loadObj(uint32_t internalId, Save::BasePtr &fp) {
-					uint32_t type = fp.readInt<uint32_t>();
+				virtual T *loadObj(IdType internalId, Save::BasePtr &fp) {
+					IdType type;
+					fp >> type;
 					
 					const typename DataBehaviourT<T>::Behaviour *b =
 						getBehaviourFromId(type);

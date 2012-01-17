@@ -16,15 +16,18 @@ namespace Sim {
 	 */
 	class Ability {
 		public:
-			uint32_t getId() const { return mId; }
-			uint32_t getTypeId() const { return mTypeId; }
+			IdType getId() const { return mId; }
+			IdType getTypeId() const { return mTypeId; }
 			
-			bool isDead() { return false; }
+			bool isFinished() { return false; }
 			bool isActive() { return true; }
 			
+			/// Returns true when this Ability is ready for complete removal
+			bool isDead() { return mReferences==0; }
+			
 		protected:
-			Ability(Simulation *sim, uint32_t id, uint32_t typeId) :
-				mId(id), mTypeId(typeId), mSim(sim) {}
+			Ability(Simulation *sim, IdType id, IdType typeId) :
+				mId(id), mTypeId(typeId), mReferences(0), mSim(sim) {}
 			virtual ~Ability() {}
 			
 			/// @name Interaction
@@ -35,12 +38,19 @@ namespace Sim {
 				virtual void prepareStep(double delta, Bot *bot)=0;
 				virtual void updateCpu(double delta, Bot *bot)=0;
 				virtual void step(double delta, Bot *bot)=0;
+				
+				virtual void start(Bot *) {}
+				virtual void end(Bot *) {}
 			//@}
 			
 			/// @name System data
 			//@{
-				uint32_t mId;
-				uint32_t mTypeId;
+				void reference() { mReferences++; }
+				void dereference() { mReferences--; }
+				
+				IdType mId;
+				IdType mTypeId;
+				uint32_t mReferences;
 				Simulation *mSim;
 			//@}
 			
@@ -81,15 +91,18 @@ namespace Sim {
 			T *createAbility(const typename T::Config &cfg)
 			{	return createType<T>(cfg); }
 			
-			Ability *getAbility(uint32_t id) { return getObject(id); }
+			Ability *getAbility(IdType id) { return getObject(id); }
 			
 		private:
 			/// @name Factory-required functions
 			//@{
 				void deleteInstance(Ability *obj) { delete obj; }
 				
-				const DataBehaviourT<Ability>::Behaviour* getBehaviourFromId(uint32_t id) const;
+				const DataBehaviourT<Ability>::Behaviour* getBehaviourFromId(IdType id) const;
 				const DataBehaviourT<Ability>::Behaviour* getBehaviourFromName(const std::string& name) const;
+				
+				void saveObj(Ability* obj, Save::BasePtr& fp);
+				Ability* loadObj(IdType internalId, Save::BasePtr& fp);
 			//@}
 	};
 }

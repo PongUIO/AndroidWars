@@ -18,7 +18,7 @@ namespace Sim {
 	class Sync;
 	class State;
 	
-	class Tile {
+	class Tile : private Save::OperatorImpl<Tile> {
 		public:
 			enum Flag {
 				/// Determines if this tile is deep inside the terrain.
@@ -39,6 +39,12 @@ namespace Sim {
 			
 			uint16_t getType() const { return mType; }
 			TileCol::TileType getColType() const { return mColType; }
+			
+			void save(Save::BasePtr &fp) const
+			{ fp << mType << mColType.data; }
+			
+			void load(Save::BasePtr &fp)
+			{ fp >> mType >> mColType.data; }
 			
 		private:
 			uint16_t mType;

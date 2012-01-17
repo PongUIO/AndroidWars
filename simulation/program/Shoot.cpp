@@ -24,16 +24,14 @@ namespace Sim { namespace Prog {
 	
 	void Shoot::save(Save::BasePtr& fp)
 	{
-		fp.writeInt<uint32_t>(mTargetIndex);
-		fp.writeSave(mWeapArg);
+		fp << mTargetIndex << mWeapArg;
 		
 		return Program::save(fp);
 	}
 
 	void Shoot::load(Save::BasePtr& fp)
 	{
-		mTargetIndex = fp.readInt<uint32_t>();
-		mWeapArg = fp.readSave();
+		fp >> mTargetIndex >> mWeapArg;
 		
 		return Program::load(fp);
 	}

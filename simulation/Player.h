@@ -12,12 +12,19 @@
 namespace Sim {
 	class State;
 	
-	struct Player {
-		uint32_t sideId;
-		uint32_t allyGroup;
+	struct Player : private Save::OperatorImpl<Player> {
+		uint32_t mSideId;
+		uint32_t mAllyGroup;
 		
-		BotAbility::AvailableProgram mBasePrograms;
+		BotAbility::AvailableProgram mBasePrograms; /// @todo Save bitsets
 		BotAbility::AbilityList mGlobalAbilities;
+		
+		void save(Save::BasePtr &fp) const
+		{	fp << mSideId << mAllyGroup;
+			fp.writeCtr(mGlobalAbilities); }
+		void load(Save::BasePtr &fp)
+		{	fp >> mSideId >> mAllyGroup;
+			fp.readCtr(mGlobalAbilities); }
 	};
 	
 	class PlayerData : public StateObj {
@@ -42,7 +49,7 @@ namespace Sim {
 			/// @name Interface
 			//@{
 				void addPlayer(Player &player);
-				Player &getPlayer(uint32_t id)
+				Player &getPlayer(IdType id)
 				{ return mData[id]; }
 			//@}
 			

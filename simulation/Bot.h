@@ -31,16 +31,17 @@ namespace Sim {
 		public:
 			struct Input {
 				uint32_t mStepDelay;
-				uint32_t mProgramId;
+				IdType mProgramId;
 			};
 			
-			struct SensorState {
-				uint32_t mTargetBot;
-				
+			struct SensorState : private Save::OperatorImpl<SensorState> {
+				IdType mTargetBot;
 				bool mWasHit;
 				
-				void save(Save::BasePtr &fp);
-				void load(Save::BasePtr &fp);
+				void save(Save::BasePtr &fp) const
+					{ fp << mTargetBot << mWasHit; }
+				void load(Save::BasePtr &fp)
+					{ fp >> mTargetBot >> mWasHit; }
 			};
 			
 			struct Engine {
@@ -48,18 +49,17 @@ namespace Sim {
 				Vector mDirection;
 			};
 			
-			struct State {
+			struct State : private Save::OperatorImpl<State> {
 				public:
 					State() : mSide(0), mType(0),
 						mSensor(), mBody(), mWeapon(),
 						mCpu(), mAbility(), mEngine()
 						{}
 					
-					uint32_t mSide;
-					uint32_t mType;
+					IdType mSide;
+					IdType mType;
 					
 					SensorState mSensor;
-					
 					Body mBody;
 					Health mHealth;
 					
@@ -68,16 +68,13 @@ namespace Sim {
 					BotAbility mAbility;
 					Engine mEngine;
 					
-				private:
-					void save(Save::BasePtr &fp);
+					void save(Save::BasePtr &fp) const;
 					void load(Save::BasePtr &fp);
-					
-					friend class Bot;
 			};
 			typedef State Config;
 			
-			uint32_t getId() const { return mId; }
-			uint32_t getTypeId() const { return getState().mType; }
+			IdType getId() const { return mId; }
+			IdType getTypeId() const { return getState().mType; }
 			Body &getBody() { return getState().mBody; }
 			Health &getHealth() { return getState().mHealth; }
 			
@@ -93,7 +90,7 @@ namespace Sim {
 			//@}
 			
 		private:
-			Bot(Simulation *sim, uint32_t id, const State &cfg=State());
+			Bot(Simulation *sim, IdType id, const State &cfg=State());
 			~Bot();
 			
 			/// @name Interaction
@@ -102,7 +99,7 @@ namespace Sim {
 				void updateCpu(double stepTime);
 				void step(double stepTime);
 				
-				void save(Save::BasePtr &fp);
+				void save(Save::BasePtr &fp) const;
 				void load(Save::BasePtr &fp);
 			//@}
 			
@@ -121,7 +118,7 @@ namespace Sim {
 			 * used for management of a bot.
 			 */
 			//@{
-				uint32_t mId;
+				IdType mId;
 				Simulation *mSim;
 			//@}
 			
@@ -155,9 +152,9 @@ namespace Sim {
 			
 			/// @name Interaction
 			//@{
-				uint32_t createBot(const Bot::Config &cfg);
+				IdType createBot(const Bot::Config &cfg);
 				
-				Bot *getBot(uint32_t id) { return getObject(id); }
+				Bot *getBot(IdType id) { return getObject(id); }
 				
 				const UidFactory<Bot>::DataList &getBotList() const
 					{ return getData(); }
@@ -173,7 +170,7 @@ namespace Sim {
 			//@{
 				void deleteInstance(Bot* obj) { delete obj; }
 				void saveObj(Bot *bot, Save::BasePtr &fp);
-				Bot* loadObj(uint32_t id, Save::BasePtr &fp);
+				Bot* loadObj(IdType id, Save::BasePtr &fp);
 			//@}
 	};
 	

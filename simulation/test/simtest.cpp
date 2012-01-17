@@ -25,11 +25,32 @@ class DemoWeapon : public Sim::Weapon {
 		
 		void step(double stepTime) {}
 		
+		void printHull(Sim::Health::Hull &hull) {
+			printf("\t\t%-10s : %3d / %3d\n",
+				sim.getData().getArmorDb().getNameOf(hull.getType()).c_str(),
+				hull.getHealth(), hull.getMaxHealth() );
+		}
+		
+		void printBotArmor(Sim::Bot *bot) {
+			printf("\tCore:\n");
+			printHull(bot->getState().mHealth.getCore());
+			
+			printf("\tAttachments:\n");
+			Sim::Health::AttachmentVec  atmVec =
+				bot->getState().mHealth.getAttachments();
+			for(Sim::Health::AttachmentVec::iterator i=atmVec.begin();
+				i!=atmVec.end(); i++) {
+				printHull(*i);
+			}
+		}
+		
 		void shoot(Sim::Bot *bot, Sim::Save &arg) {
-			Sim::Health::Hull &core = bot->getHealth().getCore();
-			printf("Before: %d / %d\n", core.getHealth(), core.getMaxHealth());
+			printf("Before:\n");
+			printBotArmor(bot);
 			bot->getHealth().causeDamage(mSim, 20, 1);
-			printf("Bang! %d / %d\n", core.getHealth(), core.getMaxHealth());
+			printf("After:\n");
+			printBotArmor(bot);
+			printf("\n");
 		}
 };
 
@@ -63,15 +84,17 @@ void loadDamageArmor()
 	
 	Sim::ArmorD *armor = armorDb.newArmor("Light");
 	Sim::ArmorD *shield = armorDb.newArmor("Shield");
+	Sim::ArmorD *hardened = armorDb.newArmor("Hardened");
 	
 	armor->registerRule(1, Sim::ArmorD::DamageRule(2.0) );
 	shield->registerRule(1, Sim::ArmorD::DamageRule(0.3) );
+	hardened->setDefaultRule( Sim::ArmorD::DamageRule(0.1) );
 }
 
 void loadSides()
 {
 	Sim::Player testSide;
-	testSide.allyGroup = 0;
+	testSide.mAllyGroup = 0;
 	
 	sim.getState().getPlayerData().addPlayer(testSide);
 }
@@ -144,6 +167,14 @@ void setupWorld()
 	botCfg.mWeapon.addWeapon( weapon->getId() );
 	uint32_t botId = sim.getState().getBotFactory().createBot( botCfg );
 	
+	// Create a second dummy bot
+	botCfg = Sim::Bot::Config();
+	botCfg.mSide = 0;
+	botCfg.mType = 0;
+	botCfg.mBody.mPos = Sim::Vector(50,50);
+	
+	sim.getState().getBotFactory().createBot( botCfg );
+	
 	// Give the bot some input
 	using namespace Sim::Prog;
 	Sim::InputManager &inMgr = sim.getState().getInputManager();
@@ -162,6 +193,24 @@ void setupWorld()
 	inMgr.registerInput(botId, shoot->getId(), 5);
 	
 	sim.getState().getWorld().getTile(3,5).setType(1);
+	
+	// Create abilities and distribute them
+	{
+		using namespace Sim::Abil;
+		
+		Sim::AbilityFactory &abilFact = sim.getState().getAbilityFactory();
+		
+		CpuBoost *sharedBoost =
+			abilFact.createAbility<CpuBoost>( CpuBoost::Config(0, 5) );
+		ArmorAttachment *armorAtm =
+			abilFact.createAbility<ArmorAttachment>(
+			ArmorAttachment::Config(2, 10)
+		);
+		
+		Sim::Player &player = sim.getState().getPlayerData().getPlayer(0);
+		player.mGlobalAbilities.push_back(sharedBoost->getId());
+		player.mGlobalAbilities.push_back(armorAtm->getId());
+	}
 }
 
 

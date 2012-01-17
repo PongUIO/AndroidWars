@@ -11,7 +11,7 @@ namespace Sim {
 	WeaponFactory::~WeaponFactory()
 	{}
 	
-	const DataBehaviourT<Weapon>::Behaviour* WeaponFactory::getBehaviourFromId(uint32_t id) const
+	const DataBehaviourT<Weapon>::Behaviour* WeaponFactory::getBehaviourFromId(IdType id) const
 	{	return mSim->getData().getWeaponDb().getType(id); }
 	
 	const DataBehaviourT<Weapon>::Behaviour* WeaponFactory::getBehaviourFromName(const std::string& name) const
@@ -20,21 +20,14 @@ namespace Sim {
 	
 	// WeaponBox
 	// 
-	// 
-	void WeaponBox::save(Save::BasePtr& fp)
+	//
+	void WeaponBox::save(Save::BasePtr& fp) const
 	{
-		fp.writeInt<uint32_t>(mData.size());
-		for(WeaponVec::iterator i=mData.begin(); i!=mData.end(); ++i) {
-			fp.writeInt<uint32_t>(*i);
-		}
+		fp.writeCtr(mData);
 	}
 	
 	void WeaponBox::load(Save::BasePtr& fp)
 	{
-		uint32_t count = fp.readInt<uint32_t>();
-		for(uint32_t i=0; i<count; i++) {
-			uint32_t id = fp.readInt<uint32_t>();
-			mData.push_back(id);
-		}
+		fp.readCtr(mData);
 	}
 }

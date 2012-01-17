@@ -15,15 +15,20 @@ namespace Sim {
 			public:
 				_SIM_ABILITY_HEADER
 				
-				struct Config {
+				struct Config : private Save::OperatorImpl<Config> {
 					double mPercentage;
 					int32_t mAbsolute;
 					
 					Config(double percentage=0.0, uint32_t absolute=0) :
 						mPercentage(percentage), mAbsolute(absolute) {}
+					
+					void save(Save::BasePtr &fp) const
+					{ fp << mPercentage << mAbsolute; }
+					void load(Save::BasePtr &fp)
+					{ fp >> mPercentage >> mAbsolute; }
 				};
 				
-				CpuBoost(Simulation* sim, uint32_t id, uint32_t typeId,
+				CpuBoost(Simulation* sim, IdType id, IdType typeId,
 					const Config &cfg);
 				virtual ~CpuBoost();
 				

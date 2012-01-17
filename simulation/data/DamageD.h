@@ -16,10 +16,10 @@ namespace Sim {
 			DamageD() {}
 			~DamageD() {}
 			
-			uint32_t getId() const { return mId; }
+			IdType getId() const { return mId; }
 			
 		private:
-			uint32_t mId;
+			IdType mId;
 			
 			friend class DamageDatabase;
 	};
@@ -32,19 +32,22 @@ namespace Sim {
 			DamageDatabase() {}
 			virtual ~DamageDatabase() {}
 			
-			const DamageD *getDamage(uint32_t id) const
+			const DamageD *getDamage(IdType id) const
 			{ return getType(id); }
 			
 			const DamageD *getDamage(const std::string &name) const
 			{ return getType(mNameIdMgr.getIdOf(name)); }
 			
-			uint32_t getIdOf(const std::string &name) const
+			IdType getIdOf(const std::string &name) const
 			{ return mNameIdMgr.getIdOf(name); }
+			
+			std::string getNameOf(IdType id) const
+			{ return mNameIdMgr.getNameOf(id); }
 			
 			DamageD *newDamage(const std::string &name)
 			{
 				DamageD *data = new DamageD();
-				uint32_t id = addType(data);
+				IdType id = addType(data);
 				data->mId = id;
 				
 				mNameIdMgr.connect(id, name);

@@ -9,6 +9,8 @@
 #include "program/ProgramInclude.h"
 #include "ability/AbilityInclude.h"
 
+#include "Common.h"
+
 namespace Sim {
 	struct Configuration {
 		Configuration() :

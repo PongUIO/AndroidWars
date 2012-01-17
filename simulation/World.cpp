@@ -54,12 +54,11 @@ namespace Sim {
 	
 	void World::save(Save::BasePtr &fp)
 	{
-		fp.writeInt(mWidth);
-		fp.writeInt(mHeight);
+		fp << mWidth << mHeight;
+		fp << mOffScreen;
+		
 		for(size_t i=0; i<mWidth*mHeight; i++) {
-			Tile &t = mData[i];
-			fp.writeInt(t.mType);
-			fp.writeInt(t.mColType.data);
+			fp << mData[i];
 		}
 	}
 	
@@ -67,16 +66,12 @@ namespace Sim {
 	{
 		mData.clear();
 		
-		mWidth = fp.readInt<uint32_t>();
-		mHeight = fp.readInt<uint32_t>();
+		fp >> mWidth >> mHeight;
+		fp >> mOffScreen;
 		
-		mOffScreen = Tile(0);
+		mData.resize(mWidth*mHeight);
 		for(size_t i=0; i<mWidth*mHeight; i++) {
-			Tile t;
-			t.mType = fp.readInt<uint16_t>();
-			t.mColType.data = fp.readInt<uint8_t>();
-			
-			mData.push_back(t);
+			fp >> mData[i];
 		}
 	}
 	

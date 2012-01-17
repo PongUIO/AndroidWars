@@ -6,23 +6,6 @@
 #include "State.h"
 
 namespace Sim {
-	// BotInput
-	//
-	//
-	void BotInput::save(Save::BasePtr& fp)
-	{
-		fp.writeInt<uint32_t>(mTargetBot);
-		fp.writeInt<uint32_t>(mProgramId);
-		fp.writeInt<uint32_t>(mDelay);
-	}
-	
-	void BotInput::load(Save::BasePtr& fp)
-	{
-		mTargetBot = fp.readInt<uint32_t>();
-		mProgramId = fp.readInt<uint32_t>();
-		mDelay = fp.readInt<uint32_t>();
-	}
-	
 	// InputManager
 	//
 	//
@@ -59,13 +42,12 @@ namespace Sim {
 	
 	void InputManager::save(Save::BasePtr& fp)
 	{
-		mBotInput.save(fp);
+		fp << mBotInput;
 	}
 
 	void InputManager::load(Save::BasePtr& fp)
 	{
-		mBotInput.load(fp);
-		
+		fp >> mBotInput;
 	}
 
 }

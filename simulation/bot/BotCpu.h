@@ -12,18 +12,18 @@ namespace Sim {
 	// Forward declarations
 	class Bot;
 	
-	class BotCpu {
+	class BotCpu : private Save::OperatorImpl<BotCpu> {
 		public:
-			struct Schedule {
-				Schedule(uint32_t progId, uint32_t activateStep,
-					uint32_t scheduleCounter) :
+			struct Schedule : private Save::OperatorImpl<Schedule> {
+				Schedule(IdType progId=0, uint32_t activateStep=0,
+					IdType scheduleCounter=0) :
 					mProgId(progId), mActivateStep(activateStep),
 					mScheduleCounter(scheduleCounter)
 				{}
 				
-				uint32_t mProgId;
+				IdType mProgId;
 				uint32_t mActivateStep;
-				uint32_t mScheduleCounter;
+				IdType mScheduleCounter;
 				
 				bool isReady(uint32_t currentStep) const
 				{ return currentStep >= mActivateStep; }
@@ -32,25 +32,30 @@ namespace Sim {
 				{ return mActivateStep>other.mActivateStep ||
 					(mActivateStep==other.mActivateStep &&
 					mScheduleCounter>other.mScheduleCounter); }
+				
+				void save(Save::BasePtr &fp) const
+				{ fp << mProgId << mActivateStep << mScheduleCounter; }
+				void load(Save::BasePtr &fp)
+				{ fp >> mProgId >> mActivateStep >> mScheduleCounter; }
 			};
 			
 			typedef std::priority_queue<Schedule> ScheduleQueue;
-			typedef std::list<uint32_t> ProgramRefList;
+			typedef std::list<IdType> ProgramRefList;
 			
 			BotCpu();
 			~BotCpu();
 			
 			int32_t getCycles() const { return mCycleCount; }
 			
-			void scheduleProgram(uint32_t progId, uint32_t stepDelay);
+			void scheduleProgram(IdType progId, uint32_t stepDelay);
 			const ProgramRefList &getProgramList() { return mProgramList; }
 			
-			bool hasRunningProgram(uint32_t progId);
+			bool hasRunningProgram(IdType progId);
 			bool isRunning() { return mIsRunning; }
 			
 			void feedCycles(int32_t cycleCount);
 			
-			void save(Save::BasePtr &fp);
+			void save(Save::BasePtr &fp) const;
 			void load(Save::BasePtr &fp);
 			
 		private:
@@ -60,25 +65,33 @@ namespace Sim {
 			void runScheduler(double stepTime);
 			void runPrograms(double stepTime);
 			
-			void autoSchedule(uint32_t progId);
+			void autoSchedule(IdType progId);
 			void iterProgram(bool eraseCurrent=false);
 			
-			Bot *mHost;
+			/// @name Temporary data
+			//@{
+				Bot *mHost;
+				bool mIsRunning;
+				
+				ProgramRefList::iterator mAutoScheduleIndex;
+				
+				/// Internal temporary counter that makes sure
+				/// all programs are only processed once per step.
+				uint32_t mMaxProcessCount;
+			//@}
 			
-			ScheduleQueue mScheduleQueue;
-			uint32_t mScheduleCounter;
+			/// @name Dynamic data
+			//@{
+				ScheduleQueue mScheduleQueue;
+				IdType mScheduleCounter;
+				
+				ProgramRefList mProgramList;
+				
+				bool mIsEndIter;
+				ProgramRefList::iterator mCurProgram;
 			
-			ProgramRefList mProgramList;
-			bool mIsEndIter;
-			bool mIsRunning;
-			ProgramRefList::iterator mCurProgram;
-			ProgramRefList::iterator mAutoScheduleIndex;
-			
-			int32_t mCycleCount;
-			
-			/// Internal temporary counter that makes sure
-			/// all programs are only processed once per step.
-			uint32_t mMaxProcessCount;
+				int32_t mCycleCount;
+			//@}
 			
 			friend class Bot;
 	};

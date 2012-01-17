@@ -29,17 +29,17 @@ namespace Sim {
 		double friction;     ///< The friction for the tile
 	};
 	
-	class TileDatabase : public DataT<TileD,uint16_t> {
+	class TileDatabase : public DataT<TileD> {
 		public:
 			TileDatabase() {}
 			virtual ~TileDatabase() {}
 			
 			/// @name Compatibility layer
 			//@{
-				const TileD &getTile(uint16_t type) const
+				const TileD &getTile(IdType type) const
 				{ return *getType(type); }
 				
-				uint16_t addTile(const TileD &tile)
+				IdType addTile(const TileD &tile)
 				{ return addType(new TileD(tile) ); }
 			//@}
 			

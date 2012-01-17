@@ -14,27 +14,27 @@ namespace Sim {
 				double mMultiplier;
 				bool mIsIgnoring;
 			};
-			typedef boost::unordered_map<uint32_t, DamageRule> RuleMap;
+			typedef boost::unordered_map<IdType, DamageRule> RuleMap;
 			
 			ArmorD() {}
 			~ArmorD() {}
 			
-			const DamageRule &getDamageRule(uint32_t dmgType) const {
+			const DamageRule &getDamageRule(IdType dmgType) const {
 				RuleMap::const_iterator i=mRules.find(dmgType);
 				return (i==mRules.end()) ? mDefault : i->second;
 			}
 			
 			void setDefaultRule(const DamageRule &data) { mDefault = data; }
-			void registerRule(uint32_t dmgType, const DamageRule &data)
+			void registerRule(IdType dmgType, const DamageRule &data)
 			{ mRules[dmgType] = data; }
 			
-			uint32_t getId() const { return mId; }
+			IdType getId() const { return mId; }
 			
 		private:
 			DamageRule mDefault;
 			RuleMap mRules;
 			
-			uint32_t mId;
+			IdType mId;
 			
 			friend class ArmorDatabase;
 	};
@@ -44,22 +44,22 @@ namespace Sim {
 			ArmorDatabase() {}
 			virtual ~ArmorDatabase() {}
 			
-			const ArmorD *getArmor(uint32_t id) const
+			const ArmorD *getArmor(IdType id) const
 			{ return getType(id); }
 			
 			const ArmorD *getArmor(const std::string &name) const
 			{ return getType(mNameIdMgr.getIdOf(name)); }
 			
-			uint32_t getIdOf(const std::string &name) const
+			IdType getIdOf(const std::string &name) const
 			{ return mNameIdMgr.getIdOf(name); }
 			
-			std::string getNameOf(uint32_t id) const
+			std::string getNameOf(IdType id) const
 			{ return mNameIdMgr.getNameOf(id); }
 			
 			ArmorD *newArmor(const std::string &name)
 			{
 				ArmorD *data = new ArmorD();
-				uint32_t id = addType(data);
+				IdType id = addType(data);
 				data->mId = id;
 				
 				mNameIdMgr.connect(id,name);

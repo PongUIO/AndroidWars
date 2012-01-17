@@ -15,20 +15,4 @@ namespace Sim {
 		
 		mPos += mVel*stepTime + mAcc*0.5*stepTime*stepTime;
 	}
-	
-	void Body::save(Save::BasePtr &fp)
-	{
-		fp.writeVec(mPos);
-		fp.writeVec(mVel);
-		fp.writeVec(mAcc);
-		fp.writeFloat(mMass);
-	}
-	
-	void Body::load(Save::BasePtr& fp)
-	{
-		mPos = fp.readVec();
-		mVel = fp.readVec();
-		mAcc = fp.readVec();
-		mMass = fp.readFloat();
-	}
 }

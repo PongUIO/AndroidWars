@@ -5,7 +5,7 @@
 #include "Save.h"
 
 namespace Sim {
-	class Body {
+	class Body : public Save::OperatorImpl<Body> {
 		public:
 			Body();
 			
@@ -19,8 +19,10 @@ namespace Sim {
 			void addMomentum(const Vector &mom)
 			{ mVel += mom/mMass; }
 			
-			void save(Save::BasePtr &fp);
-			void load(Save::BasePtr &fp);
+			void save(Save::BasePtr &fp) const
+			{ fp << mPos << mVel << mAcc << mMass; }
+			void load(Save::BasePtr &fp)
+			{ fp >> mPos >> mVel >> mAcc >> mMass; }
 			
 		private:
 			

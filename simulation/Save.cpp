@@ -1,5 +1,7 @@
 #include "Save.h"
 
+#include "Common.h"
+
 namespace Sim {
 	const char *Save::FP_mix = "%g";
 	int Save::FP_mix_bufSize = 32;
@@ -37,4 +39,44 @@ namespace Sim {
 		memcpy(&file.data[oldSize], ptr, bytes);
 		readPtr += bytes;
 	}
+	
+	// Save::BasePtr stream operators
+	//
+	//
+	
+	// Base macros
+#define WRITE_FUNC(Type, contents) \
+	template<> Save::BasePtr& Save::BasePtr::operator<<(Type val) \
+	{ contents; return *this; }
+#define READ_FUNC(Type, contents) \
+	template<> Save::BasePtr& Save::BasePtr::operator>>(Type &val) \
+	{ contents; return *this; }
+
+#define STREAM_FUNC(Type, writeCts, readCts) \
+	WRITE_FUNC(Type, writeCts) \
+	READ_FUNC(Type, readCts)
+	
+	// Base types
+#define STREAM_INT(Type) \
+	STREAM_FUNC(Type, writeInt<Type>(val), val=readInt<Type>())
+#define STREAM_FLOAT(Type) \
+	STREAM_FUNC(Type, writeFloat<Type>(val), val=readFloat())
+	
+	STREAM_INT(int8_t)
+	STREAM_INT(int16_t)
+	STREAM_INT(int32_t)
+	STREAM_INT(int64_t)
+	
+	STREAM_INT(uint8_t)
+	STREAM_INT(uint16_t)
+	STREAM_INT(uint32_t)
+	STREAM_INT(uint64_t)
+	
+	STREAM_FLOAT(float)
+	STREAM_FLOAT(double)
+	
+	// Special types
+	STREAM_FUNC(Vector, writeVec(val), val=readVec())
+	STREAM_FUNC(Save, writeSave(val), val=readSave())
+	STREAM_FUNC(bool, writeInt<uint8_t>(val), val=readInt<uint8_t>())
 }

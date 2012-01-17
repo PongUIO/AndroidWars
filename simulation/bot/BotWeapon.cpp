@@ -1,5 +1,3 @@
-#include <boost/lambda/lambda.hpp>
-
 #include "BotWeapon.h"
 #include "../Bot.h"
 #include "../Simulation.h"
@@ -54,15 +52,15 @@ namespace Sim {
 		mOrder.clear();
 	}
 	
-	void BotWeapon::save(Save::BasePtr& fp)
+	void BotWeapon::save(Save::BasePtr& fp) const
 	{
-		fp.writeCtr(mOrder, boost::bind(&Order::save, _1, _2));
-		mWeaponBox.save(fp);
+		fp.writeCtr(mOrder);
+		fp << mWeaponBox;
 	}
 	
 	void BotWeapon::load(Save::BasePtr& fp)
 	{
-		fp.readCtr(mOrder, boost::bind(&Order::load, _1, _2));
-		mWeaponBox.load(fp);
+		fp.readCtr(mOrder);
+		fp >> mWeaponBox;
 	}
 }

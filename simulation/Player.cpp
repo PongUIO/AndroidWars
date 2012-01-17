@@ -2,6 +2,13 @@
 #include "State.h"
 
 namespace Sim {
+	// Player
+	//
+	//
+	
+	// PlayerData
+	//
+	//
 	PlayerData::PlayerData()
 	{}
 	PlayerData::~PlayerData()
@@ -24,29 +31,17 @@ namespace Sim {
 	
 	void PlayerData::addPlayer(Player& side)
 	{
-		side.sideId = mData.size();
+		side.mSideId = mData.size();
 		mData.push_back(side);
 	}
 	
 	void PlayerData::save(Save::BasePtr& fp)
 	{
-		fp.writeInt<uint32_t>(mData.size());
-		for(size_t i=0; i<mData.size(); i++) {
-			Player &pl = mData[i];
-			fp.writeInt<uint32_t>(pl.sideId);
-			fp.writeInt<uint32_t>(pl.allyGroup);
-		}
+		fp.writeCtr(mData);
 	}
 	
 	void PlayerData::load(Save::BasePtr& fp)
 	{
-		mData.clear();
-		
-		uint32_t count = fp.readInt<uint32_t>();
-		for(uint32_t i=0; i<count; i++) {
-			Player pl;
-			pl.sideId = fp.readInt<uint32_t>();
-			pl.allyGroup = fp.readInt<uint32_t>();
-		}
+		fp.readCtr(mData);
 	}
 }

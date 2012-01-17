@@ -15,12 +15,12 @@ namespace Sim {
 				_SIM_PROGRAM_HEADER
 				
 				struct Config {
-					uint32_t mTargetId;
+					IdType mTargetId;
 					
-					explicit Config(uint32_t id=FactoryNoId) : mTargetId(id) {}
+					explicit Config(IdType id=NoId) : mTargetId(id) {}
 				};
 				
-				Kill(Simulation* sim, uint32_t id, uint32_t typeId,
+				Kill(Simulation* sim, IdType id, IdType typeId,
 					 const Config &cfg);
 				~Kill();
 				
@@ -33,7 +33,7 @@ namespace Sim {
 				void process(Bot* bot, BotCpu* cpu);
 				bool isFinished(Bot* bot, BotCpu* cpu) { return false; }
 				
-				uint32_t mTargetId;
+				IdType mTargetId;
 		};
 	}
 }

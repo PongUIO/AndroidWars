@@ -7,7 +7,7 @@
 
 namespace Sim {
 	namespace Prog {
-		MoveTowards::MoveTowards(Simulation *sim, uint32_t id, uint32_t typeId,
+		MoveTowards::MoveTowards(Simulation *sim, IdType id, IdType typeId,
 			const Config& cfg) :
 			Program(sim, id, typeId), mType(cfg.mType),
 			mTarget(cfg.mTargetId), mTargetPos(cfg.mTargetPos)
@@ -19,7 +19,7 @@ namespace Sim {
 		
 		void MoveTowards::process(Bot* bot, BotCpu* cpu)
 		{
-			if(mTarget != FactoryNoId) {
+			if(mTarget != NoId) {
 				Bot *target = mSim->getState().getBotFactory().getBot(mTarget);
 				if(target)
 					mTargetPos = target->getState().mBody.mPos;
@@ -35,18 +35,14 @@ namespace Sim {
 		
 		void MoveTowards::save(Save::BasePtr& fp)
 		{
-			fp.writeInt<uint8_t>(mType);
-			fp.writeInt<uint32_t>(mTarget);
-			fp.writeVec(mTargetPos);
+			fp << mType << mTarget << mTargetPos;
 			
 			return Program::save(fp);
 		}
 		
 		void MoveTowards::load(Save::BasePtr& fp)
 		{
-			mType = (DestinationType)fp.readInt<uint8_t>();
-			mTarget = fp.readInt<uint32_t>();
-			mTargetPos = fp.readVec();
+			fp >> mType >> mTarget >> mTargetPos;
 			
 			return Program::load(fp);
 		}

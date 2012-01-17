@@ -2,7 +2,9 @@
 #define SIM_SAVE_H
 
 #include <boost/crc.hpp>
+#include <boost/bind.hpp>
 
+#include <algorithm>
 #include <vector>
 #include <stdint.h>
 #include <stdio.h>
@@ -87,6 +89,9 @@ namespace Sim {
 					}
 					
 					template<class T>
+					void readIntRef(T &ref) { ref = readInt<T>(); }
+					
+					template<class T>
 					void writeFloat(const T &v) {
 						char byteStr[FP_mix_bufSize];
 						memset(byteStr,0, FP_mix_bufSize);
@@ -104,6 +109,9 @@ namespace Sim {
 						nanoRead( (uint8_t*)byteStr, bytes);
 						return atof(byteStr);
 					}
+					
+					template<class T>
+					void readFloatRef(T &ref) { ref = readFloat(); }
 					
 					void writeVec(const Vector &v)
 					{ writeFloat(v.x); writeFloat(v.y); }
@@ -135,39 +143,123 @@ namespace Sim {
 					}
 					
 					/**
-					 * Writes a vector container to the stream.
+					 * Writes a vector or list container to the stream.
 					 * 
 					 * @param writeFunc A function object, takes two
 					 * parameters: A reference to the object to be written,
 					 * and a reference to this write pointer object.
 					 */
-					template<class C, class Func>
-					void writeCtr(const C &data, Func writeFunc)
+					template<class C>
+					void writeCtr(const C &data)
 					{
-						writeInt<uint32_t>(data.size());
+						*this << uint32_t(data.size());
 						for(typename C::const_iterator i=data.begin();
 							i!=data.end(); i++)
-							writeFunc(*i, *this);
+							*this << *i;
 					}
 					
 					/**
-					 * Reads a vector container from the stream.
+					 * Reads a vector or list container from the stream.
 					 * 
 					 * @param readFunc A function object taking the parameters:
 					 * An input data object, and a referece to this read
 					 * pointer object.
 					 */
-					template<class C, class Func>
-					void readCtr(C &data, Func readFunc)
+					template<class C>
+					void readCtr(C &data)
 					{
 						data.clear();
 						
-						uint32_t count = readInt<uint32_t>();
+						uint32_t count;
+						*this >> count;
+						
 						data.resize(count);
-						for(uint32_t i=0; i<count; i++) {
-							readFunc(data[i], *this);
+						for(typename C::iterator i=data.begin();
+							i!=data.end(); i++) {
+							*this >> *i;
 						}
 					}
+					
+					template<class C>
+					void readIntCtr(C &data)
+					{
+						readCtr(data,
+							boost::bind(&BasePtr::readIntRef<typename C::value_type>,
+							_2, _1)
+						);
+					}
+					
+					/// Writes a queue to the stream
+					template<class C>
+					void writeQueue(const C &data)
+					{
+						C queueCopy = C(data);
+						*this << uint32_t(queueCopy.size());
+						while(queueCopy.size()>0) {
+							*this << queueCopy.top();
+							queueCopy.pop();
+						}
+					}
+					
+					/// Reads a queue from the stream
+					template<class C>
+					void readQueue(C &data)
+					{
+						uint32_t loadCount;
+						*this >> loadCount;
+						while(loadCount>0) {
+							typename C::value_type dataObj;
+							*this >> dataObj;
+							
+							data.push(dataObj);
+							loadCount--;
+						}
+					}
+					
+					/**
+					 * Writes an unordered set to the stream.
+					 * 
+					 * The set is sorted before insertion to assure
+					 * the checksum is deterministic.
+					 */
+					template<class C>
+					void writeUnorderedSet(const C &data)
+					{
+						typedef std::vector<typename C::value_type> SetVector;
+						
+						SetVector result = SetVector(data.size());
+						
+						std::partial_sort_copy(data.begin(),data.end(),
+							result.begin(), result.end());
+						
+						writeCtr(result);
+					}
+					
+					/**
+					 * Reads an unordered set from the stream.
+					 */
+					template<class C>
+					void readUnorderedSet(C &data)
+					{
+						typedef std::vector<typename C::value_type> SetVector;
+						
+						SetVector input;
+						readCtr(input);
+						
+						data.clear();
+						for(typename SetVector::iterator i=input.begin();
+							i!=input.end(); i++) {
+							data.insert(*i);
+						}
+					}
+					
+					/// Writes a value into the stream
+					template<class T>
+					Save::BasePtr &operator<<(T val);
+					
+					/// Reads a value from the stream
+					template<class T>
+					Save::BasePtr &operator>>(T &val);
 					
 					virtual uint32_t debugReadPos() { return 0; }
 					virtual uint32_t debugWritePos() { return 0; }
@@ -225,6 +317,19 @@ namespace Sim {
 					
 					uint32_t size()
 					{ return mSize; }
+			};
+			
+			/**
+			 * Implements the operators necessary for
+			 * for saving special types.
+			 */
+			template<class T>
+			struct OperatorImpl {
+				friend Save::BasePtr &operator<<(Save::BasePtr &fp, T const& ref)
+				{ ref.save(fp); return fp; }
+				
+				friend Save::BasePtr &operator>>(Save::BasePtr &fp, T &ref)
+				{ ref.load(fp); return fp; }
 			};
 	};
 }

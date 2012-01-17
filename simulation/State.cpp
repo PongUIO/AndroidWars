@@ -36,10 +36,10 @@ namespace Sim {
 		registerCallObj(&mWorld);
 		registerCallObj(&mBotFactory);
 		registerCallObj(&mProgramFactory);
-		registerCallObj(&mAbilityFactory);
 		registerCallObj(&mWeaponFactory);
 		registerCallObj(&mBulletFactory);
 		registerCallObj(&mPlayer);
+		registerCallObj(&mAbilityFactory);
 	}
 	
 	void State::startup()
@@ -77,16 +77,14 @@ namespace Sim {
 	
 	void State::save(Save::BasePtr &fp)
 	{
-		fp.writeInt<uint32_t>(getCurPhase());
-		fp.writeInt<uint32_t>(getCurPhaseStep());
+		fp << mCtrl;
 		
 		call( boost::bind(&StateObj::save, _1, boost::ref(fp)) );
 	}
 	
 	void State::load(Save::BasePtr& fp)
 	{
-		curPhase() = fp.readInt<uint32_t>();
-		curPhaseStep() = fp.readInt<uint32_t>();
+		fp >> mCtrl;
 		
 		call( boost::bind(&StateObj::load, _1, boost::ref(fp)) );
 	}

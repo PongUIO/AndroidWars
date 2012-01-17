@@ -6,19 +6,22 @@ namespace Sim {
 	// BotCpu
 	//
 	//
-	BotCpu::BotCpu() : mHost(0),
+	BotCpu::BotCpu() :
+			mHost(0), mIsRunning(false),
+			mAutoScheduleIndex(mProgramList.end()),
+			mMaxProcessCount(0),
+			
 			mScheduleQueue(), mScheduleCounter(0),
 			mProgramList(),
-			mIsEndIter(true), mIsRunning(false),
+			mIsEndIter(true), 
 			mCurProgram(mProgramList.end()),
-			mAutoScheduleIndex(mProgramList.end()),
 			mCycleCount(0)
 		{}
 	
 	BotCpu::~BotCpu()
 		{}
 	
-	void BotCpu::scheduleProgram(uint32_t progId, uint32_t stepDelay)
+	void BotCpu::scheduleProgram(IdType progId, uint32_t stepDelay)
 	{
 		if(mIsRunning && stepDelay==0) {
 			autoSchedule(progId);
@@ -147,7 +150,7 @@ namespace Sim {
 	 * also updates the number of processes that may be processed this
 	 * step.
 	 */
-	void BotCpu::autoSchedule(uint32_t progId)
+	void BotCpu::autoSchedule(IdType progId)
 	{
 		mProgramList.insert(mAutoScheduleIndex, progId);
 		mMaxProcessCount++;
@@ -228,7 +231,7 @@ namespace Sim {
 	/**
 	 * Checks if the CPU has a running program with the given ID.
 	 */
-	bool BotCpu::hasRunningProgram(uint32_t progId)
+	bool BotCpu::hasRunningProgram(IdType progId)
 	{
 		for(ProgramRefList::iterator i=mProgramList.begin();
 			i!=mProgramList.end(); i++) {
@@ -239,79 +242,40 @@ namespace Sim {
 		return false;
 	}
 	
-	void BotCpu::save(Save::BasePtr& fp)
+	void BotCpu::save(Save::BasePtr& fp) const
 	{
+		fp.writeQueue(mScheduleQueue);
+		fp << mScheduleCounter;
 		
-		ScheduleQueue scheduleCopy = ScheduleQueue(mScheduleQueue);
-		fp.writeInt<uint32_t>(scheduleCopy.size());
-		while(scheduleCopy.size()>0) {
-			const Schedule &sch = scheduleCopy.top();
-			fp.writeInt<uint32_t>(sch.mProgId);
-			fp.writeInt<uint32_t>(sch.mActivateStep);
-			fp.writeInt<uint32_t>(sch.mScheduleCounter);
-			scheduleCopy.pop();
-		}
-		fp.writeInt<uint32_t>(mScheduleCounter);
+		fp.writeCtr(mProgramList);
 		
-		fp.writeInt<uint32_t>(mProgramList.size());
-		for(ProgramRefList::iterator i=mProgramList.begin();
-			i!=mProgramList.end(); i++) {
-			fp.writeInt<uint32_t>(*i);
-		}
-		
-		// Calculate the current iterator position
-		fp.writeInt<uint8_t>(mIsEndIter);
+		fp << mIsEndIter;
 		if(!mIsEndIter) {
-			uint32_t iterPos = 0;
-			for(ProgramRefList::iterator i=mProgramList.begin();
-				i!=mProgramList.end(); i++) {
-				if(i==mCurProgram)
-					break;
-				iterPos++;
-			}
-			fp.writeInt<uint32_t>(iterPos);
+			ProgramRefList::const_iterator curIter= mCurProgram;
+			fp << uint32_t(std::distance(mProgramList.begin(),curIter));
 		}
 		
-		fp.writeInt<int32_t>(mCycleCount);
+		fp << mCycleCount;
 	}
 	
 	void BotCpu::load(Save::BasePtr& fp)
 	{
-		uint32_t loadCount;
+		fp.readQueue(mScheduleQueue);
+		fp >> mScheduleCounter;
 		
-		mScheduleQueue = ScheduleQueue();
-		loadCount = fp.readInt<uint32_t>();
-		while(loadCount>0) {
-			uint32_t progId = fp.readInt<uint32_t>();
-			uint32_t activateStep = fp.readInt<uint32_t>();
-			uint32_t schCount = fp.readInt<uint32_t>();
-			
-			mScheduleQueue.push( Schedule(progId, activateStep, schCount) );
-			loadCount--;
-		}
-		mScheduleCounter = fp.readInt<uint32_t>();
+		fp.readCtr(mProgramList);
 		
-		mProgramList.clear();
-		loadCount = fp.readInt<uint32_t>();
-		while(loadCount>0) {
-			uint32_t progId = fp.readInt<uint32_t>();
-			mProgramList.push_back(progId);
-			loadCount--;
-		}
-		
-		mIsEndIter = fp.readInt<uint8_t>();
+		fp << mIsEndIter;
 		if(mIsEndIter)
 			mCurProgram = mProgramList.end();
 		else {
-			uint32_t iterCount = fp.readInt<uint32_t>();
-			printf("%d\n", iterCount);
-			
+			uint32_t iterCount;
+			fp >> iterCount;
 			mCurProgram = mProgramList.begin();
-			while(mCurProgram != mProgramList.end() && (iterCount--)>0)
-				mCurProgram++;
+			std::advance(mCurProgram, iterCount);
 		}
 		
-		mCycleCount = fp.readInt<int32_t>();
+		fp >> mCycleCount;
 	}
 	
 }

@@ -16,20 +16,20 @@ namespace Sim {
 	
 	class Bullet {
 		public:
-			uint32_t getId() const { return mId; }
-			uint32_t getTypeId() const { return mTypeId; }
+			IdType getId() const { return mId; }
+			IdType getTypeId() const { return mTypeId; }
 			const Body &getBody() const { return mBody; }
 			
 			bool isDead() { return false; }
 			
 		protected:
-			Bullet(Simulation *sim, uint32_t id, uint32_t typeId) :
+			Bullet(Simulation *sim, IdType id, IdType typeId) :
 				mId(id), mTypeId(typeId), mSim(sim) {}
 			virtual ~Bullet() {}
 			
 			/// @name Interaction
 			//@{
-				virtual void save(Save::BasePtr &fp);
+				virtual void save(Save::BasePtr &fp) const;
 				virtual void load(Save::BasePtr &fp);
 				
 				virtual void step(double stepTime);
@@ -37,8 +37,8 @@ namespace Sim {
 			
 			/// @name Identification
 			//@{
-				uint32_t mId;
-				uint32_t mTypeId;
+				IdType mId;
+				IdType mTypeId;
 				Simulation *mSim;
 			//@}
 			
@@ -56,15 +56,15 @@ namespace Sim {
 			BulletFactory(Simulation *sim);
 			~BulletFactory();
 			
-			void destroyBullet(uint32_t id) { removeObj(id); }
-			Bullet *getBullet(uint32_t id) { return getObject(id); }
+			void destroyBullet(IdType id) { removeObj(id); }
+			Bullet *getBullet(IdType id) { return getObject(id); }
 			
 		private:
 			/// @name Factory-required functions
 			//@{
 				void deleteInstance(Bullet* obj) { delete obj; }
 				
-				const DataBehaviourT<Bullet>::Behaviour* getBehaviourFromId(uint32_t id) const;
+				const DataBehaviourT<Bullet>::Behaviour* getBehaviourFromId(IdType id) const;
 				const DataBehaviourT<Bullet>::Behaviour* getBehaviourFromName(const std::string& name) const;
 			//@}
 	};

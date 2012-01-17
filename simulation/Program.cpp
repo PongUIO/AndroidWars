@@ -38,18 +38,10 @@ namespace Sim {
 	}
 	
 	void Program::save(Save::BasePtr& fp)
-	{
-		mEndSensor.save(fp);
-		fp.writeInt<uint32_t>(mRunningTime);
-		fp.writeInt<uint8_t>(mFinished);
-	}
+	{	fp << mEndSensor << mRunningTime << mFinished; }
 	
 	void Program::load(Save::BasePtr& fp)
-	{
-		mEndSensor.load(fp);
-		mRunningTime = fp.readInt<uint32_t>();
-		mFinished = fp.readInt<uint8_t>();
-	}
+	{	fp >> mEndSensor >> mRunningTime >> mFinished; }
 	
 	
 	// ProgramFactory
@@ -103,10 +95,10 @@ namespace Sim {
 	{}
 	
 	void ProgramFactory::save(Save::BasePtr& fp)
-	{	fp.writeInt<uint32_t>(mLastPhaseInputId);
+	{	fp << mLastPhaseInputId;
 		UidFactory<Program>::save(fp); }
 	
 	void ProgramFactory::load(Save::BasePtr& fp)
-	{	mLastPhaseInputId = fp.readInt<uint32_t>();
+	{	fp >> mLastPhaseInputId;
 		UidFactory<Program>::load(fp); }
 }

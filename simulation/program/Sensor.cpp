@@ -13,28 +13,14 @@ namespace Sim {
 			}
 		}
 		
-		void Sensor::save(Save::BasePtr& fp)
+		void Sensor::save(Save::BasePtr& fp) const
 		{
-			fp.writeInt<uint32_t>(mResponseProg.size());
-			for(ProgramIdVec::iterator i=mResponseProg.begin();
-				i!=mResponseProg.end(); i++) {
-				Schedule &sch = *i;
-				fp.writeInt<uint32_t>(sch.mId);
-				fp.writeInt<uint32_t>(sch.mDelay);
-			}
+			fp.writeCtr(mResponseProg);
 		}
 		
 		void Sensor::load(Save::BasePtr& fp)
 		{
-			mResponseProg.clear();
-			
-			uint32_t count = fp.readInt<uint32_t>();
-			for(uint32_t i=0; i<count; i++) {
-				uint32_t id = fp.readInt<uint32_t>();
-				uint32_t delay = fp.readInt<uint32_t>();
-				
-				mResponseProg.push_back( Schedule(id, delay) );
-			}
+			fp.readCtr(mResponseProg);
 		}
 	}
 }

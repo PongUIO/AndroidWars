@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "../Save.h"
+#include "../Common.h"
 
 namespace Sim {
 	class Bot;
@@ -18,26 +19,31 @@ namespace Sim {
 		 * The class is not a true program by itself, it should be utilized
 		 * by other program types to simplify mass scheduling of programs.
 		 */
-		class Sensor {
+		class Sensor : private Save::OperatorImpl<Sensor> {
 			public:
-				struct Schedule {
-					Schedule(uint32_t id, uint32_t delay) :
+				struct Schedule : private Save::OperatorImpl<Schedule> {
+					Schedule(IdType id=0, uint32_t delay=0) :
 						mId(id), mDelay(delay) {}
 					
-					uint32_t mId;
+					IdType mId;
 					uint32_t mDelay;
+					
+					void save(Save::BasePtr &fp) const
+						{ fp << mId << mDelay; }
+					void load(Save::BasePtr &fp)
+						{ fp >> mId >> mDelay; }
 				};
 				typedef std::vector<Schedule> ProgramIdVec;
 				
 				Sensor() {}
 				~Sensor() {}
 				
-				void insertResponse(uint32_t progId, uint32_t delay)
+				void insertResponse(IdType progId, uint32_t delay)
 				{ mResponseProg.push_back( Schedule(progId, delay) ); }
 				
 				void execute(Bot *bot, BotCpu *cpu);
 				
-				void save(Save::BasePtr &fp);
+				void save(Save::BasePtr &fp) const;
 				void load(Save::BasePtr &fp);
 				
 				bool hasResponse() { return !mResponseProg.empty(); }

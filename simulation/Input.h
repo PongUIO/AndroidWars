@@ -2,9 +2,11 @@
 #define SIM_INPUT_H
 
 #include <stdint.h>
+#include <boost/bind.hpp>
 
 #include <deque>
 #include "Save.h"
+#include "Common.h"
 #include "StateObj.h"
 
 namespace Sim {
@@ -12,7 +14,7 @@ namespace Sim {
 	 * This class handles a buffer of input commands.
 	 */
 	template<class T>
-	class InputBuffer {
+	class InputBuffer : private Save::OperatorImpl< InputBuffer<T> > {
 		public:
 			InputBuffer() {}
 			~InputBuffer() {}
@@ -38,20 +40,11 @@ namespace Sim {
 				}
 			}
 			
-			void save(Save::BasePtr &fp) {
-				fp.writeInt<uint32_t>(mInputQueue.size());
-				for(typename InputQueue::iterator i=mInputQueue.begin();
-					i!=mInputQueue.end(); ++i) {
-					(*i).save(fp);
-				}
+			void save(Save::BasePtr &fp) const {
+				fp.writeCtr(mInputQueue);
 			}
 			void load(Save::BasePtr &fp) {
-				uint32_t numElm = fp.readInt<uint32_t>();
-				while( (numElm--) >0 ) {
-					T v = T();
-					v.load(fp);
-					addInput(v);
-				}
+				fp.readCtr(mInputQueue);
 			}
 			
 		private:
@@ -62,17 +55,19 @@ namespace Sim {
 	/**
 	 * This class handles basic bot input.
 	 */
-	struct BotInput {
-		BotInput(uint32_t botId=0, uint32_t progId=0, uint32_t delay=0) :
+	struct BotInput : public Save::OperatorImpl<BotInput> {
+		BotInput(IdType botId=0, IdType progId=0, uint32_t delay=0) :
 			mTargetBot(botId), mProgramId(progId), mDelay(delay)
 			{}
 		
-		uint32_t mTargetBot;
-		uint32_t mProgramId;
+		IdType mTargetBot;
+		IdType mProgramId;
 		uint32_t mDelay;
 		
-		void save(Save::BasePtr &fp);
-		void load(Save::BasePtr &fp);
+		void save(Save::BasePtr &fp) const
+		{ fp << mTargetBot << mProgramId << mDelay; }
+		void load(Save::BasePtr &fp)
+		{ fp >> mTargetBot >> mProgramId >> mDelay; }
 	};
 	
 	class InputManager : public StateObj {
@@ -96,7 +91,7 @@ namespace Sim {
 			void registerInput(const BotInput &in)
 			{ mBotInput.addInput(in); }
 			
-			void registerInput(uint32_t botId, uint32_t progId, uint32_t delay)
+			void registerInput(IdType botId, IdType progId, uint32_t delay)
 			{ registerInput(BotInput(botId, progId, delay)); }
 			
 			void registerInput(const InputBuffer<BotInput> &in)

@@ -5,7 +5,7 @@
 
 namespace Sim {
 	namespace Abil {
-		CpuBoost::CpuBoost(Simulation* sim, uint32_t id, uint32_t typeId,
+		CpuBoost::CpuBoost(Simulation* sim, IdType id, IdType typeId,
 			const Config& cfg): Ability(sim, id, typeId), mData(cfg)
 		{}
 		
@@ -27,14 +27,12 @@ namespace Sim {
 		
 		void CpuBoost::save(Save::BasePtr& fp)
 		{
-			fp.writeFloat(mData.mPercentage);
-			fp.writeInt<int32_t>(mData.mAbsolute);
+			fp << mData;
 		}
 
 		void CpuBoost::load(Save::BasePtr& fp)
 		{
-			mData.mPercentage = fp.readFloat();
-			mData.mAbsolute = fp.readInt<int32_t>();
+			fp >> mData;
 		}
 
 	}

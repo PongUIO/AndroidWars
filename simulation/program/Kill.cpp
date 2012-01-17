@@ -30,14 +30,14 @@ namespace Sim {
 		
 		void Kill::save(Save::BasePtr& fp)
 		{
-			fp.writeInt<uint32_t>(mTargetId);
+			fp << mTargetId;
 			
 			return Program::save(fp);
 		}
 		
 		void Kill::load(Save::BasePtr& fp)
 		{
-			mTargetId = fp.readInt<uint32_t>();
+			fp >> mTargetId;
 			
 			return Program::load(fp);
 		}
