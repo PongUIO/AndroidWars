@@ -16,6 +16,36 @@ namespace Sim {
 #include "ability/AbilityDef.def"
 #undef _SIM_ABILITY_DEF
 	
+	void Ability::abort(bool force) { mIsFinished=true; }
+	void Ability::toggleSuspend(bool isSuspended, bool force)
+	{ mIsActive = !isSuspended; }
+	
+	void Ability::injectDelay(int32_t delay, bool force)
+	{
+		int32_t newDelay = mDelay+delay;
+		if(newDelay < 0)
+			newDelay = 0;
+		
+		mDelay = newDelay;
+	}
+	
+	void Ability::setDuration(uint32_t duration, bool force)
+	{
+		if(duration < 0)
+			duration = -1;
+		
+		mDuration = duration;
+	}
+
+	
+	void Ability::updateInternal()
+	{
+		if(mDuration > 0 && mDuration!=uint32_t(-1))
+			mDuration--;
+		if(mDelay > 0)
+			mDelay--;
+	}
+	
 	// AbilityFactory
 	//
 	//
@@ -48,6 +78,8 @@ namespace Sim {
 	
 	void AbilityFactory::step(double stepTime)
 	{
+		factoryCall(boost::bind(&Ability::updateInternal, _1));
+		
 		// Force cleanup of dead abilities
 		cleanDead();
 	}
@@ -61,13 +93,13 @@ namespace Sim {
 	void AbilityFactory::saveObj(Ability* obj, Save::BasePtr& fp)
 	{
 		DefaultUidFactory<Ability>::saveObj(obj, fp);
-		fp << obj->mReferences;
+		obj->saveSys(fp);
 	}
 
 	Ability* AbilityFactory::loadObj(IdType internalId, Save::BasePtr& fp)
 	{
 		Ability *obj = DefaultUidFactory<Ability>::loadObj(internalId,fp);
-		fp >> obj->mReferences;
+		obj->loadSys(fp);
 		return obj;
 	}
 

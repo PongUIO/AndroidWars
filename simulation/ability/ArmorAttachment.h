@@ -20,11 +20,6 @@ namespace Sim { namespace Abil {
 				public:
 					Config(IdType type=0, uint32_t maxHealth=0) :
 						Hull(type, maxHealth) {}
-					
-					/*void save(Save::BasePtr &fp) const
-					{ fp << (Health::Hull&)*this; }
-					void load(Save::BasePtr &fp)
-					{ fp >> (Health::Hull&)*this; }*/
 			};
 			
 			ArmorAttachment(Simulation* sim, IdType id, IdType typeId,

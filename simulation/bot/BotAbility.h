@@ -89,7 +89,7 @@ namespace Sim {
 			void endAbility(Ability *ability);
 			
 			template<class Func>
-			void executeStepPart(Func f);
+			void executeStepPart(Func f, bool canRemove=false);
 			
 			template<class Func>
 			void executeStepPartList(AbilityList &abl, Func f, bool canRemove=true);

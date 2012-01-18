@@ -47,10 +47,10 @@ namespace Sim {
 	 * player, then the bot itself.
 	 */
 	template<class Func>
-	void BotAbility::executeStepPart(Func f)
+	void BotAbility::executeStepPart(Func f, bool canRemove)
 	{
 		executeStepPartList(mHost->getPlayerPtr()->mGlobalAbilities, f, false);
-		executeStepPartList(mAbilityList, f, true);
+		executeStepPartList(mAbilityList, f, canRemove);
 	}
 	
 	void BotAbility::prepareStep(double delta)
@@ -92,8 +92,7 @@ namespace Sim {
 	void BotAbility::step(double delta)
 	{
 		executeStepPart(boost::bind(&Ability::step, _1, delta, mHost) );
-		
-		executeStepPart(boost::bind(&BotAbility::endAbility, this, _1) );
+		executeStepPart(boost::bind(&BotAbility::endAbility, this, _1), true );
 	}
 	
 	void BotAbility::save(Save::BasePtr& fp) const

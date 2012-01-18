@@ -43,11 +43,11 @@ may execute several times during a bot's step.
 Passive abilities will run every step, regardless of whether the bot wants to
 or not.
 
-However, passive abilities may be delayed, temporary, aborted, halted,
+However, passive abilities may be delayed, temporary, aborted, suspended,
 or resumed during its run. If delayed the ability do not process until the
 delay runs out. If temporary, the ability will only run for the given number
 of steps. If aborted the ability is permanently removed (unless explicitly
-denoted as a permanent). If halted, the ability is turned idle until it is
+denoted as a permanent). If suspended, the ability is turned idle until it is
 later resumed.
 
 Note that all of these behaviour modifiers may be overridden by the ability's

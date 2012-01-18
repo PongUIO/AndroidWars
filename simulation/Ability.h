@@ -19,15 +19,22 @@ namespace Sim {
 			IdType getId() const { return mId; }
 			IdType getTypeId() const { return mTypeId; }
 			
-			bool isFinished() { return false; }
-			bool isActive() { return true; }
+			bool isFinished() { return mIsFinished || mDuration==0; }
+			bool isActive() { return mIsActive && mDelay==0; }
 			
 			/// Returns true when this Ability is ready for complete removal
 			bool isDead() { return mReferences==0; }
 			
+			virtual void abort(bool force=false);
+			virtual void toggleSuspend(bool isSuspended, bool force=false);
+			virtual void injectDelay(int32_t delay, bool force=false);
+			virtual void setDuration(uint32_t duration, bool force=false);
+			
 		protected:
 			Ability(Simulation *sim, IdType id, IdType typeId) :
-				mId(id), mTypeId(typeId), mReferences(0), mSim(sim) {}
+				mId(id), mTypeId(typeId), mReferences(0), mSim(sim),
+				mIsActive(true), mIsFinished(false), mDelay(0), mDuration(-1)
+				{}
 			virtual ~Ability() {}
 			
 			/// @name Interaction
@@ -35,6 +42,7 @@ namespace Sim {
 				virtual void save(Save::BasePtr &fp)=0;
 				virtual void load(Save::BasePtr &fp)=0;
 				
+				void updateInternal();
 				virtual void prepareStep(double delta, Bot *bot)=0;
 				virtual void updateCpu(double delta, Bot *bot)=0;
 				virtual void step(double delta, Bot *bot)=0;
@@ -52,6 +60,17 @@ namespace Sim {
 				IdType mTypeId;
 				uint32_t mReferences;
 				Simulation *mSim;
+				
+				// State flags
+				bool mIsActive;
+				bool mIsFinished;
+				uint32_t mDelay;
+				uint32_t mDuration;
+				
+				void saveSys(Save::BasePtr &fp) const
+				{ fp << mIsActive << mIsFinished << mDelay << mDuration; }
+				void loadSys(Save::BasePtr &fp)
+				{ fp >> mIsActive >> mIsFinished >> mDelay >> mDuration; }
 			//@}
 			
 		private:

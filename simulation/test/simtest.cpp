@@ -210,6 +210,8 @@ void setupWorld()
 		Sim::Player &player = sim.getState().getPlayerData().getPlayer(0);
 		player.mGlobalAbilities.push_back(sharedBoost->getId());
 		player.mGlobalAbilities.push_back(armorAtm->getId());
+		
+		armorAtm->setDuration(6);
 	}
 }
 
@@ -273,7 +275,7 @@ int main(void)
 	
 	// Test rewinding
 #define REWIND_COUNT 5
-	double timeUnit[REWIND_COUNT] = {0.26, 0.2, 0.1, 0.4, 3000.0};
+	double timeUnit[REWIND_COUNT] = {0.26, 0.2, 0.1, 0.4, 300.0};
 	
 	for(uint32_t i=0; i<REWIND_COUNT; i++) {
 		printf("Rewinding the simulation to timeunit %g\n", timeUnit[i]);
