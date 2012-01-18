@@ -37,7 +37,7 @@ add_library(AWSim
 	collision/TileCol.cpp
 	)
 
-add_executable(../SimTest
-	test/simtest.cpp)
-
-target_link_libraries(../SimTest AWSim)
+if(COMP_SIM_TEST)
+	add_executable(../SimTest test/simtest.cpp)
+	target_link_libraries(../SimTest AWSim)
+endif(COMP_SIM_TEST)

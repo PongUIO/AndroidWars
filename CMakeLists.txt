@@ -30,9 +30,10 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${LINKFLAGS}")
 add_definitions(${CPPFLAGS})
 include_directories(${Boost_INCLUDE_DIR})
 
-if(COMP_SIM_TEST)
-	add_subdirectory(simulation/)
-endif(COMP_SIM_TEST)
+add_subdirectory(dascript/)
+add_subdirectory(simulation/)
+
+include_directories(${DASCRIPT_INCLUDE_DIR})
 
 if(COMP_GUI)
 	add_subdirectory(pc/)
