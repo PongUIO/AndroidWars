@@ -10,7 +10,7 @@ class ClientStates {
 	private:
 		boost::unordered_set<uint> selBots;
 		Sim::Simulation *sim;
-		bool shift, ctrl;
+                bool shift, ctrl, menu;
 	public:
 		ClientStates() {
 		}
@@ -20,8 +20,7 @@ class ClientStates {
 		}
 
 		void setSim(Sim::Simulation *in) {
-			shift = false;
-			ctrl = false;
+                        shift = ctrl = menu = false;
 			sim = in;
 			selBots.clear();
 		}
@@ -35,7 +34,13 @@ class ClientStates {
 
 		void setCtrl(bool state) {
 			ctrl = state;
-		}
+                }
+                void setMenu(bool state) {
+                        menu = state;
+                }
+                bool menuOpen() {
+                        return menu;
+                }
 
 		bool isSelected(uint b) {
 			return selBots.find(b) != selBots.end();

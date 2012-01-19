@@ -9,7 +9,7 @@
 #include "../util/cursordefines.h"
 
 class GameDrawer : public QGLWidget {
-	Q_OBJECT        // must include this if you use Qt signals/slots
+        Q_OBJECT
 
 public slots:
 	void redraw() {
@@ -17,6 +17,9 @@ public slots:
 	}
 
         void tick() {
+                if (states->menuOpen()) {
+                        return;
+                }
                 cam->setLastPos(lastX, lastY);
                 cam->iter();
                 if (dirAlpha) {
@@ -53,7 +56,8 @@ public:
 	GLuint bullettextures[1];
 	Camera *cam;
 	ClientStates *states;
-	GameDrawer(ClientStates *states, QWidget *parent = 0)
+        QTimer *glTimer;
+        GameDrawer(ClientStates *states, QWidget *parent = 0)
 		: QGLWidget(QGLFormat(QGL::SampleBuffers), parent) {
 		this->parent = parent;
 		cMouse = 0;
@@ -65,18 +69,24 @@ public:
 		selAlpha = 0.3;
 		dirAlpha = false;
 		fullScreen = false;
-	}
+                glTimer = new QTimer(parent);
+                connect(glTimer, SIGNAL(timeout()), this, SLOT(redraw()));
+                glTimer->start(0);
+        }
 
 protected:
 	// overriden
-	void mouseMoveEvent(QMouseEvent * event) {
-		lastX = event->pos().x();
+        void mouseMoveEvent(QMouseEvent * event) {
+                lastX = event->pos().x();
 		lastY = event->pos().y();
 	}
 
 	// overridden
-	void mousePressEvent(QMouseEvent * event) {
-		int w = width();
+        void mousePressEvent(QMouseEvent * event) {
+                if (states->menuOpen()) {
+                        return;
+                }
+                int w = width();
 		int h = height();
 		states->registerClick(cam->xToSimX(event->x()), cam->yToSimY(event->y()), event->button());
 	}
@@ -117,15 +127,15 @@ protected:
 	}
 
 	// overridden
-	void resizeGL( int w, int h) {
-		// setup viewport, projection etc.:
+        void resizeGL( int w, int h) {
 		glViewport( 0, 0, (GLint)w, (GLint)h);
 		cam->calcRatio(w, h);
 	}
 
-	void resizeEvent(QResizeEvent *event) {
-		resizeGL(event->size().width(), event->size().height());
-		resize(event->size().width(), event->size().height());
+        void resizeEvent(QResizeEvent *event) {
+                qDebug() << event->size();
+                resize(event->size().width(), event->size().height());
+                resizeGL(event->size().width(), event->size().height());
 	}
 
 	void wheelEvent(QWheelEvent *event) {
@@ -153,7 +163,7 @@ protected:
 
 	// overridden
 	void paintGL() {
-		Sim::Simulation *sim = states->getSim();
+                Sim::Simulation *sim = states->getSim();
 		Sim::World *wld = &(states->getSim()->getState().getWorld());
 		int i, j;
 		glClear(GL_COLOR_BUFFER_BIT);

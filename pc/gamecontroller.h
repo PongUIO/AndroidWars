@@ -16,7 +16,7 @@ class GameController {
 public:
 	QWidget *parent;
 	GameDrawer *drawer;
-	QTimer *glTimer, *camTimer, *timer;
+        QTimer *camTimer, *timer;
 	QHBoxLayout *lower, *upper;
 	QVBoxLayout *iconHolder;
 	QSpacerItem *space;
@@ -30,9 +30,6 @@ public:
 
 		drawer = new GameDrawer(states, parent);
 
-		glTimer = new QTimer(parent);
-		drawer->connect(glTimer, SIGNAL(timeout()), drawer, SLOT(redraw()));
-		glTimer->start(0);
 
 		camTimer = new QTimer(parent);
                 drawer->connect(camTimer, SIGNAL(timeout()), drawer, SLOT(tick()));

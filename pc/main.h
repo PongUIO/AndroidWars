@@ -8,6 +8,7 @@
 #include"../util/client.h"
 #include"gamecontroller.h"
 #include"menubutton.h"
+#include"menudefines.h"
 
 class MainWidget : public QWidget {
 Q_OBJECT
@@ -21,11 +22,13 @@ public slots:
 	}
 public:
 	QPalette *p;
-	bool fullScreen, menu, gameRunning;
+        bool fullScreen, gameRunning;
+        char menu;
 	ClientStates *states;
 	GameController *gc;
 	Sim::Simulation sim;
-	MenuButton *gameButton;
+        MenuButton *gameButton;
+        QSize size;
 	MainWidget (QWidget *parent = 0) : QWidget(parent) {
 		grabKeyboard();
 		states = new ClientStates();
@@ -34,7 +37,7 @@ public:
 		p = new QPalette( this->palette() );
 		p->setColor( QPalette::Background, Qt::black );
 		setPalette( *p );
-		menu = true;
+                menu = 0;
 		gameRunning = false;
 		gc = new GameController(states, this);
 		gc->hideAll();
@@ -61,24 +64,34 @@ public:
 	}
 
 	void toggleMenu() {
-		setMenu(!menu);
+                if (menu == GAME) {
+                        setMenu(GAMEBGMENU);
+                } else if (menu == GAMEBGMENU) {
+                        setMenu(GAME);
+                }
 	}
-	void setMenu(bool state) {
-		menu = state;
-		if (state) {
-			gc->hideAll();
-			showMenus();
-		} else {
-			gc->showAll();
-			hideMenus();
-		}
+        void setMenu(int state) {
+                menu = state;
+                if (state == GAMEBGMENU) {
+                        gc->showAll();
+                        showMenus();
+                } else if (state == GAME) {
+                        gc->showAll();
+                        hideMenus();
+                } else {
+                        gc->hideAll();
+                        showMenus();
+                }
+                fixRes();
 	}
 	void hideMenus() {
-		gameButton->hide();
+                states->setMenu(false);
+                gameButton->hide();
 	}
 	void showMenus() {
-		moveMenuElements();
-		gameButton->show();
+                states->setMenu(true);
+                moveMenuElements();
+                gameButton->show();
 	}
 	void setMouse() {
 		QPixmap m;
@@ -86,7 +99,7 @@ public:
 		setCursor(m);
 	}
 	void initMenus() {
-		gameButton = new MenuButton(0, 0, this);
+                gameButton = new MenuButton(0, GAME, this);
 		gameButton->setPixmap(QPixmap(":/graphics/menu/startgame.png"));
 		gameButton->resize(gameButton->pixmap()->size());
 		gameButton->show();
@@ -95,7 +108,17 @@ public:
 	}
 	void moveMenuElements() {
 		gameButton->move(geometry().width()/2-gameButton->pixmap()->width()/2, geometry().height()/2-gameButton->pixmap()->height()/2);
-	}
+        }
+        void fixRes() {
+                moveMenuElements();
+                for (int i = 0; i < res.size(); i++) {
+                        #ifdef _WIN32
+                        res[i]->resize(size.width(), size.height()-1);
+                        #else
+                        res[i]->resize(size);
+                        #endif
+                }
+        }
 	void initSim() {
 		Sim::Configuration config;
 
@@ -173,17 +196,9 @@ protected:
 	std::vector<QWidget*> res;
 	// overridden
 	void resizeEvent(QResizeEvent *event) {
-		resize(event->size());
-		if (menu) {
-			moveMenuElements();
-		}
-		for (int i = 0; i < res.size(); i++) {
-			#ifdef _WIN32
-			res[i]->resize(event->size().width(), event->size().height()-1);
-			#else
-			res[i]->resize(event->size());
-			#endif
-		}
+                size = event->size();
+                //resize(size);
+                fixRes();
 	}
 	void keyPressEvent(QKeyEvent *event) {
 		int k = event->key();
