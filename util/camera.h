@@ -2,6 +2,9 @@
 #define CAMERA_H
 #include "../simulation/Vector.h"
 #include<cmath>
+
+#define EDGE 10
+
 class Camera {
 public:
         double zoom, dzoom, panfriction, zoomfriction, ratio;
@@ -23,33 +26,40 @@ public:
 		ratio = yres/((double)xres);
 		this->xres = xres;
 		this->yres = yres;
-	}
-        void addVel(int lastX, int lastY) {
+        }
+        void setLastPos(int lastX, int lastY) {
                 this->lastX = lastX;
                 this->lastY = lastY;
-		delta += Sim::Vector((lastX > xres -10 ) * (-(lastX - xres + 10)*0.001) +
-			    (lastX < 10) * (-(lastX-10)*0.001),
-			    (lastY < 10) * ((lastY - 10)*0.001) +
-			    ((lastY > yres - 10)) * ((lastY - yres + 10)* 0.001))/2;
         }
 	void modZoom(double mod) {
 		dzoom -= mod/10000;
         }
 
         void iter() {
+                qDebug() << lastX << lastY;
+                if ( 0 < lastX && lastX < xres && 0 < lastY && lastY < yres) {
+                        delta += Sim::Vector((lastX > xres -EDGE ) * (-(lastX - xres + EDGE)*0.001) +
+                                    (lastX < EDGE) * (-(lastX-EDGE)*0.001),
+                                    (lastY < EDGE) * ((lastY - EDGE)*0.001) +
+                                    ((lastY > yres - EDGE)) * ((lastY - yres + EDGE)* 0.001))/2;
+                }
                 pos += delta*zoom;
                 delta *= panfriction;
                 dzoom *= zoomfriction;
 		zoom *= dzoom + 1;
 
+                if (zoom < 1) {
+                        zoom = 1;
+                } else if (zoom > 32) {
+                        zoom = 32;
+                }
+
+                if (dzoom > 0) {
+                        return;
+                }
                 Sim::Vector temp = Sim::Vector( xPixToDouble(lastX), yPixToDouble(lastY))*(-fabs(dzoom*5));
                 //qDebug("%4.4f %4.4f\n", temp.x, temp.y);
                 pos += temp;
-		if (zoom < 1) {
-			zoom = 1;
-                } else if (zoom > 32) {
-                        zoom = 32;
-		}
         }	
 
 	double xToSimX(int x) {

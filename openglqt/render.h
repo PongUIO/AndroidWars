@@ -17,7 +17,7 @@ public slots:
 	}
 
         void tick() {
-                cam->addVel(lastX, lastY);
+                cam->setLastPos(lastX, lastY);
                 cam->iter();
                 if (dirAlpha) {
                         selAlpha += 0.003;
