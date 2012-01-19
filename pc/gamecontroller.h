@@ -10,7 +10,7 @@
 #include "botselector.h"
 #include "gamebutton.h"
 
-#define RATE 20
+#define RATE 60
 
 class GameController {
 public:
@@ -35,8 +35,8 @@ public:
 		glTimer->start(0);
 
 		camTimer = new QTimer(parent);
-		drawer->connect(camTimer, SIGNAL(timeout()), drawer, SLOT(moveMouseCheck()));
-		camTimer->start(1000./RATE);
+                drawer->connect(camTimer, SIGNAL(timeout()), drawer, SLOT(tick()));
+                camTimer->start(1000./RATE);
 
 		iconHolder  = new QVBoxLayout(parent);
 		lower = new QHBoxLayout();

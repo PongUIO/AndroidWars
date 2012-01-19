@@ -16,10 +16,20 @@ public slots:
 		paintGL();
 	}
 
-	void moveMouseCheck() {
-
-		cam->addVel(lastX, lastY);
-	}
+        void tick() {
+                cam->addVel(lastX, lastY);
+                cam->iter();
+                if (dirAlpha) {
+                        selAlpha += 0.003;
+                } else {
+                        selAlpha -= 0.003;
+                }
+                if (selAlpha > 0.5) {
+                        dirAlpha = false;
+                } else if (selAlpha < 0.2) {
+                        dirAlpha = true;
+                }
+        }
 
 public:
 	int lastX, lastY, cMouse;
@@ -78,7 +88,7 @@ protected:
 		// Set up the rendering context, define display lists etc.:
 		glClearColor( 0.0, 0.0, 0.0, 0.0 );
 		//glEnable(GL_DEPTH_TEST);
-		glEnable(GL_DOUBLE);
+                glEnable(GL_DOUBLE) ;
 
 		//Loading textures.
 		loadAndBind(":/graphics/tiles/empty.png", &data[0], &textures[0]);
@@ -140,21 +150,11 @@ protected:
 		glEnd();
 	}
 
+
 	// overridden
 	void paintGL() {
 		Sim::Simulation *sim = states->getSim();
 		Sim::World *wld = &(states->getSim()->getState().getWorld());
-		cam->iter();
-		if (dirAlpha) {
-			selAlpha += 0.003;
-		} else {
-			selAlpha -= 0.003;
-		}
-		if (selAlpha > 0.5) {
-			dirAlpha = false;
-		} else if (selAlpha < 0.2) {
-			dirAlpha = true;
-		}
 		int i, j;
 		glClear(GL_COLOR_BUFFER_BIT);
 		glMatrixMode(GL_PROJECTION);
