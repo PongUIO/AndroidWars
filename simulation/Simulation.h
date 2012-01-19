@@ -17,13 +17,17 @@ namespace Sim {
 			phaseLength(100),
 			stepTime(0.01),
 			
-			tileSize(1.0)
+			tileSize(1.0),
+			worldWidth(128),
+			worldHeight(64)
 			{}
 		
 		uint32_t phaseLength;  ///< Number of steps in a simulation phase
 		double stepTime;       ///< Duration of a single simulation step
 		
 		double tileSize;       ///< Size of each world tile
+		uint32_t worldWidth;   ///< Width of the world in tiles
+		uint32_t worldHeight;  ///< Height of the world in tiles
 	};
 	
 	class Simulation {

@@ -9,7 +9,7 @@ namespace Sim {
 	//
 	//
 	Bot::Bot(Simulation* sim, IdType id, const Sim::Bot::State& cfg) :
-		mId(id), mSim(sim), mState(cfg)
+		mId(id), mSim(sim), mDoRemove(false), mState(cfg)
 	{
 		mState.mWeapon.initialize(this);
 		mState.mAbility.initialize(this);
@@ -62,6 +62,15 @@ namespace Sim {
 		}
 		
 		mState.mWeapon.step(stepTime);
+	}
+	
+	void Bot::checkDeath()
+	{
+		if(mState.mHealth.isDead()) {
+			mState.mAbility.shutdown();
+			
+			mDoRemove = true;
+		}
 	}
 	
 	const Sim::BotD* Bot::getTypePtr() const
@@ -136,6 +145,8 @@ namespace Sim {
 		factoryCall(boost::bind(&Bot::prepareStep, _1, stepTime));
 		factoryCall(boost::bind(&Bot::updateCpu, _1, stepTime));
 		factoryCall(boost::bind(&Bot::step, _1, stepTime));
+		
+		factoryCall(boost::bind(&Bot::checkDeath, _1));
 	}
 	
 	

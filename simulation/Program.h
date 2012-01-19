@@ -143,7 +143,7 @@ namespace Sim {
 			void destroyProgram(IdType id) { removeObj(id); }
 			Program *getProgram(IdType id) { return getObject(id); }
 			
-			IdType getLastPhaseId() { return mLastPhaseInputId; }
+			//IdType getLastPhaseId() { return mLastPhaseInputId; }
 			IdType getCurrentUniqueId()
 			{ return UidFactory<Program>::getCurrentUniqueId(); }
 			
@@ -155,8 +155,6 @@ namespace Sim {
 				const DataBehaviourT<Program>::Behaviour* getBehaviourFromName(const std::string& name) const;
 				const DataBehaviourT<Program>::Behaviour* getBehaviourFromId(IdType id) const;
 			//@}
-			
-			IdType mLastPhaseInputId;
 			
 			friend class ReplayManager;
 	};

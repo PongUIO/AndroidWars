@@ -80,6 +80,7 @@ namespace Sim {
 			
 		private:
 			void initialize(Bot *host);
+			void shutdown();
 			
 			void prepareStep(double delta);
 			void updateCpu(double delta);
@@ -88,11 +89,15 @@ namespace Sim {
 			void startAbility(Ability *ability);
 			void endAbility(Ability *ability);
 			
-			template<class Func>
-			void executeStepPart(Func f, bool canRemove=false);
+			void dereferenceAbility(Ability *ability);
 			
 			template<class Func>
-			void executeStepPartList(AbilityList &abl, Func f, bool canRemove=true);
+			void executeStepPart(Func f,
+				bool canRemove=false, bool checkActive=true);
+			
+			template<class Func>
+			void executeStepPartList(AbilityList &abl, Func f,
+				bool canRemove=true, bool checkActive=true);
 			
 			/// @name Constant/temporary data
 			//@{

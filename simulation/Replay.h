@@ -40,6 +40,7 @@ namespace Sim {
 			
 			bool rewind(double timeUnit);
 			bool rewind(uint32_t phase, uint32_t step);
+			void loadCurPhaseInput();
 			
 			void gotoPresent();
 			void trackbackPresent(uint32_t phase);
@@ -64,6 +65,8 @@ namespace Sim {
 			
 			uint32_t mPhaseSaveInterval;
 			uint32_t mPresentPhase;
+			
+			uint32_t mLocalLastProgramId;
 			
 			Simulation *mSim;
 			

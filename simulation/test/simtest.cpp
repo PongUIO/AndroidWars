@@ -45,12 +45,12 @@ class DemoWeapon : public Sim::Weapon {
 		}
 		
 		void shoot(Sim::Bot *bot, Sim::Save &arg) {
-			printf("Before:\n");
+			/*printf("Before:\n");
+			printBotArmor(bot);*/
+			bot->getHealth().causeDamage(mSim, 40, 1);
+			/*printf("After:\n");
 			printBotArmor(bot);
-			bot->getHealth().causeDamage(mSim, 20, 1);
-			printf("After:\n");
-			printBotArmor(bot);
-			printf("\n");
+			printf("\n");*/
 		}
 };
 
@@ -222,14 +222,19 @@ int main(void)
 	loadData();
 	setupWorld();
 	
-	// Run a test phase
+	// Simulate a few finalized phases
 	sim.prepareSim();
-	for(int i = 0; i < 4; i++) {
+#define PHASE_COUNT 8
+	
+	for(int i = 0; i < PHASE_COUNT; i++) {
 		sim.startPhase();
 		
 		while( sim.hasPhaseStep() ) {
-			Sim::Vector pos = sim.getState().getBotFactory().
-				getBot(0)->getBody().mPos;
+			Sim::Bot *bot = sim.getState().getBotFactory().getBot(0);
+			Sim::Vector pos;
+			if(bot)
+				pos = bot->getBody().mPos;
+			
 			printf("%02d %03d (%g, %g)\n",
 				sim.getCurPhase(), sim.getCurPhaseStep(),
 				pos.x, pos.y);
@@ -237,16 +242,8 @@ int main(void)
 			sim.step();
 		}
 		
-		// For iteration 0, only run a non-final 
-		if(i == 1) {
-			sim.endPhase(false);
-			
-			// This loads the 'present' time, or what is internally
-			// considered the real simulation state by the replay manager
-			sim.getReplayManager().gotoPresent();
-		} else {
-			sim.endPhase(true);
-		}
+		sim.endPhase(true);
+		printf("Phase %02d checksum: %X\n", sim.getCurPhase(), sim.checksumSim());
 		
 		if(i==1) {
 			// Example of giving input after a phase
@@ -266,27 +263,56 @@ int main(void)
 		}
 	}
 	
-	printf("%X == %X\n", sim.checksumSim(), sim.save().checksum());
+	printf("\n\n");
 	
-	printf("Savefile size: %g KiB\n", double(sim.save().size())/1024.0);
-	FILE *fp = fopen("save", "w");
-	fwrite(sim.save().getData(), sim.save().size(), 1, fp);
-	fclose(fp);
-	
-	// Test rewinding
-#define REWIND_COUNT 5
-	double timeUnit[REWIND_COUNT] = {0.26, 0.2, 0.1, 0.4, 300.0};
-	
-	for(uint32_t i=0; i<REWIND_COUNT; i++) {
-		printf("Rewinding the simulation to timeunit %g\n", timeUnit[i]);
+	// Re-run the simulation to assure it is deterministic
+	printf("Simulation replay:\n");
+	sim.getReplayManager().rewind(0,0);
+	bool doLoadInput = false;
+	for(int i=0; i<PHASE_COUNT; i++) {
+		if(doLoadInput)
+			sim.getReplayManager().loadCurPhaseInput();
+		else
+			doLoadInput=true;
 		
-		sim.getReplayManager().rewind(timeUnit[i]);
-		Sim::Vector pos = sim.getState().getBotFactory().
-			getBot(0)->getBody().mPos;
+		sim.startPhase();
+		
+		while( sim.hasPhaseStep() ) {
+			Sim::Bot *bot = sim.getState().getBotFactory().getBot(0);
+			Sim::Vector pos;
+			if(bot)
+				pos = bot->getBody().mPos;
 			
-		printf("Bot had position (%g, %g)\n", pos.x, pos.y);
-		printf("\tat phase %d, step %d\n", sim.getCurPhase(),
-			sim.getCurPhaseStep());
+			printf("%02d %03d (%g, %g)\n",
+				sim.getCurPhase(), sim.getCurPhaseStep(),
+				pos.x, pos.y);
+			
+			sim.step();
+		}
+		
+		sim.endPhase(false);
+		printf("Phase %02d checksum: %X\n", sim.getCurPhase(), sim.checksumSim());
+	}
+	
+	printf("\n\nPresent checksum vs. rewind checksum\n");
+	sim.gotoPresent();
+	uint32_t presentChecksum = sim.checksumSim();
+	sim.getReplayManager().rewind(sim.getCurPhase(),sim.getCurPhaseStep());
+	uint32_t rewindChecksum = sim.checksumSim();
+	
+	printf("%X == %X\n", presentChecksum, rewindChecksum);
+	
+	printf("Testing simulation saving:\n");
+	for(int i=0; i<2; i++) {
+		if(i==0)
+			sim.gotoPresent();
+		else
+			sim.getReplayManager().rewind(sim.getCurPhase(),sim.getCurPhaseStep());
+		
+		printf("Savefile size: %g KiB\n", double(sim.save().size())/1024.0);
+		FILE *fp = fopen((i==0) ? "presentSave" : "rewindSave", "w");
+		fwrite(sim.save().getData(), sim.save().size(), 1, fp);
+		fclose(fp);
 	}
 	
 	// Shutdown the simulation

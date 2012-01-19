@@ -17,17 +17,24 @@ namespace Sim {
 		mHost = host;
 	}
 	
+	void BotAbility::shutdown()
+	{
+		executeStepPart(boost::bind(&BotAbility::dereferenceAbility, this, _1),
+			false);
+	}
+
+	
 	/**
 	 * Executes a function for a single ability list.
 	 */
 	template<class Func>
-	void BotAbility::executeStepPartList(BotAbility::AbilityList& abl, Func F, bool canRemove)
+	void BotAbility::executeStepPartList(BotAbility::AbilityList& abl, Func F, bool canRemove, bool checkActive)
 	{
 		for(AbilityList::iterator i=abl.begin(); i!=abl.end();) {
 			Ability *ability = mHost->mSim->getState().getAbilityFactory()
 				.getAbility(*i);
 			
-			if(ability && ability->isActive()) {
+			if(ability && (checkActive==false || ability->isActive())) {
 				F(ability);
 			}
 			
@@ -47,10 +54,11 @@ namespace Sim {
 	 * player, then the bot itself.
 	 */
 	template<class Func>
-	void BotAbility::executeStepPart(Func f, bool canRemove)
+	void BotAbility::executeStepPart(Func f, bool canRemove, bool checkActive)
 	{
-		executeStepPartList(mHost->getPlayerPtr()->mGlobalAbilities, f, false);
-		executeStepPartList(mAbilityList, f, canRemove);
+		executeStepPartList(mHost->getPlayerPtr()->mGlobalAbilities, f,
+			false, checkActive);
+		executeStepPartList(mAbilityList, f, canRemove, checkActive);
 	}
 	
 	void BotAbility::prepareStep(double delta)
@@ -82,6 +90,12 @@ namespace Sim {
 			ability->dereference();
 		}
 	}
+	
+	void Sim::BotAbility::dereferenceAbility(Ability* ability)
+	{
+		ability->dereference();
+	}
+
 
 	
 	void BotAbility::updateCpu(double delta)
@@ -92,7 +106,7 @@ namespace Sim {
 	void BotAbility::step(double delta)
 	{
 		executeStepPart(boost::bind(&Ability::step, _1, delta, mHost) );
-		executeStepPart(boost::bind(&BotAbility::endAbility, this, _1), true );
+		executeStepPart(boost::bind(&BotAbility::endAbility, this, _1), true, false );
 	}
 	
 	void BotAbility::save(Save::BasePtr& fp) const

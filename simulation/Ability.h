@@ -68,9 +68,9 @@ namespace Sim {
 				uint32_t mDuration;
 				
 				void saveSys(Save::BasePtr &fp) const
-				{ fp << mIsActive << mIsFinished << mDelay << mDuration; }
+				{ fp << mReferences << mIsActive << mIsFinished << mDelay << mDuration; }
 				void loadSys(Save::BasePtr &fp)
-				{ fp >> mIsActive >> mIsFinished >> mDelay >> mDuration; }
+				{ fp >> mReferences >> mIsActive >> mIsFinished >> mDelay >> mDuration; }
 			//@}
 			
 		private:

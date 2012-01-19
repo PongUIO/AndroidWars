@@ -78,7 +78,7 @@ namespace Sim {
 			Body &getBody() { return getState().mBody; }
 			Health &getHealth() { return getState().mHealth; }
 			
-			bool isDead() { return false; }
+			bool isDead() { return mDoRemove; }
 			
 			State &getState() { return mState; }
 			const State &getState() const { return mState; }
@@ -101,6 +101,8 @@ namespace Sim {
 				
 				void save(Save::BasePtr &fp) const;
 				void load(Save::BasePtr &fp);
+				
+				void checkDeath();
 			//@}
 			
 			/// @name Input
@@ -120,6 +122,8 @@ namespace Sim {
 			//@{
 				IdType mId;
 				Simulation *mSim;
+				
+				bool mDoRemove;
 			//@}
 			
 			/**

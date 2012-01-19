@@ -88,12 +88,17 @@ namespace Sim {
 		// Save all input
 		ProgramFactory &progFact = mSim->getState().getProgramFactory();
 		uint32_t saveCount = progFact.getCurrentUniqueId()-
-			progFact.getLastPhaseId();
+			mLocalLastProgramId;
 		fp.writeInt<uint32_t>(saveCount);
-		for(uint32_t i=progFact.getLastPhaseId();
+		for(uint32_t i=mLocalLastProgramId;
 			i<progFact.getCurrentUniqueId(); i++) {
 			progFact.saveObj(progFact.getProgram(i), fp);
 		}
+		
+		// Save the input buffer
+		mSim->getState().getInputManager().save(fp);
+		
+		mLocalLastProgramId = progFact.getCurrentUniqueId();
 	}
 	
 	/**
@@ -111,8 +116,9 @@ namespace Sim {
 		if(mSim->getCurPhase() < mPresentPhase)
 			return;
 		
-		if( (mSim->getCurPhase() % mPhaseSaveInterval) == 0 )
+		if( (mSim->getCurPhase() % mPhaseSaveInterval) == 0 ) {
 			mPhaseSaves.push_back(mSim->save());
+		}
 	}
 	
 	/**
@@ -143,23 +149,16 @@ namespace Sim {
 		
 		// Run phases until reaching the target
 		bool hasStarted = false;
+		bool hasIgnoredFirstInput=false;
 		while( mSim->getCurPhase() < phase ||
 			(mSim->getCurPhase() >= phase && mSim->getCurPhaseStep() < step) ) {
 			
 			// Start the phase if necessary
 			if( !hasStarted ) {
-				// Load input for the current phase
-				if(mSim->getCurPhase() < mPhaseInput.size()) {
-					ProgramFactory &progFact = mSim->getState().getProgramFactory();
-					Save &inputData = mPhaseInput[mSim->getCurPhase()];
-					Save::FilePtr fp = Save::FilePtr(inputData);
-					
-					uint32_t inputCount = fp.readInt<uint32_t>();
-					for(uint32_t i=0; i<inputCount; i++) {
-						progFact.createFromSerialized(fp);
-					}
-				}
-				
+				if(hasIgnoredFirstInput)
+					loadCurPhaseInput();
+				else
+					hasIgnoredFirstInput=true;
 				mSim->startPhase();
 				hasStarted = true;
 			}
@@ -175,6 +174,28 @@ namespace Sim {
 		}
 		
 		return true;
+	}
+	
+	/**
+	 * Loads any stored input for this phase. Intended for use
+	 * after a call to rewind().
+	 * 
+	 * @note To be called just before \c Simulation::startPhase().
+	 */
+	void ReplayManager::loadCurPhaseInput()
+	{
+		if(mSim->getCurPhase() < mPhaseInput.size()) {
+			ProgramFactory &progFact = mSim->getState().getProgramFactory();
+			Save &inputData = mPhaseInput[mSim->getCurPhase()];
+			Save::FilePtr fp = Save::FilePtr(inputData);
+			
+			uint32_t inputCount = fp.readInt<uint32_t>();
+			for(uint32_t i=0; i<inputCount; i++) {
+				progFact.createFromSerialized(fp);
+			}
+			
+			mSim->getState().getInputManager().load(fp);
+		}
 	}
 	
 	/**

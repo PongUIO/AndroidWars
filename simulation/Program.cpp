@@ -56,9 +56,7 @@ namespace Sim {
 	{}
 	
 	void ProgramFactory::startup()
-	{
-		mLastPhaseInputId = getCurrentUniqueId();
-	}
+	{}
 	
 	void ProgramFactory::shutdown()
 	{
@@ -87,18 +85,14 @@ namespace Sim {
 	{}
 	
 	void ProgramFactory::endPhase()
-	{
-		mLastPhaseInputId = getCurrentUniqueId();
-	}
+	{}
 	
 	void ProgramFactory::step(double stepTime)
 	{}
 	
 	void ProgramFactory::save(Save::BasePtr& fp)
-	{	fp << mLastPhaseInputId;
-		UidFactory<Program>::save(fp); }
+	{	UidFactory<Program>::save(fp); }
 	
 	void ProgramFactory::load(Save::BasePtr& fp)
-	{	fp >> mLastPhaseInputId;
-		UidFactory<Program>::load(fp); }
+	{	UidFactory<Program>::load(fp); }
 }
