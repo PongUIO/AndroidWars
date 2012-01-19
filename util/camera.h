@@ -36,7 +36,6 @@ public:
         }
 
         void iter() {
-                qDebug() << lastX << lastY;
                 if ( 0 < lastX && lastX < xres && 0 < lastY && lastY < yres) {
                         delta += Sim::Vector((lastX > xres -EDGE ) * (-(lastX - xres + EDGE)*0.001) +
                                     (lastX < EDGE) * (-(lastX-EDGE)*0.001),
