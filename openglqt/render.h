@@ -142,7 +142,6 @@ protected:
 	}
 
         void resizeEvent(QResizeEvent *event) {
-                qDebug() << event->size();
                 resize(event->size().width(), event->size().height());
                 resizeGL(event->size().width(), event->size().height());
 	}

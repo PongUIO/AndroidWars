@@ -100,8 +100,19 @@ public:
         void showMenus() {
                 hideMenus();
                 states->setMenu(true);
-                for (int j = 0; j < menus[submenu].size(); j++) {
-                        menus[submenu][j]->show();
+                if (submenu < 0 || menus.size() < submenu) {
+                        qDebug() << "Submenu-index out of range!!!";
+                } else {
+                        for (int j = 0; j < menus[submenu].size(); j++) {
+                                menus[submenu][j]->show();
+                        }
+                }
+        }
+        void addMenusToWidget() {
+                for (int i = 0; i < menus.size(); i++) {
+                        for (int j = 0; j < menus[i].size(); j++) {
+                                layout()->addWidget(menus[i][j]);
+                        }
                 }
         }
         void setToHidden() {
@@ -114,9 +125,10 @@ public:
 	}
         void initMenus() {
                 addMenuPage();
-                addMenuButton(createButton(MENU, GAME, QString("Start game")));
-                layout()->addWidget(menus[0][0]);
+                addMenuButton(createButton(MENU, GAME, QString("Start Game")));
+                addMenusToWidget();
                 showMenus();
+
         }
 
         void addMenuPage() {
