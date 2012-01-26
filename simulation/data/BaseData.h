@@ -21,24 +21,11 @@ namespace Sim {
 		
 	};
 	
-	/**
-	 * Implements a basic database system.
-	 * Registers new types by an ID.
-	 */
 	template<typename T>
-	class DataT : public BaseData {
+	class DataCtr {
 		public:
-			DataT() {}
-			virtual ~DataT() { clearData(); }
-			
-			virtual void startup(Simulation *sim)
-			{ mSim = sim; }
-			
-			virtual void shutdown()
-			{ clearData(); }
-			
-			const T *getType(IdType type) const
-			{ return (type>=mData.size()) ? 0 : mData[type]; }
+			DataCtr() {}
+			~DataCtr() { clearData(); }
 			
 			T *createType() {
 				T *data = new T();
@@ -47,7 +34,10 @@ namespace Sim {
 				return data;
 			}
 			
-			size_t debugSize() { return mData.size(); }
+			const T *getType(IdType type) const
+			{ return (type>=mData.size()) ? 0 : mData[type]; }
+			
+			size_t size() const { return mData.size(); }
 			
 		protected:
 			IdType addType(T *type)
@@ -61,12 +51,31 @@ namespace Sim {
 				for(typename DataVec::iterator i=mData.begin();
 					i!=mData.end(); ++i)
 					delete *i;
+				
 				mData.clear();
 			}
 			
 			typedef std::vector<T*> DataVec;
-			
 			DataVec mData;
+	};
+	
+	/**
+	 * Implements a basic database system.
+	 * Registers new types by an ID.
+	 */
+	template<typename T>
+	class DataT : public DataCtr<T>, public BaseData {
+		public:
+			DataT() : mSim(0) {}
+			virtual ~DataT() {}
+			
+			virtual void startup(Simulation *sim)
+			{ mSim = sim; }
+			
+			virtual void shutdown()
+			{ DataCtr<T>::clearData(); }
+			
+		protected:
 			Simulation *mSim;
 	};
 	

@@ -39,7 +39,7 @@ class DemoWeapon : public Sim::Weapon {
 			Sim::Health::AttachmentVec  atmVec =
 				bot->getState().mHealth.getAttachments();
 			for(Sim::Health::AttachmentVec::iterator i=atmVec.begin();
-				i!=atmVec.end(); i++) {
+				i!=atmVec.end(); ++i) {
 				printHull(*i);
 			}
 		}

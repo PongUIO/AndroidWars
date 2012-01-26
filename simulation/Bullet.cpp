@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include "Simulation.h"
 #include "Bullet.h"
 

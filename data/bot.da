@@ -1,0 +1,117 @@
+#BOT
+	Name "Vanisher"
+	BaseCost 200
+	
+	Description {
+		Agile light bot with a passive jammer.
+	}
+	
+	Health "Light" 50
+	#ATTACHMENTS
+		Health "Shield" 25
+	#
+	
+	CpuLimit 10 20
+	Weight 5
+	Speed 4
+	
+	BaseProgram "Shield"
+	
+	Comment "Registers a passive ability for this bot"
+	Ability "Jammer"
+	
+	Comment {
+		Slot takes the parameters [size] [count].
+		
+		If count is absent, it is assumed to be 1.
+		
+		Indexes are automatically allocated in the same order they were
+		defined. So the below definition allocates, by index:
+		0: Small
+		1: Small
+		2: Medium
+	}
+	#WEAPONS
+		Slot Small 2
+		Slot Medium 1
+	#
+	
+	#COLLISION
+		#STANDING
+			PT 0 0
+			PT 1 0
+			PT 1 1
+			PT 0 1
+			
+			Comment {
+				Registers the firing position for a weapon index for this
+				stance.
+				
+				Slot takes the parameters [weaponIndex] [xPos] [yPos].
+			}
+			
+			#WEAPON
+				Firing 0 0.25 0.75
+				Firing 1 0.75 0.75
+				Firing 2 0.5 0.5
+			#
+		#
+	#
+#
+
+#ABILITY
+	Name "Jammer"
+	Base "Base/Jammer"
+	
+	Description {
+		Reduces the range in which hostile weapons can actively target
+		this bot.
+	}
+	
+	Comment {
+		Note that passive abilities like this one are defined as extended
+		data. This is because the extended simulation has to manually
+		give a bot abilities when a bot using this ability is created.
+		
+		To assure cheating is impossible, input is always serialized through
+		the extended simulation, instead of directly through the simulation.
+		
+		This avoids any issue with malicious input which is not restrained by
+		the extended simulation. For example, any bot that can call
+		Ability/ArmorAttachment could in theory give themselves armor of any
+		strength or type.
+	}
+	
+	Comment "Parameters used to initialize the jammer"
+	#PARAM
+		Multiplier 0.5
+		MinRange 5
+	#
+#
+
+#PROGRAM
+	Name "Shield"
+	Base "Ability/ArmorAttachment"
+	
+	#PARAM
+		ArmorType "Shield"
+		Health 25
+	#
+#
+
+#WEAPON
+	Name "SR Rocket"
+	Base "Ext/RocketWeapon"
+	Size Medium
+	BaseDamage "Rocket"
+	
+	Description {
+		Fires a single short-range rocket.
+	}
+	
+	#PARAM
+		Range 10
+		Damage 5
+		ReloadTime 10
+	#
+#

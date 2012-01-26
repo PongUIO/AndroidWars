@@ -31,6 +31,7 @@ class Script {
 				
 				size_t argCount() const { return mArgs.size(); }
 				bool isDefined() const { return !mId.empty(); }
+				const std::string &getId() const { return mId; }
 				
 				const std::string &firstArg() const
 				{
@@ -129,8 +130,8 @@ class Script {
 				DataRange getData(const std::string &id)
 				{	return mData.equal_range(id); }
 				
-				const Data &getDataSimple(const std::string &id)
-				{	DataMap::const_iterator i = mData.find(id);
+				Data &getDataSimple(const std::string &id)
+				{	DataMap::iterator i = mData.find(id);
 					if(i == mData.end())
 						i=mData.insert( DataPair(id, Data()) );
 					return i->second;

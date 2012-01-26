@@ -7,8 +7,6 @@
 #include <algorithm>
 #include <stdint.h>
 
-#include <stdio.h>
-
 #include <boost/bind.hpp>
 #include <boost/unordered_map.hpp>
 

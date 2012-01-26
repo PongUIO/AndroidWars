@@ -1,13 +1,9 @@
-#include <math.h>
-#include <stdio.h>
-
 #include "Simulation.h"
 #include "World.h"
 #include "Data.h"
 #include "data/TileD.h"
 #include "State.h"
 
-#include <stdio.h>
 namespace Sim {
 	
 	World::World(Simulation *sim) :

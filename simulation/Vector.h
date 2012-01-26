@@ -2,9 +2,13 @@
 #define SIM_VECTOR_H
 
 #include <math.h>
+#include <boost/operators.hpp>
 
 namespace Sim {
-	class Vector {
+	class Vector :
+		boost::equality_comparable<Vector>,
+		boost::arithmetic<Vector>
+	{
 		public:
 			double x,y;
 			
@@ -24,31 +28,19 @@ namespace Sim {
 			Vector &operator =(const double &d)
 			{ x=d; y=d; return *this; }
 			
-			bool operator ==(const Vector &b)
+			bool operator ==(const Vector &b) const
 			{ return (x==b.x) && (y==b.y); }
+			// by equality_comparable: !=
 			
-			bool operator !=(const Vector &b)
-			{ return !(*this == b); }
+			void operator +=(const Vector &b) { x+=b.x; y+=b.y; }
+			void operator -=(const Vector &b) { x-=b.x; y-=b.y; }
+			void operator *=(const Vector &b) { x*=b.x; y*=b.y; }
+			void operator /=(const Vector &b) { x/=b.x; y/=b.y; }
 			
-			// Vector operations
-			#define VECV_OPER(op) \
-				Vector operator op(const Vector &b) const \
-				{ return Vector(x op b.x, y op b.y); } \
-				void operator op##=(const Vector &b) \
-				{ x op##=b.x; y op##= b.y; }
-			VECV_OPER(+)
-			VECV_OPER(-)
-			VECV_OPER(*)
-			VECV_OPER(/)
-			#undef VECV_OPER
-			
-			#define VECD_OPER(op) \
-				Vector operator op(const double &d) const \
-				{ return Vector(x op d, y op d); } \
-				void operator op##=(const double &d) \
-				{ x op##=d; y op##= d; }
-			VECD_OPER(*)
-			VECD_OPER(/)
+			void operator +=(const double &b) { x+=b; y+=b; }
+			void operator -=(const double &b) { x-=b; y-=b; }
+			void operator *=(const double &b) { x*=b; y*=b; }
+			void operator /=(const double &b) { x/=b; y/=b; }
 			
 			double len() const { return sqrt(dot()); }
 			double dot() const { return x*x+y*y; }

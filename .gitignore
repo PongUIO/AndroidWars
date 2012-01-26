@@ -6,3 +6,4 @@ pc/Makefile
 build/*
 simulation/test/simtest
 simulation/doc/**
+*.kdev4*

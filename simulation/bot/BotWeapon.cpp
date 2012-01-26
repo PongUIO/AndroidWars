@@ -41,7 +41,7 @@ namespace Sim {
 		}
 		
 		// Execute all firing orders
-		for(OrderVec::iterator i=mOrder.begin(); i!=mOrder.end(); i++) {
+		for(OrderVec::iterator i=mOrder.begin(); i!=mOrder.end(); ++i) {
 			Order &order = *i;
 			Weapon *w = getWeapon(order.mIndex);
 			if(w)

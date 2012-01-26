@@ -1,4 +1,3 @@
-#include <algorithm>
 #include <limits>
 
 #include "Collision.h"
@@ -220,14 +219,14 @@ namespace Sim {
 	}
 	
 	struct GreaterEqPred {
-		bool operator()(const double &dist)
+		bool operator()(const double &dist) const
 		{ return dist >= 0.0; }
 	};
 	
 	struct DistancePred {
 		DistancePred(double size) : size(size) {}
 		
-		bool operator()(const double &dist)
+		bool operator()(const double &dist) const
 		{ return dist > size; }
 		
 		double size;

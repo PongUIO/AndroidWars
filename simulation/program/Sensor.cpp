@@ -7,7 +7,7 @@ namespace Sim {
 		void Sensor::execute(Bot* bot, BotCpu* cpu)
 		{
 			for(ProgramIdVec::iterator i=mResponseProg.begin();
-				i!=mResponseProg.end(); i++) {
+				i!=mResponseProg.end(); ++i) {
 				Schedule &sch = *i;
 				cpu->scheduleProgram(sch.mId, sch.mDelay);
 			}

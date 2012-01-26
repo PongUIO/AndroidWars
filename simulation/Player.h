@@ -1,7 +1,6 @@
 #ifndef SIM_PLAYER_H
 #define SIM_PLAYER_H
 
-#include <stdint.h>
 #include <vector>
 
 #include "StateObj.h"

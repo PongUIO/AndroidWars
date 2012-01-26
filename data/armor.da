@@ -1,0 +1,16 @@
+#ARMOR
+	Name "Shield"
+	
+	Default 0 true
+	
+	Rule "Energy" 0.5 false
+#
+
+#ARMOR
+	Name "Light"
+	
+	Default 1 false
+	
+	Rule "Explosive" 2.0
+	Rule "Rocket" 2.0
+#

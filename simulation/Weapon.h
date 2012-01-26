@@ -25,11 +25,11 @@ namespace Sim {
 			
 			bool isDead() { return mIsDead; }
 			
-			uint32_t getReloadTime() { return mReloadTimer; }
+			uint32_t getReloadTime() const { return mReloadTimer; }
 			
 		protected:
 			Weapon(Simulation *sim, IdType id, IdType typeId) :
-				mId(id), mTypeId(typeId), mSim(sim) {}
+				mId(id), mTypeId(typeId), mSim(sim), mIsDead(false) {}
 			virtual ~Weapon() {}
 			
 			/// @name Interaction
@@ -51,7 +51,12 @@ namespace Sim {
 			
 			/// @name Behaviour
 			//@{
-				uint32_t mReloadTimer; /// @todo Save basic weapon data
+				uint32_t mReloadTimer;
+				
+				void saveSys(Save::BasePtr &fp) const
+				{ fp << mReloadTimer; }
+				void loadSys(Save::BasePtr &fp)
+				{ fp >> mReloadTimer; }
 				
 				bool mIsDead;
 			//@}
@@ -105,6 +110,9 @@ namespace Sim {
 		private:
 			/// @name Factory-required functions
 			//@{
+				void saveObj(Weapon* obj, Save::BasePtr& fp);
+				Weapon* loadObj(IdType internalId, Save::BasePtr& fp);
+				
 				void deleteInstance(Weapon* obj) { delete obj; }
 				
 				const DataBehaviourT<Weapon>::Behaviour* getBehaviourFromId(IdType id) const;

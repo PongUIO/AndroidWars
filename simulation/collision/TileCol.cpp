@@ -1,4 +1,3 @@
-#include <boost/functional/hash.hpp>
 #include <algorithm>
 
 #include "Collision.h"
@@ -9,7 +8,7 @@ namespace Sim {
 	bool operator==(TileCol::TileType const& a, TileCol::TileType const& b)
 	{	return a.data == b.data;	}
 	
-	TileCol::TileCol()
+	TileCol::TileCol() : mTileSize(0.0)
 	{}
 	
 	TileCol::~TileCol()
@@ -24,7 +23,7 @@ namespace Sim {
 
 	void TileCol::shutdown()
 	{
-		for(TileMap::iterator i=mData.begin(); i!=mData.end(); i++) {
+		for(TileMap::iterator i=mData.begin(); i!=mData.end(); ++i) {
 			delete i->second;
 		}
 	}

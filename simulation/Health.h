@@ -34,6 +34,7 @@ namespace Sim {
 					int32_t addHealth(int32_t amount);
 					int32_t addMaxHealth(int32_t amount,
 						bool adjustHealth=true);
+					void setType(IdType type) { mArmorType = type; }
 					
 					IdType getType() const { return mArmorType; }
 					uint32_t getHealth() const { return mHealth; }
@@ -55,6 +56,7 @@ namespace Sim {
 			typedef std::vector<Hull> AttachmentVec;
 			
 			Hull &getCore() { return mCore; }
+			const Hull &getCore() const { return mCore; }
 			const AttachmentVec &getAttachments() const { return mAttachments; }
 			bool isDead() const { return mCore.isDead(); }
 			

@@ -45,7 +45,7 @@ namespace Sim {
 			if(eraseCurrent)
 				mCurProgram = mProgramList.erase(mCurProgram);
 			else
-				mCurProgram++;
+				++mCurProgram;
 			
 			if(mCurProgram == mProgramList.end())
 				mCurProgram = mProgramList.begin();
@@ -57,11 +57,11 @@ namespace Sim {
 			// The next program will be the first program
 			mAutoScheduleIndex = mProgramList.begin();
 			if(mProgramList.size()!=0)
-				mAutoScheduleIndex++;
+				++mAutoScheduleIndex;
 		} else {
 			// Schedule just after the current program
 			mAutoScheduleIndex = mCurProgram;
-			mAutoScheduleIndex++;
+			++mAutoScheduleIndex;
 		}
 	}
 	
@@ -234,7 +234,7 @@ namespace Sim {
 	bool BotCpu::hasRunningProgram(IdType progId)
 	{
 		for(ProgramRefList::iterator i=mProgramList.begin();
-			i!=mProgramList.end(); i++) {
+			i!=mProgramList.end(); ++i) {
 			if(*i == progId)
 				return true;
 		}

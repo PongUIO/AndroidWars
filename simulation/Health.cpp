@@ -1,5 +1,3 @@
-#include <boost/bind.hpp>
-
 #include "Health.h"
 #include "Simulation.h"
 #include "data/DamageD.h"
@@ -40,7 +38,7 @@ namespace Sim {
 	Health::AttachmentVec::iterator Health::findType(IdType type)
 	{
 		for(AttachmentVec::iterator i=mAttachments.begin();
-			i!=mAttachments.end(); i++) {
+			i!=mAttachments.end(); ++i) {
 			if( (*i).getType() == type )
 				return i;
 		}
@@ -135,7 +133,7 @@ namespace Sim {
 			if( (*i).isRemovable() )
 				i = mAttachments.erase(i);
 			else
-				i++;
+				++i;
 		}
 	}
 
@@ -153,7 +151,7 @@ namespace Sim {
 		AttachmentVec::iterator bestAtm = mAttachments.end();
 		double bestMultiplier = 0.0;
 		for(AttachmentVec::iterator i=mAttachments.begin();
-			i!=mAttachments.end(); i++) {
+			i!=mAttachments.end(); ++i) {
 			
 			if( (*i).isDead() )
 				continue;

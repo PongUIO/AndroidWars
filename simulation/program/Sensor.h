@@ -46,8 +46,9 @@ namespace Sim {
 				void save(Save::BasePtr &fp) const;
 				void load(Save::BasePtr &fp);
 				
-				bool hasResponse() { return !mResponseProg.empty(); }
-				const ProgramIdVec &getResponseVec() { return mResponseProg; }
+				bool hasResponse() const { return !mResponseProg.empty(); }
+				const ProgramIdVec &getResponseVec() const
+				{ return mResponseProg; }
 				
 			private:
 				ProgramIdVec mResponseProg;

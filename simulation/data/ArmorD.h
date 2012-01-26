@@ -28,6 +28,9 @@ namespace Sim {
 			void registerRule(IdType dmgType, const DamageRule &data)
 			{ mRules[dmgType] = data; }
 			
+			const RuleMap &getRules() const { return mRules; }
+			const DamageRule &getDefault() const { return mDefault; }
+			
 			IdType getId() const { return mId; }
 			
 		private:

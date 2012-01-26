@@ -6,7 +6,7 @@
 #include "../data/BotD.h"
 
 namespace Sim {
-	BotAbility::BotAbility()
+	BotAbility::BotAbility() : mHost(0)
 	{}
 	
 	BotAbility::~BotAbility()

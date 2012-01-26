@@ -37,9 +37,12 @@ namespace Sim {
 		{ return collision; }
 		
 		private:
+			uint32_t mId;
+			
 			Collision *collision;
 			
 			friend class BotDatabase;
+			friend class DataCtr<BotD>;
 	};
 	
 	class BotDatabase : public DataT<BotD> {
