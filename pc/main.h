@@ -115,9 +115,7 @@ public:
         void initMenus() {
                 menus.push_back(std::vector<QWidget*>());
                 menus.at(0).push_back(createButton(MENU, GAME, QString("Start game")));
-                menus.at(0).push_back(createButton(MENU, GAME, QString("Start game")));
                 layout()->addWidget(menus[0][0]);
-                layout()->addWidget(menus[0][1]);
                 showMenus();
         }
 
