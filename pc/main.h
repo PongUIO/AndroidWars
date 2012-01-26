@@ -113,10 +113,18 @@ public:
 		setCursor(m);
 	}
         void initMenus() {
-                menus.push_back(std::vector<QWidget*>());
-                menus.at(0).push_back(createButton(MENU, GAME, QString("Start game")));
+                addMenuPage();
+                addMenuButton(createButton(MENU, GAME, QString("Start game")));
                 layout()->addWidget(menus[0][0]);
                 showMenus();
+        }
+
+        void addMenuPage() {
+                menus.push_back(std::vector<QWidget*>());
+        }
+
+        void addMenuButton(QWidget *in) {
+                menus[menus.size()-1].push_back(in);
         }
 
         MenuButton *createButton(int type, int signal, QString text) {

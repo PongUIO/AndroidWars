@@ -97,7 +97,6 @@ protected:
                 }
                 int w = width();
                 int h = height();
-                qDebug() << event->button();
 		states->registerClick(cam->xToSimX(event->x()), cam->yToSimY(event->y()), event->button());
 	}
 
