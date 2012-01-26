@@ -16,7 +16,7 @@ signals:
 	void onClick(int type, int value);
 protected:
 	// overridden
-	void mousePressEvent(QMouseEvent * event) {
+        void mousePressEvent(QMouseEvent * event) {
 		emit onClick(type, value);
 	}
 };

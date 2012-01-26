@@ -10,7 +10,6 @@
 #include "botselector.h"
 #include "gamebutton.h"
 
-#define RATE 60
 
 class GameController {
 public:
@@ -29,12 +28,6 @@ public:
 		this->parent = parent;
 
 		drawer = new GameDrawer(states, parent);
-
-
-		camTimer = new QTimer(parent);
-                drawer->connect(camTimer, SIGNAL(timeout()), drawer, SLOT(tick()));
-                camTimer->start(1000./RATE);
-
 		iconHolder  = new QVBoxLayout(parent);
 		lower = new QHBoxLayout();
 		upper = new QHBoxLayout();
@@ -64,13 +57,15 @@ public:
 	void showAll() {
 		label->show();
 		label2->show();
-		drawer->show();
-		updateGUI();
+                drawer->show();
+                drawer->startTimers();
+                updateGUI();
 	}
 	void hideAll() {
 		label->hide();
 		label2->hide();
 		drawer->hide();
+                drawer->stopTimers();
 		emptyGUI();
 	}
 

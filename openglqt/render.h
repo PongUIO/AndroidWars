@@ -55,8 +55,8 @@ public:
 	QImage bullet[1];
 	GLuint bullettextures[1];
 	Camera *cam;
-	ClientStates *states;
-        QTimer *glTimer;
+        ClientStates *states;
+        QTimer *glTimer, *camTimer;
         GameDrawer(ClientStates *states, QWidget *parent = 0)
 		: QGLWidget(QGLFormat(QGL::SampleBuffers), parent) {
 		this->parent = parent;
@@ -71,9 +71,18 @@ public:
 		fullScreen = false;
                 glTimer = new QTimer(parent);
                 connect(glTimer, SIGNAL(timeout()), this, SLOT(redraw()));
-                glTimer->start(0);
+                camTimer = new QTimer(parent);
+                connect(camTimer, SIGNAL(timeout()), this, SLOT(tick()));
         }
 
+        void stopTimers() {
+                glTimer->stop();
+                camTimer->stop();
+        }
+        void startTimers() {
+                glTimer->start(0);
+                camTimer->start(40);
+        }
 protected:
 	// overriden
         void mouseMoveEvent(QMouseEvent * event) {
@@ -87,7 +96,8 @@ protected:
                         return;
                 }
                 int w = width();
-		int h = height();
+                int h = height();
+                qDebug() << event->button();
 		states->registerClick(cam->xToSimX(event->x()), cam->yToSimY(event->y()), event->button());
 	}
 

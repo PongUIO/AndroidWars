@@ -13,24 +13,26 @@
 class MainWidget : public QWidget {
 Q_OBJECT
 public slots:
-	void receiveClick(int type, int value) {
-		if (type == 1) {
-			changeMenu(value);
-		} else {
-			setMenu(value);
+        void receiveClick(int type, int value) {
+                if (type == MENU) {
+                        setMenu(value);
+                } else if (type == SUBMENU) {
+                        changeToSubMenu(value);
+                } else if (type == TIMESLIDER) {
+
 		}
 	}
 public:
 	QPalette *p;
         bool fullScreen, gameRunning;
-        char menu;
+        char menu, submenu;
 	ClientStates *states;
 	GameController *gc;
 	Sim::Simulation sim;
-        MenuButton *gameButton;
         QSize size;
-	MainWidget (QWidget *parent = 0) : QWidget(parent) {
-		grabKeyboard();
+        std::vector< std::vector<QWidget*> > menus;
+        MainWidget (QWidget *parent = 0) : QWidget(parent) {
+                grabKeyboard();
 		states = new ClientStates();
 		initSim();
 		fullScreen = false;
@@ -38,6 +40,7 @@ public:
 		p->setColor( QPalette::Background, Qt::black );
 		setPalette( *p );
                 menu = 0;
+                submenu = 0;
 		gameRunning = false;
 		gc = new GameController(states, this);
 		gc->hideAll();
@@ -58,11 +61,12 @@ public:
 	void setStates(ClientStates *nS) {
 		states = nS;
 		states->releaseMods();
-	}
-	void changeMenu(int menu) {
 
-	}
-
+        }
+        void changeToSubMenu(int value) {
+                submenu = value;
+                showMenus();
+        }
 	void toggleMenu() {
                 if (menu == GAME) {
                         setMenu(GAMEBGMENU);
@@ -73,7 +77,8 @@ public:
         void setMenu(int state) {
                 menu = state;
                 if (state == GAMEBGMENU) {
-                        gc->showAll();
+                        //gc->showAll();
+                        gc->hideAll();
                         showMenus();
                 } else if (state == GAME) {
                         gc->showAll();
@@ -86,31 +91,47 @@ public:
 	}
 	void hideMenus() {
                 states->setMenu(false);
-                gameButton->hide();
+                for (int i = 0; i < menus.size(); i++) {
+                        for (int j = 0; j < menus[i].size(); j++) {
+                                menus[i][j]->hide();
+                        }
+                }
 	}
-	void showMenus() {
+        void showMenus() {
+                hideMenus();
                 states->setMenu(true);
-                moveMenuElements();
-                gameButton->show();
-	}
+                for (int j = 0; j < menus[submenu].size(); j++) {
+                        menus[submenu][j]->show();
+                }
+        }
+        void setToHidden() {
+
+        }
 	void setMouse() {
 		QPixmap m;
 		m.convertFromImage(QImage(":/graphics/mouse/default.png").scaled(64,64));
 		setCursor(m);
 	}
-	void initMenus() {
-                gameButton = new MenuButton(0, GAME, this);
-		gameButton->setPixmap(QPixmap(":/graphics/menu/startgame.png"));
-		gameButton->resize(gameButton->pixmap()->size());
-		gameButton->show();
-		connect(gameButton, SIGNAL(onClick(int, int)), this, SLOT(receiveClick(int, int)));
-		moveMenuElements();
-	}
-	void moveMenuElements() {
-		gameButton->move(geometry().width()/2-gameButton->pixmap()->width()/2, geometry().height()/2-gameButton->pixmap()->height()/2);
+        void initMenus() {
+                menus.push_back(std::vector<QWidget*>());
+                menus.at(0).push_back(createButton(MENU, GAME, QString("Start game")));
+                menus.at(0).push_back(createButton(MENU, GAME, QString("Start game")));
+                layout()->addWidget(menus[0][0]);
+                layout()->addWidget(menus[0][1]);
+                showMenus();
         }
+
+        MenuButton *createButton(int type, int signal, QString text) {
+                MenuButton *menuButton;
+                menuButton = new MenuButton(type, signal, this);
+                menuButton->setPixmap(QPixmap(":/graphics/menu/startgame.png"));
+                menuButton->resize(menuButton->pixmap()->size());
+                menuButton->hide();
+                connect(menuButton, SIGNAL(onClick(int, int)), this, SLOT(receiveClick(int, int)));
+                return menuButton;
+        }
+
         void fixRes() {
-                moveMenuElements();
                 for (int i = 0; i < res.size(); i++) {
                         #ifdef _WIN32
                         res[i]->resize(size.width(), size.height()-1);
@@ -156,19 +177,17 @@ public:
 		botCfg.mBody.mPos = Sim::Vector(0,2);
 		sim.getState().getBotFactory().createBot( botCfg );
 
-		// Send some input to this bot
+                // Send some input to t	his bot
 		{
-			Sim::InputManager &inMgr = sim.getState().getInputManager();
+                        Sim::InputManager &inMgr = sim.getState().getInputManager();
 			Sim::ProgramFactory &progFact = sim.getState().getProgramFactory();
 
 			using namespace Sim::Prog;
 			MoveTowards *move = progFact.createProgram<MoveTowards>(
 				MoveTowards::Config(MoveTowards::DtPosition, Sim::Vector(5,0))
-			);
-
-			Kill *kill = progFact.createProgram<Kill>(
-				Kill::Config(move->getId()));
-
+                        );
+                        Kill *kill = progFact.createProgram<Kill>(
+                        Kill::Config(move->getId()));
 			inMgr.registerInput(botId, move->getId(), 0);
 			inMgr.registerInput(botId, kill->getId(), 20);
 		}
@@ -185,7 +204,7 @@ public:
 		myTile.colMask = Sim::TileD::ColAll;
 		db.addTile(myTile);
 
-		sim.getState().getWorld().getTile(3,0).setType(1);
+                //sim.getState().getWorld().getTile(3,0).setType(1);
 
 		sim.prepareSim();
 

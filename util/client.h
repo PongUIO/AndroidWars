@@ -55,20 +55,38 @@ class ClientStates {
 
 		void registerClick(double x, double y, int button) {
 			int i;
-			if (sim != NULL) {
-				std::list<Sim::Bot*> bots = sim->getState().getBotFactory().getBotList();
-				std::list<Sim::Bot*>::iterator bot;
-				if (!shift) {
-					selBots.clear();
-				}
-				for (bot = bots.begin(); bot != bots.end(); bot++) {
-					Sim::Vector pos = (*bot)->getBody().mPos;
-					Sim::Vector col = (*bot)->getTypePtr()->getCollision()->getBboxHigh();
-					if ( pos.x < x && x < pos.x + col.x && pos.y < y && y < pos.y + col.y) {
-						selBots.insert((*bot)->getId());
-						return;
-					}
-				}
+                        if (sim != NULL) {
+                                std::list<Sim::Bot*> bots = sim->getState().getBotFactory().getBotList();
+                                std::list<Sim::Bot*>::iterator bot;
+                                if (button == Qt::LeftButton) {
+                                        if (!shift) {
+                                                selBots.clear();
+                                        }
+                                        for (bot = bots.begin(); bot != bots.end(); bot++) {
+                                                Sim::Vector pos = (*bot)->getBody().mPos;
+                                                Sim::Vector col = (*bot)->getTypePtr()->getCollision()->getBboxHigh();
+                                                if ( pos.x < x && x < pos.x + col.x && pos.y < y && y < pos.y + col.y) {
+                                                        selBots.insert((*bot)->getId());
+                                                        return;
+                                                }
+                                        }
+                                } else if (button == Qt::RightButton) {
+                                        for (bot = bots.begin(); bot != bots.end(); bot++) {
+                                                if (isSelected((*bot)->getId())) {
+                                                        Sim::InputManager &inMgr = sim->getState().getInputManager();
+                                                        Sim::ProgramFactory &progFact = sim->getState().getProgramFactory();
+
+                                                        using namespace Sim::Prog;
+                                                        MoveTowards *move = progFact.createProgram<MoveTowards>(
+                                                                MoveTowards::Config(MoveTowards::DtPosition, Sim::Vector(x, y))
+                                                        );
+                                                        Kill *kill = progFact.createProgram<Kill>(
+                                                        Kill::Config(move->getId()));
+                                                        inMgr.registerInput((*bot)->getId(), move->getId(), 0);
+                                                        inMgr.registerInput((*bot)->getId(), kill->getId(), 20);
+                                                }
+                                        }
+                                }
 			}
 		}
 
