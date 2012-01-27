@@ -1,4 +1,5 @@
 #include "Armor.h"
+#include "../ExtData.h"
 
 #include "../../simulation/Simulation.h"
 #include "../../simulation/data/WeaponD.h"
@@ -68,8 +69,8 @@ namespace ExtS {
 		
 		if(loadType)
 			rule.mDmgType = data.getArg(ind++);
-		rule.mMultiplier = readValue<double>(data.getArg(ind++), 1.0);
-		rule.mIsIgnoring = readValue<bool>(data.getArg(ind++), false);
+		rule.mMultiplier = ExtData::readValue<double>(data.getArg(ind++), 1.0);
+		rule.mIsIgnoring = ExtData::readValue<bool>(data.getArg(ind++), false);
 		
 		return rule;
 	}

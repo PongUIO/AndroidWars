@@ -1,4 +1,5 @@
 #include "Bot.h"
+#include "../ExtData.h"
 
 #include "../../simulation/Simulation.h"
 
@@ -32,7 +33,7 @@ namespace ExtS {
 	
 	void BotData::loadSimBot(Script::Block& block, Sim::BotD *simBot)
 	{
-		simBot->baseSpeed = readValue<double>("Speed", 0);
+		simBot->baseSpeed = ExtData::readValue<double>("Speed", 0);
 	}
 	
 	void BotData::postProcess()
@@ -56,7 +57,7 @@ namespace ExtS {
 			mName = block.getDataFirst("Name");
 			mDescription = block.getDataFirst("Description");
 			
-			mBaseCost = host.readValue<uint32_t>(
+			mBaseCost = ExtData::readValue<uint32_t>(
 				block.getDataFirst("BaseCost"), 0);
 			
 			// Load weapon slots
@@ -66,7 +67,7 @@ namespace ExtS {
 				
 				if(slotData->getId() == "Slot") {
 					const std::string &slotType = slotData->getArg(0);
-					int slotCount = host.readValue<int>(slotData->getArg(1), 1);
+					int slotCount = ExtData::readValue<int>(slotData->getArg(1), 1);
 					
 					for(int sc=0; sc<slotCount; sc++)
 						mWeaponSlot.push_back( WeaponSlot(slotType) );
@@ -115,9 +116,9 @@ namespace ExtS {
 		mType = data.getArg(0);
 		
 		int health, maxHealth;
-		health = maxHealth = host.readValue<int>(data.getArg(1), 1);
+		health = maxHealth = ExtData::readValue<int>(data.getArg(1), 1);
 		if(data.argCount()==3)
-			health = host.readValue<int>(data.getArg(2), maxHealth);
+			health = ExtData::readValue<int>(data.getArg(2), maxHealth);
 		
 		addMaxHealth(maxHealth, false);
 		addHealth(health);

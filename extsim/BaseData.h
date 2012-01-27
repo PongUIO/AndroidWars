@@ -30,23 +30,6 @@ namespace ExtS {
 			virtual void postProcess()=0;
 			
 		protected:
-			template<class T>
-			T badCastStrategy(const std::string &str, T def) { return def; }
-			
-			template<class T>
-			T readValue(const std::string &str, T def=T())
-			{
-				T val = def;
-				if(str.empty())
-					return def;
-				
-				try { val = boost::lexical_cast<T>(str); }
-				catch(boost::bad_lexical_cast &)
-				{ val=badCastStrategy<T>(str,def); }
-				
-				return val;
-			}
-			
 			Sim::Simulation &mSim;
 	};
 	

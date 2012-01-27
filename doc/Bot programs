@@ -110,16 +110,16 @@ Ability: (Manages special abilities that a bot may have)
 - Hack (Enables the bot to start a single program on any target CPU)
 
 Sensors: (Alters programs due to external influences)
-- Schedule program(s) if harmed.
-- Schedule program(s) if within a specific distance of a hostile and/or friendly.
-- Schedule program(s) if colliding with a tile / specific tile type(s).
-- Schedule program(s) if health is below a specific value or percentage.
-- Schedule program(s) if caught in a momentum-giving explosion.
+- Schedule program(s) if harmed. (Pain sensor)
+- Schedule program(s) if within a specific distance of a hostile and/or friendly. (Radar sensor)
+- Schedule program(s) if colliding with a tile / specific tile type(s). (Touch sensor)
+- Schedule program(s) if health is below a specific value or percentage. (Health sensor)
+- Schedule program(s) if caught in a momentum-giving explosion. (Momentum sensor)
 - Schedule program(s) if a message is received with specific data. (This will
 	use the message's state in collaboration with any other sensor or program
 	as a replacement for the bots own state. This might be used to, for example
-	have bots guard a specific bot, attacking whoever hits that bot)
-- Schedule program(s) if bot destroyed its target.
+	have bots guard a specific bot, attacking whoever hits that bot) (Communication sensor)
+- Schedule program(s) if bot destroyed its target. ()
 
 Metaprograms (Programs that alter other programs):
 - Kill (aborts target program(s), useful for sensors, may also abort all running programs on a CPU.

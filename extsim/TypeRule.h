@@ -10,10 +10,10 @@ namespace ExtS {
 	/**
 	 * Contains a list of parameters
 	 */
-	class TypeParam {
+	class ParamList {
 		public:
-			TypeParam();
-			~TypeParam();
+			ParamList();
+			~ParamList();
 			
 			/**
 			 * A single parameter object.
@@ -22,7 +22,13 @@ namespace ExtS {
 				Param() {}
 				virtual ~Param() {}
 				
-				virtual void save(Sim::Save::BasePtr& fp)=0;
+				virtual void save(Sim::Save::BasePtr& fp) const=0;
+				
+				virtual void loadData(Script::Data &data)=0;
+				virtual void postProcess()=0;
+				
+				virtual void fill()=0;
+				virtual int getType()=0;
 			};
 			
 			template<class T>
@@ -73,7 +79,13 @@ namespace ExtS {
 			TypeRule();
 			virtual ~TypeRule();
 			
-			virtual void readParam();
+			virtual ParamList *readParam()=0;
+			
+			
+			
+			struct MetaParam {
+				
+			};
 			
 		private:
 	};
@@ -83,12 +95,7 @@ namespace ExtS {
 			TypeRuleMgr();
 			~TypeRuleMgr();
 			
-			struct RuleData {
-				TypeRule *mRule;
-				TypeParam mParam;
-			};
-			
-			RuleData loadBlock(Script::Block &block);
+			void loadBlock(Script::Block &block);
 			
 		private:
 			typedef boost::unordered_map<std::string,TypeRule*> RuleMap;

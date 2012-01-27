@@ -46,6 +46,23 @@ namespace ExtS {
 				BotData &getBotDb() { return mBot; }
 			//@}
 			
+			template<class T>
+			static T badCastStrategy(const std::string &str, T def) { return def; }
+			
+			template<class T>
+			static T readValue(const std::string &str, T def=T())
+			{
+				T val = def;
+				if(str.empty())
+					return def;
+				
+				try { val = boost::lexical_cast<T>(str); }
+				catch(boost::bad_lexical_cast &)
+				{ val=badCastStrategy<T>(str,def); }
+				
+				return val;
+			}
+			
 		private:
 			void registerListener(const std::string &blockTag, BaseData *db);
 			BaseData *getListener(const std::string &tag);

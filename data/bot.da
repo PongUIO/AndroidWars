@@ -99,6 +99,16 @@
 	#
 #
 
+#PROGRAM
+	Name "LightOrMedium"
+	Base "Ability/ArmorAttachment"
+	
+	#PARAM
+		ArmorType "Light" "Medium"
+		Health 25-50
+	#
+#
+
 #WEAPON
 	Name "SR Rocket"
 	Base "Ext/RocketWeapon"
