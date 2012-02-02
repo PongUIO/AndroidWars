@@ -1,12 +1,12 @@
 #ifndef MENUDEFINES_H
 #define MENUDEFINES_H
 
-#define MENU 0
-#define SUBMENU 1
+enum State {MENU, GAME, EXIT};
 
-#define BLANKMENU 0
-#define GAMEBGMENU 1
-#define GAME 2
+// submenus:
+#define MAIN 0
+#define RESUME 1
+
 
 #define TIMESLIDER 255
 

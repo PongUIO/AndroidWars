@@ -1,19 +1,22 @@
 #ifndef MENUBUTTON_H
 #define MENUBUTTON_H
 #include<QtGui>
-class MenuButton : public QLabel {
+#include "menudefines.h"
+class MenuButton : public QPushButton {
 	Q_OBJECT
 public:
-	int type, value;
+        State type;
+        int value;
 	QWidget *parent;
-	MenuButton(int type, int value, QWidget *parent = 0)
-		: QLabel(parent) {
+        MenuButton(State type, int value, QWidget *parent = 0)
+                : QPushButton(parent) {
 		this->parent = parent;
 		this->value = value;
-		this->type = type;
+                this->type = type;
+                setFont(QFont("Arial", 30));
 	}
 signals:
-	void onClick(int type, int value);
+        void onClick(State type, int value);
 protected:
 	// overridden
         void mousePressEvent(QMouseEvent * event) {

@@ -13,25 +13,35 @@
 class MainWidget : public QWidget {
 Q_OBJECT
 public slots:
-        void receiveClick(int type, int value) {
-                if (type == MENU) {
-                        setMenu(value);
-                } else if (type == SUBMENU) {
+        void receiveClick(State type, int value) {
+                switch(type) {
+                        case GAME:
+                        setState(GAME);
+                        subMenu = RESUME;
+                        break;
+                        case MENU:
                         changeToSubMenu(value);
-                } else if (type == TIMESLIDER) {
-
+                        break;
+                        case EXIT:
+                        QApplication::quit();
+                        break;
+                        default:
+                        qDebug() << "What on earth is this state? " << type;
 		}
 	}
 public:
 	QPalette *p;
         bool fullScreen, gameRunning;
-        char menu, submenu;
+        State dispState;
+        int subMenu;
 	ClientStates *states;
 	GameController *gc;
 	Sim::Simulation sim;
         QSize size;
         std::vector< std::vector<QWidget*> > menus;
         MainWidget (QWidget *parent = 0) : QWidget(parent) {
+                dispState = MENU;
+                subMenu = MAIN;
                 grabKeyboard();
 		states = new ClientStates();
 		initSim();
@@ -39,14 +49,12 @@ public:
 		p = new QPalette( this->palette() );
 		p->setColor( QPalette::Background, Qt::black );
 		setPalette( *p );
-                menu = 0;
-                submenu = 0;
 		gameRunning = false;
 		gc = new GameController(states, this);
 		gc->hideAll();
 		registerForResize(gc->drawer);
 		resize(700,700);
-		initMenus();
+                initMenus();
 	}
 	void registerForResize(QWidget *target) {
 		res.push_back(target);
@@ -64,30 +72,31 @@ public:
 
         }
         void changeToSubMenu(int value) {
-                submenu = value;
+                subMenu = value;
                 showMenus();
         }
-	void toggleMenu() {
-                if (menu == GAME) {
-                        setMenu(GAMEBGMENU);
-                } else if (menu == GAMEBGMENU) {
-                        setMenu(GAME);
+        void toggleMenu() {
+                switch (dispState) {
+                        case GAME:
+                        setState(MENU);
+                        break;
+                        case MENU:
+                        setState(GAME);
+                        break;
                 }
 	}
-        void setMenu(int state) {
-                menu = state;
-                if (state == GAMEBGMENU) {
-                        //gc->showAll();
+        void setState(State s) {
+                dispState = s;
+                switch (s) {
+                        case MENU:
                         gc->hideAll();
                         showMenus();
-                } else if (state == GAME) {
+                        break;
+                        case GAME:
                         gc->showAll();
                         hideMenus();
-                } else {
-                        gc->hideAll();
-                        showMenus();
+                        break;
                 }
-                fixRes();
 	}
 	void hideMenus() {
                 states->setMenu(false);
@@ -100,11 +109,11 @@ public:
         void showMenus() {
                 hideMenus();
                 states->setMenu(true);
-                if (submenu < 0 || menus.size() < submenu) {
+                if (subMenu < 0 || menus.size() < subMenu) {
                         qDebug() << "Submenu-index out of range!!!";
                 } else {
-                        for (int j = 0; j < menus[submenu].size(); j++) {
-                                menus[submenu][j]->show();
+                        for (int j = 0; j < menus[subMenu].size(); j++) {
+                                menus[subMenu][j]->show();
                         }
                 }
         }
@@ -125,7 +134,12 @@ public:
 	}
         void initMenus() {
                 addMenuPage();
-                addMenuButton(createButton(MENU, GAME, QString("Start Game")));
+                addMenuButton(createButton(GAME, 0, QString("Start Game")));
+                addMenuButton(createButton(EXIT, 0, QString("Exit")));
+                addMenuPage();
+                addMenuButton(createButton(GAME, 0, QString("Resume Game")));
+                addMenuButton(createButton(MENU, MAIN, QString("To main menu")));
+                addMenuButton(createButton(EXIT, 0, QString("Exit")));
                 addMenusToWidget();
                 showMenus();
 
@@ -139,13 +153,12 @@ public:
                 menus[menus.size()-1].push_back(in);
         }
 
-        MenuButton *createButton(int type, int signal, QString text) {
+        MenuButton *createButton(State type, int signal, QString text) {
                 MenuButton *menuButton;
                 menuButton = new MenuButton(type, signal, this);
-                menuButton->setPixmap(QPixmap(":/graphics/menu/startgame.png"));
-                menuButton->resize(menuButton->pixmap()->size());
+                menuButton->setText(text);
                 menuButton->hide();
-                connect(menuButton, SIGNAL(onClick(int, int)), this, SLOT(receiveClick(int, int)));
+                connect(menuButton, SIGNAL(onClick(State, int)), this, SLOT(receiveClick(State, int)));
                 return menuButton;
         }
 

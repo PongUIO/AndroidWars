@@ -8,7 +8,7 @@ public:
 	int func;
 	Sim::Simulation *sim;
 	GameButton(Sim::Simulation *sim, int func, QWidget *parent = 0)
-		: QLabel(parent) {
+                : QLabel(parent) {
 		this->func = func;
 		this->sim = sim;
 	}
