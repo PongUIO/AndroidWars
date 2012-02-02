@@ -11,7 +11,7 @@
 namespace ExtS {
 	class ArmorData : public BaseData {
 		public:
-			ArmorData(Sim::Simulation& sim);
+			ArmorData(ExtSim& esim);
 			virtual ~ArmorData();
 			
 			void startup() {}

@@ -6,7 +6,7 @@
 namespace ExtS {
 	class DamageData : public BaseData {
 		public:
-			DamageData(Sim::Simulation& sim);
+			DamageData(ExtSim& esim);
 			virtual ~DamageData();
 			
 			void startup() {}

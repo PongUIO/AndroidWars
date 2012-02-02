@@ -8,18 +8,16 @@
 #include "../simulation/Common.h"
 #include "../simulation/data/BaseData.h"
 
-namespace Sim {
-	class Simulation;
-}
-
 namespace ExtS {
+	class ExtSim;
+	
 	/**
 	 * Base virtual class for processing and storing data.
 	 * 
 	 */
 	class BaseData {
 		public:
-			BaseData(Sim::Simulation &sim) : mSim(sim) {}
+			BaseData(ExtSim &sim) : mExtSim(sim) {}
 			virtual ~BaseData();
 			
 			virtual void startup()=0;
@@ -30,7 +28,7 @@ namespace ExtS {
 			virtual void postProcess()=0;
 			
 		protected:
-			Sim::Simulation &mSim;
+			ExtSim &mExtSim;
 	};
 	
 	/**
@@ -39,7 +37,7 @@ namespace ExtS {
 	template<class T>
 	class DefaultData : public Sim::DataCtr<T>, public BaseData {
 		public:
-			DefaultData(Sim::Simulation& sim) : BaseData(sim)
+			DefaultData(ExtSim& extsim) : BaseData(extsim)
 			{}
 			
 			virtual ~DefaultData()

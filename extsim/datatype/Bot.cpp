@@ -2,12 +2,13 @@
 #include "../ExtData.h"
 
 #include "../../simulation/Simulation.h"
+#include "../ExtSim.h"
 
 namespace ExtS {
 	// BotData
 	//
 	//
-	BotData::BotData(Sim::Simulation& sim): DefaultData<ExtBot>(sim)
+	BotData::BotData(ExtSim &esim): DefaultData<ExtBot>(esim)
 	{}
 	
 	BotData::~BotData()
@@ -20,7 +21,8 @@ namespace ExtS {
 			return;
 		
 		// Create the sim/extsim data pair
-		Sim::BotD *simData = mSim.getData().getBotDb().createType();
+		Sim::BotD *simData =
+			mExtSim.getSim().getData().getBotDb().createType();
 		ExtBot *extData = createType();
 		extData->mSimData = simData;
 		
@@ -39,7 +41,7 @@ namespace ExtS {
 	void BotData::postProcess()
 	{
 		for(DataVec::iterator i=mData.begin(); i!=mData.end(); ++i) {
-			(*i)->postProcess(*this, mSim);
+			(*i)->postProcess(*this, mExtSim.getSim());
 		}
 	}
 

@@ -2,10 +2,17 @@ add_library(AWExtSim
 	ExtSim.cpp
 	ExtData.cpp
 	BaseData.cpp
+	TypeRule.cpp
+	
+	param/Position.cpp
+	param/IdList.cpp
+	
+	typerule/program/ArmorAttachment.cpp
 	
 	datatype/Armor.cpp
 	datatype/Damage.cpp
 	datatype/Bot.cpp
+	datatype/Program.cpp
 	)
 
 if(COMP_EXTSIM_TEST AND Boost_FILESYSTEM_FOUND)

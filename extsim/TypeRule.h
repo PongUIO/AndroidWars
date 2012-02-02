@@ -7,95 +7,191 @@
 #include "../simulation/Save.h"
 
 namespace ExtS {
+	class MetaParam;
+	class ExtSim;
+	
+	template<class Type>
+	struct Listener {
+		virtual void process(Type *src)=0;
+	};
+	
 	/**
-	 * Contains a list of parameters
+	 * Manages the global listener for a parameter or constraint.
+	 * 
+	 * Used to implement callbacks for \c Param or \c Constraint
+	 * specializations.
+	 */
+	template<class Type>
+	class ListenerSlot {
+		public:
+			static void setListener(Listener<Type> L) {
+				clearListener();
+				sListener = new Listener<Type>(L);
+			}
+			
+			static void clearListener() {
+				if(sListener)
+					delete sListener;
+				sListener=0;
+			}
+			
+			static void raiseListener(Type *src) {
+				if(sListener)
+					sListener->process(src);
+			}
+		
+		private:
+			static Listener<Type> *sListener;
+	};
+	
+	template<class Type>
+	Listener<Type> *ListenerSlot<Type>::sListener = 0;
+	
+	/**
+	 * A single parameter object.
+	 * 
+	 * Each parameter type must also have an associated \c MetaParam
+	 * implementation.
+	 */
+	class Param {
+		public:
+			Param(MetaParam *parent) : mParent(parent) {}
+			virtual ~Param() {}
+			
+			virtual void readParam(Script::Data &data)=0;
+			
+			virtual void callback()=0;
+			
+		protected:
+			MetaParam *mParent;
+	};
+	
+	/**
+	 * Implements parameter constraints
+	 */
+	class Constraint {
+		public:
+			Constraint(MetaParam *parent) :
+				mParent(parent), mIsUndefined(false) {}
+			
+			virtual void readConstraint(Script::Data &data)=0;
+			virtual bool isValid(Param *param, ExtSim &extsim) const=0;
+			
+			virtual void callback()=0;
+			
+			bool isUndefined() const { return mIsUndefined; }
+			
+		protected:
+			MetaParam *mParent;
+			bool mIsUndefined;
+			
+			friend class MetaParam;
+	};
+	
+	/**
+	 * Contains static information about a parameter type, including
+	 * parameter constraints.
+	 */
+	class MetaParam {
+		public:
+			MetaParam(const std::string &dataName) : mDataName(dataName) {}
+			virtual ~MetaParam() {}
+			
+			/**
+			 * Constructs a default parameter object of the type this
+			 * \c MetaParam object implements.
+			 */
+			virtual Param *constructParam()=0;
+			
+			virtual MetaParam *clone()=0;
+			
+			virtual void readParam(Script::Data &data)=0;
+			virtual void readConstraint(Script::Data &data)=0;
+			
+			virtual void postProcess(ExtSim &extsim) {}
+			
+			virtual Param *getDefaultParam()=0;
+			virtual Constraint *getDefaultConstraint()=0;
+			
+			const std::string &getDataName() const { return mDataName; }
+			
+		private:
+			std::string mDataName;
+	};
+	
+	/**
+	 * Contains a list of parameter objects.
 	 */
 	class ParamList {
 		public:
-			ParamList();
-			~ParamList();
+			typedef std::vector<Param*> ParamVec;
 			
-			/**
-			 * A single parameter object.
-			 */
-			struct Param {
-				Param() {}
-				virtual ~Param() {}
-				
-				virtual void save(Sim::Save::BasePtr& fp) const=0;
-				
-				virtual void loadData(Script::Data &data)=0;
-				virtual void postProcess()=0;
-				
-				virtual void fill()=0;
-				virtual int getType()=0;
-			};
-			
-			template<class T>
-			void insertParam(const typename T::Config &cfg=T::Config()) {
-				mParam.push_back(new T(cfg));
+			ParamList() {}
+			~ParamList() {
+				for(ParamVec::iterator i=mParam.begin(); i!=mParam.end();
+					++i)
+					delete *i;
 			}
 			
-			void save(Sim::Save::BasePtr &fp);
+			void insertParam(Param *p) { mParam.push_back(p); }
+			
+			size_t size() const { return mParam.size(); }
 			
 		private:
-			typedef std::vector<Param*> ParamVec;
 			ParamVec mParam;
 	};
 	
 	/**
 	 * @brief Manages the behaviour of a base type
 	 * 
-	 * Script-defined objects that specify an inheritance through the
-	 * "Base" parameter in reality select a \c TypeRule to use.
+	 * A TypeRule contain a vector of \c MetaParam objects. Each of these
+	 * objects contain information about the default paramter and parameter
+	 * constraints.
 	 * 
-	 * This links an extended implementation to the internal simulation-type,
-	 * providing extended information to simplify the creation of input and
-	 * standard abilitiy types.
-	 * 
-	 * \c TypeRule converts parameters into simulation input.
-	 * 
-	 * Specialization of generic base types are done through the use of a
-	 * "#PARAM" block, and the arguments to this block are predefined and
-	 * limited by type and range (for example, one may have a type for armor
-	 * types, or another for integers [which may further be limited in a numeric
-	 * range]). If a parameter is not specified in #PARAM, it is assumed to
-	 * be customizeable, as such can be altered externally (for example through
-	 * a GUI).
-	 * 
-	 * An example of such a rule is the MoveTowards program. The \c TypeRule
-	 * would define a parameter "Position", which takes a value of type
-	 * WorldPosition. The GUI could interpret this as having to right click
-	 * on a position in the world.
-	 * 
-	 * Other parameter types could be, for example, TargetBot, or TargetObject,
-	 * SelectWeapon, TargetProgram, TargetProgramClass.
-	 * 
-	 * Conditional parameters should also be possible. For
-	 * example allowing the selection of either a WorldPosition or TargetBot.
+	 * \c TypeRule::makeParam is used to create a \c ParamList for parameters
+	 * that the caller can manipulate. When the parameter package is ready
+	 * it is fed back in order to create the object that depend on the
+	 * parameters.
 	 */
 	class TypeRule {
 		public:
 			TypeRule();
 			virtual ~TypeRule();
 			
-			virtual ParamList *readParam()=0;
+			TypeRule *clone();
 			
+			ParamList *makeParam();
 			
+			void readParam(Script::Block &paramBlock);
+			void readConstraint(Script::Block &constraintBlock);
 			
-			struct MetaParam {
-				
-			};
+			void postProcess(ExtSim &extsim);
+			
+		protected:
+			void registerMetaParam(MetaParam *mgr)
+			{ mMetaParam.push_back(mgr); }
+			
 			
 		private:
+			typedef std::vector<MetaParam*> MetaParamVec;
+			MetaParamVec mMetaParam;
 	};
 	
+	/**
+	 * @brief Manages a mapping of \c TypeRule objects by a string identifier.
+	 * 
+	 * This mapping is used by \c loadRuleBlock() to find any matching
+	 * "Base" type for inheritance.
+	 */
 	class TypeRuleMgr {
 		public:
 			TypeRuleMgr();
 			~TypeRuleMgr();
 			
-			void loadBlock(Script::Block &block);
+			TypeRule *loadRuleBlock(Script::Block &block);
+			
+			void registerTypeRule(const std::string &name, TypeRule *rule)
+			{ mRuleMap[name] = rule; }
 			
 		private:
 			typedef boost::unordered_map<std::string,TypeRule*> RuleMap;

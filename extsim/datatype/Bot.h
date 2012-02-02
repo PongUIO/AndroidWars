@@ -70,7 +70,7 @@ namespace ExtS {
 	
 	class BotData : public DefaultData<ExtBot> {
 		public:
-			BotData(Sim::Simulation& sim);
+			BotData(ExtSim &esim);
 			virtual ~BotData();
 			
 			void startup() {}

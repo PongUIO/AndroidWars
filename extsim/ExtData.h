@@ -2,6 +2,7 @@
 #define EXTSIM_EXTDATA_H
 
 #include <boost/unordered_map.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include "BaseData.h"
 
@@ -25,7 +26,7 @@ namespace ExtS {
 		public:
 			/// @name Initialization
 			//@{
-				ExtData(Sim::Simulation &sim);
+				ExtData(ExtSim &esim);
 				~ExtData();
 				
 				void startup();
@@ -44,6 +45,7 @@ namespace ExtS {
 				ArmorData &getArmorDb() { return mArmor; }
 				DamageData &getDamageDb() { return mDamage; }
 				BotData &getBotDb() { return mBot; }
+				ProgramData &getProgramDb() { return mProgram; }
 			//@}
 			
 			template<class T>
@@ -63,6 +65,22 @@ namespace ExtS {
 				return val;
 			}
 			
+			static Sim::Vector readVector(const std::string &str,
+				Sim::Vector def=Sim::Vector()) {
+				typedef std::vector<std::string> StringVec;
+				StringVec sep;
+				boost::algorithm::split(sep, str, boost::is_any_of(" ,"),
+					boost::algorithm::token_compress_on);
+				
+				Sim::Vector vec = def;
+				if(sep.size() == 2) {
+					vec.x = readValue<double>(sep[0]);
+					vec.y = readValue<double>(sep[1]);
+				}
+				
+				return vec;
+			}
+			
 		private:
 			void registerListener(const std::string &blockTag, BaseData *db);
 			BaseData *getListener(const std::string &tag);
@@ -72,6 +90,7 @@ namespace ExtS {
 				ArmorData mArmor;
 				DamageData mDamage;
 				BotData mBot;
+				ProgramData mProgram;
 			//@}
 			
 			/// @name Internal
@@ -79,7 +98,7 @@ namespace ExtS {
 				typedef boost::unordered_map<std::string, BaseData*> ListenerMap;
 				ListenerMap mListeners;
 				
-				Sim::Simulation &mSim;
+				ExtSim &mExtSim;
 			//@}
 	};
 }

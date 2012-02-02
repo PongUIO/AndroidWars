@@ -1,11 +1,11 @@
 #include "Armor.h"
 #include "../ExtData.h"
 
-#include "../../simulation/Simulation.h"
+#include "../ExtSim.h"
 #include "../../simulation/data/WeaponD.h"
 
 namespace ExtS {
-	ArmorData::ArmorData(Sim::Simulation& sim): BaseData(sim)
+	ArmorData::ArmorData(ExtSim &esim): BaseData(esim)
 	{}
 	
 	ArmorData::~ArmorData()
@@ -17,7 +17,8 @@ namespace ExtS {
 		if(name.empty())
 			return;
 		
-		Sim::ArmorD *armorType = mSim.getData().getArmorDb().newArmor(name);
+		Sim::ArmorD *armorType =
+			mExtSim.getSim().getData().getArmorDb().newArmor(name);
 		
 		RuleData::Rule defaultRule = loadRuleData(block.getDataSimple("Default"), false);
 		armorType->setDefaultRule(defaultRule);
@@ -42,7 +43,8 @@ namespace ExtS {
 	 */
 	void ArmorData::postProcess()
 	{
-		Sim::DamageDatabase &damageDb = mSim.getData().getDamageDb();
+		Sim::DamageDatabase &damageDb =
+			mExtSim.getSim().getData().getDamageDb();
 		
 		for(RuleDataVec::iterator i=mRuleData.begin(); i!=mRuleData.end(); i++) {
 			RuleData &data = *i;

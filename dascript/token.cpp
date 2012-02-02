@@ -12,7 +12,7 @@ bool TokenData::isNum(char ch)
 {	return (ch >= '0' && ch <= '9'); }
 
 bool TokenData::isSpecial(char ch)
-{	return (ch == '-' || ch == '+' || ch == '.'); }
+{	return (ch == '-' || ch == '+' || ch == '.' || ch == '*'); }
 
 bool TokenData::isWord(char ch)
 {	return isChar(ch) || isNum(ch) || isSpecial(ch); }

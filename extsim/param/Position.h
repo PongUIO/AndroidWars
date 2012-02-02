@@ -7,24 +7,58 @@
 #include "../ExtData.h"
 
 namespace ExtS {
-	class Position : public ParamList::Param {
+	class PositionC;
+	
+	class PositionP : public Param, public ListenerSlot<PositionP> {
 		public:
-			Position();
-			virtual ~Position();
+			PositionP(MetaParam* parent) : Param(parent) {}
 			
-			void loadBlock(Script::Data& data) {
-				mPos.x = ExtData::readValue<double>(data.getArg(0));
-				mPos.y = ExtData::readValue<double>(data.getArg(1));
-			}
-			void postProcess() {}
+			void readParam(Script::Data& data);
+			void callback()
+			{ ListenerSlot<PositionP>::raiseListener(this); }
 			
-			void save(Sim::Save::BasePtr& fp) const
-			{ fp << mPos; }
-			
-			void fill();
+			Sim::Vector getPos() const { return mPos; }
 			
 		private:
 			Sim::Vector mPos;
+	};
+	
+	class PositionC : public Constraint, public ListenerSlot<PositionC> {
+		public:
+			PositionC(MetaParam* parent) : Constraint(parent),
+				mMin(-Sim::Vector::infinity()),
+				mMax(Sim::Vector::infinity()) {}
+			
+			void readConstraint(Script::Data& data);
+			bool isValid(Param* param, ExtSim& extsim) const;
+			
+			void callback()
+			{ ListenerSlot<PositionC>::raiseListener(this); }
+			
+		private:
+			Sim::Vector mMin, mMax;
+	};
+	
+	class MetaPosition : public MetaParam {
+		public:
+			MetaPosition(const std::string& dataName) : MetaParam(dataName),
+				mDefault(this), mConstraint(this) {}
+			virtual ~MetaPosition() {}
+			
+			Param* constructParam() { return new PositionP(mDefault); }
+			MetaParam* clone() { return new MetaPosition(*this); }
+			
+			void readParam(Script::Data& data)
+			{ mDefault.readParam(data); }
+			void readConstraint(Script::Data& data)
+			{ mConstraint.readConstraint(data); }
+			
+			Param* getDefaultParam() { return &mDefault; }
+			Constraint* getDefaultConstraint() { return &mConstraint; }
+			
+		private:
+			PositionP mDefault;
+			PositionC mConstraint;
 	};
 }
 

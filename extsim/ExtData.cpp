@@ -3,16 +3,18 @@
 #include "../dascript/script.h"
 
 namespace ExtS {
-	ExtData::ExtData(Sim::Simulation& sim) :
-		mArmor(sim),
-		mDamage(sim),
-		mBot(sim),
+	ExtData::ExtData(ExtSim &esim) :
+		mArmor(esim),
+		mDamage(esim),
+		mBot(esim),
+		mProgram(esim),
 		
-		mSim(sim)
+		mExtSim(esim)
 	{
 		registerListener("ARMOR", &mArmor);
 		registerListener("DAMAGE", &mDamage);
 		registerListener("BOT", &mBot);
+		registerListener("PROGRAM", &mProgram);
 	}
 	
 	ExtData::~ExtData()

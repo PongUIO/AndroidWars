@@ -1,12 +1,15 @@
 #ifndef SIM_VECTOR_H
 #define SIM_VECTOR_H
 
+#include <limits>
+
 #include <math.h>
 #include <boost/operators.hpp>
 
 namespace Sim {
 	class Vector :
 		boost::equality_comparable<Vector>,
+		boost::less_than_comparable<Vector>,
 		boost::arithmetic<Vector>
 	{
 		public:
@@ -28,9 +31,15 @@ namespace Sim {
 			Vector &operator =(const double &d)
 			{ x=d; y=d; return *this; }
 			
+			bool operator <(const Vector &b) const
+			{ return (x<b.x) || (y<b.y); }
+			// by less_than_comparable: > <= >=
+			
 			bool operator ==(const Vector &b) const
 			{ return (x==b.x) && (y==b.y); }
 			// by equality_comparable: !=
+			
+			Vector operator -(void) const { return Vector(-x,-y); }
 			
 			void operator +=(const Vector &b) { x+=b.x; y+=b.y; }
 			void operator -=(const Vector &b) { x-=b.x; y-=b.y; }
@@ -52,6 +61,11 @@ namespace Sim {
 			
 			Vector rightNormal()
 				{ return Vector(-y, x); }
+			
+			static Vector infinity() {
+				double infVal = std::numeric_limits<double>::infinity();
+				return Vector(infVal,infVal);
+			}
 	};
 }
 

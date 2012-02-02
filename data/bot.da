@@ -6,16 +6,11 @@
 		Agile light bot with a passive jammer.
 	}
 	
-	Health "Light" 50
-	#ATTACHMENTS
-		Health "Shield" 25
-	#
+	Health "Light" 75
 	
 	CpuLimit 10 20
 	Weight 5
 	Speed 4
-	
-	BaseProgram "Shield"
 	
 	Comment "Registers a passive ability for this bot"
 	Ability "Jammer"
@@ -59,6 +54,42 @@
 	#
 #
 
+#BOT
+	Name "Omni"
+	BaseCost 500
+	
+	Description {
+		Expensive but fragile bot with the ability to layer any armor
+		type on itself.
+	}
+	
+	Health "Light" 50
+	
+	CpuLimit 15 30
+	Weight 15
+	Speed 5
+	
+	BaseProgram "OmniArmor"
+	
+	#WEAPONS
+		Slot Large 2
+	#
+	
+	#COLLISION
+		#STANDING
+			PT 0 0
+			PT 1 0
+			PT 1 1
+			PT 0 1
+			
+			#WEAPON
+				Firing 0 0.5 0.5
+				Firing 1 0.5 0.5
+			#
+		#
+	#
+#
+
 #ABILITY
 	Name "Jammer"
 	Base "Base/Jammer"
@@ -90,22 +121,20 @@
 #
 
 #PROGRAM
-	Name "Shield"
+	Name "OmniArmor"
 	Base "Ability/ArmorAttachment"
 	
+	Description {
+		Allows a bot to create an armor attachment of any armor type.
+	}
+	
 	#PARAM
-		ArmorType "Shield"
-		Health 25
+		ArmorType "Light"
+		Health 100
 	#
-#
-
-#PROGRAM
-	Name "LightOrMedium"
-	Base "Ability/ArmorAttachment"
 	
-	#PARAM
-		ArmorType "Light" "Medium"
-		Health 25-50
+	#CONSTRAINT
+		ArmorType *
 	#
 #
 
@@ -120,8 +149,11 @@
 	}
 	
 	#PARAM
-		Range 10
 		Damage 5
 		ReloadTime 10
+	#
+	
+	#CONSTRAINT
+		Range "1>10"
 	#
 #

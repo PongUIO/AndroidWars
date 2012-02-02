@@ -4,7 +4,7 @@ namespace ExtS {
 	ExtSim::ExtSim() :
 		mSim(),
 		
-		mData(mSim)
+		mData(*this)
 	{
 	}
 
