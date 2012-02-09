@@ -85,20 +85,8 @@ namespace Sim {
 		mPhaseInput.push_back( Save() );
 		Save::FilePtr fp = Save::FilePtr(mPhaseInput.back());
 		
-		// Save all input
-		ProgramFactory &progFact = mSim->getState().getProgramFactory();
-		uint32_t saveCount = progFact.getCurrentUniqueId()-
-			mLocalLastProgramId;
-		fp.writeInt<uint32_t>(saveCount);
-		for(uint32_t i=mLocalLastProgramId;
-			i<progFact.getCurrentUniqueId(); i++) {
-			progFact.saveObj(progFact.getProgram(i), fp);
-		}
-		
 		// Save the input buffer
-		mSim->getState().getInputManager().save(fp);
-		
-		mLocalLastProgramId = progFact.getCurrentUniqueId();
+		mSim->getInput().save(fp);
 	}
 	
 	/**
@@ -185,16 +173,10 @@ namespace Sim {
 	void ReplayManager::loadCurPhaseInput()
 	{
 		if(mSim->getCurPhase() < mPhaseInput.size()) {
-			ProgramFactory &progFact = mSim->getState().getProgramFactory();
 			Save &inputData = mPhaseInput[mSim->getCurPhase()];
 			Save::FilePtr fp = Save::FilePtr(inputData);
 			
-			uint32_t inputCount = fp.readInt<uint32_t>();
-			for(uint32_t i=0; i<inputCount; i++) {
-				progFact.createFromSerialized(fp);
-			}
-			
-			mSim->getState().getInputManager().load(fp);
+			mSim->getInput().load(fp);
 		}
 	}
 	

@@ -3,13 +3,38 @@
 
 #include <stdint.h>
 #include <boost/bind.hpp>
+#include <boost/smart_ptr.hpp>
 
 #include <deque>
 #include "Save.h"
 #include "Common.h"
 #include "StateObj.h"
 
+#include "Bot.h"
+#include "Program.h"
+#include "Ability.h"
+#include "Bullet.h"
+#include "Weapon.h"
+
+#include "utility/CallGroup.h"
+
 namespace Sim {
+	
+	class InputObj {
+		public:
+			InputObj() {}
+			virtual ~InputObj() {}
+			
+			virtual void startup()=0;
+			virtual void shutdown()=0;
+			
+			virtual void finalizeInput()=0;
+			virtual void dispatchInput()=0;
+			
+			virtual void save(Save::BasePtr &fp) const=0;
+			virtual void load(Save::BasePtr &fp)=0;
+	};
+	
 	/**
 	 * This class handles a buffer of input commands.
 	 */
@@ -40,6 +65,8 @@ namespace Sim {
 				}
 			}
 			
+			size_t getSize() const { return mInputQueue.size(); }
+			
 			void save(Save::BasePtr &fp) const {
 				fp.writeCtr(mInputQueue);
 			}
@@ -53,54 +80,187 @@ namespace Sim {
 	};
 	
 	/**
-	 * This class handles basic bot input.
+	 * Handles input related to creating new objects in factories.
 	 */
-	struct BotInput : public Save::OperatorImpl<BotInput> {
-		BotInput(IdType botId=0, IdType progId=0, uint32_t delay=0) :
-			mTargetBot(botId), mProgramId(progId), mDelay(delay)
-			{}
-		
-		IdType mTargetBot;
-		IdType mProgramId;
-		uint32_t mDelay;
-		
-		void save(Save::BasePtr &fp) const
-		{ fp << mTargetBot << mProgramId << mDelay; }
-		void load(Save::BasePtr &fp)
-		{ fp >> mTargetBot >> mProgramId >> mDelay; }
+	template<class T>
+	class FactoryInput : public InputObj,
+	public Save::OperatorImpl<FactoryInput<T> > {
+		public:
+			FactoryInput(Simulation *sim) : mIdCounter(0), mSim(sim) {}
+			
+			void startup() {}
+			void shutdown() {}
+			
+			void registerInput(const Save &data) { mBuffer.addInput(data); }
+			void registerInput(typename T::Type *obj) {
+				T &fact = T::getFactory(mSim);
+				
+				Save data;
+				Save::FilePtr fp = Save::FilePtr(data);
+				fact.saveObj(obj, fp);
+				registerInput(data);
+			}
+			
+			/**
+			 * Builds an object using the factory and registers it as
+			 * input.
+			 * 
+			 * The object is given an automatic id which should correspond to
+			 * its real id when dispatched.
+			 * 
+			 * @see DefaultUidFactory::createType
+			 */
+			template<class Impl>
+			Impl *buildInputImpl(const typename Impl::Config &cfg) {
+				T &fact = T::getFactory(mSim);
+				
+				IdType id = allocateId();
+				Impl *obj = fact.template createType<Impl>(cfg, id);
+				
+				if(obj)
+					mTmpBuffer.addInput(obj);
+				
+				return obj;
+			}
+			
+			/**
+			 * Similar to \c buildInputImpl, but creating an object of the
+			 * default generic type.
+			 */
+			template<class Arg>
+			typename T::Type *buildInput(const Arg &cfg) {
+				T &fact = T::getFactory(mSim);
+				
+				IdType id = allocateId();
+				typename T::Type *obj = fact.template create<Arg>(cfg, id);
+				if(obj)
+					mTmpBuffer.addInput(obj);
+				
+				return obj;
+			}
+			
+			IdType allocateId() {
+				T &fact = T::getFactory(mSim);
+				return fact.getCurrentUniqueId() + mIdCounter++;
+			}
+			
+			void finalizeInput() {
+				while(mTmpBuffer.hasInput()) {
+					typename T::Type *obj = mTmpBuffer.nextInput();
+					registerInput(obj);
+					delete obj;
+				}
+			}
+			
+			void dispatchInput() {
+				T &fact = T::getFactory(mSim);
+				
+				while(mBuffer.hasInput()) {
+					Save save = mBuffer.nextInput();
+					Save::FilePtr fp = Save::FilePtr(save);
+					fact.createSerialized(fp);
+				}
+				
+				mIdCounter=0;
+			}
+			
+			void save(Save::BasePtr &fp) const
+			{ fp << mBuffer; }
+			void load(Save::BasePtr &fp)
+			{ fp >> mBuffer; }
+			
+		private:
+			InputBuffer<typename T::Type*> mTmpBuffer;
+			InputBuffer<Save> mBuffer;
+			
+			IdType mIdCounter;
+			
+			Simulation *mSim;
 	};
 	
-	class InputManager : public StateObj {
+	/**
+	 * Handles input specifically related to scheduling to a bot's cpu.
+	 */
+	class BotCpuInput : public InputObj, 
+	public Save::OperatorImpl<BotCpuInput> {
 		public:
-			InputManager(Simulation *sim);
-			~InputManager();
-			
-			/// @name StateObj calls
-			//@{
-				void startup();
-				void shutdown();
+			struct CpuRef : public Save::OperatorImpl<CpuRef> {
+				CpuRef(IdType botId=0, IdType progId=0, uint32_t delay=0) :
+					mTargetBot(botId), mProgramId(progId), mDelay(delay)
+					{}
 				
-				void startPhase();
-				void step(double stepTime);
-				void endPhase();
+				IdType mTargetBot;
+				IdType mProgramId;
+				uint32_t mDelay;
 				
-				void save(Save::BasePtr &fp);
-				void load(Save::BasePtr &fp);
-			//@}
+				void save(Save::BasePtr &fp) const
+				{ fp << mTargetBot << mProgramId << mDelay; }
+				void load(Save::BasePtr &fp)
+				{ fp >> mTargetBot >> mProgramId >> mDelay; }
+			};
 			
-			void registerInput(const BotInput &in)
-			{ mBotInput.addInput(in); }
+			BotCpuInput(Simulation *sim) : mSim(sim) {}
+			~BotCpuInput() {}
 			
 			void registerInput(IdType botId, IdType progId, uint32_t delay)
-			{ registerInput(BotInput(botId, progId, delay)); }
+			{ mBuffer.addInput(CpuRef(botId,progId,delay)); }
 			
-			void registerInput(const InputBuffer<BotInput> &in)
-			{ mBotInput.addInput(in); }
+			void startup();
+			void shutdown();
+			
+			void finalizeInput() {}
+			void dispatchInput();
+			
+			void save(Save::BasePtr &fp) const
+			{ fp << mBuffer; }
+			void load(Save::BasePtr &fp)
+			{ fp >> mBuffer; }
+		
+		private:
+			InputBuffer<CpuRef> mBuffer;
+			
+			Simulation *mSim;
+	};
+	
+	/**
+	 * @brief Main simulation input manager.
+	 */
+	class Input : public CallGroup<InputObj> {
+		public:
+			Input(Simulation *sim);
+			~Input();
+			
+			void startup();
+			void shutdown();
+			
+			void finalizeInput();
+			void dispatchInput();
+				
+			void save(Save::BasePtr &fp);
+			void load(Save::BasePtr &fp);
+			
+			FactoryInput<BotFactory> &getBotInput() { return mBotInput; }
+			FactoryInput<ProgramFactory> &getProgramInput()
+			{ return mProgramInput; }
+			FactoryInput<AbilityFactory> &getAbilityInput()
+			{ return mAbilityInput; }
+			FactoryInput<BulletFactory> &getBulletInput()
+			{ return mBulletInput; }
+			FactoryInput<WeaponFactory> &getWeaponInput()
+			{ return mWeaponInput; }
+			
+			BotCpuInput &getCpuInput() { return mCpuInput; }
 			
 		private:
 			Simulation *mSim;
 			
-			InputBuffer<BotInput> mBotInput;
+			FactoryInput<BotFactory> mBotInput;
+			FactoryInput<ProgramFactory> mProgramInput;
+			FactoryInput<AbilityFactory> mAbilityInput;
+			FactoryInput<BulletFactory> mBulletInput;
+			FactoryInput<WeaponFactory> mWeaponInput;
+			
+			BotCpuInput mCpuInput;
 	};
 }
 

@@ -6,48 +6,68 @@
 #include "State.h"
 
 namespace Sim {
-	// InputManager
+	// Input
 	//
 	//
-	InputManager::InputManager(Simulation* sim) : mSim(sim), mBotInput()
+	Input::Input(Simulation* sim) : mSim(sim),
+		mBotInput(sim),
+		mProgramInput(sim),
+		mAbilityInput(sim),
+		mBulletInput(sim),
+		mWeaponInput(sim),
+		mCpuInput(sim)
+	{
+		registerCallObj(&mBotInput);
+		registerCallObj(&mProgramInput);
+		registerCallObj(&mAbilityInput);
+		registerCallObj(&mBulletInput);
+		registerCallObj(&mWeaponInput);
+		registerCallObj(&mCpuInput);
+	}
+	
+	Input::~Input()
 	{}
 	
-	InputManager::~InputManager()
+	void Input::startup()
+	{ call( boost::bind(&InputObj::startup, _1) ); }
+	
+	void Input::shutdown()
+	{ call( boost::bind(&InputObj::shutdown, _1) ); }
+	
+	void Input::finalizeInput()
+	{ call( boost::bind(&InputObj::finalizeInput, _1) ); }
+	
+	void Input::dispatchInput()
+	{ call( boost::bind(&InputObj::dispatchInput, _1) ); }
+	
+	void Input::save(Save::BasePtr& fp)
+	{ call( boost::bind(&InputObj::save, _1, boost::ref(fp)) ); }
+	
+	void Input::load(Save::BasePtr& fp)
+	{ call( boost::bind(&InputObj::load, _1, boost::ref(fp)) ); }
+	
+	
+	// BotCpuInput
+	//
+	//
+	void BotCpuInput::startup()
 	{}
 	
-	void InputManager::startup()
+	void BotCpuInput::shutdown()
 	{}
 	
-	void InputManager::shutdown()
-	{}
-	
-	void InputManager::startPhase()
+	void BotCpuInput::dispatchInput()
 	{
 		BotFactory &botFact = mSim->getState().getBotFactory();
 		
-		while(mBotInput.hasInput()) {
-			BotInput in = mBotInput.nextInput();
+		while(mBuffer.hasInput()) {
+			CpuRef cpuRef = mBuffer.nextInput();
 			
-			Bot *bot = botFact.getBot(in.mTargetBot);
-			if(bot)
-				bot->getState().mCpu.scheduleProgram(in.mProgramId,in.mDelay);
+			Bot *bot = botFact.getBot(cpuRef.mTargetBot);
+			if(bot) {
+				bot->getState().mCpu.scheduleProgram(
+				cpuRef.mProgramId,cpuRef.mDelay);
+			}
 		}
 	}
-	
-	void InputManager::endPhase()
-	{}
-	
-	void InputManager::step(double stepTime)
-	{}
-	
-	void InputManager::save(Save::BasePtr& fp)
-	{
-		fp << mBotInput;
-	}
-
-	void InputManager::load(Save::BasePtr& fp)
-	{
-		fp >> mBotInput;
-	}
-
 }

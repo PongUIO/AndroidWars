@@ -50,9 +50,6 @@ namespace Sim {
 			
 			/// @name Module accessors
 			//@{
-				InputManager &getInputManager()
-				{ return mInputManager; }
-				
 				BotFactory &getBotFactory()
 				{ return mBotFactory; }
 				
@@ -83,7 +80,6 @@ namespace Sim {
 			//@{
 				void registerStateObj();
 				
-				InputManager mInputManager;
 				BotFactory mBotFactory;
 				ProgramFactory mProgramFactory;
 				AbilityFactory mAbilityFactory;

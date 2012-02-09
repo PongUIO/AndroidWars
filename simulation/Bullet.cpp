@@ -11,6 +11,10 @@ namespace Sim {
 	BulletFactory::~BulletFactory()
 	{}
 	
+	BulletFactory& BulletFactory::getFactory(Simulation* sim)
+	{ return sim->getState().getBulletFactory(); }
+
+	
 	const DataBehaviourT< Bullet >::Behaviour* BulletFactory::
 		getBehaviourFromId(IdType id) const
 	{	return mSim->getData().getBulletDb().getType(id); }

@@ -1,0 +1,14 @@
+#GAME
+	Name "AndroidWars"
+	
+	Description {
+		Standard AndroidWars game implementation.
+	}
+	
+	Comment {
+		While this steptime might seem odd, it is more floating-point
+		compatible, as it is 1/64. This should alleviate some issues with
+		floating point rounding.
+	}
+	StepTime 0.015625
+#

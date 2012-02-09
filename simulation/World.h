@@ -72,6 +72,8 @@ namespace Sim {
 				void load(Save::BasePtr &fp);
 			//@}
 			
+			void setDimensions(uint32_t width, uint32_t height);
+			
 			/// @name Tile information
 			//@{
 				Tile &getTile(uint32_t xInd, uint32_t yInd);

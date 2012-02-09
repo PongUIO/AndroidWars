@@ -27,11 +27,11 @@ namespace Sim {
 			
 			uint32_t getReloadTime() const { return mReloadTimer; }
 			
-		protected:
 			Weapon(Simulation *sim, IdType id, IdType typeId) :
 				mId(id), mTypeId(typeId), mSim(sim), mIsDead(false) {}
 			virtual ~Weapon() {}
 			
+		protected:
 			/// @name Interaction
 			//@{
 				virtual void save(Save::BasePtr &fp)=0;
@@ -107,12 +107,14 @@ namespace Sim {
 			void destroyWeapon(IdType id) { removeObj(id); }
 			Weapon *getWeapon(IdType id) { return getObject(id); }
 			
+			static WeaponFactory &getFactory(Simulation *sim);
+			
+			void saveObj(Weapon* obj, Save::BasePtr& fp);
+			Weapon* loadObj(IdType internalId, Save::BasePtr& fp);
+			
 		private:
 			/// @name Factory-required functions
 			//@{
-				void saveObj(Weapon* obj, Save::BasePtr& fp);
-				Weapon* loadObj(IdType internalId, Save::BasePtr& fp);
-				
 				void deleteInstance(Weapon* obj) { delete obj; }
 				
 				const DataBehaviourT<Weapon>::Behaviour* getBehaviourFromId(IdType id) const;

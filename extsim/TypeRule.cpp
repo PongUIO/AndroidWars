@@ -28,11 +28,11 @@ namespace ExtS {
 	}
 
 	
-	ParamList* TypeRule::makeParam()
+	ParamList* TypeRule::makeParam() const
 	{
 		ParamList *pL = new ParamList();
 		
-		for(MetaParamVec::iterator i=mMetaParam.begin(); i!=mMetaParam.end();
+		for(MetaParamVec::const_iterator i=mMetaParam.begin(); i!=mMetaParam.end();
 			++i) {
 			pL->insertParam( (*i)->constructParam() );
 		}

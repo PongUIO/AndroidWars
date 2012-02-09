@@ -5,7 +5,6 @@
 #include <boost/bind.hpp>
 
 #include "Factory.h"
-#include "Input.h"
 #include "Body.h"
 #include "Health.h"
 #include "Save.h"
@@ -73,6 +72,9 @@ namespace Sim {
 			};
 			typedef State Config;
 			
+			Bot(Simulation *sim, IdType id, const State &cfg=State());
+			~Bot();
+			
 			IdType getId() const { return mId; }
 			IdType getTypeId() const { return getState().mType; }
 			Body &getBody() { return getState().mBody; }
@@ -90,9 +92,6 @@ namespace Sim {
 			//@}
 			
 		private:
-			Bot(Simulation *sim, IdType id, const State &cfg=State());
-			~Bot();
-			
 			/// @name Interaction
 			//@{
 				void prepareStep(double stepTime);
@@ -169,12 +168,15 @@ namespace Sim {
 				void endPhase();
 			//@}
 			
+			static BotFactory &getFactory(Simulation *sim);
+			
+			void saveObj(Bot *bot, Save::BasePtr &fp);
+			Bot* loadObj(IdType id, Save::BasePtr &fp);
+			
 		private:
 			/// @name Factory-required functions
 			//@{
 				void deleteInstance(Bot* obj) { delete obj; }
-				void saveObj(Bot *bot, Save::BasePtr &fp);
-				Bot* loadObj(IdType id, Save::BasePtr &fp);
 			//@}
 	};
 	

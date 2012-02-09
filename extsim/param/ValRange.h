@@ -17,7 +17,7 @@ namespace ExtS {
 			void callback()
 			{ ListenerSlot<ValueRangeP<T> >::raiseListener(this); }
 			
-			T getVal() { return mVal; }
+			T getVal() const { return mVal; }
 			
 		private:
 			T mVal;

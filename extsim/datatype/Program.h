@@ -18,6 +18,9 @@ namespace ExtS {
 			const std::string &getName() const { return mName; }
 			const std::string &getDescription() const { return mDescription; }
 			
+			const TypeRule *getRule() const { return mRule; }
+			Sim::IdType getId() const { return mId; }
+			
 		private:
 			Sim::IdType mId;
 			
@@ -39,7 +42,13 @@ namespace ExtS {
 			void loadBlock(Script::Block& block);
 			void postProcess();
 			
+			Sim::IdType getIdOf(const std::string &name) const
+			{ return mNameIdMgr.getIdOf(name); }
+			std::string getNameOf(Sim::IdType id) const
+			{ return mNameIdMgr.getNameOf(id); }
+			
 		private:
+			Sim::NameIdMgr mNameIdMgr;
 	};
 }
 

@@ -44,6 +44,13 @@ namespace Sim {
 	template<class T>
 	class UidFactory {
 		public:
+			typedef T Type;
+			typedef std::list<T*> DataList;
+			typedef boost::unordered_map<IdType, typename DataList::iterator>
+				IdResolveMap;
+			typedef std::pair<IdType,typename DataList::iterator>
+				InsertData;
+			
 			UidFactory() : mCurrentUniqueId(0)
 				{}
 			~UidFactory() {}
@@ -110,13 +117,10 @@ namespace Sim {
 				}
 			}
 			
-		protected:
-			typedef std::list<T*> DataList;
-			typedef boost::unordered_map<IdType, typename DataList::iterator>
-				IdResolveMap;
-			typedef std::pair<IdType,typename DataList::iterator>
-				InsertData;
+			const DataList &getData() const { return mData; }
+			IdType getCurrentUniqueId() const { return mCurrentUniqueId;}
 			
+		protected:
 			T *getObject(IdType id) {
 				typename IdResolveMap::iterator i = mIdResolve.find(id);
 				return (i==mIdResolve.end()) ? 0 : *i->second;
@@ -155,9 +159,6 @@ namespace Sim {
 					mIdResolve.erase(i);
 				}
 			}
-			
-			const DataList &getData() const { return mData; }
-			IdType getCurrentUniqueId() const { return mCurrentUniqueId;}
 			
 		private:
 			IdType mCurrentUniqueId;
@@ -203,53 +204,68 @@ namespace Sim {
 				{ throw std::string("UidFactory::getBehaviourFromId() unimplemented"); }
 				
 				/**
-				 * Creates a type based on an implementation, and
-				 * inserts it into the factory. May create any valid inheritor
-				 * of the type this factory uses.
+				 * Creates an object based on an implementation.
+				 * May create any valid inheritor of the type this factory uses.
+				 * 
+				 * The created object is not associated with the simulation,
+				 * and as such it must be deleted manually.
+				 * 
+				 * To actually make the object active in the simulation, it
+				 * has to be serialized and then added as input.
 				 * 
 				 * This function uses Impl::getTypeName() to find the
 				 * typeid of the new object.
+				 * 
+				 * @warning This is not intended to be used directly, but
+				 * rather through the \c Input class.
 				 * 
 				 * @return A pointer to the new object if successful, or NULL if
 				 * the type is not registered to the simulation.
 				 */
 				template<typename Impl>
-				Impl *createType(const typename Impl::Config &cfg) {
+				Impl *createType(const typename Impl::Config &cfg, IdType id) {
 					const typename DataBehaviourT<T>::Behaviour *b =
 						getBehaviourFromName(Impl::getTypeName());
 					if(!b)
 						return 0;
 					
-					typename UidFactory<T>::InsertData insData =
-						UidFactory<T>::insertObject();
-					Impl *tmp = new Impl(mSim, insData.first, b->mId, cfg);
-					*insData.second = tmp;
-					
-					return tmp;
+					return new Impl(mSim, id, b->mId, cfg);
 				}
 				
 				/**
-				 * Creates an abstract type based on a type ID.
+				 * Creates an object directly.
 				 * 
-				 * As the ID of the created type is know, it should be
-				 * trivial to cast the abstract pointer to the proper type.
+				 * The created object is not associated with the simulation,
+				 * and as such must be deleted manually.
+				 * 
+				 * @note Making this function a template is a crude hack to
+				 * avoid the necessity of T::Config
 				 */
-				T *createObjFromTypeName(const std::string &name) {
-					typename DataBehaviourT<T>::Behaviour *b =
-						getBehaviourFromName(name);
-					if(!b)
-						return 0;
+				template<class Arg>
+				T *create(const Arg &cfg, IdType id) 
+				{ return new T(mSim, id, cfg); }
+				
+				/**
+				 * Creates a serialized object and optionally inserts it
+				 * into the factory.
+				 */
+				T *createSerialized(Save::BasePtr &fp, bool doInsert=true) {
+					typename UidFactory<T>::InsertData insData;
+					IdType id = NoId;
 					
-					typename UidFactory<T>::InsertData insData =
-						UidFactory<T>::insertObject();
-					T *obj = b->createObj(mSim, insData.first);
-					*insData.second = obj;
+					if(doInsert) {
+						insData = UidFactory<T>::insertObject();
+						id = insData.first;
+					}
+					
+					T *obj = loadObj(id, fp);
+					if(doInsert)
+						*insData.second = obj;
 					
 					return obj;
 				}
 			//@}
 			
-		protected:
 			/// @name Factory-required default functions
 			//@{
 				virtual void saveObj(T *obj, Save::BasePtr &fp) {
@@ -271,6 +287,7 @@ namespace Sim {
 				}
 			//@}
 			
+		protected:
 			Simulation *mSim;
 	};
 }

@@ -5,6 +5,7 @@
 
 #include "Data.h"
 #include "State.h"
+#include "Input.h"
 #include "Replay.h"
 #include "program/ProgramInclude.h"
 #include "ability/AbilityInclude.h"
@@ -14,20 +15,18 @@
 namespace Sim {
 	struct Configuration {
 		Configuration() :
-			phaseLength(100),
-			stepTime(0.01),
+			phaseLength(25),
+			stepTime(1.0),
 			
-			tileSize(1.0),
-			worldWidth(128),
-			worldHeight(64)
+			tileSize(1.0)
 			{}
 		
 		uint32_t phaseLength;  ///< Number of steps in a simulation phase
 		double stepTime;       ///< Duration of a single simulation step
 		
 		double tileSize;       ///< Size of each world tile
-		uint32_t worldWidth;   ///< Width of the world in tiles
-		uint32_t worldHeight;  ///< Height of the world in tiles
+		//uint32_t worldWidth;   ///< Width of the world in tiles
+		//uint32_t worldHeight;  ///< Height of the world in tiles
 	};
 	
 	class Simulation {
@@ -37,7 +36,7 @@ namespace Sim {
 				Simulation();
 				~Simulation();
 				
-				void startup(const Configuration &config);
+				void startup();
 				void shutdown();
 				
 				void clear();
@@ -74,13 +73,16 @@ namespace Sim {
 				State &getState()
 				{ return mStateActive; }
 				
+				Input &getInput()
+				{ return mInput; }
+				
 				Data &getData()
 				{ return mData; }
 				
 				ReplayManager &getReplayManager()
 				{ return mReplay; }
 				
-				const Configuration &getConfig()
+				Configuration &getConfig()
 				{ return config; }
 			//@}
 			
@@ -99,8 +101,8 @@ namespace Sim {
 			/// @name Subsystems
 			//@{
 				State mStateActive;
+				Input mInput;
 				Data mData;
-				
 				ReplayManager mReplay;
 			//@}
 			

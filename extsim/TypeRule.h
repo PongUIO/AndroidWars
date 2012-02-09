@@ -24,9 +24,10 @@ namespace ExtS {
 	template<class Type>
 	class ListenerSlot {
 		public:
-			static void setListener(Listener<Type> L) {
+			template<class LT>
+			static void setListener(const LT &L) {
 				clearListener();
-				sListener = new Listener<Type>(L);
+				sListener = new LT(L);
 			}
 			
 			static void clearListener() {
@@ -155,17 +156,28 @@ namespace ExtS {
 	 */
 	class TypeRule {
 		public:
+			typedef std::vector<MetaParam*> MetaParamVec;
+			
 			TypeRule();
 			virtual ~TypeRule();
 			
 			TypeRule *clone();
 			
-			ParamList *makeParam();
+			ParamList *makeParam() const;
 			
 			void readParam(Script::Block &paramBlock);
 			void readConstraint(Script::Block &constraintBlock);
 			
 			void postProcess(ExtSim &extsim);
+			
+			const MetaParamVec &getMetaParamVec() const { return mMetaParam; }
+			
+			/**
+			 * Must be implemented in order to convert a parameter list into
+			 * a
+			 */
+			virtual void saveInput(ParamList *, Sim::Save::BasePtr &,
+				ExtSim &esim) const=0;
 			
 		protected:
 			void registerMetaParam(MetaParam *mgr)
@@ -173,7 +185,6 @@ namespace ExtS {
 			
 			
 		private:
-			typedef std::vector<MetaParam*> MetaParamVec;
 			MetaParamVec mMetaParam;
 	};
 	

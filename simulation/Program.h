@@ -36,12 +36,12 @@ namespace Sim {
 			void setForceFinished() { mFinished=true; }
 			void setRunningTime(uint32_t steps) { mRunningTime=steps; }
 			
-		protected:
 			Program(Simulation *sim, IdType id, IdType typeId) :
 				mId(id), mTypeId(typeId), mSim(sim),
 				mEndSensor(), mRunningTime(-1), mFinished(false) {}
 			virtual ~Program() {}
 			
+		protected:
 			/// @name Interaction
 			//@{
 				virtual void save(Save::BasePtr &fp);
@@ -134,9 +134,9 @@ namespace Sim {
 			 * Creates a program and inserts it into the factory.
 			 * May create any valid inheritor of \c Program.
 			 */
-			template<class T>
+			/*template<class T>
 			T *createProgram(const typename T::Config &cfg)
-			{	return createType<T>(cfg); }
+			{	return createType<T>(cfg); }*/
 			
 			Program *createFromSerialized(Save::BasePtr &fp);
 			
@@ -146,6 +146,8 @@ namespace Sim {
 			//IdType getLastPhaseId() { return mLastPhaseInputId; }
 			IdType getCurrentUniqueId()
 			{ return UidFactory<Program>::getCurrentUniqueId(); }
+			
+			static ProgramFactory &getFactory(Simulation *sim);
 			
 		private:
 			/// @name Factory-required functions

@@ -11,6 +11,10 @@ namespace Sim {
 	WeaponFactory::~WeaponFactory()
 	{}
 	
+	WeaponFactory& WeaponFactory::getFactory(Simulation* sim)
+	{ return sim->getState().getWeaponFactory(); }
+
+	
 	const DataBehaviourT<Weapon>::Behaviour* WeaponFactory::getBehaviourFromId(IdType id) const
 	{	return mSim->getData().getWeaponDb().getType(id); }
 	

@@ -13,6 +13,7 @@ namespace Sim {
 		registerCallObj(&mAbility);
 		registerCallObj(&mArmor);
 		registerCallObj(&mDamage);
+		registerCallObj(&mTileCol);
 	}
 	
 	Data::~Data()
@@ -23,19 +24,14 @@ namespace Sim {
 		const Configuration &cfg = mSim->getConfig();
 		
 		call( boost::bind(&BaseData::startup, _1, mSim) );
-		
-		mTileCol.startup(cfg.tileSize, 8);
 	}
 	
 	void Data::shutdown()
 	{
-		mTileCol.shutdown();
-		
 		rcall( boost::bind(&BaseData::shutdown, _1) );
 	}
 	
 	void Data::save(Save::BasePtr &fp)
 	{
-		mTile.save(fp);
 	}
 }

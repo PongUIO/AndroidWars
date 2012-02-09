@@ -4,6 +4,7 @@
 #include "../simulation/Simulation.h"
 
 #include "ExtData.h"
+#include "ExtInput.h"
 
 namespace ExtS {
 	/**
@@ -24,11 +25,24 @@ namespace ExtS {
 			//@{
 				ExtSim();
 				~ExtSim();
+				
+				void startup();
+				void shutdown();
+				
+				void loadDataScript(const std::string &script)
+				{ mData.loadScript(script); }
+				void postProcessData()
+				{ mData.postProcess(); }
+				void switchDataContext(ExtData::ListenerContext context)
+				{ mData.switchContext(context); }
+				
+				void prepareSim();
 			//@}
 			
 			/// @name Module accessors
 			//@{
 				ExtData &getData() { return mData; }
+				ExtInput &getInput() { return mInput; }
 				
 				Sim::Simulation &getSim() { return mSim; }
 			//@}
@@ -39,6 +53,7 @@ namespace ExtS {
 			/// @name Subsystems
 			//@{
 				ExtData mData;
+				ExtInput mInput;
 			//@}
 	};
 }

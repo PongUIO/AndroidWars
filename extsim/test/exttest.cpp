@@ -1,14 +1,46 @@
 #include <stdio.h>
+#include <stdint.h>
 #include <boost/filesystem.hpp>
 #include <fstream>
 #include <sstream>
+#include <iostream>
 
 #include "../ExtSim.h"
+
+#include "../param/IdList.h"
+#include "../param/Position.h"
+#include "../param/ValRange.h"
 
 ExtS::ExtSim extSim = ExtS::ExtSim();
 Sim::Simulation &sim = extSim.getSim();
 
 namespace fs = boost::filesystem;
+
+template<class T>
+struct IdListPListener : public ExtS::Listener<ExtS::IdListP<T> > {
+	void process(ExtS::IdListP<T> *p) {
+		std::cout << p->getId();
+	}
+};
+
+template<class T>
+struct IdListCListener : public ExtS::Listener<ExtS::IdListC<T> > {
+	void process(ExtS::IdListC<T> *p) {
+		const typename ExtS::IdListC<T>::IdSet &idSet = p->getIdSet();
+		for(typename ExtS::IdListC<T>::IdSet::const_iterator i=idSet.begin();
+			i!=idSet.end(); ++i) {
+			std::cout << *i << " ";
+		}
+		std::cout << (p->isAlwaysValid()?"(all)":"");
+	}
+};
+
+template<class T>
+struct ValueRangeListener : public ExtS::Listener<ExtS::ValueRangeP<T> > {
+	void process(ExtS::ValueRangeP<T> *p) {
+		std::cout << p->getVal();
+	}
+};
 
 void loadFiles()
 {
@@ -118,16 +150,60 @@ void listBot()
 	}
 }
 
+void testParam()
+{
+	ExtS::IdListP<Sim::ArmorD>::setListener( IdListPListener<Sim::ArmorD>() );
+	ExtS::IdListC<Sim::ArmorD>::setListener( IdListCListener<Sim::ArmorD>() );
+	ExtS::ValueRangeP<uint32_t>::setListener( ValueRangeListener<uint32_t>() );
+	
+	ExtS::ProgramData &progDb = extSim.getData().getProgramDb();
+	for(Sim::IdType i=0; i<progDb.size(); ++i) {
+		const ExtS::ExtProgram *prog = progDb.getType(i);
+		std::cout << prog->getName() << "\n";
+		
+		const ExtS::TypeRule *rule;
+		if(prog && (rule=prog->getRule())!=0) {
+			ExtS::ParamList *param = rule->makeParam();
+			const ExtS::TypeRule::MetaParamVec &paramVec =
+				rule->getMetaParamVec();
+			
+			for(ExtS::TypeRule::MetaParamVec::const_iterator i=paramVec.begin();
+				i!=paramVec.end(); ++i) {
+				std::cout << "\t\"" << (*i)->getDataName() << "\"\t ";
+				if( (*i)->getDefaultParam() )
+					(*i)->getDefaultParam()->callback();
+				std::cout << " | ";
+				if( (*i)->getDefaultConstraint() )
+					(*i)->getDefaultConstraint()->callback();
+				std::cout << "\n";
+			}
+			
+			delete param;
+		}
+	}
+}
+
 int main(void)
 {
 	Sim::Configuration config;
 	config.phaseLength = 5;
 	config.stepTime = 0.01;
 	
-	sim.startup(config);
+	// [bootstrap]
+	extSim.startup();
 	
+	// [data loading]
+	extSim.switchDataContext(ExtS::ExtData::LcDataLoading);
 	loadFiles();
-	extSim.getData().postProcess();
+	extSim.postProcessData();
+	
+	// [content loading]
+	extSim.switchDataContext(ExtS::ExtData::LcContentLoading);
+	loadFiles();
+	extSim.postProcessData();
+	
+	// [prepare simulation]
+	extSim.prepareSim();
 	
 	printf("\n");
 	listArmor();
@@ -135,6 +211,9 @@ int main(void)
 	listDamage();
 	printf("\n");
 	listBot();
+	
+	// Testing parameters
+	testParam();
 	
 	return 0;
 }

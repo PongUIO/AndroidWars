@@ -54,10 +54,12 @@ namespace ExtS {
 					// Special case: Matches any identifier
 					if(*i == "*")
 						mIsAlwaysValid=true;
-					
-					Sim::IdType id = translateNameToId<T>(extsim, *i);
-					mIdSet.insert( id );
+					else {
+						Sim::IdType id = translateNameToId<T>(extsim, *i);
+						mIdSet.insert( id );
+					}
 				}
+				mNameVec.clear();
 			}
 			
 			bool isValid(Param* param, ExtSim& extsim) const {
@@ -69,6 +71,9 @@ namespace ExtS {
 			
 			void callback()
 			{ ListenerSlot<IdListC<T> >::raiseListener(this); }
+			
+			const IdSet &getIdSet() const { return mIdSet; }
+			bool isAlwaysValid() const { return mIsAlwaysValid; }
 			
 		private:
 			StringVec mNameVec;

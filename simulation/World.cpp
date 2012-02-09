@@ -16,22 +16,29 @@ namespace Sim {
 	
 	void World::startup()
 	{
-		mWidth = mSim->getConfig().worldWidth;
-		mHeight = mSim->getConfig().worldHeight;
 		mTileSize = mSim->getConfig().tileSize;
 		
 		mOffScreen = Tile(0);
-		
-		size_t totalSize = mWidth*mHeight;
-		for(size_t i=0; i<totalSize; i++) {
-			mData.push_back( mOffScreen );
-		}
 	}
 	
 	void World::shutdown()
 	{
 		mData.clear();
 	}
+	
+	void World::setDimensions(uint32_t width, uint32_t height)
+	{
+		mData.clear();
+		
+		mWidth = width;
+		mHeight = height;
+		
+		size_t totalSize = mWidth*mHeight;
+		for(size_t i=0; i<totalSize; i++) {
+			mData.push_back( mOffScreen );
+		}
+	}
+
 	
 	void World::startPhase()
 	{

@@ -22,11 +22,11 @@ namespace Sim {
 			
 			bool isDead() { return false; }
 			
-		protected:
 			Bullet(Simulation *sim, IdType id, IdType typeId) :
 				mId(id), mTypeId(typeId), mSim(sim) {}
 			virtual ~Bullet() {}
 			
+		protected:
 			/// @name Interaction
 			//@{
 				virtual void save(Save::BasePtr &fp) const;
@@ -58,6 +58,8 @@ namespace Sim {
 			
 			void destroyBullet(IdType id) { removeObj(id); }
 			Bullet *getBullet(IdType id) { return getObject(id); }
+			
+			static BulletFactory &getFactory(Simulation *sim);
 			
 		private:
 			/// @name Factory-required functions

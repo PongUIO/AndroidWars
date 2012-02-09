@@ -12,6 +12,8 @@
 #include "datatype/Damage.h"
 #include "datatype/Program.h"
 #include "datatype/Weapon.h"
+#include "datatype/Game.h"
+#include "datatype/Map.h"
 
 namespace ExtS {
 	/**
@@ -24,6 +26,20 @@ namespace ExtS {
 	 */
 	class ExtData {
 		public:
+			enum ListenerContext {
+				LcNone					= 0x00,
+				LcDataLoading			= 0x01,
+				LcContentLoading		= 0x02
+			};
+			
+			struct Listener {
+				Listener(BaseData *data=0, ListenerContext context=LcNone) :
+					mData(data), mContext(context) {}
+				
+				BaseData *mData;
+				ListenerContext mContext;
+			};
+			
 			/// @name Initialization
 			//@{
 				ExtData(ExtSim &esim);
@@ -38,6 +54,8 @@ namespace ExtS {
 				void loadScript(const std::string &data);
 				
 				void postProcess();
+				void switchContext(ListenerContext ctx)
+				{ mCurrentContext = ctx; }
 			//@}
 			
 			/// @name Database retrieval
@@ -46,8 +64,36 @@ namespace ExtS {
 				DamageData &getDamageDb() { return mDamage; }
 				BotData &getBotDb() { return mBot; }
 				ProgramData &getProgramDb() { return mProgram; }
+				GameData &getGameDb() { return mGame; }
+				MapData &getMapDb() { return mMap; }
 			//@}
 			
+		private:
+			void registerListener(const std::string &blockTag,
+				const Listener &listener);
+			BaseData *getListener(const std::string &tag);
+			
+			/// @name Databases
+			//@{
+				ArmorData mArmor;
+				DamageData mDamage;
+				BotData mBot;
+				ProgramData mProgram;
+				GameData mGame;
+				MapData mMap;
+			//@}
+			
+			/// @name Internal
+			//@{
+				typedef boost::unordered_map<std::string, Listener> ListenerMap;
+				ListenerMap mListeners;
+				ListenerContext mCurrentContext;
+				
+				ExtSim &mExtSim;
+			//@}
+			
+			
+		public:
 			template<class T>
 			static T badCastStrategy(const std::string &str, T def) { return def; }
 			
@@ -81,25 +127,21 @@ namespace ExtS {
 				return vec;
 			}
 			
-		private:
-			void registerListener(const std::string &blockTag, BaseData *db);
-			BaseData *getListener(const std::string &tag);
-			
-			/// @name Databases
-			//@{
-				ArmorData mArmor;
-				DamageData mDamage;
-				BotData mBot;
-				ProgramData mProgram;
-			//@}
-			
-			/// @name Internal
-			//@{
-				typedef boost::unordered_map<std::string, BaseData*> ListenerMap;
-				ListenerMap mListeners;
+			template<class T>
+			static T readBitfield(const std::string &str,
+				T def=T()) {
+				T val = def;
+				if(str.empty())
+					return def;
 				
-				ExtSim &mExtSim;
-			//@}
+				size_t bitIndex = 0;
+				for(size_t i=0; i<str.size(); ++i) {
+					if(str[i] == '1')
+						val |= (1<<bitIndex);
+				}
+				
+				return val;
+			}
 	};
 }
 

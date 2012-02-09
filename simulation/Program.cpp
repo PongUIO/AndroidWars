@@ -55,6 +55,9 @@ namespace Sim {
 	ProgramFactory::~ProgramFactory()
 	{}
 	
+	ProgramFactory& ProgramFactory::getFactory(Simulation* sim)
+	{	return sim->getState().getProgramFactory(); }
+	
 	void ProgramFactory::startup()
 	{}
 	

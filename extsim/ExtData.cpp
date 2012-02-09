@@ -8,13 +8,19 @@ namespace ExtS {
 		mDamage(esim),
 		mBot(esim),
 		mProgram(esim),
+		mGame(esim),
+		mMap(esim),
 		
+		mCurrentContext(LcNone),
 		mExtSim(esim)
 	{
-		registerListener("ARMOR", &mArmor);
-		registerListener("DAMAGE", &mDamage);
-		registerListener("BOT", &mBot);
-		registerListener("PROGRAM", &mProgram);
+		registerListener("ARMOR", Listener(&mArmor, LcDataLoading) );
+		registerListener("DAMAGE", Listener(&mDamage, LcDataLoading) );
+		registerListener("BOT", Listener(&mBot, LcDataLoading) );
+		registerListener("PROGRAM", Listener(&mProgram, LcDataLoading) );
+		registerListener("GAME", Listener(&mGame, LcDataLoading) );
+		
+		registerListener("MAP", Listener(&mMap, LcContentLoading) );
 	}
 	
 	ExtData::~ExtData()
@@ -53,17 +59,20 @@ namespace ExtS {
 	{
 		for(ListenerMap::iterator i=mListeners.begin();
 			i!=mListeners.end(); i++) {
-			i->second->postProcess();
+			if(i->second.mContext & mCurrentContext)
+				i->second.mData->postProcess();
 		}
 	}
 	
-	void ExtData::registerListener(const std::string& blockTag, BaseData* db)
-	{	mListeners[blockTag] = db; }
+	void ExtData::registerListener(const std::string& blockTag,
+		const Listener &listener)
+	{	mListeners[blockTag] = listener; }
 	
 	BaseData* ExtData::getListener(const std::string& tag)
 	{
 		ListenerMap::iterator i=mListeners.find(tag);
-		return (i==mListeners.end()) ? 0 : i->second;
+		return (i==mListeners.end() || !(i->second.mContext&mCurrentContext)) ?
+			0 : i->second.mData;
 	}
 	
 	

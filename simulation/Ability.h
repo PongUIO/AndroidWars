@@ -30,13 +30,13 @@ namespace Sim {
 			virtual void injectDelay(int32_t delay, bool force=false);
 			virtual void setDuration(uint32_t duration, bool force=false);
 			
-		protected:
 			Ability(Simulation *sim, IdType id, IdType typeId) :
 				mId(id), mTypeId(typeId), mReferences(0), mSim(sim),
 				mIsActive(true), mIsFinished(false), mDelay(0), mDuration(-1)
 				{}
 			virtual ~Ability() {}
 			
+		protected:
 			/// @name Interaction
 			//@{
 				virtual void save(Save::BasePtr &fp)=0;
@@ -106,11 +106,16 @@ namespace Sim {
 			 * @return A pointer to the new object if successful, or NULL
 			 * if the ability type is not registered.
 			 */
-			template<class T>
+			/*template<class T>
 			T *createAbility(const typename T::Config &cfg)
-			{	return createType<T>(cfg); }
+			{	return createType<T>(cfg); }*/
 			
 			Ability *getAbility(IdType id) { return getObject(id); }
+			
+			static AbilityFactory &getFactory(Simulation *sim);
+			
+			void saveObj(Ability* obj, Save::BasePtr& fp);
+			Ability* loadObj(IdType internalId, Save::BasePtr& fp);
 			
 		private:
 			/// @name Factory-required functions
@@ -119,9 +124,6 @@ namespace Sim {
 				
 				const DataBehaviourT<Ability>::Behaviour* getBehaviourFromId(IdType id) const;
 				const DataBehaviourT<Ability>::Behaviour* getBehaviourFromName(const std::string& name) const;
-				
-				void saveObj(Ability* obj, Save::BasePtr& fp);
-				Ability* loadObj(IdType internalId, Save::BasePtr& fp);
 			//@}
 	};
 }

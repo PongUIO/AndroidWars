@@ -2,23 +2,22 @@
 
 #include "Collision.h"
 #include "TileCol.h"
+#include "../Simulation.h"
 
 //#include <stdio.h>
 namespace Sim {
 	bool operator==(TileCol::TileType const& a, TileCol::TileType const& b)
 	{	return a.data == b.data;	}
 	
-	TileCol::TileCol() : mTileSize(0.0)
+	TileCol::TileCol()
 	{}
 	
 	TileCol::~TileCol()
 	{}
 	
-	void TileCol::startup(double tileSize, int slopeRes)
+	void TileCol::startup(Simulation *sim)
 	{
-		mTileSize = tileSize;
-		
-		mSlopeRes = std::min(slopeRes, 1<<TileType::SlopeBits);
+		mSim = sim;
 	}
 
 	void TileCol::shutdown()
@@ -27,6 +26,13 @@ namespace Sim {
 			delete i->second;
 		}
 	}
+	
+	double TileCol::getSlope(uint32_t sy)
+	{	return (1.0-double(sy)/double(sSlopeRes))*getTileSize(); }
+	
+	double TileCol::getTileSize()
+	{	return mSim->getConfig().tileSize; }
+
 	
 	Collision* TileCol::getTileCol(const Sim::TileCol::TileType& type)
 	{
@@ -84,12 +90,12 @@ namespace Sim {
 		
 		//printf("%d %d %d\n", type.getSide(), type.getSlopeL(), type.getSlopeR());
 		//printf("%d %d\n", act.basePt[0], act.basePt[1]);
-		points[act.basePt[0]] = act.off[0]*mTileSize;
-		points[act.basePt[1]] = act.off[1]*mTileSize;
+		points[act.basePt[0]] = act.off[0]*getTileSize();
+		points[act.basePt[1]] = act.off[1]*getTileSize();
 		points[act.modPt[0]] =
-			act.off[1]*mTileSize + act.dir*getSlope(type.getSlopeL());
+			act.off[1]*getTileSize() + act.dir*getSlope(type.getSlopeL());
 		points[act.modPt[1]] =
-			act.off[0]*mTileSize + act.dir*getSlope(type.getSlopeR());
+			act.off[0]*getTileSize() + act.dir*getSlope(type.getSlopeR());
 		//printf("%g %g, %g %g\n", points[0].x, points[0].y, points[1].x, points[1].y);
 		//printf("%g %g, %g %g\n", points[2].x, points[2].y, points[3].x, points[3].y);
 		

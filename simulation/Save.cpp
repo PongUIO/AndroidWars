@@ -60,7 +60,7 @@ namespace Sim {
 #define STREAM_INT(Type) \
 	STREAM_FUNC(Type, writeInt<Type>(val), val=readInt<Type>())
 #define STREAM_FLOAT(Type) \
-	STREAM_FUNC(Type, writeFloat<Type>(val), val=readFloat())
+	STREAM_FUNC(Type, writeFloat(val), val=readFloat())
 	
 	STREAM_INT(int8_t)
 	STREAM_INT(int16_t)
@@ -72,7 +72,6 @@ namespace Sim {
 	STREAM_INT(uint32_t)
 	STREAM_INT(uint64_t)
 	
-	STREAM_FLOAT(float)
 	STREAM_FLOAT(double)
 	
 	// Special types

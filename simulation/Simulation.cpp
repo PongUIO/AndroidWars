@@ -4,6 +4,7 @@
 namespace Sim {
 	Simulation::Simulation() :
 		mStateActive(this),
+		mInput(this),
 		mData(this),
 		mReplay(this)
 		{}
@@ -11,11 +12,10 @@ namespace Sim {
 	Simulation::~Simulation()
 		{}
 	
-	void Simulation::startup(const Configuration &config)
+	void Simulation::startup()
 	{
-		this->config = config;
-		
 		mData.startup();
+		mInput.startup();
 		clear();
 		mReplay.startup();
 	}
@@ -24,6 +24,7 @@ namespace Sim {
 	{
 		mReplay.shutdown();
 		mStateActive.shutdown();
+		mInput.shutdown();
 		mData.shutdown();
 	}
 	
@@ -41,18 +42,19 @@ namespace Sim {
 	
 	void Simulation::prepareSim()
 	{
+		mInput.finalizeInput();
+		mInput.dispatchInput();
 		mReplay.prepareSim();
 	}
 	
 	/**
 	 * Starts a new simulation phase.
-	 * 
-	 * \param doTrialRun If false, all steps will be reverted when
-	 * \c endPhase() is called.
 	 */
 	void Simulation::startPhase()
 	{
+		mInput.finalizeInput();
 		mReplay.startPhase();
+		mInput.dispatchInput();
 		
 		mStateActive.startPhase();
 	}

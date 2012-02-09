@@ -7,7 +7,6 @@
 
 namespace Sim {
 	State::State(Simulation* sim) :
-		mInputManager(sim),
 		mBotFactory(sim),
 		mProgramFactory(sim),
 		mAbilityFactory(sim),
@@ -32,7 +31,6 @@ namespace Sim {
 	void State::registerStateObj()
 	{
 		CallGroup<StateObj>::clear();
-		registerCallObj(&mInputManager);
 		registerCallObj(&mWorld);
 		registerCallObj(&mBotFactory);
 		registerCallObj(&mProgramFactory);

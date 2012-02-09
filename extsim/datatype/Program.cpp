@@ -29,6 +29,7 @@ namespace ExtS {
 		TypeRule *rule = loadRuleBlock(block);
 		if(rule) {
 			ExtProgram *extProgram = createType();
+			mNameIdMgr.connect(extProgram->getId(), name);
 			
 			extProgram->loadBlock(block, rule);
 		} else printf("Program '%s' does not inherit any valid rule\n",

@@ -91,23 +91,14 @@ namespace Sim {
 					template<class T>
 					void readIntRef(T &ref) { ref = readInt<T>(); }
 					
-					template<class T>
-					void writeFloat(const T &v) {
-						char byteStr[FP_mix_bufSize];
-						memset(byteStr,0, FP_mix_bufSize);
-						
-						uint8_t bytes = snprintf(byteStr, FP_mix_bufSize, FP_mix, v);
-						writeInt<uint8_t>(bytes);
-						nanoWrite((uint8_t*)byteStr, bytes);
+					void writeFloat(double v) {
+						nanoWrite((uint8_t*)&v, sizeof(double));
 					}
 					
 					double readFloat() {
-						char byteStr[FP_mix_bufSize];
-						memset(byteStr,0, FP_mix_bufSize);
-						
-						uint8_t bytes = readInt<uint8_t>();
-						nanoRead( (uint8_t*)byteStr, bytes);
-						return atof(byteStr);
+						double v;
+						nanoRead((uint8_t*)&v, sizeof(double));
+						return v;
 					}
 					
 					template<class T>

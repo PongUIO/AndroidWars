@@ -56,6 +56,10 @@ namespace Sim {
 	AbilityFactory::~AbilityFactory()
 	{}
 	
+	AbilityFactory& AbilityFactory::getFactory(Simulation* sim)
+	{ return sim->getState().getAbilityFactory(); }
+
+	
 	void AbilityFactory::startup()
 	{}
 	

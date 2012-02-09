@@ -138,6 +138,20 @@
 	#
 #
 
+#PROGRAM
+	Name "Shield"
+	Base "Ability/ArmorAttachment"
+	
+	Description {
+		Allows a bot to temporarily shield itself from damage.
+	}
+	
+	#PARAM
+		ArmorType "Shield"
+		Health 150
+	#
+#
+
 #WEAPON
 	Name "SR Rocket"
 	Base "Ext/RocketWeapon"

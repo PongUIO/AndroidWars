@@ -120,6 +120,10 @@ namespace Sim {
 	BotFactory::~BotFactory()
 	{}
 	
+	BotFactory& BotFactory::getFactory(Simulation* sim)
+	{	return sim->getState().getBotFactory(); }
+
+	
 	void BotFactory::startup()
 	{
 		DefaultUidFactory<Bot>::startup();

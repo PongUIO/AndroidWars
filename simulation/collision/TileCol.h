@@ -3,14 +3,17 @@
 
 #include <boost/unordered_map.hpp>
 
+#include "../data/BaseData.h"
+
 namespace Sim {
 	// Forward declarations
 	class Collision;
+	class Simulation;
 	
 	/**
 	 * This class contains an index of tile collision objects.
 	 */
-	class TileCol {
+	class TileCol : public BaseData {
 		public:
 			/**
 			 * The datatype used to describe a collision tile.
@@ -69,21 +72,24 @@ namespace Sim {
 			TileCol();
 			~TileCol();
 			
-			void startup(double tileSize, int slopeRes);
+			void startup(Simulation *sim);
 			void shutdown();
 			
 			Collision *getTileCol(const TileType &type);
 			
 		private:
 			Collision *generateTile(const TileType &type);
-			double getSlope(uint32_t sy)
-			{ return (1.0-double(sy)/double(mSlopeRes))*mTileSize; }
+			
+			double getSlope(uint32_t sy);
+			double getTileSize();
 			
 			typedef boost::unordered_map<TileType, Collision*> TileMap;
 			
 			TileMap mData;
-			double mTileSize;
-			uint32_t mSlopeRes;    ///< Resolution of possible tile slopes
+			Simulation *mSim;
+			
+			 /// Resolution of possible tile slopes
+			static const uint32_t sSlopeRes = 1<<TileType::SlopeBits;
 	};
 	
 	/// Hash function for TileCol::TileType
