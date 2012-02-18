@@ -6,59 +6,26 @@
 #include "../TypeRule.h"
 #include "../ExtData.h"
 
+#include "ValRange.h"
+
 namespace ExtS {
-	class PositionC;
-	
-	class PositionP : public Param, public ListenerSlot<PositionP> {
+	/**
+	 * Used to denote a world position.
+	 */
+	class PositionParam : public ValRange<Sim::Vector>,
+	public ListenerSlot<PositionParam> {
 		public:
-			PositionP(MetaParam* parent) : Param(parent) {}
+			PositionParam(const std::string& dataName) :
+				ValRange<Sim::Vector>(dataName) {}
+			virtual ~PositionParam() {}
 			
-			void readParam(Script::Data& data);
-			void callback()
-			{ ListenerSlot<PositionP>::raiseListener(this); }
+			virtual RuleParameter* clone()
+			{ return new PositionParam(*this); }
 			
-			Sim::Vector getPos() const { return mPos; }
+			virtual void callback()
+			{ ListenerSlot<PositionParam>::raiseListener(this); }
 			
 		private:
-			Sim::Vector mPos;
-	};
-	
-	class PositionC : public Constraint, public ListenerSlot<PositionC> {
-		public:
-			PositionC(MetaParam* parent) : Constraint(parent),
-				mMin(-Sim::Vector::infinity()),
-				mMax(Sim::Vector::infinity()) {}
-			
-			void readConstraint(Script::Data& data);
-			bool isValid(Param* param, ExtSim& extsim) const;
-			
-			void callback()
-			{ ListenerSlot<PositionC>::raiseListener(this); }
-			
-		private:
-			Sim::Vector mMin, mMax;
-	};
-	
-	class MetaPosition : public MetaParam {
-		public:
-			MetaPosition(const std::string& dataName) : MetaParam(dataName),
-				mDefault(this), mConstraint(this) {}
-			virtual ~MetaPosition() {}
-			
-			Param* constructParam() { return new PositionP(mDefault); }
-			MetaParam* clone() { return new MetaPosition(*this); }
-			
-			void readParam(Script::Data& data)
-			{ mDefault.readParam(data); }
-			void readConstraint(Script::Data& data)
-			{ mConstraint.readConstraint(data); }
-			
-			Param* getDefaultParam() { return &mDefault; }
-			Constraint* getDefaultConstraint() { return &mConstraint; }
-			
-		private:
-			PositionP mDefault;
-			PositionC mConstraint;
 	};
 }
 

@@ -50,7 +50,10 @@ namespace ExtS {
 	{}
 	
 	ExtProgram::~ExtProgram()
-	{}
+	{
+		if(mRule)
+			delete mRule;
+	}
 
 	void ExtProgram::loadBlock(Script::Block& block, TypeRule *rule)
 	{

@@ -14,6 +14,12 @@ void Script::compile(const std::string &str)
 	tokenizer.generate(str);
 }
 
+Script::Data &Script::Data::emptyData()
+{
+	static Script::Data empty = Script::Data();
+	return empty;
+}
+
 Script::Block::~Block()
 {
 	for(BlockMap::iterator i=mBlock.begin(); i!=mBlock.end(); i++) {

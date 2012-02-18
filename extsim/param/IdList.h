@@ -14,102 +14,85 @@ namespace ExtS {
 	template<class T>
 	Sim::IdType translateNameToId(ExtSim &extsim, const std::string &str);
 	
+	/**
+	 * Allows an identifier of an arbitrary type, constrained to a
+	 * list of identifiers.
+	 */
 	template<class T>
-	class IdListP : public Param, public ListenerSlot<IdListP<T> > {
-		public:
-			IdListP(MetaParam* parent) : Param(parent), mId(0) {}
-			
-			void readParam(Script::Data& data)
-			{ mName = data.getArg(0); }
-			void postProcess(ExtSim& extsim)
-			{ mId = translateNameToId<T>(extsim, mName); }
-			
-			void callback()
-			{ ListenerSlot<IdListP<T> >::raiseListener(this); }
-			
-			Sim::IdType getId() const { return mId; }
-			
-		private:
-			std::string mName;
-			Sim::IdType mId;
-	};
-	
-	template<class T>
-	class IdListC : public Constraint, public ListenerSlot<IdListC<T> > {
+	class IdList : public RuleParameter,
+	public ListenerSlot<IdList<T> > {
 		public:
 			typedef std::vector<std::string> StringVec;
 			typedef boost::unordered_set<Sim::IdType> IdSet;
 			
-			IdListC(MetaParam* parent) : Constraint(parent),
+			IdList(const std::string& dataName) : RuleParameter(dataName),
 				mIsAlwaysValid(false) {}
+			virtual ~IdList() {}
 			
-			void readConstraint(Script::Data& data) {
-				for(size_t i=0; i<data.argCount(); i++)
-					mNameVec.push_back(data.getArg(i));
+			RuleParameter *clone() { return new IdList<T>(*this); }
+			
+			void readBlock(Script::Block* block) {
+				Script::Block *paramBlock, *constraintBlock;
+				
+				paramBlock = block->getBlock("PARAM");
+				constraintBlock = block->getBlock("CONSTRAINT");
+				
+				// Read default value
+				if(paramBlock) {
+					Script::Data &paramData = getBlockData(paramBlock);
+					mIdName = paramData.getArg(0);
+				}
+				
+				// Read constraints
+				Script::Data &constraintData = getBlockData(constraintBlock);
+				if(constraintBlock && constraintData.isDefined()) {
+					setDefinedConstraint();
+					
+					for(size_t i=0; i<constraintData.argCount(); ++i)
+						mIdNameVec.push_back(constraintData.getArg(i));
+				}
 			}
-			void postProcess(ExtSim& extsim)
-			{
-				for(StringVec::iterator i=mNameVec.begin(); i!=mNameVec.end();
-					++i) {
-					// Special case: Matches any identifier
+			
+			void postProcess(ExtSim& extsim) {
+				// Translate default value
+				mId = translateNameToId<T>(extsim, mIdName);
+				
+				// Translate constraints
+				for(StringVec::iterator i=mIdNameVec.begin();
+					i!=mIdNameVec.end(); ++i) {
 					if(*i == "*")
 						mIsAlwaysValid=true;
 					else {
 						Sim::IdType id = translateNameToId<T>(extsim, *i);
-						mIdSet.insert( id );
+						mIdSet.insert(id);
 					}
 				}
-				mNameVec.clear();
+				mIdNameVec.clear();
 			}
 			
-			bool isValid(Param* param, ExtSim& extsim) const {
-				IdListP<T> *pIdList = static_cast<IdListP<T>*>(param);
+			bool isValid(RuleParameter* param, ExtSim& extsim) const {
+				IdList<T> *srcList = static_cast<IdList<T>*>(param);
 				
 				return mIsAlwaysValid ||
-					mIdSet.find(pIdList->getId())!=mIdSet.end();
+					mIdSet.find(srcList->getId())!=mIdSet.end();
 			}
 			
 			void callback()
-			{ ListenerSlot<IdListC<T> >::raiseListener(this); }
+			{ ListenerSlot<IdList<T> >::raiseListener(this); }
 			
+			Sim::IdType getId() const { return mId; }
 			const IdSet &getIdSet() const { return mIdSet; }
 			bool isAlwaysValid() const { return mIsAlwaysValid; }
 			
 		private:
-			StringVec mNameVec;
+			// Value
+			std::string mIdName;
+			Sim::IdType mId;
+			
+			// Constraint
+			StringVec mIdNameVec;
 			IdSet mIdSet;
 			bool mIsAlwaysValid;
-	};
-	
-	template<class T>
-	class MetaIdList : public MetaParam {
-		public:
-			MetaIdList(const std::string& dataName) : MetaParam(dataName),
-				mDefault(this), mConstraint(this) {}
-			virtual ~MetaIdList() {}
-			
-			virtual Param* constructParam()
-			{ return new IdListP<T>(mDefault); }
-			
-			MetaParam* clone()
-			{ return new MetaIdList(*this); }
-			
-			virtual void readParam(Script::Data& data)
-			{ mDefault.readParam(data); }
-			virtual void readConstraint(Script::Data& data)
-			{ mConstraint.readConstraint(data); }
-			
-			virtual void postProcess(ExtSim& extsim) {
-				mDefault.postProcess(extsim);
-				mConstraint.postProcess(extsim);
-			}
-			
-			Param* getDefaultParam() { return &mDefault; }
-			Constraint* getDefaultConstraint() { return &mConstraint; }
-			
-		private:
-			IdListP<T> mDefault;
-			IdListC<T> mConstraint;
 	};
 }
 

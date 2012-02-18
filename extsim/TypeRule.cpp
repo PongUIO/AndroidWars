@@ -8,23 +8,22 @@ namespace ExtS {
 	{}
 	
 	TypeRule::~TypeRule()
+	{}
+	
+	void TypeRule::readBlock(Script::Block* block)
 	{
-		for(MetaParamVec::iterator i=mMetaParam.begin();
-			i!=mMetaParam.end(); ++i)
-			delete *i;
+		for(RuleParamVec::iterator i=mRuleParam.begin(); i!=mRuleParam.end();
+			++i) {
+			(*i)->readBlock(block);
+		}
 	}
 	
-	TypeRule* TypeRule::clone()
+	void TypeRule::postProcess(ExtSim& extsim)
 	{
-		TypeRule *copy = new TypeRule();
-		
-		copy->mMetaParam.reserve(mMetaParam.size());
-		for(MetaParamVec::iterator i=mMetaParam.begin();
-			i!=mMetaParam.end(); ++i) {
-			copy->mMetaParam.push_back( (*i)->clone() );
+		for(RuleParamVec::iterator i=mRuleParam.begin(); i!=mRuleParam.end();
+			++i) {
+			(*i)->postProcess(extsim);
 		}
-		
-		return copy;
 	}
 
 	
@@ -32,43 +31,45 @@ namespace ExtS {
 	{
 		ParamList *pL = new ParamList();
 		
-		for(MetaParamVec::const_iterator i=mMetaParam.begin(); i!=mMetaParam.end();
-			++i) {
-			pL->insertParam( (*i)->constructParam() );
-		}
-		
+		*pL = *this;
 		return pL;
 	}
 	
-	void TypeRule::readConstraint(Script::Block& constraintBlock)
+	// ParamList
+	//
+	//
+	/**
+	 * Copy constructor that clones the source's parameters
+	 */
+	ParamList::ParamList(const ExtS::ParamList& src)
 	{
-		for(MetaParamVec::iterator i=mMetaParam.begin(); i!=mMetaParam.end();
-			++i) {
-			MetaParam *meta = *i;
+		*this = src;
+	}
+	
+	ParamList& ParamList::operator=(const ExtS::ParamList& src)
+	{
+		if(this != &src) {
+			clearRuleParam();
 			
-			meta->readConstraint(
-				constraintBlock.getDataSimple(meta->getDataName()));
+			for(RuleParamVec::const_iterator i=src.mRuleParam.begin();
+			i!=src.mRuleParam.end(); ++i) {
+				registerRuleParam( (*i)->clone() );
+			}
 		}
-	}
-	
-	void TypeRule::readParam(Script::Block& paramBlock)
-	{
-		for(MetaParamVec::iterator i=mMetaParam.begin(); i!=mMetaParam.end();
-			++i) {
-			MetaParam *meta = *i;
-			meta->readParam(
-				paramBlock.getDataSimple(meta->getDataName()));
-		}
-	}
-	
-	void TypeRule::postProcess(ExtSim& extsim)
-	{
-		for(MetaParamVec::iterator i=mMetaParam.begin(); i!=mMetaParam.end();
-			++i)
-			(*i)->postProcess(extsim);
+		
+		return *this;
 	}
 
 	
+	void ParamList::clearRuleParam()
+	{
+		for(RuleParamVec::iterator i=mRuleParam.begin();
+			i!=mRuleParam.end(); ++i)
+			delete *i;
+		
+		mRuleParam.clear();
+	}
+
 	
 	// TypeRuleMgr
 	//
@@ -97,13 +98,7 @@ namespace ExtS {
 		RuleMap::iterator i = mRuleMap.find(baseRuleName);
 		if(i != mRuleMap.end()) {
 			rule = i->second->clone();
-			
-			Script::Block *paramBlock = block.getBlock("PARAM");
-			Script::Block *constraintBlock = block.getBlock("CONSTRAINT");
-			
-			// Weird construct because I can
-			paramBlock ? rule->readParam(*paramBlock) : (void)0;
-			constraintBlock ? rule->readConstraint(*constraintBlock) : (void)0;
+			rule->readBlock(&block);
 		}
 		
 		return rule;

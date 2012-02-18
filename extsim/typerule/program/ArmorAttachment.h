@@ -9,7 +9,10 @@ namespace ExtS { namespace Prog {
 				ArmorAttachmentRule();
 				~ArmorAttachmentRule() {}
 				
-				void saveInput(ParamList* , Sim::Save::BasePtr& ) const;
+				virtual TypeRule* clone()
+				{ return new ArmorAttachmentRule(*this); }
+				
+				//void saveInput(ParamList* , Sim::Save::BasePtr& ) const;
 				
 			private:
 		};

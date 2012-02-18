@@ -17,27 +17,23 @@ Sim::Simulation &sim = extSim.getSim();
 namespace fs = boost::filesystem;
 
 template<class T>
-struct IdListPListener : public ExtS::Listener<ExtS::IdListP<T> > {
-	void process(ExtS::IdListP<T> *p) {
-		std::cout << p->getId();
-	}
-};
-
-template<class T>
-struct IdListCListener : public ExtS::Listener<ExtS::IdListC<T> > {
-	void process(ExtS::IdListC<T> *p) {
-		const typename ExtS::IdListC<T>::IdSet &idSet = p->getIdSet();
-		for(typename ExtS::IdListC<T>::IdSet::const_iterator i=idSet.begin();
+struct IdListListener : public ExtS::Listener<ExtS::IdList<T> > {
+	void process(ExtS::IdList<T> *p) {
+		std::cout << p->getId() << " | ";
+		
+		const typename ExtS::IdList<T>::IdSet &idSet = p->getIdSet();
+		for(typename ExtS::IdList<T>::IdSet::const_iterator i=idSet.begin();
 			i!=idSet.end(); ++i) {
 			std::cout << *i << " ";
 		}
 		std::cout << (p->isAlwaysValid()?"(all)":"");
+		std::cout << (p->isConstraintUndefined()?"(identity)":"");
 	}
 };
 
 template<class T>
-struct ValueRangeListener : public ExtS::Listener<ExtS::ValueRangeP<T> > {
-	void process(ExtS::ValueRangeP<T> *p) {
+struct ValRangeListener : public ExtS::Listener<ExtS::ValRange<T> > {
+	void process(ExtS::ValRange<T> *p) {
 		std::cout << p->getVal();
 	}
 };
@@ -152,29 +148,27 @@ void listBot()
 
 void testParam()
 {
-	ExtS::IdListP<Sim::ArmorD>::setListener( IdListPListener<Sim::ArmorD>() );
-	ExtS::IdListC<Sim::ArmorD>::setListener( IdListCListener<Sim::ArmorD>() );
-	ExtS::ValueRangeP<uint32_t>::setListener( ValueRangeListener<uint32_t>() );
+	ExtS::IdList<Sim::ArmorD>::setListener( IdListListener<Sim::ArmorD>() );
+	ExtS::ValRange<uint32_t>::setListener( ValRangeListener<uint32_t>() );
+	
+	printf("\nParameter testing:\n");
 	
 	ExtS::ProgramData &progDb = extSim.getData().getProgramDb();
 	for(Sim::IdType i=0; i<progDb.size(); ++i) {
 		const ExtS::ExtProgram *prog = progDb.getType(i);
-		std::cout << prog->getName() << "\n";
+		std::cout << prog->getName() << "\n\tDescription: " <<
+			prog->getDescription() << "\n";
 		
 		const ExtS::TypeRule *rule;
 		if(prog && (rule=prog->getRule())!=0) {
 			ExtS::ParamList *param = rule->makeParam();
-			const ExtS::TypeRule::MetaParamVec &paramVec =
-				rule->getMetaParamVec();
+			const ExtS::TypeRule::RuleParamVec &paramVec =
+				rule->getRuleParamVec();
 			
-			for(ExtS::TypeRule::MetaParamVec::const_iterator i=paramVec.begin();
+			for(ExtS::TypeRule::RuleParamVec::const_iterator i=paramVec.begin();
 				i!=paramVec.end(); ++i) {
 				std::cout << "\t\"" << (*i)->getDataName() << "\"\t ";
-				if( (*i)->getDefaultParam() )
-					(*i)->getDefaultParam()->callback();
-				std::cout << " | ";
-				if( (*i)->getDefaultConstraint() )
-					(*i)->getDefaultConstraint()->callback();
+				(*i)->callback();
 				std::cout << "\n";
 			}
 			

@@ -48,7 +48,9 @@ class Script {
 				}
 				
 				void dump(int indent=0);
-			
+				
+				static Data &emptyData();
+				
 			private:
 				typedef std::vector<std::string> ArgVec;
 				

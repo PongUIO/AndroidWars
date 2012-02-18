@@ -5,7 +5,7 @@ namespace ExtS {
 	// Parameter
 	//
 	//
-	void PositionP::readParam(Script::Data& data)
+	/*void PositionP::readParam(Script::Data& data)
 	{
 		mPos = ExtData::readVector(data.getArg(0));
 	}
@@ -17,14 +17,14 @@ namespace ExtS {
 	{
 		mMin = ExtData::readVector(data.getArg(0), -Sim::Vector::infinity());
 		mMax = ExtData::readVector(data.getArg(1), Sim::Vector::infinity());
-	}
+	}*/
 	
-	bool PositionC::isValid(Param* param, ExtSim& extsim) const
+	/*bool PositionC::isValid(Param* param, ExtSim& extsim) const
 	{
 		PositionP *paramPos = static_cast<PositionP*>(param);
 		
 		Sim::Vector pos = paramPos->getPos();
 		return pos >= mMin && pos <= mMax;
-	}
+	}*/
 
 }

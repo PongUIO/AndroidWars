@@ -111,22 +111,6 @@ namespace ExtS {
 				return val;
 			}
 			
-			static Sim::Vector readVector(const std::string &str,
-				Sim::Vector def=Sim::Vector()) {
-				typedef std::vector<std::string> StringVec;
-				StringVec sep;
-				boost::algorithm::split(sep, str, boost::is_any_of(" ,"),
-					boost::algorithm::token_compress_on);
-				
-				Sim::Vector vec = def;
-				if(sep.size() == 2) {
-					vec.x = readValue<double>(sep[0]);
-					vec.y = readValue<double>(sep[1]);
-				}
-				
-				return vec;
-			}
-			
 			template<class T>
 			static T readBitfield(const std::string &str,
 				T def=T()) {
@@ -143,6 +127,22 @@ namespace ExtS {
 				return val;
 			}
 	};
+	
+	template<>
+	inline Sim::Vector ExtData::readValue<Sim::Vector>(const std::string &str,
+		Sim::Vector def) {
+		std::vector<std::string> sep;
+		boost::split(sep, str, boost::is_any_of(" ,"),
+			boost::algorithm::token_compress_on);
+		
+		Sim::Vector val = def;
+		if(sep.size() == 2) {
+			val.x = readValue<double>(sep[0]);
+			val.y = readValue<double>(sep[1]);
+		}
+		
+		return val;
+	}
 }
 
 #endif

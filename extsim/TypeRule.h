@@ -2,6 +2,7 @@
 #define EXTSIM_TYPERULE_H
 
 #include <boost/unordered_map.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include "../dascript/script.h"
 #include "../simulation/Save.h"
@@ -23,101 +24,70 @@ namespace ExtS {
 	 */
 	template<class Type>
 	class ListenerSlot {
+		private:
+			typedef boost::shared_ptr<Listener<Type> > SharedPtr;
+		
 		public:
 			template<class LT>
 			static void setListener(const LT &L) {
-				clearListener();
-				sListener = new LT(L);
+				sListener = SharedPtr(new LT(L));
 			}
 			
 			static void clearListener() {
-				if(sListener)
-					delete sListener;
-				sListener=0;
+				sListener.reset();
 			}
 			
 			static void raiseListener(Type *src) {
-				if(sListener)
+				if(sListener.get())
 					sListener->process(src);
 			}
 		
 		private:
-			static Listener<Type> *sListener;
+			static SharedPtr sListener;
 	};
 	
 	template<class Type>
-	Listener<Type> *ListenerSlot<Type>::sListener = 0;
+	typename ListenerSlot<Type>::SharedPtr ListenerSlot<Type>::sListener =
+		typename ListenerSlot<Type>::SharedPtr();
 	
 	/**
-	 * A single parameter object.
+	 * Contains parameter information such as the default value of a parameter
+	 * and its constraints.
 	 * 
-	 * Each parameter type must also have an associated \c MetaParam
+	 * Any implementation of this class describe the details of the
 	 * implementation.
 	 */
-	class Param {
+	class RuleParameter {
 		public:
-			Param(MetaParam *parent) : mParent(parent) {}
-			virtual ~Param() {}
+			RuleParameter(const std::string &dataName) : mDataName(dataName),
+				mIsConstraintDefined(false) {}
+			virtual ~RuleParameter() {}
 			
-			virtual void readParam(Script::Data &data)=0;
+			virtual RuleParameter *clone()=0;
 			
-			virtual void callback()=0;
-			
-		protected:
-			MetaParam *mParent;
-	};
-	
-	/**
-	 * Implements parameter constraints
-	 */
-	class Constraint {
-		public:
-			Constraint(MetaParam *parent) :
-				mParent(parent), mIsUndefined(false) {}
-			
-			virtual void readConstraint(Script::Data &data)=0;
-			virtual bool isValid(Param *param, ExtSim &extsim) const=0;
-			
-			virtual void callback()=0;
-			
-			bool isUndefined() const { return mIsUndefined; }
-			
-		protected:
-			MetaParam *mParent;
-			bool mIsUndefined;
-			
-			friend class MetaParam;
-	};
-	
-	/**
-	 * Contains static information about a parameter type, including
-	 * parameter constraints.
-	 */
-	class MetaParam {
-		public:
-			MetaParam(const std::string &dataName) : mDataName(dataName) {}
-			virtual ~MetaParam() {}
-			
-			/**
-			 * Constructs a default parameter object of the type this
-			 * \c MetaParam object implements.
-			 */
-			virtual Param *constructParam()=0;
-			
-			virtual MetaParam *clone()=0;
-			
-			virtual void readParam(Script::Data &data)=0;
-			virtual void readConstraint(Script::Data &data)=0;
-			
+			virtual void readBlock(Script::Block *block)=0;
 			virtual void postProcess(ExtSim &extsim) {}
 			
-			virtual Param *getDefaultParam()=0;
-			virtual Constraint *getDefaultConstraint()=0;
+			virtual void callback()=0;
+			
+			virtual bool isValid(RuleParameter *param, ExtSim &extsim) const=0;
 			
 			const std::string &getDataName() const { return mDataName; }
+			bool isConstraintUndefined() const
+			{ return !mIsConstraintDefined; }
+			
+		protected:
+			Script::Data &getBlockData(Script::Block *block) const
+			{ return block ?
+				block->getDataSimple(getDataName()) :
+				Script::Data::emptyData(); }
+			
+			void setDefinedConstraint() { mIsConstraintDefined=true; }
 			
 		private:
 			std::string mDataName;
+			
+			bool mIsConstraintDefined;
 	};
 	
 	/**
@@ -125,21 +95,22 @@ namespace ExtS {
 	 */
 	class ParamList {
 		public:
-			typedef std::vector<Param*> ParamVec;
+			typedef std::vector<RuleParameter*> RuleParamVec;
 			
 			ParamList() {}
-			~ParamList() {
-				for(ParamVec::iterator i=mParam.begin(); i!=mParam.end();
-					++i)
-					delete *i;
-			}
+			~ParamList() { clearRuleParam(); }
 			
-			void insertParam(Param *p) { mParam.push_back(p); }
+			ParamList(const ParamList &src);
+			ParamList &operator=(const ParamList &src);
 			
-			size_t size() const { return mParam.size(); }
+			void registerRuleParam(RuleParameter *mgr)
+			{ mRuleParam.push_back(mgr); }
+			void clearRuleParam();
 			
-		private:
-			ParamVec mParam;
+			size_t size() const { return mRuleParam.size(); }
+			
+		protected:
+			RuleParamVec mRuleParam;
 	};
 	
 	/**
@@ -154,38 +125,24 @@ namespace ExtS {
 	 * it is fed back in order to create the object that depend on the
 	 * parameters.
 	 */
-	class TypeRule {
+	class TypeRule : protected ParamList {
 		public:
-			typedef std::vector<MetaParam*> MetaParamVec;
+			typedef ParamList::RuleParamVec RuleParamVec;
 			
 			TypeRule();
 			virtual ~TypeRule();
 			
-			TypeRule *clone();
+			virtual TypeRule *clone()=0;
+			
+			void readBlock(Script::Block *block);
+			void postProcess(ExtSim &extsim);
 			
 			ParamList *makeParam() const;
 			
-			void readParam(Script::Block &paramBlock);
-			void readConstraint(Script::Block &constraintBlock);
-			
-			void postProcess(ExtSim &extsim);
-			
-			const MetaParamVec &getMetaParamVec() const { return mMetaParam; }
-			
-			/**
-			 * Must be implemented in order to convert a parameter list into
-			 * a
-			 */
-			virtual void saveInput(ParamList *, Sim::Save::BasePtr &,
-				ExtSim &esim) const=0;
-			
-		protected:
-			void registerMetaParam(MetaParam *mgr)
-			{ mMetaParam.push_back(mgr); }
-			
+			const RuleParamVec &getRuleParamVec() const { return mRuleParam; }
 			
 		private:
-			MetaParamVec mMetaParam;
+			
 	};
 	
 	/**
