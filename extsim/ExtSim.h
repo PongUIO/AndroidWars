@@ -7,6 +7,11 @@
 #include "ExtInput.h"
 
 namespace ExtS {
+#define _EXTS_X_EXTSIM_COMPONENTS \
+	_EXTS_X(Sim::Simulation, Sim) \
+	_EXTS_X(ExtData, Data) \
+	_EXTS_X(ExtInput, Input)
+	
 	/**
 	 * @brief Manages simulation data not directly related to simulation.
 	 * 
@@ -41,19 +46,20 @@ namespace ExtS {
 			
 			/// @name Module accessors
 			//@{
-				ExtData &getData() { return mData; }
-				ExtInput &getInput() { return mInput; }
+				template<class T>
+				T &getComponent();
 				
-				Sim::Simulation &getSim() { return mSim; }
+#define _EXTS_X(type, name) type &get##name() { return m##name; }
+				_EXTS_X_EXTSIM_COMPONENTS
+#undef _EXTS_X
 			//@}
 			
 		private:
-			Sim::Simulation mSim;
-			
 			/// @name Subsystems
 			//@{
-				ExtData mData;
-				ExtInput mInput;
+#define _EXTS_X(type, name) type m##name;
+				_EXTS_X_EXTSIM_COMPONENTS
+#undef _EXTS_X
 			//@}
 	};
 }

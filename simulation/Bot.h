@@ -25,9 +25,12 @@ namespace Sim {
 	class State;
 	class Collision;
 	class Player;
+	class BotDatabase;
 	
 	class Bot {
 		public:
+			typedef BotDatabase TypeDatabase;
+			
 			struct Input {
 				uint32_t mStepDelay;
 				IdType mProgramId;

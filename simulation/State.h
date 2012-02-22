@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+#include "CommonTemplate.h"
+
 #include "World.h"
 #include "Bot.h"
 #include "Bullet.h"
@@ -10,7 +12,7 @@
 #include "Player.h"
 #include "Program.h"
 #include "Ability.h"
-#include "Input.h"
+//#include "Input.h"
 #include "Replay.h"
 
 #include "utility/CallGroup.h"
@@ -21,6 +23,15 @@ namespace Sim {
 	class BotFactory;
 	class WeaponFactory;
 	class BulletFactory;
+	
+#define _SIM_X_STATE_COMPONENTS \
+	_SIM_X(BotFactory) \
+	_SIM_X(ProgramFactory) \
+	_SIM_X(AbilityFactory) \
+	_SIM_X(BulletFactory) \
+	_SIM_X(WeaponFactory) \
+	_SIM_X(World) \
+	_SIM_X(PlayerData) \
 	
 	class State : private CallGroup<StateObj> {
 		public:
@@ -50,27 +61,17 @@ namespace Sim {
 			
 			/// @name Module accessors
 			//@{
-				BotFactory &getBotFactory()
-				{ return mBotFactory; }
+				template<class T>
+				T &getComponent();
 				
-				ProgramFactory &getProgramFactory()
-				{ return mProgramFactory; }
+				template<class T>
+				typename T::FactoryType &getComponentByRelated()
+				{ return getComponent<T::FactoryType>(); }
 				
-				AbilityFactory &getAbilityFactory()
-				{ return mAbilityFactory; }
-				
-				BulletFactory &getBulletFactory()
-				{ return mBulletFactory; }
-				
-				WeaponFactory &getWeaponFactory()
-				{ return mWeaponFactory; }
-				
-				World &getWorld()
-				{ return mWorld; }
-				
-				PlayerData &getPlayerData()
-				{ return mPlayer; }
-				
+#define _SIM_X(type) type &get##type() { return m##type; }
+				_SIM_X_STATE_COMPONENTS
+#undef _SIM_X
+
 				uint32_t getCurPhaseStep() { return mCtrl.mCurPhaseStep; }
 				uint32_t getCurPhase() { return mCtrl.mCurPhase; }
 			//@}
@@ -80,13 +81,9 @@ namespace Sim {
 			//@{
 				void registerStateObj();
 				
-				BotFactory mBotFactory;
-				ProgramFactory mProgramFactory;
-				AbilityFactory mAbilityFactory;
-				BulletFactory mBulletFactory;
-				WeaponFactory mWeaponFactory;
-				World mWorld;
-				PlayerData mPlayer;
+#define _SIM_X(type) type m##type;
+				_SIM_X_STATE_COMPONENTS
+#undef _SIM_X
 			//@}
 			
 			/// @name State control

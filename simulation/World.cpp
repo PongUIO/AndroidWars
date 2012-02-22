@@ -16,7 +16,7 @@ namespace Sim {
 	
 	void World::startup()
 	{
-		mTileSize = mSim->getConfig().tileSize;
+		mTileSize = mSim->getConfiguration().tileSize;
 		
 		mOffScreen = Tile(0);
 	}
@@ -84,7 +84,7 @@ namespace Sim {
 	{
 		static const int MaxIter = 4;
 		
-		TileCol &tcolData = mSim->getData().getTileCol();
+		TileCol &tcolData = mSim->getData().getTileColDb();
 		
 		World::ColResult tmpRet, res;
 		tmpRet.colRes.isCol = false;

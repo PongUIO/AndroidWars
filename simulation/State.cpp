@@ -6,6 +6,12 @@
 #include "Save.h"
 
 namespace Sim {
+#define _SIM_X(type) \
+	template<> type &State::getComponent() \
+	{ return get##type(); }
+	_SIM_X_STATE_COMPONENTS
+#undef _SIM_X
+	
 	State::State(Simulation* sim) :
 		mBotFactory(sim),
 		mProgramFactory(sim),
@@ -13,7 +19,7 @@ namespace Sim {
 		mBulletFactory(sim),
 		mWeaponFactory(sim),
 		mWorld(sim),
-		mPlayer(),
+		mPlayerData(),
 		mSim(sim)
 	{
 		registerStateObj();
@@ -36,7 +42,7 @@ namespace Sim {
 		registerCallObj(&mProgramFactory);
 		registerCallObj(&mWeaponFactory);
 		registerCallObj(&mBulletFactory);
-		registerCallObj(&mPlayer);
+		registerCallObj(&mPlayerData);
 		registerCallObj(&mAbilityFactory);
 	}
 	

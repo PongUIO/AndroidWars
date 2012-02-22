@@ -75,7 +75,7 @@ namespace Sim {
 	
 	const Sim::BotD* Bot::getTypePtr() const
 	{
-		return mSim->getData().getBotDb().getType(mState.mType);
+		return mSim->getData().getBotDb().getDataById(mState.mType);
 	}
 	
 	Sim::Player* Bot::getPlayerPtr() const

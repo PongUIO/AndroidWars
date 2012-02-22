@@ -9,6 +9,7 @@
 
 namespace Sim {
 	class Simulation;
+	class BulletDatabase;
 	
 #define SIM_BULLET_HEADER(name) \
 	static const std::string &getTypeName() \
@@ -16,6 +17,8 @@ namespace Sim {
 	
 	class Bullet {
 		public:
+			typedef BulletDatabase TypeDatabase;
+			
 			IdType getId() const { return mId; }
 			IdType getTypeId() const { return mTypeId; }
 			const Body &getBody() const { return mBody; }
@@ -59,15 +62,10 @@ namespace Sim {
 			void destroyBullet(IdType id) { removeObj(id); }
 			Bullet *getBullet(IdType id) { return getObject(id); }
 			
-			static BulletFactory &getFactory(Simulation *sim);
-			
 		private:
 			/// @name Factory-required functions
 			//@{
 				void deleteInstance(Bullet* obj) { delete obj; }
-				
-				const DataBehaviourT<Bullet>::Behaviour* getBehaviourFromId(IdType id) const;
-				const DataBehaviourT<Bullet>::Behaviour* getBehaviourFromName(const std::string& name) const;
 			//@}
 	};
 }

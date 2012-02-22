@@ -14,6 +14,7 @@ add_library(AWSim
 	Save.cpp
 	World.cpp
 	Replay.cpp
+	CommonTemplate.cpp
 	
 	bot/BotCpu.cpp
 	bot/BotAbility.cpp

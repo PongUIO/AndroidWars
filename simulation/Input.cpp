@@ -6,6 +6,11 @@
 #include "State.h"
 
 namespace Sim {
+#define _SIM_X(type, name) \
+	template<> type &Input::getComponent() { return get##name(); }
+	_SIM_X_INPUT_COMPONENTS
+#undef _SIM_X
+	
 	// Input
 	//
 	//

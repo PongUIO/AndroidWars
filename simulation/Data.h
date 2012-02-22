@@ -1,6 +1,8 @@
 #ifndef SIM_DATA_H
 #define SIM_DATA_H
 
+#include "CommonTemplate.h"
+
 #include "Save.h"
 #include "data/TileD.h"
 #include "data/BotD.h"
@@ -18,6 +20,17 @@
 namespace Sim {
 	class Simulation;
 	
+#define _SIM_X_DATA_COMPONENTS \
+	_SIM_X(TileDatabase, Tile) \
+	_SIM_X(BotDatabase, Bot) \
+	_SIM_X(BulletDatabase, Bullet) \
+	_SIM_X(WeaponDatabase, Weapon) \
+	_SIM_X(ProgramDatabase, Program) \
+	_SIM_X(AbilityDatabase, Ability) \
+	_SIM_X(ArmorDatabase, Armor) \
+	_SIM_X(DamageDatabase, Damage) \
+	_SIM_X(TileCol, TileCol)
+	
 	class Data : private CallGroup<BaseData>  {
 		public:
 			Data(Simulation *sim);
@@ -31,30 +44,22 @@ namespace Sim {
 			/// @name Database retrieval
 			//@{
 				// Databases
-				TileDatabase &getTileDb() { return mTile; }
-				BotDatabase &getBotDb() { return mBot; }
-				BulletDatabase &getBulletDb() { return mBullet; }
-				WeaponDatabase &getWeaponDb() { return mWeapon; }
-				ProgramDatabase &getProgramDb()  { return mProgram; }
-				AbilityDatabase &getAbilityDb() { return mAbility; }
-				ArmorDatabase &getArmorDb() { return mArmor; }
-				DamageDatabase &getDamageDb() { return mDamage; }
+				template<class T>
+				T &getDatabase();
 				
-				// Other constant data
-				TileCol &getTileCol() { return mTileCol; }
+				template<class T>
+				typename T::DatabaseType &getDatabaseByRelated()
+				{ return getDatabase<typename T::DatabaseType>(); }
+				
+#define _SIM_X(type, name) type &get##name##Db() { return m##name; }
+				_SIM_X_DATA_COMPONENTS
+#undef _SIM_X
 			//@}
 			
 		private:
-			TileDatabase mTile;
-			BotDatabase mBot;
-			BulletDatabase mBullet;
-			WeaponDatabase mWeapon;
-			ProgramDatabase mProgram;
-			AbilityDatabase mAbility;
-			ArmorDatabase mArmor;
-			DamageDatabase mDamage;
-			
-			TileCol mTileCol;
+#define _SIM_X(type, name) type m##name;
+				_SIM_X_DATA_COMPONENTS
+#undef _SIM_X
 			
 			Simulation *mSim;
 	};

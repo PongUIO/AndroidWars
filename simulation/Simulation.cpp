@@ -2,11 +2,17 @@
 #include "Save.h"
 
 namespace Sim {
+#define _SIM_X(type) \
+	template<> type &Simulation::getComponent() \
+	{ return get##type(); }
+	_SIM_X_SIMULATION_COMPONENTS
+#undef _SIM_X
+	
 	Simulation::Simulation() :
-		mStateActive(this),
+		mState(this),
 		mInput(this),
 		mData(this),
-		mReplay(this)
+		mReplayManager(this)
 		{}
 	
 	Simulation::~Simulation()
@@ -17,13 +23,13 @@ namespace Sim {
 		mData.startup();
 		mInput.startup();
 		clear();
-		mReplay.startup();
+		mReplayManager.startup();
 	}
 	
 	void Simulation::shutdown()
 	{
-		mReplay.shutdown();
-		mStateActive.shutdown();
+		mReplayManager.shutdown();
+		mState.shutdown();
 		mInput.shutdown();
 		mData.shutdown();
 	}
@@ -36,15 +42,15 @@ namespace Sim {
 	 */
 	void Simulation::clear()
 	{
-		mStateActive = State(this);
-		mStateActive.startup();
+		mState = State(this);
+		mState.startup();
 	}
 	
 	void Simulation::prepareSim()
 	{
 		mInput.finalizeInput();
 		mInput.dispatchInput();
-		mReplay.prepareSim();
+		mReplayManager.prepareSim();
 	}
 	
 	/**
@@ -53,15 +59,15 @@ namespace Sim {
 	void Simulation::startPhase()
 	{
 		mInput.finalizeInput();
-		mReplay.startPhase();
+		mReplayManager.startPhase();
 		mInput.dispatchInput();
 		
-		mStateActive.startPhase();
+		mState.startPhase();
 	}
 	
 	void Simulation::step()
 	{
-		mStateActive.step(config.stepTime);
+		mState.step(getConfiguration().stepTime);
 	}
 	
 	/**
@@ -71,9 +77,9 @@ namespace Sim {
 	 */
 	void Simulation::endPhase(bool finalize)
 	{
-		mStateActive.endPhase();
+		mState.endPhase();
 		
-		mReplay.endPhase(finalize);
+		mReplayManager.endPhase(finalize);
 	}
 	
 	uint32_t Simulation::checksumData()
@@ -108,7 +114,7 @@ namespace Sim {
 	
 	void Simulation::save(Save::BasePtr& fp)
 	{
-		mStateActive.save(fp);
+		mState.save(fp);
 	}
 	
 	/**
@@ -121,6 +127,6 @@ namespace Sim {
 	{
 		Save::FilePtr fp = Save::FilePtr(saveData);
 		
-		mStateActive.load(fp);
+		mState.load(fp);
 	}
 }

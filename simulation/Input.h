@@ -6,6 +6,8 @@
 #include <boost/smart_ptr.hpp>
 
 #include <deque>
+
+#include "CommonTemplate.h"
 #include "Save.h"
 #include "Common.h"
 #include "StateObj.h"
@@ -93,7 +95,7 @@ namespace Sim {
 			
 			void registerInput(const Save &data) { mBuffer.addInput(data); }
 			void registerInput(typename T::Type *obj) {
-				T &fact = T::getFactory(mSim);
+				T &fact = getStateComponent<T>(*mSim);
 				
 				Save data;
 				Save::FilePtr fp = Save::FilePtr(data);
@@ -112,7 +114,7 @@ namespace Sim {
 			 */
 			template<class Impl>
 			Impl *buildInputImpl(const typename Impl::Config &cfg) {
-				T &fact = T::getFactory(mSim);
+				T &fact = getStateComponent<T>(*mSim);
 				
 				IdType id = allocateId();
 				Impl *obj = fact.template createType<Impl>(cfg, id);
@@ -129,7 +131,7 @@ namespace Sim {
 			 */
 			template<class Arg>
 			typename T::Type *buildInput(const Arg &cfg) {
-				T &fact = T::getFactory(mSim);
+				T &fact = getStateComponent<T>(*mSim);
 				
 				IdType id = allocateId();
 				typename T::Type *obj = fact.template create<Arg>(cfg, id);
@@ -140,7 +142,7 @@ namespace Sim {
 			}
 			
 			IdType allocateId() {
-				T &fact = T::getFactory(mSim);
+				T &fact = getStateComponent<T>(*mSim);
 				return fact.getCurrentUniqueId() + mIdCounter++;
 			}
 			
@@ -153,7 +155,7 @@ namespace Sim {
 			}
 			
 			void dispatchInput() {
-				T &fact = T::getFactory(mSim);
+				T &fact = getStateComponent<T>(*mSim);
 				
 				while(mBuffer.hasInput()) {
 					Save save = mBuffer.nextInput();
@@ -222,6 +224,14 @@ namespace Sim {
 			Simulation *mSim;
 	};
 	
+#define _SIM_X_INPUT_COMPONENTS \
+	_SIM_X(FactoryInput<BotFactory>, BotInput) \
+	_SIM_X(FactoryInput<ProgramFactory>, ProgramInput) \
+	_SIM_X(FactoryInput<AbilityFactory>, AbilityInput) \
+	_SIM_X(FactoryInput<BulletFactory>, BulletInput) \
+	_SIM_X(FactoryInput<WeaponFactory>, WeaponInput) \
+	_SIM_X(BotCpuInput, CpuInput)
+	
 	/**
 	 * @brief Main simulation input manager.
 	 */
@@ -239,28 +249,19 @@ namespace Sim {
 			void save(Save::BasePtr &fp);
 			void load(Save::BasePtr &fp);
 			
-			FactoryInput<BotFactory> &getBotInput() { return mBotInput; }
-			FactoryInput<ProgramFactory> &getProgramInput()
-			{ return mProgramInput; }
-			FactoryInput<AbilityFactory> &getAbilityInput()
-			{ return mAbilityInput; }
-			FactoryInput<BulletFactory> &getBulletInput()
-			{ return mBulletInput; }
-			FactoryInput<WeaponFactory> &getWeaponInput()
-			{ return mWeaponInput; }
+			template<class T>
+			T &getComponent();
 			
-			BotCpuInput &getCpuInput() { return mCpuInput; }
+#define _SIM_X(type, name) type &get##name() { return m##name; }
+			_SIM_X_INPUT_COMPONENTS
+#undef _SIM_X
 			
 		private:
 			Simulation *mSim;
 			
-			FactoryInput<BotFactory> mBotInput;
-			FactoryInput<ProgramFactory> mProgramInput;
-			FactoryInput<AbilityFactory> mAbilityInput;
-			FactoryInput<BulletFactory> mBulletInput;
-			FactoryInput<WeaponFactory> mWeaponInput;
-			
-			BotCpuInput mCpuInput;
+#define _SIM_X(type, name) type m##name;
+			_SIM_X_INPUT_COMPONENTS
+#undef _SIM_X
 	};
 }
 

@@ -55,9 +55,6 @@ namespace Sim {
 	ProgramFactory::~ProgramFactory()
 	{}
 	
-	ProgramFactory& ProgramFactory::getFactory(Simulation* sim)
-	{	return sim->getState().getProgramFactory(); }
-	
 	void ProgramFactory::startup()
 	{}
 	
@@ -75,14 +72,6 @@ namespace Sim {
 		
 		return prog;
 	}
-	
-	const DataBehaviourT<Program>::Behaviour* ProgramFactory::getBehaviourFromId(uint32_t id) const
-	{	return mSim->getData().getProgramDb().getType(id); }
-
-	const DataBehaviourT<Program>::Behaviour* ProgramFactory::getBehaviourFromName(const std::string& name) const
-	{	return mSim->getData().getProgramDb().getType(name); }
-
-	
 	
 	void ProgramFactory::startPhase()
 	{}

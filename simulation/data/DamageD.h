@@ -33,10 +33,10 @@ namespace Sim {
 			virtual ~DamageDatabase() {}
 			
 			const DamageD *getDamage(IdType id) const
-			{ return getType(id); }
+			{ return getDataById(id); }
 			
 			const DamageD *getDamage(const std::string &name) const
-			{ return getType(mNameIdMgr.getIdOf(name)); }
+			{ return getDataById(mNameIdMgr.getIdOf(name)); }
 			
 			IdType getIdOf(const std::string &name) const
 			{ return mNameIdMgr.getIdOf(name); }

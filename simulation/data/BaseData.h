@@ -34,8 +34,8 @@ namespace Sim {
 				return data;
 			}
 			
-			const T *getType(IdType type) const
-			{ return (type>=mData.size()) ? 0 : mData[type]; }
+			const T *getDataById(IdType id) const
+			{ return (id>=mData.size()) ? 0 : mData[id]; }
 			
 			size_t size() const { return mData.size(); }
 			
@@ -138,10 +138,10 @@ namespace Sim {
 			void shutdown() { mInternal.shutdown(); }
 			
 			const Behaviour *getType(IdType type) const
-			{	return mInternal.getType(type); }
+			{	return mInternal.getDataById(type); }
 			
 			const Behaviour *getType(const std::string &name) const
-			{	return mInternal.getType(getIdOf(name)); }
+			{	return mInternal.getDataById(getIdOf(name)); }
 			
 			
 			/**

@@ -53,7 +53,7 @@ namespace Sim {
 			/// @name Compatibility layer
 			//@{
 				const BotD &getBot(IdType type) const
-				{ return *getType(type); }
+				{ return *getDataById(type); }
 				
 				IdType addBot(const BotD &bot, const Collision::ColPoints &pts)
 				{
@@ -63,6 +63,9 @@ namespace Sim {
 					
 					return id;
 				}
+				
+				template<class T>
+				DataBehaviourT<Bot>::Behaviour *getType(T val) { return 0; }
 			//@}
 			
 			void checksum(Save::SyncPtr &sync);

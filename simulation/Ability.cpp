@@ -56,10 +56,6 @@ namespace Sim {
 	AbilityFactory::~AbilityFactory()
 	{}
 	
-	AbilityFactory& AbilityFactory::getFactory(Simulation* sim)
-	{ return sim->getState().getAbilityFactory(); }
-
-	
 	void AbilityFactory::startup()
 	{}
 	
@@ -67,12 +63,6 @@ namespace Sim {
 	{
 		killAll();
 	}
-	
-	const DataBehaviourT< Ability >::Behaviour* AbilityFactory::getBehaviourFromId(IdType id) const
-	{	return mSim->getData().getAbilityDb().getType(id); }
-	
-	const DataBehaviourT< Ability >::Behaviour* AbilityFactory::getBehaviourFromName(const std::string& name) const
-	{	return mSim->getData().getAbilityDb().getType(name); }
 	
 	void AbilityFactory::startPhase()
 	{}

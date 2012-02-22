@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+#include "CommonTemplate.h"
+
 #include "Data.h"
 #include "State.h"
 #include "Input.h"
@@ -29,6 +31,13 @@ namespace Sim {
 		//uint32_t worldHeight;  ///< Height of the world in tiles
 	};
 	
+#define _SIM_X_SIMULATION_COMPONENTS \
+	_SIM_X(State) \
+	_SIM_X(Input) \
+	_SIM_X(Data) \
+	_SIM_X(ReplayManager) \
+	_SIM_X(Configuration)
+	
 	class Simulation {
 		public:
 			/// @name Initialization
@@ -50,10 +59,10 @@ namespace Sim {
 				void step();
 				void endPhase(bool finalize);
 				
-				void gotoPresent() { mReplay.gotoPresent(); }
+				void gotoPresent() { mReplayManager.gotoPresent(); }
 				
 				bool hasPhaseStep()
-				{ return getCurPhaseStep()<config.phaseLength; }
+				{ return getCurPhaseStep()<getConfiguration().phaseLength; }
 				
 				uint32_t getCurPhase()
 				{ return getState().getCurPhase(); }
@@ -62,28 +71,20 @@ namespace Sim {
 				{ return getState().getCurPhaseStep(); }
 				
 				uint32_t getCurTotalStep()
-				{ return getCurPhase()*config.phaseLength+getCurPhaseStep(); }
+				{ return getCurPhase()*getConfiguration().phaseLength+getCurPhaseStep(); }
 				
 				double getCurTime()
-				{ return double(getCurTotalStep())*config.stepTime; }
+				{ return double(getCurTotalStep())*getConfiguration().stepTime; }
 			//@}
 			
 			/// @name Module accessors
 			//@{
-				State &getState()
-				{ return mStateActive; }
+				template<class T>
+				T &getComponent();
 				
-				Input &getInput()
-				{ return mInput; }
-				
-				Data &getData()
-				{ return mData; }
-				
-				ReplayManager &getReplayManager()
-				{ return mReplay; }
-				
-				Configuration &getConfig()
-				{ return config; }
+#define _SIM_X(type) type &get##type() { return m##type; }
+				_SIM_X_SIMULATION_COMPONENTS
+#undef _SIM_X
 			//@}
 			
 			/// @name Checksum, saving, and loading
@@ -100,15 +101,9 @@ namespace Sim {
 		private:
 			/// @name Subsystems
 			//@{
-				State mStateActive;
-				Input mInput;
-				Data mData;
-				ReplayManager mReplay;
-			//@}
-			
-			/// @name Other variables
-			//@{
-				Configuration config;
+#define _SIM_X(type) type m##type;
+				_SIM_X_SIMULATION_COMPONENTS
+#undef _SIM_X
 			//@}
 	};
 }

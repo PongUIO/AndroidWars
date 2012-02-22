@@ -26,6 +26,8 @@ namespace Sim {
 	
 	class Program {
 		public:
+			typedef ProgramDatabase TypeDatabase;
+			
 			virtual uint32_t getCycleCost()=0;
 			
 			IdType getId() const { return mId; }
@@ -130,32 +132,15 @@ namespace Sim {
 				void step(double stepTime);
 			//@}
 			
-			/**
-			 * Creates a program and inserts it into the factory.
-			 * May create any valid inheritor of \c Program.
-			 */
-			/*template<class T>
-			T *createProgram(const typename T::Config &cfg)
-			{	return createType<T>(cfg); }*/
-			
 			Program *createFromSerialized(Save::BasePtr &fp);
 			
 			void destroyProgram(IdType id) { removeObj(id); }
 			Program *getProgram(IdType id) { return getObject(id); }
 			
-			//IdType getLastPhaseId() { return mLastPhaseInputId; }
-			IdType getCurrentUniqueId()
-			{ return UidFactory<Program>::getCurrentUniqueId(); }
-			
-			static ProgramFactory &getFactory(Simulation *sim);
-			
 		private:
 			/// @name Factory-required functions
 			//@{
 				void deleteInstance(Program* obj) { delete obj; }
-				
-				const DataBehaviourT<Program>::Behaviour* getBehaviourFromName(const std::string& name) const;
-				const DataBehaviourT<Program>::Behaviour* getBehaviourFromId(IdType id) const;
 			//@}
 			
 			friend class ReplayManager;

@@ -5,8 +5,12 @@
 #include "BaseData.h"
 
 namespace Sim {
+	class ArmorDatabase;
+	
 	class ArmorD {
 		public:
+			typedef ArmorDatabase DatabaseType;
+			
 			struct DamageRule {
 				DamageRule(double multiplier=1.0, bool isIgnoring=false) :
 					mMultiplier(multiplier), mIsIgnoring(isIgnoring) {}
@@ -48,10 +52,10 @@ namespace Sim {
 			virtual ~ArmorDatabase() {}
 			
 			const ArmorD *getArmor(IdType id) const
-			{ return getType(id); }
+			{ return getDataById(id); }
 			
 			const ArmorD *getArmor(const std::string &name) const
-			{ return getType(mNameIdMgr.getIdOf(name)); }
+			{ return getDataById(mNameIdMgr.getIdOf(name)); }
 			
 			IdType getIdOf(const std::string &name) const
 			{ return mNameIdMgr.getIdOf(name); }

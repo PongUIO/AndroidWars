@@ -187,7 +187,7 @@ namespace Sim {
 	 */
 	bool ReplayManager::rewind(double timeUnit)
 	{
-		const Configuration &cfg = mSim->getConfig();
+		const Configuration &cfg = mSim->getConfiguration();
 		double phaseTime = cfg.stepTime*cfg.phaseLength;
 		
 		uint32_t phase = timeUnit / phaseTime;

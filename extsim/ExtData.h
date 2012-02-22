@@ -4,6 +4,7 @@
 #include <boost/unordered_map.hpp>
 #include <boost/algorithm/string.hpp>
 
+#include "CommonTemplate.h"
 #include "BaseData.h"
 
 #include "datatype/Ability.h"
@@ -16,6 +17,14 @@
 #include "datatype/Map.h"
 
 namespace ExtS {
+#define _EXTS_X_EXTDATA_COMPONENTS \
+	_EXTS_X(ArmorData, Armor) \
+	_EXTS_X(DamageData, Damage) \
+	_EXTS_X(BotData, Bot) \
+	_EXTS_X(ProgramData, Program) \
+	_EXTS_X(GameData, Game) \
+	_EXTS_X(MapData, Map)
+	
 	/**
 	 * @brief Data manager for the extended simulation.
 	 * 
@@ -60,12 +69,12 @@ namespace ExtS {
 			
 			/// @name Database retrieval
 			//@{
-				ArmorData &getArmorDb() { return mArmor; }
-				DamageData &getDamageDb() { return mDamage; }
-				BotData &getBotDb() { return mBot; }
-				ProgramData &getProgramDb() { return mProgram; }
-				GameData &getGameDb() { return mGame; }
-				MapData &getMapDb() { return mMap; }
+				template<class T>
+				T &getComponent();
+				
+#define _EXTS_X(type, name) type &get##name##Db() { return m##name; }
+				_EXTS_X_EXTDATA_COMPONENTS
+#undef _EXTS_X
 			//@}
 			
 		private:
@@ -75,12 +84,9 @@ namespace ExtS {
 			
 			/// @name Databases
 			//@{
-				ArmorData mArmor;
-				DamageData mDamage;
-				BotData mBot;
-				ProgramData mProgram;
-				GameData mGame;
-				MapData mMap;
+#define _EXTS_X(type, name) type m##name;
+				_EXTS_X_EXTDATA_COMPONENTS
+#undef _EXTS_X
 			//@}
 			
 			/// @name Internal

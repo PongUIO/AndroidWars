@@ -3,6 +3,12 @@
 #include "../dascript/script.h"
 
 namespace ExtS {
+#define _EXTS_X(type, name) \
+	template<> type &ExtData::getComponent() \
+	{ return get##name##Db(); }
+	_EXTS_X_EXTDATA_COMPONENTS
+#undef _EXTS_X
+	
 	ExtData::ExtData(ExtSim &esim) :
 		mArmor(esim),
 		mDamage(esim),

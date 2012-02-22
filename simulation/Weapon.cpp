@@ -11,16 +11,6 @@ namespace Sim {
 	WeaponFactory::~WeaponFactory()
 	{}
 	
-	WeaponFactory& WeaponFactory::getFactory(Simulation* sim)
-	{ return sim->getState().getWeaponFactory(); }
-
-	
-	const DataBehaviourT<Weapon>::Behaviour* WeaponFactory::getBehaviourFromId(IdType id) const
-	{	return mSim->getData().getWeaponDb().getType(id); }
-	
-	const DataBehaviourT<Weapon>::Behaviour* WeaponFactory::getBehaviourFromName(const std::string& name) const
-	{	return mSim->getData().getWeaponDb().getType(name); }
-	
 	void WeaponFactory::saveObj(Weapon* obj, Save::BasePtr& fp)
 	{
 		DefaultUidFactory<Weapon>::saveObj(obj, fp);

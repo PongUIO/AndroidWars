@@ -23,7 +23,7 @@ namespace ExtS {
 	
 	void MapData::loadBlock(Script::Block& block)
 	{
-		mExtSim.getSim().getConfig().tileSize =
+		mExtSim.getSim().getConfiguration().tileSize =
 			ExtData::readValue<double>(block.getDataFirst("TileSize"), 1.0);
 		
 		// Read tile types

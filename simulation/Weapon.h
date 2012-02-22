@@ -8,6 +8,7 @@
 
 namespace Sim {
 	class Simulation;
+	class WeaponDatabase;
 	class Bot;
 	
 #define SIM_WEAPON_HEADER(name) \
@@ -19,6 +20,8 @@ namespace Sim {
 	 */
 	class Weapon {
 		public:
+			typedef WeaponDatabase TypeDatabase;
+			
 			IdType getId() const { return mId; }
 			IdType getTypeId() const { return mTypeId; }
 			Simulation *getSim() const { return mSim; }
@@ -107,8 +110,6 @@ namespace Sim {
 			void destroyWeapon(IdType id) { removeObj(id); }
 			Weapon *getWeapon(IdType id) { return getObject(id); }
 			
-			static WeaponFactory &getFactory(Simulation *sim);
-			
 			void saveObj(Weapon* obj, Save::BasePtr& fp);
 			Weapon* loadObj(IdType internalId, Save::BasePtr& fp);
 			
@@ -116,9 +117,6 @@ namespace Sim {
 			/// @name Factory-required functions
 			//@{
 				void deleteInstance(Weapon* obj) { delete obj; }
-				
-				const DataBehaviourT<Weapon>::Behaviour* getBehaviourFromId(IdType id) const;
-				const DataBehaviourT<Weapon>::Behaviour* getBehaviourFromName(const std::string& name) const;
 			//@}
 	};
 }

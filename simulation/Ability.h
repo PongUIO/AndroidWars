@@ -8,6 +8,7 @@
 
 namespace Sim {
 	class Bot;
+	class AbilityDatabase;
 	
 	#define _SIM_ABILITY_HEADER static const std::string &getTypeName();
 	
@@ -16,6 +17,8 @@ namespace Sim {
 	 */
 	class Ability {
 		public:
+			typedef AbilityDatabase TypeDatabase;
+			
 			IdType getId() const { return mId; }
 			IdType getTypeId() const { return mTypeId; }
 			
@@ -98,21 +101,7 @@ namespace Sim {
 				void step(double stepTime);
 			//@}
 			
-			/**
-			 * Creates an ability and inserts it into the factory.
-			 * May create any valid inheritor of \c Program that is registered
-			 * as an ability in the simulation data.
-			 * 
-			 * @return A pointer to the new object if successful, or NULL
-			 * if the ability type is not registered.
-			 */
-			/*template<class T>
-			T *createAbility(const typename T::Config &cfg)
-			{	return createType<T>(cfg); }*/
-			
 			Ability *getAbility(IdType id) { return getObject(id); }
-			
-			static AbilityFactory &getFactory(Simulation *sim);
 			
 			void saveObj(Ability* obj, Save::BasePtr& fp);
 			Ability* loadObj(IdType internalId, Save::BasePtr& fp);
@@ -121,9 +110,6 @@ namespace Sim {
 			/// @name Factory-required functions
 			//@{
 				void deleteInstance(Ability *obj) { delete obj; }
-				
-				const DataBehaviourT<Ability>::Behaviour* getBehaviourFromId(IdType id) const;
-				const DataBehaviourT<Ability>::Behaviour* getBehaviourFromName(const std::string& name) const;
 			//@}
 	};
 }

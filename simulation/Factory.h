@@ -10,6 +10,8 @@
 #include <boost/bind.hpp>
 #include <boost/unordered_map.hpp>
 
+#include "CommonTemplate.h"
+
 #include "utility/CallGroup.h"
 #include "data/BaseData.h"
 #include "StateObj.h"
@@ -196,13 +198,6 @@ namespace Sim {
 			
 			/// @name Object creation
 			//@{
-				virtual const typename DataBehaviourT<T>::Behaviour *
-					getBehaviourFromName(const std::string &name) const
-				{ throw std::string("UidFactory::getBehaviourFromName() unimplemented"); }
-				virtual const typename DataBehaviourT<T>::Behaviour *
-					getBehaviourFromId(IdType id) const
-				{ throw std::string("UidFactory::getBehaviourFromId() unimplemented"); }
-				
 				/**
 				 * Creates an object based on an implementation.
 				 * May create any valid inheritor of the type this factory uses.
@@ -225,7 +220,7 @@ namespace Sim {
 				template<typename Impl>
 				Impl *createType(const typename Impl::Config &cfg, IdType id) {
 					const typename DataBehaviourT<T>::Behaviour *b =
-						getBehaviourFromName(Impl::getTypeName());
+						getBehaviourFromType<T>(*mSim, Impl::getTypeName());
 					if(!b)
 						return 0;
 					
@@ -278,7 +273,7 @@ namespace Sim {
 					fp >> type;
 					
 					const typename DataBehaviourT<T>::Behaviour *b =
-						getBehaviourFromId(type);
+						getBehaviourFromType<T>(*mSim, type);
 					
 					T *obj = b->createObj(mSim, internalId);
 					obj->load(fp);

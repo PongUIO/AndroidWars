@@ -159,6 +159,9 @@ namespace ExtS {
 		private:
 	};
 	
+#define _EXTS_X_EXTINPUT_COMPONENTS \
+	_EXTS_X(ExtProgramInput, Program)
+	
 	/**
 	 * @brief Manages extended behaviour for simulation input.
 	 * 
@@ -183,12 +186,24 @@ namespace ExtS {
 			
 			ExtSim &getExtSim() { return mExtSim; }
 			
+			/// @name Components
+			//@{
+				template<class T>
+				T &getComponent();
+				
+#define _EXTS_X(type, name) type &get##name() { return m##name; }
+				_EXTS_X_EXTINPUT_COMPONENTS
+#undef _EXTS_X
+			//@}
+			
 		private:
 			ExtSim &mExtSim;
 			
 			/// @name Input managers
 			//@{
-				ExtProgramInput mProgram;
+#define _EXTS_X(type, name) type m##name;
+				_EXTS_X_EXTINPUT_COMPONENTS
+#undef _EXTS_X
 			//@}
 			
 			/// @name Constraint mode

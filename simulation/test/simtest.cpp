@@ -57,7 +57,7 @@ class DemoWeapon : public Sim::Weapon {
 // Starts the simulation
 void startSim()
 {
-	Sim::Configuration &config = sim.getConfig();
+	Sim::Configuration &config = sim.getConfiguration();
 	config.phaseLength = 5;
 	config.stepTime = 0.01;
 	

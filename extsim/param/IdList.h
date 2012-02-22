@@ -3,17 +3,11 @@
 
 #include <boost/unordered_set.hpp>
 
+#include "../ExtSim.h"
 #include "../TypeRule.h"
 #include "../../simulation/Common.h"
 
-namespace Sim {
-	class ArmorD;
-}
-
 namespace ExtS {
-	template<class T>
-	Sim::IdType translateNameToId(ExtSim &extsim, const std::string &str);
-	
 	/**
 	 * Allows an identifier of an arbitrary type, constrained to a
 	 * list of identifiers.
@@ -54,8 +48,12 @@ namespace ExtS {
 			}
 			
 			void postProcess(ExtSim& extsim) {
+				typename T::DatabaseType &db =
+					Sim::getDataComponent<typename T::DatabaseType>(
+					extsim.getSim());
+				
 				// Translate default value
-				mId = translateNameToId<T>(extsim, mIdName);
+				mId = db.getIdOf(mIdName);
 				
 				// Translate constraints
 				for(StringVec::iterator i=mIdNameVec.begin();
@@ -63,7 +61,7 @@ namespace ExtS {
 					if(*i == "*")
 						mIsAlwaysValid=true;
 					else {
-						Sim::IdType id = translateNameToId<T>(extsim, *i);
+						Sim::IdType id = db.getIdOf(*i);
 						mIdSet.insert(id);
 					}
 				}

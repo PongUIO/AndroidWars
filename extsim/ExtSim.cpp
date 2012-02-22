@@ -1,6 +1,10 @@
 #include "ExtSim.h"
 
 namespace ExtS {
+#define _EXTS_X(type, name) \
+	template<> type &ExtSim::getComponent() \
+	{ return get##name(); }
+	
 	ExtSim::ExtSim() :
 		mSim(),
 		

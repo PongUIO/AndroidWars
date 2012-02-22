@@ -37,7 +37,7 @@ namespace Sim {
 			/// @name Compatibility layer
 			//@{
 				const TileD &getTile(IdType type) const
-				{ return *getType(type); }
+				{ return *getDataById(type); }
 				
 				IdType addTile(const TileD &tile)
 				{ return addType(new TileD(tile) ); }
