@@ -17,7 +17,8 @@ HEADERS += main.h ../openglqt/render.h ../util/camera.h \
     ../util/client.h \
     botselector.h \
     main.h \
-    menudefines.h
+    menudefines.h \
+    gameslider.h
 SOURCES += main.cpp
 QT += opengl
 

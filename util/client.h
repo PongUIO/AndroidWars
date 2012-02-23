@@ -82,7 +82,7 @@ public:
 						            );
 						Kill *kill = inMgr.getProgramInput().buildInputImpl<Kill>(
 						            Kill::Config(move->getId()));
-						inMgr.getCpuInput().registerInput((*bot)->getId(), move->getId(), 0);
+						inMgr.getCpuInput().registerInput((*bot)->getId(), move->getId(), 10);
 						inMgr.getCpuInput().registerInput((*bot)->getId(), kill->getId(), 20);
 					}
 				}

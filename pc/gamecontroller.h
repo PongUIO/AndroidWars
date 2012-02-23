@@ -9,20 +9,23 @@
 #include "../util/client.h"
 #include "botselector.h"
 #include "gamebutton.h"
-
+#include "gameslider.h"
 
 class GameController {
 public:
 	QWidget *parent;
 	GameDrawer *drawer;
-        QTimer *camTimer, *timer;
+	QTimer *camTimer, *timer;
 	QHBoxLayout *lower, *upper;
 	QVBoxLayout *iconHolder;
 	QSpacerItem *space;
 	QPixmap profiles[1];
-	GameButton *label, *label2;
 	QPixmap m;
 	ClientStates *states;
+
+	//buttons
+	GameButton *label, *label2;
+	GameSlider *slider;
 	GameController(ClientStates *states, QWidget *parent = 0) {
 		this->states = states;
 		this->parent = parent;
@@ -39,6 +42,9 @@ public:
 
 		label = new GameButton(states->getSim(), 0, parent);
 		label2 = new GameButton(states->getSim(), 0, parent);
+
+		slider = new GameSlider(states->getSim(), parent);
+
 		label->setPixmap(QPixmap(":/graphics/temp/temp.png"));
 		label->resize(60,60);
 		label2->setPixmap(QPixmap(":/graphics/temp/temp2.png"));
@@ -57,21 +63,25 @@ public:
 	void showAll() {
 		label->show();
 		label2->show();
-                drawer->show();
-                drawer->startTimers();
-                updateGUI();
+		drawer->show();
+		drawer->startTimers();
+		slider->show();
+		updateGUI();
 	}
 	void hideAll() {
 		label->hide();
 		label2->hide();
 		drawer->hide();
-                drawer->stopTimers();
+		drawer->stopTimers();
+		slider->hide();
 		emptyGUI();
 	}
 
 	void updateGUI() {
 		emptyGUI();
-		int i;
+		//upper->insertWidget(1, slider);
+		upper->insertSpacerItem(0, space);
+		int i = 1;
 		std::list<Sim::Bot*> bots = states->getSim()->getState().getBotFactory().getBotList();
 		std::list<Sim::Bot*>::iterator it;
 		BotSelector *clabel;
@@ -81,8 +91,8 @@ public:
 			clabel->resize(60,60);
 			upper->insertWidget(i, clabel);
 			clabel->show();
+			i++;
 		}
-		upper->insertSpacerItem(i, space);
 	}
 
 	void emptyGUI() {

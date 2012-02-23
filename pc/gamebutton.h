@@ -16,10 +16,16 @@ protected:
 	// overridden
 	void mousePressEvent(QMouseEvent * event) {
 		if (func == 0) {
+			qDebug() << "click";
+			qDebug() << sim->getCurPhase();
+			sim->gotoPresent();
+			qDebug() << sim->getCurPhase();
 			sim->startPhase();
 			while( sim->hasPhaseStep() ) {
 				sim->step();
 			}
+			sim->endPhase(true);
+			qDebug() << sim->getCurPhase();
 		}
 	}
 };

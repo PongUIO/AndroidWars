@@ -42,7 +42,7 @@ public:
 	MainWidget (QWidget *parent = 0) : QWidget(parent) {
 		dispState = MENU;
 		subMenu = MAIN;
-		grabKeyboard();
+		//grabKeyboard();
 		states = new ClientStates();
 		initSim();
 		fullScreen = false;
