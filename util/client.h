@@ -7,33 +7,33 @@
 #include<QDebug>
 
 class ClientStates {
-	private:
-		boost::unordered_set<uint> selBots;
-		Sim::Simulation *sim;
+        private:
+                boost::unordered_set<uint> selBots;
+                Sim::Simulation *sim;
                 bool shift, ctrl, menu;
-	public:
-		ClientStates() {
-		}
+        public:
+                ClientStates() {
+                }
 
-		Sim::Simulation* getSim() {
-			return sim;
-		}
+                Sim::Simulation* getSim() {
+                        return sim;
+                }
 
-		void setSim(Sim::Simulation *in) {
+                void setSim(Sim::Simulation *in) {
                         shift = ctrl = menu = false;
-			sim = in;
-			selBots.clear();
-		}
-		void releaseMods() {
-			shift = false;
-			ctrl = false;
-		}
-		void setShift(bool state) {
-			shift = state;
-		}
+                        sim = in;
+                        selBots.clear();
+                }
+                void releaseMods() {
+                        shift = false;
+                        ctrl = false;
+                }
+                void setShift(bool state) {
+                        shift = state;
+                }
 
-		void setCtrl(bool state) {
-			ctrl = state;
+                void setCtrl(bool state) {
+                        ctrl = state;
                 }
                 void setMenu(bool state) {
                         menu = state;
@@ -42,19 +42,19 @@ class ClientStates {
                         return menu;
                 }
 
-		bool isSelected(uint b) {
-			return selBots.find(b) != selBots.end();
-		}
+                bool isSelected(uint b) {
+                        return selBots.find(b) != selBots.end();
+                }
 
-		void select(uint i) {
-			if (!shift) {
-				selBots.clear();
-			}
-			selBots.insert(i);
-		}
+                void select(uint i) {
+                        if (!shift) {
+                                selBots.clear();
+                        }
+                        selBots.insert(i);
+                }
 
-		void registerClick(double x, double y, int button) {
-			int i;
+                void registerClick(double x, double y, int button) {
+                        int i;
                         if (sim != NULL) {
                                 std::list<Sim::Bot*> bots = sim->getState().getBotFactory().getBotList();
                                 std::list<Sim::Bot*>::iterator bot;
@@ -73,22 +73,22 @@ class ClientStates {
                                 } else if (button == Qt::RightButton) {
                                         for (bot = bots.begin(); bot != bots.end(); bot++) {
                                                 if (isSelected((*bot)->getId())) {
-                                                        Sim::InputManager &inMgr = sim->getState().getInputManager();
+                                                        Sim::Input &inMgr = sim->getInput();
                                                         Sim::ProgramFactory &progFact = sim->getState().getProgramFactory();
 
                                                         using namespace Sim::Prog;
-                                                        MoveTowards *move = progFact.createProgram<MoveTowards>(
+                                                        MoveTowards *move = inMgr.getProgramInput().buildInputImpl<MoveTowards>(
                                                                 MoveTowards::Config(MoveTowards::DtPosition, Sim::Vector(x, y))
                                                         );
-                                                        Kill *kill = progFact.createProgram<Kill>(
+                                                        Kill *kill = inMgr.getProgramInput().buildInputImpl<Kill>(
                                                         Kill::Config(move->getId()));
-                                                        inMgr.registerInput((*bot)->getId(), move->getId(), 0);
-                                                        inMgr.registerInput((*bot)->getId(), kill->getId(), 20);
+                                                        inMgr.getCpuInput().registerInput((*bot)->getId(), move->getId(), 0);
+                                                        inMgr.getCpuInput().registerInput((*bot)->getId(), kill->getId(), 20);
                                                 }
                                         }
                                 }
-			}
-		}
+                        }
+                }
 
 };
 
