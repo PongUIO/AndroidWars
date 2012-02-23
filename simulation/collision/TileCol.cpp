@@ -31,7 +31,7 @@ namespace Sim {
 	{	return (1.0-double(sy)/double(sSlopeRes))*getTileSize(); }
 	
 	double TileCol::getTileSize()
-	{	return mSim->getConfig().tileSize; }
+	{	return mSim->getConfiguration().tileSize; }
 
 	
 	Collision* TileCol::getTileCol(const Sim::TileCol::TileType& type)
