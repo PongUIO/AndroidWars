@@ -250,7 +250,9 @@ namespace Sim {
 		fp.writeCtr(mProgramList);
 		
 		fp << mIsEndIter;
-		if(!mIsEndIter) {
+		if(mIsEndIter) {
+			// Do nothing.
+		} else {
 			ProgramRefList::const_iterator curIter= mCurProgram;
 			fp << uint32_t(std::distance(mProgramList.begin(),curIter));
 		}
@@ -265,7 +267,7 @@ namespace Sim {
 		
 		fp.readCtr(mProgramList);
 		
-		fp << mIsEndIter;
+		fp >> mIsEndIter;
 		if(mIsEndIter)
 			mCurProgram = mProgramList.end();
 		else {

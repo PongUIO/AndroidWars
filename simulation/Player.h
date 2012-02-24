@@ -12,6 +12,10 @@ namespace Sim {
 	class State;
 	
 	struct Player : private Save::OperatorImpl<Player> {
+		Player() : mSideId(0), mAllyGroup(0),
+			mBasePrograms(), mGlobalAbilities() {}
+		~Player() {}
+		
 		uint32_t mSideId;
 		uint32_t mAllyGroup;
 		

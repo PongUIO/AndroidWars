@@ -208,6 +208,7 @@ void setupWorld()
 		cpuInput.registerInput(botId, shoot->getId(), 5);
 	}
 	
+	sim.getState().getWorld().setDimensions(32,32);
 	sim.getState().getWorld().getTile(3,5).setType(1);
 	
 	// Create abilities and distribute them

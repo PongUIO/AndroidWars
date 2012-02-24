@@ -31,7 +31,8 @@ namespace Sim {
 			uint32_t getReloadTime() const { return mReloadTimer; }
 			
 			Weapon(Simulation *sim, IdType id, IdType typeId) :
-				mId(id), mTypeId(typeId), mSim(sim), mIsDead(false) {}
+				mId(id), mTypeId(typeId), mSim(sim),
+				mReloadTimer(0), mIsDead(false) {}
 			virtual ~Weapon() {}
 			
 		protected:

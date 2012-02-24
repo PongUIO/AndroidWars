@@ -62,7 +62,11 @@ namespace Sim {
 	}
 	
 	/**
-	 * Loads the "present" time for the simulation.
+	 * @brief Loads the "present" time for the simulation.
+	 * 
+	 * The present simulation time is how the state of the simulation was
+	 * right after the call to \c Simulation::endPhase(true). None of the
+	 * input created after that is re-registered.
 	 */
 	void ReplayManager::gotoPresent()
 	{
