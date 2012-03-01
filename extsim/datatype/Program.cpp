@@ -3,6 +3,7 @@
 #include "../ExtSim.h"
 
 #include "../typerule/program/ArmorAttachment.h"
+#include "../typerule/program/MoveTowards.h"
 
 namespace ExtS {
 	// ProgramData
@@ -13,6 +14,8 @@ namespace ExtS {
 	{
 		registerTypeRule("Ability/ArmorAttachment",
 			new Prog::ArmorAttachmentRule());
+		registerTypeRule("Base/MoveTowards",
+			new Prog::MoveTowardsRule());
 	}
 	
 	ProgramData::~ProgramData()
@@ -64,6 +67,7 @@ namespace ExtS {
 
 	void ExtProgram::postProcess(ExtSim& extsim)
 	{
+		mRule->setHost(&extsim, getId());
 		mRule->postProcess(extsim);
 	}
 

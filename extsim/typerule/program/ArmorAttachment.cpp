@@ -11,12 +11,9 @@ namespace ExtS { namespace Prog {
 		registerRuleParam(new ValRange<uint32_t>("Health"));
 	}
 
-	
-	/*void ArmorAttachmentRule::saveInput(ParamList *param,
-		Sim::Save::BasePtr&fp, ExtSim &esim ) const
+	bool ArmorAttachmentRule::makeInput(
+		Sim::Save::BasePtr& fp, const ParamList* param) const
 	{
-		Sim::Program *p = esim.getSim().getState().getProgramFactory().
-			createType<Sim::Prog::>();
-	}*/
-
+		return true;
+	}
 } }

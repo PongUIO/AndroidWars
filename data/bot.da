@@ -121,6 +121,15 @@
 #
 
 #PROGRAM
+	Name "MoveTowards"
+	Base "Base/MoveTowards"
+	
+	Description {
+		Allows a bot to move towards a target position.
+	}
+#
+
+#PROGRAM
 	Name "OmniArmor"
 	Base "Ability/ArmorAttachment"
 	

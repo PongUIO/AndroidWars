@@ -228,6 +228,21 @@ namespace Sim {
 				}
 				
 				/**
+				 * Convenience function to create a type and
+				 * directly serialize it.
+				 */
+				template<typename Impl>
+				void createAndSerializeType(Save::BasePtr &fp,
+					const typename Impl::Config &cfg) {
+					Impl *obj = createType<Impl>(cfg, NoId);
+					
+					if(obj) {
+						saveObj(obj, fp);
+						delete obj;
+					}
+				}
+				
+				/**
 				 * Creates an object directly.
 				 * 
 				 * The created object is not associated with the simulation,

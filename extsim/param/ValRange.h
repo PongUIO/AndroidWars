@@ -81,6 +81,7 @@ namespace ExtS {
 			
 			
 			T getVal() const { return mVal; }
+			void setVal(const T &val) { mVal=val; }
 			const ValPairVec &getValPairs() const { return mValPairs; }
 			
 		private:

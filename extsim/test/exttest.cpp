@@ -38,6 +38,14 @@ struct ValRangeListener : public ExtS::Listener<ExtS::ValRange<T> > {
 	}
 };
 
+struct PositionListener : public ExtS::Listener<ExtS::PositionParam> {
+	void process(ExtS::PositionParam *p) {
+		p->setVal(Sim::Vector(25,25));
+		
+		std::cout << p->getVal().x << "," << p->getVal().y;
+	}
+};
+
 void loadFiles()
 {
 	fs::directory_iterator endIter;
@@ -150,6 +158,7 @@ void testParam()
 {
 	ExtS::IdList<Sim::ArmorD>::setListener( IdListListener<Sim::ArmorD>() );
 	ExtS::ValRange<uint32_t>::setListener( ValRangeListener<uint32_t>() );
+	ExtS::PositionParam::ListenerSlot<ExtS::PositionParam>::setListener( PositionListener() );
 	
 	printf("\nParameter testing:\n");
 	
@@ -163,7 +172,7 @@ void testParam()
 		if(prog && (rule=prog->getRule())!=0) {
 			ExtS::ParamList *param = rule->makeParam();
 			const ExtS::TypeRule::RuleParamVec &paramVec =
-				rule->getRuleParamVec();
+				param->getRuleParamVec();
 			
 			for(ExtS::TypeRule::RuleParamVec::const_iterator i=paramVec.begin();
 				i!=paramVec.end(); ++i) {
@@ -171,6 +180,10 @@ void testParam()
 				(*i)->callback();
 				std::cout << "\n";
 			}
+			
+			Sim::Save test;
+			Sim::Save::FilePtr fp = Sim::Save::FilePtr(test);
+			rule->makeInput(fp, param);
 			
 			delete param;
 		}
@@ -185,6 +198,8 @@ int main(void)
 	
 	// [bootstrap]
 	extSim.startup();
+	extSim.getSim().getData().getProgramDb().registerAllDefault();
+	extSim.getSim().getData().getAbilityDb().registerAllDefault();
 	
 	// [data loading]
 	extSim.switchDataContext(ExtS::ExtData::LcDataLoading);

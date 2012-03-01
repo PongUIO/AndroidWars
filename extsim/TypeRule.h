@@ -6,6 +6,7 @@
 
 #include "../dascript/script.h"
 #include "../simulation/Save.h"
+#include "../simulation/Common.h"
 
 namespace ExtS {
 	class MetaParam;
@@ -107,7 +108,13 @@ namespace ExtS {
 			{ mRuleParam.push_back(mgr); }
 			void clearRuleParam();
 			
+			template<class T>
+			const T *getParam(size_t i) const
+			{ return static_cast<T*>(mRuleParam[i]); }
+			
 			size_t size() const { return mRuleParam.size(); }
+			
+			const RuleParamVec &getRuleParamVec() const { return mRuleParam; }
 			
 		protected:
 			RuleParamVec mRuleParam;
@@ -134,15 +141,23 @@ namespace ExtS {
 			
 			virtual TypeRule *clone()=0;
 			
+			/**
+			 * Creates an input object for this typerule from a \c ParamList.
+			 */
+			virtual bool makeInput(
+				Sim::Save::BasePtr &fp, const ParamList *param) const=0;
+			
+			void setHost(ExtSim *extsim, Sim::IdType hostId)
+			{ mExtSim=extsim; mHostId=hostId; }
+			
 			void readBlock(Script::Block *block);
 			void postProcess(ExtSim &extsim);
 			
 			ParamList *makeParam() const;
 			
-			const RuleParamVec &getRuleParamVec() const { return mRuleParam; }
-			
-		private:
-			
+		protected:
+			ExtSim *mExtSim;
+			Sim::IdType mHostId;
 	};
 	
 	/**

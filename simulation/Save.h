@@ -23,9 +23,6 @@ namespace Sim {
 		private:
 			typedef std::vector<uint8_t> DataArray;
 			DataArray data;
-			
-			static const char *FP_mix;
-			static int FP_mix_bufSize;
 		
 		public:
 			Save() {}

@@ -12,6 +12,7 @@ add_library(AWExtSim
 	param/IdList.cpp
 	
 	typerule/program/ArmorAttachment.cpp
+	typerule/program/MoveTowards.cpp
 	
 	datatype/Game.cpp
 	datatype/Map.cpp

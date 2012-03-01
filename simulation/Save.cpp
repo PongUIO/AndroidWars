@@ -3,9 +3,6 @@
 #include "Common.h"
 
 namespace Sim {
-	const char *Save::FP_mix = "%g";
-	int Save::FP_mix_bufSize = 32;
-	
 	uint32_t Save::checksum()
 	{
 		boost::crc_32_type checkSum;
