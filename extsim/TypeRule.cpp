@@ -18,7 +18,7 @@ namespace ExtS {
 			if(referenceParam->isConstraintUndefined())
 				continue;
 			
-			if(!referenceParam->isValid(getParam<RuleParameter>(i),extsim))
+			if(!referenceParam->isValid(srcList->getParam<RuleParameter>(i),extsim))
 				return false;
 		}
 		

@@ -43,6 +43,13 @@ struct PositionListener : public ExtS::Listener<ExtS::PositionParam> {
 		p->setVal(Sim::Vector(25,25));
 		
 		std::cout << p->getVal().x << "," << p->getVal().y << "\n";
+		
+		const ExtS::PositionParam::ValPairVec &consts = p->getValPairs();
+		for(ExtS::PositionParam::ValPairVec::const_iterator i = consts.begin();
+			i!=consts.end(); ++i) {
+			std::cout << "\t" << i->first.x << "," << i->first.y <<
+				" -> " << i->second.x << "," << i->second.y << "\n";
+		}
 	}
 };
 
