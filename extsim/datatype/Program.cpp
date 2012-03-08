@@ -67,7 +67,6 @@ namespace ExtS {
 
 	void ExtProgram::postProcess(ExtSim& extsim)
 	{
-		mRule->setHost(&extsim, getId());
 		mRule->postProcess(extsim);
 	}
 

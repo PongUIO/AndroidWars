@@ -42,7 +42,7 @@ struct PositionListener : public ExtS::Listener<ExtS::PositionParam> {
 	void process(ExtS::PositionParam *p) {
 		p->setVal(Sim::Vector(25,25));
 		
-		std::cout << p->getVal().x << "," << p->getVal().y;
+		std::cout << p->getVal().x << "," << p->getVal().y << "\n";
 	}
 };
 
@@ -181,13 +181,65 @@ void testParam()
 				std::cout << "\n";
 			}
 			
-			Sim::Save test;
-			Sim::Save::FilePtr fp = Sim::Save::FilePtr(test);
-			rule->makeInput(fp, param);
-			
 			delete param;
 		}
 	}
+}
+
+void setupWorld()
+{
+	Sim::Player testSide;
+	testSide.mAllyGroup = 0;
+	sim.getState().getPlayerData().addPlayer(testSide);
+	
+	Sim::Bot::Config botCfg;
+	botCfg.mSide = 0;
+	botCfg.mType = 0;
+	botCfg.mBody.mPos = Sim::Vector(0,0);
+	
+	sim.getInput().getBotInput().buildInput( botCfg );
+}
+
+void testSim()
+{
+	std::cout << "\nTesting ExtSim-Simulation communication\n";
+	
+	std::cout << "Giving bot input through ExtSim\n";
+	
+	// Create input object
+	ExtS::InputData inputData = extSim.getInput().getProgram().buildInput(
+		extSim.getData().getProgramDb().getIdOf("MoveTowards")
+	);
+	
+	// Modify input object
+	ExtS::InputData::ParamPtr paramPtr = inputData.getParamList();
+	const ExtS::TypeRule::RuleParamVec paramVec = paramPtr->getRuleParamVec();
+	for(uint32_t i=0; i<paramVec.size(); ++i) {
+		paramVec[i]->callback();
+	}
+	
+	// Register input
+	extSim.getInput().getProgram().registerInput(inputData);
+	
+	// Dispatching input
+	extSim.getInput().getProgram().dispatchInput(ExtS::IcmNone);
+	
+	// (Temporary to bypass a lack of cpu input in extsim)
+	sim.getInput().getCpuInput().registerInput(0,0,0);
+	
+	// Running a single phase to assure things work
+	Sim::Vector pos = sim.getState().getBotFactory().getBot(0)->getBody().mPos;
+	std::cout << "Bot position pre: ("<<pos.x<<", "<<pos.y<<")\n";
+	
+	sim.startPhase();
+	while(sim.hasPhaseStep())
+		sim.step();
+	sim.endPhase(true);
+	
+	pos = sim.getState().getBotFactory().getBot(0)->getBody().mPos;
+	std::cout << "Bot position post: ("<<pos.x<<", "<<pos.y<<")\n";
+	
+	std::cout << "\n";
 }
 
 int main(void)
@@ -212,6 +264,7 @@ int main(void)
 	extSim.postProcessData();
 	
 	// [prepare simulation]
+	setupWorld();
 	extSim.prepareSim();
 	
 	printf("\n");
@@ -223,6 +276,9 @@ int main(void)
 	
 	// Testing parameters
 	testParam();
+	
+	// Testing extsim-simulation communication
+	testSim();
 	
 	return 0;
 }

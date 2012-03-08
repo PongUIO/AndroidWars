@@ -35,7 +35,17 @@ namespace ExtS {
 	
 	void BotData::loadSimBot(Script::Block& block, Sim::BotD *simBot)
 	{
-		simBot->baseSpeed = ExtData::readValue<double>("Speed", 0);
+		simBot->baseSpeed = ExtData::readValue<double>(
+			block.getDataFirst("Speed"), 0);
+		
+		// Load debug data
+		Sim::Collision::ColPoints pts;
+		pts.push_back(Sim::Vector(0,0));
+		pts.push_back(Sim::Vector(0,1));
+		pts.push_back(Sim::Vector(1,1));
+		pts.push_back(Sim::Vector(1,0));
+		
+		simBot->setCollision(new Sim::Collision(pts));
 	}
 	
 	void BotData::postProcess()

@@ -68,8 +68,8 @@ namespace ExtS {
 				mIdNameVec.clear();
 			}
 			
-			bool isValid(RuleParameter* param, ExtSim& extsim) const {
-				IdList<T> *srcList = static_cast<IdList<T>*>(param);
+			bool isValid(const RuleParameter* param, ExtSim& extsim) const {
+				const IdList<T> *srcList = static_cast<const IdList<T>*>(param);
 				
 				return mIsAlwaysValid ||
 					mIdSet.find(srcList->getId())!=mIdSet.end();
@@ -77,6 +77,17 @@ namespace ExtS {
 			
 			void callback()
 			{ ListenerSlot<IdList<T> >::raiseListener(this); }
+			
+			void save(Sim::Save::BasePtr& fp) const {
+				fp << mId;
+				fp.writeUnorderedSet(mIdSet);
+				fp << mIsAlwaysValid;
+			}
+			void load(Sim::Save::BasePtr& fp) {
+				fp >> mId;
+				fp.readUnorderedSet(mIdSet);
+				fp >> mIsAlwaysValid;
+			}
 			
 			Sim::IdType getId() const { return mId; }
 			const IdSet &getIdSet() const { return mIdSet; }

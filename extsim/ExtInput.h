@@ -6,9 +6,15 @@
 #include "../simulation/Input.h"
 #include "../simulation/utility/CallGroup.h"
 
+#include "TypeRule.h"
+
+#include "CommonTemplate.h"
+
 namespace ExtS {
 	class ExtSim;
 	class ExtInput;
+	
+	class ProgramData;
 	
 	enum InputConstraintMode {
 		/**
@@ -51,8 +57,7 @@ namespace ExtS {
 			/**
 			 * Sends serialized input to this input object.
 			 */
-			virtual void loadInput(Sim::Save::BasePtr &fp,
-				InputConstraintMode mode)=0;
+			virtual void loadInput(Sim::Save::BasePtr &fp)=0;
 			
 			/**
 			 * Serializes input from this input object.
@@ -60,9 +65,11 @@ namespace ExtS {
 			virtual void saveInput(Sim::Save::BasePtr &fp)=0;
 			
 			/**
-			 * Finalize input by sending it to the simulation.
+			 * Dispatch input by sending it to the simulation.
+			 * 
+			 * Input should be tested for constraints here.
 			 */
-			virtual void finalizeInput()=0;
+			virtual void dispatchInput(InputConstraintMode mode)=0;
 			
 			/**
 			 * Discards all buffered input.
@@ -80,81 +87,137 @@ namespace ExtS {
 			ExtInput &mParent;
 	};
 	
+	class InputData {
+		public:
+			typedef boost::shared_ptr<ParamList> ParamPtr;
+			
+			InputData(ParamList *param=0,
+			Sim::IdType srcId=Sim::NoId) :
+				mParam(param), mSrcId(srcId) {}
+			
+			ParamPtr getParamList() { return mParam; }
+			const ParamPtr getParamList() const { return mParam; }
+			Sim::IdType getSourceId() const { return mSrcId; }
+			
+		private:
+			ParamPtr mParam;
+			Sim::IdType mSrcId;
+	};
+	
 	/**
 	 * Generic input manager for factories.
 	 */
-	template<class T>
+	template<class DB>
 	class ExtFactoryInput : public ExtInputObj {
 		public:
-			ExtFactoryInput(ExtInput& parent, Sim::Simulation *sim) :
-				ExtInputObj(parent), mViolationCounter(0), mBuffer(sim) {}
+			ExtFactoryInput(ExtInput& parent, ExtSim &extsim,
+				Sim::Simulation *sim) : ExtInputObj(parent),
+				mExtSim(extsim), mViolationCounter(0), mBuffer() {}
 			virtual ~ExtFactoryInput() {}
 			
-			void startup() { mBuffer.startup(); }
-			void shutdown() { mBuffer.shutdown(); }
-
-			void loadInput(Sim::Save::BasePtr& fp, InputConstraintMode mode) {
-				// Input is always valid if no constraints are enforced.
-				if(!(mode==IcmNone || isValidMode(mode)))
-					return;
+			void startup() {}
+			void shutdown() {}
+			
+			InputData buildInput(Sim::IdType id) {
+				DB &data = getExtDataComponent<DB>(mExtSim);
 				
-				uint32_t inputCount;
-				fp >> inputCount;
-				for(uint32_t i=0; i<inputCount; ++i) {
-					Sim::Save tmp;
-					fp >> tmp;
-					
-					// Build the input object from the source factory
-					Sim::Save::FilePtr inptr = Sim::Save::FilePtr(tmp);
-					typename T::Type *obj = buildObject(inptr);
-					
-					// Check that its constraints is valid
-					bool isConstrained = isObjectConstrained(obj);
-					
-					if(isConstrained)
-						mBuffer.registerInput(tmp);
-					else
-						mViolationCounter++;
-					
-					// Perform cleanup
-					delete obj;
-				}
-			}
-			void saveInput(Sim::Save::BasePtr& fp) {
+				const typename DB::DataType *obj = data.getDataById(id);
+				if(obj)
+					return InputData(obj->getRule()->makeParam(), id);
+				
+				return InputData(0, Sim::NoId);
 			}
 			
-			void finalizeInput() {
-				mBuffer.dispatchInput();
+			void registerInput(const Sim::Save &data)
+			{ mBuffer.addInput(data); }
+			
+			void registerInput(const InputData &data) {
+				Sim::Save saveObj;
+				Sim::Save::FilePtr fp = Sim::Save::FilePtr(saveObj);
+				
+				fp << data.getSourceId();
+				fp << *data.getParamList();
+				
+				registerInput(saveObj);
+			}
+			
+			/**
+			 * Loads input from a save pointer.
+			 */
+			void loadInput(Sim::Save::BasePtr& fp) {
+				fp >> mBuffer;
+			}
+			
+			void saveInput(Sim::Save::BasePtr& fp) {
+				fp << mBuffer;
+			}
+			
+			void dispatchInput(InputConstraintMode mode) {
 				mViolationCounter = 0;
+				
+				// Check mode constraints
+				if(mode!=IcmNone && !isValidMode(mode)) {
+					mViolationCounter++;
+					return;
+				}
+				
+				DB &data = getExtDataComponent<DB>(mExtSim);
+				
+				while(mBuffer.hasInput()) {
+					Sim::Save saveObj = mBuffer.nextInput();
+					Sim::Save::FilePtr fp = Sim::Save::FilePtr(saveObj);
+					
+					Sim::IdType id;
+					fp >> id;
+					
+					// Read the source data object and typerule
+ 					const typename DB::DataType *dataObj = data.getDataById(id);
+					const TypeRule *rule = dataObj ? dataObj->getRule() : 0;
+					
+					if(!(dataObj || rule)) {
+						mViolationCounter++;
+						continue;
+					}
+					
+					// Read the parameter list
+					ParamList *param = rule->makeParam();
+					fp >> *param;
+					
+					if(!rule->checkConstrained(param,mExtSim)) {
+						mViolationCounter++;
+						continue;
+					}
+					
+					// Build simulation input
+					rule->makeInput(mExtSim, param);
+				}
 			}
-			void discardInput() {
-			}
+			
+			void discardInput() { mBuffer.clearInput();}
 
 			uint32_t getLastConstraintViolationCount()
 			{ return mViolationCounter; }
 
-			virtual bool isObjectConstrained(typename T::Type *obj)=0;
 			virtual bool isValidMode(InputConstraintMode mode)=0;
-			virtual typename T::Type *buildObject(Sim::Save::BasePtr &fp)=0;
 			
 		private:
+			ExtSim &mExtSim;
+			
 			uint32_t mViolationCounter;
-			Sim::FactoryInput<T> mBuffer;
+			Sim::InputBuffer<Sim::Save> mBuffer;
 	};
 	
 	/**
 	 * Manages input of program objects.
 	 */
-	class ExtProgramInput : public ExtFactoryInput<Sim::ProgramFactory> {
+	class ExtProgramInput : public ExtFactoryInput<ProgramData> {
 		public:
-			ExtProgramInput(ExtInput& parent, Sim::Simulation *sim) :
-				ExtFactoryInput<Sim::ProgramFactory>(parent,sim) {}
+			ExtProgramInput(ExtInput& parent, ExtSim &extsim, Sim::Simulation *sim) :
+				ExtFactoryInput<ProgramData>(parent,extsim,sim) {}
 			virtual ~ExtProgramInput() {}
 			
-			bool isObjectConstrained(Sim::Program *prog);
 			bool isValidMode(InputConstraintMode mode)
 			{ return mode==IcmPlayerInput; }
-			Sim::Program* buildObject(Sim::Save::BasePtr &fp);
 			
 		private:
 	};

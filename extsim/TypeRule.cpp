@@ -10,6 +10,21 @@ namespace ExtS {
 	TypeRule::~TypeRule()
 	{}
 	
+	bool TypeRule::checkConstrained(ParamList* srcList, ExtSim &extsim) const
+	{
+		for(size_t i=0; i<size(); ++i) {
+			RuleParameter *referenceParam = mRuleParam[i];
+			
+			if(referenceParam->isConstraintUndefined())
+				continue;
+			
+			if(!referenceParam->isValid(getParam<RuleParameter>(i),extsim))
+				return false;
+		}
+		
+		return true;
+	}
+	
 	void TypeRule::readBlock(Script::Block* block)
 	{
 		for(RuleParamVec::iterator i=mRuleParam.begin(); i!=mRuleParam.end();

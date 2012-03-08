@@ -37,6 +37,8 @@ namespace ExtS {
 	template<class T>
 	class DefaultData : public Sim::DataCtr<T>, public BaseData {
 		public:
+			typedef T DataType;
+			
 			DefaultData(ExtSim& extsim) : BaseData(extsim)
 			{}
 			

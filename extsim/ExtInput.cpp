@@ -12,7 +12,7 @@ namespace ExtS {
 	//
 	//
 	ExtInput::ExtInput(ExtSim& esim) : mExtSim(esim),
-		mProgram(*this,&esim.getSim()),
+		mProgram(*this,esim,&esim.getSim()),
 		
 		mConstraintMode(IcmNone),
 		mPlayerId(Sim::NoId)

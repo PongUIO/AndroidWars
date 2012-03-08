@@ -29,7 +29,7 @@ namespace Sim {
 			if(mTargetPos != bState.mBody.mPos) {
 				Vector dir = (mTargetPos - bState.mBody.mPos).normalize();
 				bState.mEngine.mDirection = dir;
-				bState.mEngine.mStrength = 10.0;
+				bState.mEngine.mStrength = bot->getTypePtr()->baseSpeed;
 			}
 		}
 		

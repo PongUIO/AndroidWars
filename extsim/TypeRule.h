@@ -58,7 +58,7 @@ namespace ExtS {
 	 * Any implementation of this class describe the details of the
 	 * implementation.
 	 */
-	class RuleParameter {
+	class RuleParameter : public Sim::Save::OperatorImpl<RuleParameter> {
 		public:
 			RuleParameter(const std::string &dataName) : mDataName(dataName),
 				mIsConstraintDefined(false) {}
@@ -71,7 +71,15 @@ namespace ExtS {
 			
 			virtual void callback()=0;
 			
-			virtual bool isValid(RuleParameter *param, ExtSim &extsim) const=0;
+			virtual void save(Sim::Save::BasePtr &fp) const=0;
+			virtual void load(Sim::Save::BasePtr &fp)=0;
+			
+			/**
+			 * By using this object as a reference, test if \c param uphelds
+			 * our constraints.
+			 */
+			virtual bool isValid(const RuleParameter *param,
+				ExtSim &extsim) const=0;
 			
 			const std::string &getDataName() const { return mDataName; }
 			bool isConstraintUndefined() const
@@ -94,7 +102,7 @@ namespace ExtS {
 	/**
 	 * Contains a list of parameter objects.
 	 */
-	class ParamList {
+	class ParamList : public Sim::Save::OperatorImpl<ParamList> {
 		public:
 			typedef std::vector<RuleParameter*> RuleParamVec;
 			
@@ -115,6 +123,34 @@ namespace ExtS {
 			size_t size() const { return mRuleParam.size(); }
 			
 			const RuleParamVec &getRuleParamVec() const { return mRuleParam; }
+			
+			/**
+			 * Saves a parameter list.
+			 * 
+			 * @warning This saves each rule directly without caring about
+			 * size or contents. This means that the loaded list must contain
+			 * the same elements.
+			 */
+			void save(Sim::Save::BasePtr &fp) const
+			{
+				for(RuleParamVec::const_iterator i=mRuleParam.begin();
+					i!=mRuleParam.end(); ++i)
+					fp << *(*i);
+			}
+			
+			/**
+			 * Loads a parameter list.
+			 * 
+			 * @warning It is required that the list that destination list
+			 * already contain the exact same number of parameters and type
+			 * for the parameters.
+			 */
+			void load(Sim::Save::BasePtr &fp)
+			{
+				for(RuleParamVec::iterator i=mRuleParam.begin();
+					i!=mRuleParam.end(); ++i)
+					fp >> *(*i);
+			}
 			
 		protected:
 			RuleParamVec mRuleParam;
@@ -144,11 +180,9 @@ namespace ExtS {
 			/**
 			 * Creates an input object for this typerule from a \c ParamList.
 			 */
-			virtual bool makeInput(
-				Sim::Save::BasePtr &fp, const ParamList *param) const=0;
-			
-			void setHost(ExtSim *extsim, Sim::IdType hostId)
-			{ mExtSim=extsim; mHostId=hostId; }
+			virtual void makeInput(
+				ExtSim &extsim, const ParamList *param) const=0;
+			bool checkConstrained(ParamList *srcList, ExtSim &extsim) const;
 			
 			void readBlock(Script::Block *block);
 			void postProcess(ExtSim &extsim);
@@ -156,8 +190,6 @@ namespace ExtS {
 			ParamList *makeParam() const;
 			
 		protected:
-			ExtSim *mExtSim;
-			Sim::IdType mHostId;
 	};
 	
 	/**

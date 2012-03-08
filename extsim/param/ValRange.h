@@ -67,8 +67,8 @@ namespace ExtS {
 			virtual void callback()
 			{ ListenerSlot< ValRange<T> >::raiseListener(this); }
 			
-			virtual bool isValid(RuleParameter* param, ExtSim& extsim) const {
-				ValRange<T> *valSrc = static_cast<ValRange<T>*>(param);
+			virtual bool isValid(const RuleParameter* param, ExtSim& extsim) const {
+				const ValRange<T> *valSrc = static_cast<const ValRange<T>*>(param);
 				
 				T val = valSrc->getVal();
 				for(typename ValPairVec::const_iterator i=mValPairs.begin();
@@ -77,6 +77,31 @@ namespace ExtS {
 						return true;
 				}
 				return false;
+			}
+			
+			virtual void save(Sim::Save::BasePtr& fp) const {
+				fp << mVal;
+				
+				fp << uint32_t(mValPairs.size());
+				for(typename ValPairVec::const_iterator i=mValPairs.begin();
+					i!=mValPairs.end(); ++i) {
+					fp << i->first;
+					fp << i->second;
+				}
+			}
+			virtual void load(Sim::Save::BasePtr& fp) {
+				fp >> mVal;
+				
+				mValPairs.clear();
+				uint32_t count;
+				fp >> count;
+				
+				mValPairs.resize(count);
+				for(typename ValPairVec::iterator i=mValPairs.begin();
+					i!=mValPairs.end(); ++i) {
+					fp >> i->first;
+					fp >> i->second;
+				}
 			}
 			
 			

@@ -36,6 +36,9 @@ namespace Sim {
 		const Collision *getCollision() const
 		{ return collision; }
 		
+		void setCollision(Collision *c)
+		{ collision = c; }
+		
 		private:
 			uint32_t mId;
 			

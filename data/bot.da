@@ -10,7 +10,7 @@
 	
 	CpuLimit 10 20
 	Weight 5
-	Speed 4
+	Speed 80
 	
 	Comment "Registers a passive ability for this bot"
 	Ability "Jammer"
@@ -67,7 +67,7 @@
 	
 	CpuLimit 15 30
 	Weight 15
-	Speed 5
+	Speed 20
 	
 	BaseProgram "OmniArmor"
 	

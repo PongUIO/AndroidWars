@@ -4,6 +4,8 @@ namespace ExtS {
 #define _EXTS_X(type, name) \
 	template<> type &ExtSim::getComponent() \
 	{ return get##name(); }
+	_EXTS_X_EXTSIM_COMPONENTS
+#undef _EXTS_X
 	
 	ExtSim::ExtSim() :
 		mSim(),

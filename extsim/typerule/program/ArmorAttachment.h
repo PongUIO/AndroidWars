@@ -12,8 +12,8 @@ namespace ExtS { namespace Prog {
 				virtual TypeRule* clone()
 				{ return new ArmorAttachmentRule(*this); }
 				
-				virtual bool makeInput(
-					Sim::Save::BasePtr& fp, const ParamList* param) const;
+				virtual void makeInput(ExtSim &extsim,
+					const ParamList* param) const;
 				
 			private:
 		};

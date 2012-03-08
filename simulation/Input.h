@@ -46,6 +46,8 @@ namespace Sim {
 			InputBuffer() {}
 			~InputBuffer() {}
 			
+			void clearInput() { mInputQueue.clear(); }
+			
 			bool hasInput() {
 				return !mInputQueue.empty();
 			}
