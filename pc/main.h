@@ -70,6 +70,10 @@ public:
 		initMenus();
 		gameTimer = new QTimer(this);
 		connect(gameTimer, SIGNAL(timeout()), this, SLOT(gameStep()));
+		resetTimer();
+	}
+	void resetTimer() {
+		gameTimer->stop();
 		gameTimer->start(sim.getConfiguration().stepTime*1000);
 	}
 	void registerForResize(QWidget *target) {

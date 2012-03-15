@@ -150,7 +150,7 @@ protected:
 		cam->modZoom(event->delta());
 	}
 
-	void drawTexObj(double xf, double yf, double xt, double yt) {
+	void drawTexObj2d(double xf, double yf, double xt, double yt) {
 		glBegin(GL_QUADS);
 		glTexCoord2f(0,1); glVertex2f(xf,yt);
 		glTexCoord2f(0,0); glVertex2f(xf,yf);
@@ -158,13 +158,29 @@ protected:
 		glTexCoord2f(1,1); glVertex2f(xt,yt);
 		glEnd();
 	}
+	void drawTexObj3d(double xf, double yf, double xt, double yt, double z) {
+		glBegin(GL_QUADS);
+		glTexCoord2f(0,1); glVertex3f(xf,yt,z);
+		glTexCoord2f(0,0); glVertex3f(xf,yf,z);
+		glTexCoord2f(1,0); glVertex3f(xt,yf,z);
+		glTexCoord2f(1,1); glVertex3f(xt,yt,z);
+		glEnd();
+	}
 
-	void drawObj(double xf, double yf, double xt, double yt) {
+	void drawObj2d(double xf, double yf, double xt, double yt) {
 		glBegin(GL_QUADS);
 		glVertex2f(xf,yt);
 		glVertex2f(xf,yf);
 		glVertex2f(xt,yf);
 		glVertex2f(xt,yt);
+		glEnd();
+	}
+	void drawObj3d(double xf, double yf, double xt, double yt, double z) {
+		glBegin(GL_QUADS);
+		glVertex3f(xf,yt,z);
+		glVertex3f(xf,yf,z);
+		glVertex3f(xt,yf,z);
+		glVertex3f(xt,yt,z);
 		glEnd();
 	}
 
@@ -175,6 +191,53 @@ protected:
 		Sim::World *wld = &(states->getSim()->getState().getWorld());
 		int i, j;
 		glClear(GL_COLOR_BUFFER_BIT);
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		//glFrustum(-cam->zoom, cam->zoom, -cam->zoom*cam->ratio, cam->zoom*cam->ratio, 0.5, 2);
+		glFrustum(-1, 1, -1*cam->ratio, 1*cam->ratio, 0.5, 2.1+cam->zoom);
+		glTranslatef(cam->pos.x,cam->pos.y,-1-cam->zoom);
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
+		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+		glBegin(GL_TRIANGLES);
+		glVertex3f(-10,-10,-1);
+		glVertex3f(10,10,-1);
+		glVertex3f(0,10,-1);
+		glEnd();
+		std::list<Sim::Bot*> bots = sim->getState().getBotFactory().getBotList();
+		std::list<Sim::Bot*>::iterator bot;
+
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glEnable(GL_BLEND);
+		glEnable(GL_TEXTURE_2D);
+		for (bot = bots.begin(); bot != bots.end(); bot++) {
+			Sim::Vector pos = (*bot)->getBody().mPos;
+			Sim::Vector col = (*bot)->getTypePtr()->getCollision()->getBboxHigh();
+			//glTexSubImage2D(GL_TEXTURE_2D, 0, 0,0 , characters[mt].width(), characters[mt].height(),  GL_RGBA, GL_UNSIGNED_BYTE, characters[mt].bits() );
+			//glBindTexture(GL_TEXTURE_2D, weaponstextures[0]);
+			//drawTexObj3d(pos.x+0.3, pos.y+1.3, pos.x+1.3, pos.y+1.3);
+
+			glBindTexture(GL_TEXTURE_2D, chartextures[0]);
+			drawTexObj3d(pos.x, pos.y, pos.x+col.x, pos.y+col.y, 0);
+
+			glBindTexture(GL_TEXTURE_2D, 0);
+			/*glBlendFunc(GL_ONE, GL_ONE);
+			//glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+
+			glEnable(GL_TEXTURE_2D);*/
+
+		}
+		glDisable(GL_TEXTURE_2D);
+
+		glDisable(GL_TEXTURE_2D);
+		glColor4f(0.2f, 1.0f, 0.2f, selAlpha);
+		for (bot = bots.begin(); bot != bots.end(); bot++) {
+			if (states->isSelected((*bot)->getId())) {
+				Sim::Vector pos = (*bot)->getBody().mPos;
+				Sim::Vector col = (*bot)->getTypePtr()->getCollision()->getBboxHigh();
+				drawObj3d(pos.x, pos.y, pos.x+col.x, pos.y+col.y,0);
+			}
+		}
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
 		glOrtho(-cam->zoom, cam->zoom, -cam->zoom*cam->ratio, cam->zoom*cam->ratio, 0.01, 1000);
@@ -199,47 +262,14 @@ protected:
 				}
 				//glTexSubImage2D(GL_TEXTURE_2D, 0, 0,0 , data[mt].width(), data[mt].height(),  GL_RGBA, GL_UNSIGNED_BYTE, data[mt].bits() );
 				glBindTexture(GL_TEXTURE_2D, textures[mt]);
-				drawTexObj(i, j, i+1, j+1);
+				drawTexObj2d(i, j, i+1, j+1);
 			}
 
 		}
 
 
-		std::list<Sim::Bot*> bots = sim->getState().getBotFactory().getBotList();
-		std::list<Sim::Bot*>::iterator bot;
-
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glEnable(GL_BLEND);
-
-		for (bot = bots.begin(); bot != bots.end(); bot++) {
-			Sim::Vector pos = (*bot)->getBody().mPos;
-			Sim::Vector col = (*bot)->getTypePtr()->getCollision()->getBboxHigh();
-			//glTexSubImage2D(GL_TEXTURE_2D, 0, 0,0 , characters[mt].width(), characters[mt].height(),  GL_RGBA, GL_UNSIGNED_BYTE, characters[mt].bits() );
-			glBindTexture(GL_TEXTURE_2D, weaponstextures[0]);
-			drawTexObj(pos.x+0.3, pos.y+1.3, pos.x+1.3, pos.y+1.3);
-
-			glBindTexture(GL_TEXTURE_2D, chartextures[0]);
-			drawTexObj(pos.x, pos.y, pos.x+col.x, pos.y+col.y);
-
-			glBindTexture(GL_TEXTURE_2D, 0);
-			/*glBlendFunc(GL_ONE, GL_ONE);
-			//glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-
-			glEnable(GL_TEXTURE_2D);*/
-
-		}
-		glDisable(GL_TEXTURE_2D);
-		glColor4f(0.2f, 1.0f, 0.2f, selAlpha);
-		for (bot = bots.begin(); bot != bots.end(); bot++) {
-			if (states->isSelected((*bot)->getId())) {
-				Sim::Vector pos = (*bot)->getBody().mPos;
-				Sim::Vector col = (*bot)->getTypePtr()->getCollision()->getBboxHigh();
-				drawObj(pos.x, pos.y, pos.x+col.x, pos.y+col.y);
-			}
-		}
 		glEnable(GL_TEXTURE_2D);
 
-		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
 		glDisable(GL_TEXTURE_2D);
 		glDisable(GL_BLEND);
