@@ -1,15 +1,15 @@
-#ifndef EXTSIM_MAP_H
-#define EXTSIM_MAP_H
+#ifndef EXTSIM_EXTMAP_H
+#define EXTSIM_EXTMAP_H
 
 #include <stdint.h>
 
-#include "../BaseData.h"
+#include "../ExtBaseData.h"
 
 namespace ExtS {
-	class MapData : public BaseData {
+	class ExtMapData : public ExtBaseData {
 		public:
-			MapData(ExtSim& sim);
-			virtual ~MapData();
+			ExtMapData(ExtSim& sim);
+			virtual ~ExtMapData();
 			
 			void startup();
 			void shutdown();

@@ -1,10 +1,10 @@
-#ifndef EXTSIM_BOT_H
-#define EXTSIM_BOT_H
+#ifndef EXTSIM_EXTBOT_H
+#define EXTSIM_EXTBOT_H
 
 #include <stdint.h>
 #include <vector>
 
-#include "../BaseData.h"
+#include "../ExtBaseData.h"
 
 #include "../../simulation/Health.h"
 
@@ -12,7 +12,7 @@ namespace Sim
 { class BotD; class ArmorDatabase; }
 
 namespace ExtS {
-	class BotData;
+	class ExtBotData;
 	
 	class ExtBot {
 		public:
@@ -25,8 +25,8 @@ namespace ExtS {
 			ExtBot();
 			~ExtBot();
 			
-			void loadBlock(BotData &host, Script::Block &block);
-			void postProcess(BotData &host, Sim::Simulation &sim);
+			void loadBlock(ExtBotData &host, Script::Block &block);
+			void postProcess(ExtBotData &host, Sim::Simulation &sim);
 			
 			const std::string &getName() const { return mName; }
 			const std::string &getDescription() const { return mDescription; }
@@ -54,7 +54,7 @@ namespace ExtS {
 				struct HealthHull : public Sim::Health::Hull {
 					std::string mType;
 					
-					void loadData(BotData &host, Script::Data &data);
+					void loadData(ExtBotData &host, Script::Data &data);
 					void postProcess(Sim::ArmorDatabase &armorDb);
 				};
 				typedef std::vector<HealthHull> AttachmentVec;
@@ -64,14 +64,14 @@ namespace ExtS {
 				AttachmentVec mAttachmentHealth;
 			//@}
 			
-			friend class BotData;
+			friend class ExtBotData;
 			friend class Sim::DataCtr<ExtBot>;
 	};
 	
-	class BotData : public DefaultData<ExtBot> {
+	class ExtBotData : public DefaultExtData<ExtBot> {
 		public:
-			BotData(ExtSim &esim);
-			virtual ~BotData();
+			ExtBotData(ExtSim &esim);
+			virtual ~ExtBotData();
 			
 			void startup() {}
 			void shutdown() {}

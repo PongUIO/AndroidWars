@@ -1,27 +1,27 @@
 #include <boost/algorithm/string.hpp>
 
-#include "Map.h"
+#include "ExtMap.h"
 
 #include "../ExtData.h"
 #include "../ExtSim.h"
 
 namespace ExtS {
-	// MapData
+	// ExtMapData
 	//
 	//
-	MapData::MapData(ExtSim& sim): BaseData(sim)
+	ExtMapData::ExtMapData(ExtSim& sim): ExtBaseData(sim)
 	{}
 	
-	MapData::~MapData()
+	ExtMapData::~ExtMapData()
 	{}
 	
-	void MapData::startup()
+	void ExtMapData::startup()
 	{}
 	
-	void MapData::shutdown()
+	void ExtMapData::shutdown()
 	{}
 	
-	void MapData::loadBlock(Script::Block& block)
+	void ExtMapData::loadBlock(Script::Block& block)
 	{
 		mExtSim.getSim().getConfiguration().tileSize =
 			ExtData::readValue<double>(block.getDataFirst("TileSize"), 1.0);
@@ -83,6 +83,6 @@ namespace ExtS {
 		}
 	}
 	
-	void MapData::postProcess()
+	void ExtMapData::postProcess()
 	{}
 }

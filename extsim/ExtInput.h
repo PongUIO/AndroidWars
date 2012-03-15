@@ -14,8 +14,8 @@ namespace ExtS {
 	class ExtSim;
 	class ExtInput;
 	
-	class ProgramData;
-	class BotData;
+	class ExtProgramData;
+	class ExtBotData;
 	
 	enum InputConstraintMode {
 		/**
@@ -211,10 +211,10 @@ namespace ExtS {
 	/**
 	 * Manages input of program objects.
 	 */
-	class ExtProgramInput : public ExtFactoryInput<ProgramData> {
+	class ExtProgramInput : public ExtFactoryInput<ExtProgramData> {
 		public:
 			ExtProgramInput(ExtInput& parent, ExtSim &extsim, Sim::Simulation *sim) :
-				ExtFactoryInput<ProgramData>(parent,extsim,sim) {}
+				ExtFactoryInput<ExtProgramData>(parent,extsim,sim) {}
 			virtual ~ExtProgramInput() {}
 			
 			bool isValidMode(InputConstraintMode mode)

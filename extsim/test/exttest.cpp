@@ -149,7 +149,7 @@ void printSimBot(const Sim::BotD *bot)
 void listBot()
 {
 	Sim::BotDatabase &simBotDb = sim.getData().getBotDb();
-	ExtS::BotData &extBotDb = extSim.getData().getBotDb();
+	ExtS::ExtBotData &extBotDb = extSim.getData().getBotDb();
 	
 	printf("Bot type list:\n");
 	for(unsigned int i=0; i<simBotDb.size(); i++) {
@@ -169,7 +169,7 @@ void testParam()
 	
 	printf("\nParameter testing:\n");
 	
-	ExtS::ProgramData &progDb = extSim.getData().getProgramDb();
+	ExtS::ExtProgramData &progDb = extSim.getData().getProgramDb();
 	for(Sim::IdType i=0; i<progDb.size(); ++i) {
 		const ExtS::ExtProgram *prog = progDb.getDataById(i);
 		std::cout << prog->getName() << "\n\tDescription: " <<

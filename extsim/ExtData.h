@@ -5,25 +5,25 @@
 #include <boost/algorithm/string.hpp>
 
 #include "CommonTemplate.h"
-#include "BaseData.h"
+#include "ExtBaseData.h"
 
-#include "datatype/Ability.h"
-#include "datatype/Armor.h"
-#include "datatype/Bot.h"
-#include "datatype/Damage.h"
-#include "datatype/Program.h"
-#include "datatype/Weapon.h"
-#include "datatype/Game.h"
-#include "datatype/Map.h"
+#include "datatype/ExtAbility.h"
+#include "datatype/ExtArmor.h"
+#include "datatype/ExtBot.h"
+#include "datatype/ExtDamage.h"
+#include "datatype/ExtProgram.h"
+#include "datatype/ExtWeapon.h"
+#include "datatype/ExtGame.h"
+#include "datatype/ExtMap.h"
 
 namespace ExtS {
 #define _EXTS_X_EXTDATA_COMPONENTS \
-	_EXTS_X(ArmorData, Armor) \
-	_EXTS_X(DamageData, Damage) \
-	_EXTS_X(BotData, Bot) \
-	_EXTS_X(ProgramData, Program) \
-	_EXTS_X(GameData, Game) \
-	_EXTS_X(MapData, Map)
+	_EXTS_X(ExtArmorData, Armor) \
+	_EXTS_X(ExtDamageData, Damage) \
+	_EXTS_X(ExtBotData, Bot) \
+	_EXTS_X(ExtProgramData, Program) \
+	_EXTS_X(ExtGameData, Game) \
+	_EXTS_X(ExtMapData, Map)
 	
 	/**
 	 * @brief Data manager for the extended simulation.
@@ -42,10 +42,10 @@ namespace ExtS {
 			};
 			
 			struct Listener {
-				Listener(BaseData *data=0, ListenerContext context=LcNone) :
+				Listener(ExtBaseData *data=0, ListenerContext context=LcNone) :
 					mData(data), mContext(context) {}
 				
-				BaseData *mData;
+				ExtBaseData *mData;
 				ListenerContext mContext;
 			};
 			
@@ -80,7 +80,7 @@ namespace ExtS {
 		private:
 			void registerListener(const std::string &blockTag,
 				const Listener &listener);
-			BaseData *getListener(const std::string &tag);
+			ExtBaseData *getListener(const std::string &tag);
 			
 			/// @name Databases
 			//@{

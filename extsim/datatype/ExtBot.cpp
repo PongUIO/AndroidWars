@@ -1,20 +1,20 @@
-#include "Bot.h"
+#include "ExtBot.h"
 #include "../ExtData.h"
 
 #include "../../simulation/Simulation.h"
 #include "../ExtSim.h"
 
 namespace ExtS {
-	// BotData
+	// ExtBotData
 	//
 	//
-	BotData::BotData(ExtSim &esim): DefaultData<ExtBot>(esim)
+	ExtBotData::ExtBotData(ExtSim &esim): DefaultExtData<ExtBot>(esim)
 	{}
 	
-	BotData::~BotData()
+	ExtBotData::~ExtBotData()
 	{}
 	
-	void BotData::loadBlock(Script::Block& block)
+	void ExtBotData::loadBlock(Script::Block& block)
 	{
 		const std::string &name = block.getDataFirst("Name");
 		if(name.empty())
@@ -33,7 +33,7 @@ namespace ExtS {
 		loadSimBot(block, simData);
 	}
 	
-	void BotData::loadSimBot(Script::Block& block, Sim::BotD *simBot)
+	void ExtBotData::loadSimBot(Script::Block& block, Sim::BotD *simBot)
 	{
 		simBot->baseSpeed = ExtData::readValue<double>(
 			block.getDataFirst("Speed"), 0);
@@ -48,7 +48,7 @@ namespace ExtS {
 		simBot->setCollision(new Sim::Collision(pts));
 	}
 	
-	void BotData::postProcess()
+	void ExtBotData::postProcess()
 	{
 		for(DataVec::iterator i=mData.begin(); i!=mData.end(); ++i) {
 			(*i)->postProcess(*this, mExtSim.getSim());
@@ -62,7 +62,7 @@ namespace ExtS {
 	ExtBot::ExtBot() {}
 	ExtBot::~ExtBot() {}
 	
-	void ExtBot::loadBlock(BotData &host, Script::Block& block)
+	void ExtBot::loadBlock(ExtBotData &host, Script::Block& block)
 	{
 		// Load extended data
 		{
@@ -105,7 +105,7 @@ namespace ExtS {
 		}
 	}
 	
-	void ExtBot::postProcess(BotData& host, Sim::Simulation& sim)
+	void ExtBot::postProcess(ExtBotData& host, Sim::Simulation& sim)
 	{
 		Sim::ArmorDatabase &armorDb = sim.getData().getArmorDb();
 		
@@ -123,7 +123,7 @@ namespace ExtS {
 	// ExtBot::HealthHull
 	//
 	//
-	void ExtBot::HealthHull::loadData(BotData &host, Script::Data& data)
+	void ExtBot::HealthHull::loadData(ExtBotData &host, Script::Data& data)
 	{
 		mType = data.getArg(0);
 		

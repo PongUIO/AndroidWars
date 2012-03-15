@@ -1,16 +1,16 @@
-#include "Weapon.h"
+#include "ExtWeapon.h"
 
 #include "../../simulation/Simulation.h"
 #include "../../simulation/data/WeaponD.h"
 
 namespace ExtS {
-	WeaponData::WeaponData(Sim::Simulation& sim): BaseData(sim)
+	ExtWeaponData::ExtWeaponData(Sim::Simulation& sim): BaseData(sim)
 	{}
 	
-	WeaponData::~WeaponData()
+	ExtWeaponData::~ExtWeaponData()
 	{}
 	
-	void WeaponData::loadBlock(Script::Block& block)
+	void ExtWeaponData::loadBlock(Script::Block& block)
 	{
 		Sim::WeaponDatabase &weapDb = mSim.getData().getWeaponDb();
 		

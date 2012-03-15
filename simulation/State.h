@@ -74,6 +74,7 @@ namespace Sim {
 
 				uint32_t getCurPhaseStep() { return mCtrl.mCurPhaseStep; }
 				uint32_t getCurPhase() { return mCtrl.mCurPhase; }
+				bool isInPhase() { return mCtrl.mInPhase; }
 			//@}
 			
 		private:
@@ -92,14 +93,18 @@ namespace Sim {
 				uint32_t &curPhase() { return mCtrl.mCurPhase; }
 				
 				struct StateControl :
-					private Save::OperatorImpl<StateControl> {
+				private Save::OperatorImpl<StateControl> {
+					StateControl() : mCurPhaseStep(0), mCurPhase(0), mInPhase(false)
+						{}
+					
 					uint32_t mCurPhaseStep;
 					uint32_t mCurPhase;
+					bool mInPhase;
 					
 					void save(Save::BasePtr &fp) const
-					{ fp << mCurPhaseStep << mCurPhase; }
+					{ fp << mCurPhaseStep << mCurPhase << mInPhase; }
 					void load(Save::BasePtr &fp)
-					{ fp >> mCurPhaseStep >> mCurPhase; }
+					{ fp >> mCurPhaseStep >> mCurPhase >> mInPhase; }
 				};
 				StateControl mCtrl;
 			//@}

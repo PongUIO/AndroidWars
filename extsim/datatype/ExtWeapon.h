@@ -1,13 +1,13 @@
 #ifndef EXTSIM_WEAPON_H
 #define EXTSIM_WEAPON_H
 
-#include "../BaseData.h"
+#include "../ExtBaseData.h"
 
 namespace ExtS {
-	class WeaponData : public BaseData {
+	class ExtWeaponData : public ExtBaseData {
 		public:
-			WeaponData(Sim::Simulation& sim);
-			virtual ~WeaponData();
+			ExtWeaponData(Sim::Simulation& sim);
+			virtual ~ExtWeaponData();
 			
 			void loadBlock(Script::Block& block);
 			void postProcess() {}

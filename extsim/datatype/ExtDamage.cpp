@@ -1,16 +1,16 @@
-#include "Damage.h"
+#include "ExtDamage.h"
 
 #include "../../simulation/Simulation.h"
 #include "../ExtSim.h"
 
 namespace ExtS {
-	DamageData::DamageData(ExtSim & esim): BaseData(esim)
+	ExtDamageData::ExtDamageData(ExtSim & esim): ExtBaseData(esim)
 	{}
 	
-	DamageData::~DamageData()
+	ExtDamageData::~ExtDamageData()
 	{}
 	
-	void DamageData::loadBlock(Script::Block& block)
+	void ExtDamageData::loadBlock(Script::Block& block)
 	{
 		Sim::DamageDatabase &damageDb = mExtSim.getSim().getData().getDamageDb();
 		
@@ -21,7 +21,7 @@ namespace ExtS {
 		damageDb.newDamage(name);
 	}
 	
-	void DamageData::postProcess()
+	void ExtDamageData::postProcess()
 	{}
 	
 }

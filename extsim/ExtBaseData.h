@@ -1,5 +1,5 @@
-#ifndef EXTSIM_BASEDATA_H
-#define EXTSIM_BASEDATA_H
+#ifndef EXTSIM_EXTBASEDATA_H
+#define EXTSIM_EXTBASEDATA_H
 
 #include <vector>
 #include <boost/lexical_cast.hpp>
@@ -15,10 +15,10 @@ namespace ExtS {
 	 * Base virtual class for processing and storing data.
 	 * 
 	 */
-	class BaseData {
+	class ExtBaseData {
 		public:
-			BaseData(ExtSim &sim) : mExtSim(sim) {}
-			virtual ~BaseData();
+			ExtBaseData(ExtSim &sim) : mExtSim(sim) {}
+			virtual ~ExtBaseData();
 			
 			virtual void startup()=0;
 			virtual void shutdown()=0;
@@ -35,14 +35,14 @@ namespace ExtS {
 	 * Default implementation for types who mirror simulation data.
 	 */
 	template<class T>
-	class DefaultData : public Sim::DataCtr<T>, public BaseData {
+	class DefaultExtData : public Sim::DataCtr<T>, public ExtBaseData {
 		public:
 			typedef T DataType;
 			
-			DefaultData(ExtSim& extsim) : BaseData(extsim)
+			DefaultExtData(ExtSim& extsim) : ExtBaseData(extsim)
 			{}
 			
-			virtual ~DefaultData()
+			virtual ~DefaultExtData()
 			{}
 	};
 }

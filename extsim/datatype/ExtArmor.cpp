@@ -1,17 +1,17 @@
-#include "Armor.h"
+#include "ExtArmor.h"
 #include "../ExtData.h"
 
 #include "../ExtSim.h"
 #include "../../simulation/data/WeaponD.h"
 
 namespace ExtS {
-	ArmorData::ArmorData(ExtSim &esim): BaseData(esim)
+	ExtArmorData::ExtArmorData(ExtSim &esim): ExtBaseData(esim)
 	{}
 	
-	ArmorData::~ArmorData()
+	ExtArmorData::~ExtArmorData()
 	{}
 	
-	void ArmorData::loadBlock(Script::Block& block)
+	void ExtArmorData::loadBlock(Script::Block& block)
 	{
 		const std::string &name = block.getDataFirst("Name");
 		if(name.empty())
@@ -41,7 +41,7 @@ namespace ExtS {
 	 * This is necessary to ensure all names are properly resolved to their
 	 * respective identifiers.
 	 */
-	void ArmorData::postProcess()
+	void ExtArmorData::postProcess()
 	{
 		Sim::DamageDatabase &damageDb =
 			mExtSim.getSim().getData().getDamageDb();
@@ -63,7 +63,7 @@ namespace ExtS {
 		mRuleData.clear();
 	}
 	
-	ArmorData::RuleData::Rule ArmorData::loadRuleData(const Script::Data& data,
+	ExtArmorData::RuleData::Rule ExtArmorData::loadRuleData(const Script::Data& data,
 		bool loadType)
 	{
 		int ind=0;

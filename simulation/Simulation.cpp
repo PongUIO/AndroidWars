@@ -69,6 +69,7 @@ namespace Sim {
 	{
 		mState.step(getConfiguration().stepTime);
 	}
+
 	
 	/**
 	 * Ends a simulation phase.

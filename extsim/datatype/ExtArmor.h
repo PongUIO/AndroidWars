@@ -1,18 +1,18 @@
-#ifndef EXTSIM_ARMOR_H
-#define EXTSIM_ARMOR_H
+#ifndef EXTSIM_EXTARMOR_H
+#define EXTSIM_EXTARMOR_H
 
 #include <vector>
 #include <string>
 
-#include "../BaseData.h"
+#include "../ExtBaseData.h"
 #include "../../simulation/data/ArmorD.h"
 
 
 namespace ExtS {
-	class ArmorData : public BaseData {
+	class ExtArmorData : public ExtBaseData {
 		public:
-			ArmorData(ExtSim& esim);
-			virtual ~ArmorData();
+			ExtArmorData(ExtSim& esim);
+			virtual ~ExtArmorData();
 			
 			void startup() {}
 			void shutdown() {}

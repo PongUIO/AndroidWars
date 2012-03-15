@@ -62,7 +62,8 @@ namespace Sim {
 				void gotoPresent() { mReplayManager.gotoPresent(); }
 				
 				bool hasPhaseStep()
-				{ return getCurPhaseStep()<getConfiguration().phaseLength; }
+				{ return getState().isInPhase() &&
+					getCurPhaseStep()<getConfiguration().phaseLength; }
 				
 				uint32_t getCurPhase()
 				{ return getState().getCurPhase(); }

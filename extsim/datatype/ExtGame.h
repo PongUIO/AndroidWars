@@ -1,15 +1,15 @@
-#ifndef EXTSIM_GAME_H
-#define EXTSIM_GAME_H
+#ifndef EXTSIM_EXTGAME_H
+#define EXTSIM_EXTGAME_H
 
 #include <string>
 
-#include "../BaseData.h"
+#include "../ExtBaseData.h"
 
 namespace ExtS {
-	class GameData : public BaseData {
+	class ExtGameData : public ExtBaseData {
 		public:
-			GameData(ExtSim& sim);
-			virtual ~GameData();
+			ExtGameData(ExtSim& sim);
+			virtual ~ExtGameData();
 			
 			void startup();
 			void shutdown();

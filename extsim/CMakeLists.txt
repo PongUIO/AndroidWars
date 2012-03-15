@@ -2,7 +2,7 @@ add_library(AWExtSim
 	ExtSim.cpp
 	ExtData.cpp
 	ExtInput.cpp
-	BaseData.cpp
+	ExtBaseData.cpp
 	TypeRule.cpp
 	CommonTemplate.cpp
 	
@@ -14,12 +14,12 @@ add_library(AWExtSim
 	typerule/program/ArmorAttachment.cpp
 	typerule/program/MoveTowards.cpp
 	
-	datatype/Game.cpp
-	datatype/Map.cpp
-	datatype/Armor.cpp
-	datatype/Damage.cpp
-	datatype/Bot.cpp
-	datatype/Program.cpp
+	datatype/ExtGame.cpp
+	datatype/ExtMap.cpp
+	datatype/ExtArmor.cpp
+	datatype/ExtDamage.cpp
+	datatype/ExtBot.cpp
+	datatype/ExtProgram.cpp
 	)
 target_link_libraries(AWExtSim AWSim)
 

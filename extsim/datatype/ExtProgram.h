@@ -1,7 +1,7 @@
-#ifndef EXTSIM_PROGRAM_H
-#define EXTSIM_PROGRAM_H
+#ifndef EXTSIM_EXTPROGRAM_H
+#define EXTSIM_EXTPROGRAM_H
 
-#include "../BaseData.h"
+#include "../ExtBaseData.h"
 #include "../TypeRule.h"
 
 namespace ExtS {
@@ -31,10 +31,10 @@ namespace ExtS {
 			friend class Sim::DataCtr<ExtProgram>;
 	};
 	
-	class ProgramData : public DefaultData<ExtProgram>, public TypeRuleMgr {
+	class ExtProgramData : public DefaultExtData<ExtProgram>, public TypeRuleMgr {
 		public:
-			ProgramData(ExtSim &esim);
-			virtual ~ProgramData();
+			ExtProgramData(ExtSim &esim);
+			virtual ~ExtProgramData();
 			
 			void startup() {}
 			void shutdown() {}

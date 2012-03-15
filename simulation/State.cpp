@@ -59,6 +59,7 @@ namespace Sim {
 	
 	void State::startPhase()
 	{
+		mCtrl.mInPhase = true;
 		curPhaseStep() = 0;
 		
 		call( boost::bind(&StateObj::startPhase, _1) );
@@ -77,6 +78,7 @@ namespace Sim {
 		
 		curPhase()++;
 		curPhaseStep() = 0;
+		mCtrl.mInPhase = false;
 	}
 	
 	void State::save(Save::BasePtr &fp)

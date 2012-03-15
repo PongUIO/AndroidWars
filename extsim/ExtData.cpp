@@ -50,7 +50,7 @@ namespace ExtS {
 		for(size_t i=0; i<daScr.getRoot().getSize(); i++) {
 			Script::Block *block = daScr.getRoot().getBlockIndex(i);
 			if(block) {
-				BaseData *listener = getListener(block->getId());
+				ExtBaseData *listener = getListener(block->getId());
 				
 				if(listener)
 					listener->loadBlock(*block);
@@ -74,7 +74,7 @@ namespace ExtS {
 		const Listener &listener)
 	{	mListeners[blockTag] = listener; }
 	
-	BaseData* ExtData::getListener(const std::string& tag)
+	ExtBaseData* ExtData::getListener(const std::string& tag)
 	{
 		ListenerMap::iterator i=mListeners.find(tag);
 		return (i==mListeners.end() || !(i->second.mContext&mCurrentContext)) ?

@@ -1,25 +1,25 @@
-#include "Game.h"
+#include "ExtGame.h"
 
 #include "../ExtData.h"
 #include "../ExtSim.h"
 
 namespace ExtS {
-	// GameData
+	// ExtGameData
 	//
 	//
-	GameData::GameData(ExtSim& sim): BaseData(sim)
+	ExtGameData::ExtGameData(ExtSim& sim): ExtBaseData(sim)
 	{}
 	
-	GameData::~GameData()
+	ExtGameData::~ExtGameData()
 	{}
 	
-	void GameData::startup()
+	void ExtGameData::startup()
 	{}
 	
-	void GameData::shutdown()
+	void ExtGameData::shutdown()
 	{}
 	
-	void GameData::loadBlock(Script::Block& block)
+	void ExtGameData::loadBlock(Script::Block& block)
 	{
 		mName = block.getDataFirst("Name");
 		mDescription = block.getDataFirst("Description");
@@ -28,7 +28,7 @@ namespace ExtS {
 			block.getDataFirst("StepTime"), 1.0);
 	}
 
-	void GameData::postProcess()
+	void ExtGameData::postProcess()
 	{
 		mExtSim.getSim().getConfiguration().stepTime = mStepTime;
 	}

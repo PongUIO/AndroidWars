@@ -1,4 +1,4 @@
-#include "Program.h"
+#include "ExtProgram.h"
 
 #include "../ExtSim.h"
 
@@ -6,11 +6,11 @@
 #include "../typerule/program/MoveTowards.h"
 
 namespace ExtS {
-	// ProgramData
+	// ExtProgramData
 	//
 	//
-	ProgramData::ProgramData(ExtSim &esim) :
-		DefaultData<ExtProgram>(esim)
+	ExtProgramData::ExtProgramData(ExtSim &esim) :
+		DefaultExtData<ExtProgram>(esim)
 	{
 		registerTypeRule("Ability/ArmorAttachment",
 			new Prog::ArmorAttachmentRule());
@@ -18,12 +18,12 @@ namespace ExtS {
 			new Prog::MoveTowardsRule());
 	}
 	
-	ProgramData::~ProgramData()
+	ExtProgramData::~ExtProgramData()
 	{
 		
 	}
 
-	void ProgramData::loadBlock(Script::Block& block)
+	void ExtProgramData::loadBlock(Script::Block& block)
 	{
 		const std::string &name = block.getDataFirst("Name");
 		if(name.empty())
@@ -39,7 +39,7 @@ namespace ExtS {
 			name.c_str());
 	}
 
-	void ProgramData::postProcess()
+	void ExtProgramData::postProcess()
 	{
 		for(DataVec::iterator i=mData.begin(); i!=mData.end(); ++i) {
 			(*i)->postProcess(mExtSim);
