@@ -1,31 +1,33 @@
 #ifndef GAMEBUTTON_H
 #define GAMEBUTTON_H
 #include<QtGui>
+#include<QThread>
 #include "Simulation.h"
+#include "gameslider.h"
+#include "../util/client.h"
+
 class GameButton : public QLabel {
 	Q_OBJECT        // must include this if you use Qt signals/slots
 public:
 	int func;
 	Sim::Simulation *sim;
-	GameButton(Sim::Simulation *sim, int func, QWidget *parent = 0)
+	GameSlider *gs;
+	ClientStates *cs;
+	GameButton(Sim::Simulation *sim, ClientStates *states, int func, GameSlider *gs, QWidget *parent = 0)
                 : QLabel(parent) {
+                this->gs = gs;
 		this->func = func;
 		this->sim = sim;
+		this->cs = states;
 	}
 protected:
 	// overridden
 	void mousePressEvent(QMouseEvent * event) {
 		if (func == 0) {
-			qDebug() << "click";
-			qDebug() << sim->getCurPhase();
 			sim->gotoPresent();
-			qDebug() << sim->getCurPhase();
 			sim->startPhase();
-			while( sim->hasPhaseStep() ) {
-				sim->step();
-			}
-			sim->endPhase(true);
-			qDebug() << sim->getCurPhase();
+			cs->setRunning(true);
+			gs->setValue(0);
 		}
 	}
 };

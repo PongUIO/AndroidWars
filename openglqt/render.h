@@ -58,8 +58,8 @@ public:
         ClientStates *states;
         QTimer *glTimer, *camTimer;
         GameDrawer(ClientStates *states, QWidget *parent = 0)
-		: QGLWidget(QGLFormat(QGL::SampleBuffers), parent) {
-		this->parent = parent;
+                : QGLWidget(QGLFormat(QGL::SampleBuffers), parent) {
+                this->parent = parent;
 		cMouse = 0;
 		this->cam = new Camera(0, 0, parent->width(), parent->height());
 		lastX = width()/2;
@@ -170,7 +170,7 @@ protected:
 
 
 	// overridden
-	void paintGL() {
+        void paintGL() {
                 Sim::Simulation *sim = states->getSim();
 		Sim::World *wld = &(states->getSim()->getState().getWorld());
 		int i, j;

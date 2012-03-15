@@ -45,7 +45,7 @@ public:
 				sim->getReplayManager().rewind(value(), 0);
 			} else {
 				sim->gotoPresent();
-				sim->getReplayManager().rewind(value()*0.1+sim->getCurTime());
+                                sim->getReplayManager().rewind(value()*sim->getConfiguration().stepTime+sim->getCurTime());
 			}
 		}
 	}

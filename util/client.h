@@ -10,9 +10,12 @@ class ClientStates {
 private:
 	boost::unordered_set<uint> selBots;
 	Sim::Simulation *sim;
-	bool shift, ctrl, menu;
+	bool shift, ctrl, menu, gameStepping;
 public:
 	ClientStates() {
+		shift = ctrl = gameStepping = false;
+		menu = true;
+		sim = NULL;
 	}
 
 	Sim::Simulation* getSim() {
@@ -37,6 +40,12 @@ public:
 	}
 	void setMenu(bool state) {
 		menu = state;
+	}
+	void setRunning(bool state) {
+		gameStepping = state;
+	}
+	bool getRunning() {
+		return gameStepping;
 	}
 	bool menuOpen() {
 		return menu;

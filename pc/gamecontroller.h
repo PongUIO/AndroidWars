@@ -26,56 +26,55 @@ public:
 	//buttons
 	GameButton *label, *label2;
 	GameSlider *slider;
-	GameController(ClientStates *states, QWidget *parent = 0) {
+        GameController(ClientStates *states, QWidget *parent = 0) {
 		this->states = states;
-		this->parent = parent;
+                this->parent = parent;
 
-		drawer = new GameDrawer(states, parent);
-		iconHolder  = new QVBoxLayout(parent);
+               drawer = new GameDrawer(states, parent);
+                drawer->setMouseTracking(true);
+                iconHolder  = new QVBoxLayout(parent);
 		lower = new QHBoxLayout();
 		upper = new QHBoxLayout();
 		iconHolder->insertLayout(0, lower);
 		iconHolder->insertSpacing(1, -1);
 		iconHolder->insertLayout(0, upper);
 		parent->setWindowTitle(QApplication::translate("childwidget", "Child widget"));
-		drawer->setMouseTracking(true);
 
-		label = new GameButton(states->getSim(), 0, parent);
-		label2 = new GameButton(states->getSim(), 0, parent);
+                slider = new GameSlider(states->getSim(), parent);
 
-		slider = new GameSlider(states->getSim(), parent);
+		label = new GameButton(states->getSim(), states, 0, slider, parent);
+		label2 = new GameButton(states->getSim(), states, 0, slider, parent);
 
-		label->setPixmap(QPixmap(":/graphics/temp/temp.png"));
-		label->resize(60,60);
+
+                label->setPixmap(QPixmap(":/graphics/temp/temp.png"));
+                label->resize(60,60);
 		label2->setPixmap(QPixmap(":/graphics/temp/temp2.png"));
 		label2->resize(60,60);
 		profiles[0] = QPixmap(":/graphics/profiles/test.png");
 		space = new QSpacerItem(parent->width(), 0, QSizePolicy::Expanding);
-		label->show();
-		label2->show();
 		lower->insertWidget(0, label);
 		lower->insertWidget(1, label2);
 		lower->insertSpacerItem(2, space);
 		lower->setAlignment(Qt::AlignBottom);
 		upper->setAlignment(Qt::AlignTop);
-		updateGUI();
+                updateGUI();
     }
-	void showAll() {
-		label->show();
-		label2->show();
-		drawer->show();
-		drawer->startTimers();
-		slider->show();
-		updateGUI();
+        void showAll() {
+                label->show();
+                label2->show();
+                drawer->show();
+                drawer->startTimers();
+                slider->show();
+                updateGUI();
 	}
 	void hideAll() {
-		label->hide();
-		label2->hide();
-		drawer->hide();
-		drawer->stopTimers();
-		slider->hide();
-		emptyGUI();
-	}
+                label->hide();
+                label2->hide();
+                drawer->hide();
+                drawer->stopTimers();
+                slider->hide();
+                emptyGUI();
+        }
 
 	void updateGUI() {
 		emptyGUI();
@@ -102,7 +101,7 @@ public:
 		}
 	}
 	void changeBot(int bot) {
-		updateGUI();
+                updateGUI();
 	}
 };
 

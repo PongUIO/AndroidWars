@@ -29,6 +29,16 @@ public slots:
 			qDebug() << "What on earth is this state? " << type;
 		}
 	}
+	void gameStep() {
+		if (!states->getRunning()) {
+			return;
+		} else if ( sim.hasPhaseStep() ) {
+			sim.step();
+		} else {
+			sim.endPhase(true);
+			states->setRunning(false);
+		}
+	}
 public:
 	QPalette *p;
 	bool fullScreen, gameRunning;
@@ -37,8 +47,11 @@ public:
 	ClientStates *states;
 	GameController *gc;
 	Sim::Simulation sim;
-	QSize size;
+        QSize size;
 	std::vector< std::vector<QWidget*> > menus;
+	QTimer *gameTimer;
+	double lastUpdate;
+
 	MainWidget (QWidget *parent = 0) : QWidget(parent) {
 		dispState = MENU;
 		subMenu = MAIN;
@@ -50,11 +63,14 @@ public:
 		p->setColor( QPalette::Background, Qt::black );
 		setPalette( *p );
 		gameRunning = false;
-		gc = new GameController(states, this);
-		gc->hideAll();
-		registerForResize(gc->drawer);
-		resize(700,700);
+                gc = new GameController(states, this);
+                gc->hideAll();
+                registerForResize(gc->drawer);
+                resize(700,700);
 		initMenus();
+		gameTimer = new QTimer(this);
+		connect(gameTimer, SIGNAL(timeout()), this, SLOT(gameStep()));
+		gameTimer->start(sim.getConfiguration().stepTime*1000);
 	}
 	void registerForResize(QWidget *target) {
 		res.push_back(target);
@@ -215,11 +231,11 @@ public:
 
 			using namespace Sim::Prog;
 			Sim::IdType moveId = inMgr.getProgramInput().buildInputImpl<MoveTowards>(
-			            MoveTowards::Config(MoveTowards::DtPosition, Sim::Vector(10,0)))->
-			        getId();
+						MoveTowards::Config(MoveTowards::DtPosition, Sim::Vector(10,0)))->
+					getId();
 
 			Kill *kill = inMgr.getProgramInput().buildInputImpl<Kill>(
-                        Kill::Config(moveId));
+						Kill::Config(moveId));
 			inMgr.getCpuInput().registerInput(botId, moveId, 0);
 			inMgr.getCpuInput().registerInput(botId, kill->getId(), 20);
 		}
