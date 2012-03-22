@@ -203,11 +203,11 @@ protected:
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
 		glColor4f(1.0f, 1.0f, 0.f, 1.0f);
-		glBegin(GL_TRIANGLES);
+		/*glBegin(GL_TRIANGLES);
 		glVertex3f(hitX,hitY,0);
 		glVertex3f(hitX,hitY+0.2,0);
 		glVertex3f(hitX+0.2,hitY+0.2,0);
-		glEnd();
+		glEnd();*/
 
 		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 		std::list<Sim::Bot*> bots = sim->getState().getBotFactory().getBotList();
