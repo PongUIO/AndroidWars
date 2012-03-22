@@ -59,14 +59,14 @@ public:
                 Sim::Vector temp = Sim::Vector( xPixToDouble(lastX), yPixToDouble(lastY))*(-fabs(dzoom*5));
                 //qDebug("%4.4f %4.4f\n", temp.x, temp.y);
                 pos += temp;
-        }	
+        }
 
 	double xToSimX(int x) {
-		return ((xPixToDouble(x))*zoom-pos.x)*2;
+		return ((xPixToDouble(x))*(zoom+1)*2-pos.x);
 	}
 
 	double yToSimY(int y) {
-		return ((yPixToDouble(y))*zoom*ratio-pos.y)*2;
+		return ((yPixToDouble(y))*(zoom+1)*ratio*2-pos.y);
 	}
 
         double xPixToDouble(int x) {

@@ -57,6 +57,7 @@ public:
 	Camera *cam;
         ClientStates *states;
         QTimer *glTimer, *camTimer;
+	double hitX, hitY;
         GameDrawer(ClientStates *states, QWidget *parent = 0)
                 : QGLWidget(QGLFormat(QGL::SampleBuffers), parent) {
                 this->parent = parent;
@@ -73,6 +74,7 @@ public:
                 connect(glTimer, SIGNAL(timeout()), this, SLOT(redraw()));
                 camTimer = new QTimer(parent);
                 connect(camTimer, SIGNAL(timeout()), this, SLOT(tick()));
+		hitX = hitY = 0;
         }
 
         void stopTimers() {
@@ -97,6 +99,8 @@ protected:
                 }
                 int w = width();
                 int h = height();
+		hitX = cam->xToSimX(event->x());
+		hitY = cam->yToSimY(event->y());
 		states->registerClick(cam->xToSimX(event->x()), cam->yToSimY(event->y()), event->button());
 	}
 
@@ -198,12 +202,14 @@ protected:
 		glTranslatef(cam->pos.x,cam->pos.y,-1-cam->zoom);
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
-		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+		glColor4f(1.0f, 1.0f, 0.f, 1.0f);
 		glBegin(GL_TRIANGLES);
-		glVertex3f(-10,-10,-1);
-		glVertex3f(10,10,-1);
-		glVertex3f(0,10,-1);
+		glVertex3f(hitX,hitY,0);
+		glVertex3f(hitX,hitY+0.2,0);
+		glVertex3f(hitX+0.2,hitY+0.2,0);
 		glEnd();
+
+		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 		std::list<Sim::Bot*> bots = sim->getState().getBotFactory().getBotList();
 		std::list<Sim::Bot*>::iterator bot;
 
