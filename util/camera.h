@@ -81,6 +81,12 @@ public:
 	int yDoubleToPix(double y) {
 		return (y+1)/yres-pos.y;
         }
+	int ySimLim(int i) {
+		return yToSimY(i*yres);
+	}
+	int xSimLim(int i) {
+		return xToSimX(i*yres);
+	}
 };
 #endif
 

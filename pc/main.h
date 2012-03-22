@@ -5,10 +5,12 @@
 #include<QWidget>
 #include<QDebug>
 #include<vector>
-#include"../util/client.h"
-#include"gamecontroller.h"
-#include"menubutton.h"
-#include"menudefines.h"
+#include<stdlib.h>
+#include "../util/client.h"
+#include "gamecontroller.h"
+#include "menubutton.h"
+#include "menudefines.h"
+#include "../extsim/ExtSim.h"
 
 class MainWidget : public QWidget {
 	Q_OBJECT
@@ -46,17 +48,19 @@ public:
 	int subMenu;
 	ClientStates *states;
 	GameController *gc;
-	Sim::Simulation sim;
+	ExtS::ExtSim eSim;
+	Sim::Simulation &sim;
         QSize size;
 	std::vector< std::vector<QWidget*> > menus;
 	QTimer *gameTimer;
 	double lastUpdate;
 
-	MainWidget (QWidget *parent = 0) : QWidget(parent) {
+	MainWidget (QWidget *parent = 0) : QWidget(parent), sim(eSim.getSim()) {
 		dispState = MENU;
 		subMenu = MAIN;
 		//grabKeyboard();
 		states = new ClientStates();
+		loadFiles("../data/");
 		initSim();
 		fullScreen = false;
 		p = new QPalette( this->palette() );
@@ -71,6 +75,20 @@ public:
 		gameTimer = new QTimer(this);
 		connect(gameTimer, SIGNAL(timeout()), this, SLOT(gameStep()));
 		resetTimer();
+	}
+	void loadFiles(QString path) {
+		eSim.switchDataContext(ExtS::ExtData::ListenerContext(ExtS::ExtData::LcContentLoading |ExtS::ExtData::LcDataLoading));
+		QDir dir(path);
+		QStringList filters;
+		filters << "*.da";
+		QStringList files = dir.entryList(filters);
+		for (QStringList::Iterator iter = files.begin(); iter != files.end(); ++iter) {
+			QFile f(path + *iter);
+			f.open(QFile::QIODevice::ReadOnly);
+			eSim.loadDataScript(std::string(f.readAll()));
+		}
+		eSim.postProcessData();
+
 	}
 	void resetTimer() {
 		gameTimer->stop();
@@ -215,8 +233,7 @@ public:
 		cpts.push_back(Sim::Vector(1.3,1.8));
 		cpts.push_back(Sim::Vector(1.3,0));
 
-		sim.getData().getBotDb().addBot(myBot, cpts);
-
+		//sim.getData().getBotDb().addBot(myBot, cpts);
 		// Create a test bot
 		Sim::Bot::Config botCfg;
 		botCfg.mSide = 0;

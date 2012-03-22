@@ -204,9 +204,9 @@ protected:
 		glLoadIdentity();
 		glColor4f(1.0f, 1.0f, 0.f, 1.0f);
 		/*glBegin(GL_TRIANGLES);
-		glVertex3f(hitX,hitY,0);
-		glVertex3f(hitX,hitY+0.2,0);
-		glVertex3f(hitX+0.2,hitY+0.2,0);
+		glVertex3f(hitX,hitY,-1);
+		glVertex3f(hitX,hitY+1,0);
+		glVertex3f(hitX+1,hitY+1,0);
 		glEnd();*/
 
 		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
@@ -233,7 +233,28 @@ protected:
 			glEnable(GL_TEXTURE_2D);*/
 
 		}
-		glDisable(GL_TEXTURE_2D);
+
+		float mx = cam->xPixToDouble(lastX);
+		float my = cam->yPixToDouble(lastY);
+		int mt;
+		int fx = 0;//cam->xSimLim(0);
+		int tx = 16;//cam->xSimLim(1)+1;
+		int fy = 0;//cam->ySimLim(1);
+		int ty = 8;//cam->ySimLim(0)+1;
+		for (i = fx; i < tx; i++) {
+			for (j = fy; j < ty; j++) {
+				mt = wld->getTile(i, j).getType();
+				printf("%d ", mt);
+				if (mt == 0) {
+					continue;
+				}
+				//glTexSubImage2D(GL_TEXTURE_2D, 0, 0,0 , data[mt].width(), data[mt].height(),  GL_RGBA, GL_UNSIGNED_BYTE, data[mt].bits() );
+				glBindTexture(GL_TEXTURE_2D, textures[mt]);
+				drawTexObj3d(i, j, i+1, j+1, 0);
+			}
+			printf("\n", mt);
+
+		}
 
 		glDisable(GL_TEXTURE_2D);
 		glColor4f(0.2f, 1.0f, 0.2f, selAlpha);
@@ -244,40 +265,6 @@ protected:
 				drawObj3d(pos.x, pos.y, pos.x+col.x, pos.y+col.y,0);
 			}
 		}
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
-		glOrtho(-cam->zoom, cam->zoom, -cam->zoom*cam->ratio, cam->zoom*cam->ratio, 0.01, 1000);
-		glTranslatef(cam->pos.x,cam->pos.y,-1);
-		glMatrixMode(GL_MODELVIEW);
-		glLoadIdentity();
-		glEnable(GL_TEXTURE_2D);
-		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-
-		float mx = cam->xPixToDouble(lastX);
-		float my = cam->yPixToDouble(lastY);
-		int mt;
-		int fx = -cam->pos.x-cam->zoom-1;
-		int tx = -cam->pos.x+cam->zoom+1;
-		int fy = -cam->pos.y-cam->zoom*cam->ratio-1;
-		int ty = -cam->pos.y+cam->zoom*cam->ratio+1;
-		for (i = fx; i < tx; i++) {
-			for (j = fy; j < ty; j++) {
-				mt = wld->getTile(i, j).getType();
-				if (mt == 0) {
-					continue;
-				}
-				//glTexSubImage2D(GL_TEXTURE_2D, 0, 0,0 , data[mt].width(), data[mt].height(),  GL_RGBA, GL_UNSIGNED_BYTE, data[mt].bits() );
-				glBindTexture(GL_TEXTURE_2D, textures[mt]);
-				drawTexObj2d(i, j, i+1, j+1);
-			}
-
-		}
-
-
-		glEnable(GL_TEXTURE_2D);
-
-		glLoadIdentity();
-		glDisable(GL_TEXTURE_2D);
 		glDisable(GL_BLEND);
 		glFlush();
 		glFinish();
