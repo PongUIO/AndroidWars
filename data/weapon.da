@@ -1,0 +1,35 @@
+#WEAPON
+	Name "SR Rocket"
+	Base "Ext/RocketWeapon"
+	Size Medium
+	BaseDamage "Rocket"
+	
+	Description {
+		Fires a single short-range rocket.
+	}
+	
+	Comment {
+		Data within this describe the parameters (and possible constraints)
+		related to creating a weapon.
+	}
+	#CREATERULE
+		#PARAM
+			Damage 5
+			ReloadTime 10
+		#
+	#
+	
+	Comment {
+		Data within this describe the parameters that may be altered when
+		firing the weapon. Used to set things like range and similar.
+	}
+	#FIRERULE
+		#PARAM
+			Range 5
+		#
+		
+		#CONSTRAINT
+			Range "1>10"
+		#
+	#
+#

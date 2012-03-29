@@ -20,6 +20,7 @@ add_library(AWExtSim
 	datatype/ExtDamage.cpp
 	datatype/ExtBot.cpp
 	datatype/ExtProgram.cpp
+	datatype/ExtWeapon.cpp
 	)
 target_link_libraries(AWExtSim AWSim)
 

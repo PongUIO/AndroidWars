@@ -14,6 +14,7 @@ namespace ExtS {
 		mDamage(esim),
 		mBot(esim),
 		mProgram(esim),
+		mWeapon(esim),
 		mGame(esim),
 		mMap(esim),
 		
@@ -24,6 +25,7 @@ namespace ExtS {
 		registerListener("DAMAGE", Listener(&mDamage, LcDataLoading) );
 		registerListener("BOT", Listener(&mBot, LcDataLoading) );
 		registerListener("PROGRAM", Listener(&mProgram, LcDataLoading) );
+		registerListener("WEAPON", Listener(&mWeapon, LcDataLoading) );
 		registerListener("GAME", Listener(&mGame, LcDataLoading) );
 		
 		registerListener("MAP", Listener(&mMap, LcContentLoading) );

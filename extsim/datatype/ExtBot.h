@@ -14,7 +14,7 @@ namespace Sim
 namespace ExtS {
 	class ExtBotData;
 	
-	class ExtBot {
+	class ExtBot : public ExtBaseDataObj {
 		public:
 			struct WeaponSlot {
 				WeaponSlot(const std::string &type) : mType(type) {}
@@ -25,21 +25,22 @@ namespace ExtS {
 			ExtBot();
 			~ExtBot();
 			
-			void loadBlock(ExtBotData &host, Script::Block &block);
-			void postProcess(ExtBotData &host, Sim::Simulation &sim);
+			void loadBlock(Script::Block &block, TypeRule *rule);
+			void postProcess(ExtSim &extsim);
 			
-			const std::string &getName() const { return mName; }
-			const std::string &getDescription() const { return mDescription; }
+			//const std::string &getName() const { return mName; }
+			//const std::string &getDescription() const { return mDescription; }
 			
 			uint32_t getBaseCost() const { return mBaseCost; }
+			//Sim::IdType getId() const { return mId; }
 			
 		private:
 			/// @name Extended data
 			//@{
-				Sim::IdType mId;
+				/*Sim::IdType mId;
 				
 				std::string mName;
-				std::string mDescription;
+				std::string mDescription;*/
 				
 				uint32_t mBaseCost;
 			//@}
@@ -54,7 +55,7 @@ namespace ExtS {
 				struct HealthHull : public Sim::Health::Hull {
 					std::string mType;
 					
-					void loadData(ExtBotData &host, Script::Data &data);
+					void loadData(Script::Data &data);
 					void postProcess(Sim::ArmorDatabase &armorDb);
 				};
 				typedef std::vector<HealthHull> AttachmentVec;
@@ -76,8 +77,8 @@ namespace ExtS {
 			void startup() {}
 			void shutdown() {}
 			
-			void loadBlock(Script::Block& block);
-			void postProcess();
+			void setupObject(Script::Block& block,
+				TypeRule* rule, ExtBot* obj);
 			
 		private:
 			void loadSimBot(Script::Block& block, Sim::BotD *simBot);

@@ -117,6 +117,13 @@ class Script {
 					else return i->second;
 				}
 				
+				Block *getBlockSimple(const std::string &id) {
+					BlockMap::iterator i= mBlock.find(id);
+					if(i == mBlock.end())
+						return createBlock(id);
+					return i->second;
+				}
+				
 				Block *createBlock(
 					const std::string &id,
 					size_t line=0, size_t col=0)

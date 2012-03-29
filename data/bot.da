@@ -160,23 +160,3 @@
 		Health 150
 	#
 #
-
-#WEAPON
-	Name "SR Rocket"
-	Base "Ext/RocketWeapon"
-	Size Medium
-	BaseDamage "Rocket"
-	
-	Description {
-		Fires a single short-range rocket.
-	}
-	
-	#PARAM
-		Damage 5
-		ReloadTime 10
-	#
-	
-	#CONSTRAINT
-		Range "1>10"
-	#
-#

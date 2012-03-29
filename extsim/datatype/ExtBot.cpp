@@ -9,29 +9,26 @@ namespace ExtS {
 	//
 	//
 	ExtBotData::ExtBotData(ExtSim &esim): DefaultExtData<ExtBot>(esim)
-	{}
+	{
+		mIgnoreRule=true;
+	}
 	
 	ExtBotData::~ExtBotData()
 	{}
 	
-	void ExtBotData::loadBlock(Script::Block& block)
+	void ExtBotData::setupObject(Script::Block& block,
+		TypeRule* rule, ExtBot* obj)
 	{
-		const std::string &name = block.getDataFirst("Name");
-		if(name.empty())
-			return;
-		
-		// Create the sim/extsim data pair
+		// Create the corresponding sim object
 		Sim::BotD *simData =
 			mExtSim.getSim().getData().getBotDb().createType();
-		ExtBot *extData = createType();
-		extData->mSimData = simData;
 		
-		// Fill extsim with data
-		extData->loadBlock(*this, block);
+		obj->mSimData = simData;
+		obj->loadBlock(block, 0);
 		
-		// Fill core simulation data
 		loadSimBot(block, simData);
 	}
+
 	
 	void ExtBotData::loadSimBot(Script::Block& block, Sim::BotD *simBot)
 	{
@@ -48,27 +45,19 @@ namespace ExtS {
 		simBot->setCollision(new Sim::Collision(pts));
 	}
 	
-	void ExtBotData::postProcess()
-	{
-		for(DataVec::iterator i=mData.begin(); i!=mData.end(); ++i) {
-			(*i)->postProcess(*this, mExtSim.getSim());
-		}
-	}
-
-	
 	// ExtBot
 	//
 	//
 	ExtBot::ExtBot() {}
 	ExtBot::~ExtBot() {}
 	
-	void ExtBot::loadBlock(ExtBotData &host, Script::Block& block)
+	void ExtBot::loadBlock(Script::Block& block, TypeRule* rule)
 	{
+		// Load standard data
+		ExtBaseDataObj::loadBlock(block, rule);
+		
 		// Load extended data
 		{
-			mName = block.getDataFirst("Name");
-			mDescription = block.getDataFirst("Description");
-			
 			mBaseCost = ExtData::readValue<uint32_t>(
 				block.getDataFirst("BaseCost"), 0);
 			
@@ -90,7 +79,7 @@ namespace ExtS {
 		// Load temporary data
 		{
 			// Load attachments
-			mCoreHealth.loadData(host, block.getDataSimple("Health"));
+			mCoreHealth.loadData(block.getDataSimple("Health"));
 			
 			Script::Block *atmBlock = block.getBlock("ATTACHMENTS");
 			if(atmBlock) {
@@ -98,16 +87,18 @@ namespace ExtS {
 					Script::Data *healthData = atmBlock->getDataIndex(hi);
 					if(healthData) {
 						mAttachmentHealth.push_back(HealthHull());
-						mAttachmentHealth.back().loadData(host, *healthData);
+						mAttachmentHealth.back().loadData(*healthData);
 					}
 				}
 			}
 		}
 	}
 	
-	void ExtBot::postProcess(ExtBotData& host, Sim::Simulation& sim)
+	void ExtBot::postProcess(ExtSim& extsim)
 	{
-		Sim::ArmorDatabase &armorDb = sim.getData().getArmorDb();
+		ExtBaseDataObj::postProcess(extsim);
+		
+		Sim::ArmorDatabase &armorDb = extsim.getSim().getData().getArmorDb();
 		
 		mCoreHealth.postProcess(armorDb);
 		mSimData->coreHealth.getCore() = mCoreHealth;
@@ -123,7 +114,7 @@ namespace ExtS {
 	// ExtBot::HealthHull
 	//
 	//
-	void ExtBot::HealthHull::loadData(ExtBotData &host, Script::Data& data)
+	void ExtBot::HealthHull::loadData(Script::Data& data)
 	{
 		mType = data.getArg(0);
 		

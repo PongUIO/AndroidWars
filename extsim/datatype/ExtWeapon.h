@@ -4,15 +4,31 @@
 #include "../ExtBaseData.h"
 
 namespace ExtS {
-	class ExtWeaponData : public ExtBaseData {
+	class ExtWeapon : public ExtBaseDataObj {
 		public:
-			ExtWeaponData(Sim::Simulation& sim);
-			virtual ~ExtWeaponData();
+			ExtWeapon();
+			~ExtWeapon();
 			
-			void loadBlock(Script::Block& block);
-			void postProcess() {}
+			void loadBlock(Script::Block &block, TypeRule *rule);
+			void postProcess(ExtSim &extsim);
 			
 		private:
+			std::string mSizeType;
+			std::string mBaseDamageStr;
+			
+			Sim::IdType mBaseDamageType;
+	};
+	
+	class ExtWeaponData : public DefaultExtData<ExtWeapon> {
+		public:
+			ExtWeaponData(ExtSim& esim);
+			virtual ~ExtWeaponData();
+			
+			Script::Block &getTypeRuleBlock(Script::Block& block)
+			{ return *block.getBlockSimple("CREATERULE"); }
+			
+			void startup() {}
+			void shutdown() {}
 	};
 }
 

@@ -1,23 +1,48 @@
 #include "ExtWeapon.h"
 
+#include "../ExtSim.h"
+
 #include "../../simulation/Simulation.h"
 #include "../../simulation/data/WeaponD.h"
 
 namespace ExtS {
-	ExtWeaponData::ExtWeaponData(Sim::Simulation& sim): BaseData(sim)
-	{}
+	// ExtWeaponData
+	//
+	//
+	ExtWeaponData::ExtWeaponData(ExtSim &esim) :
+		DefaultExtData<ExtWeapon>(esim)
+	{
+		
+	}
 	
 	ExtWeaponData::~ExtWeaponData()
+	{
+		
+	}
+	
+	// ExtProgram
+	//
+	//
+	ExtWeapon::ExtWeapon()
+	{}
+
+	ExtWeapon::~ExtWeapon()
 	{}
 	
-	void ExtWeaponData::loadBlock(Script::Block& block)
+	void ExtWeapon::loadBlock(Script::Block& block, TypeRule* rule)
 	{
-		Sim::WeaponDatabase &weapDb = mSim.getData().getWeaponDb();
+		ExtBaseDataObj::loadBlock(block, rule);
 		
-		const std::string &name = block.getDataFirst("Name");
-		if(name.empty() || weapDb.getType(name)!=0)
-			return;
+		mSizeType = block.getDataFirst("Size");
+		mBaseDamageStr = block.getDataFirst("BaseDamage");
+	}
+	
+	void ExtWeapon::postProcess(ExtSim& extsim)
+	{
+		ExtBaseDataObj::postProcess(extsim);
 		
+		mBaseDamageType = extsim.getSim().getData().
+			getDamageDb().getIdOf(mBaseDamageStr);
 	}
 	
 }

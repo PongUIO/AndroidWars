@@ -22,6 +22,7 @@ namespace ExtS {
 	_EXTS_X(ExtDamageData, Damage) \
 	_EXTS_X(ExtBotData, Bot) \
 	_EXTS_X(ExtProgramData, Program) \
+	_EXTS_X(ExtWeaponData, Weapon) \
 	_EXTS_X(ExtGameData, Game) \
 	_EXTS_X(ExtMapData, Map)
 	

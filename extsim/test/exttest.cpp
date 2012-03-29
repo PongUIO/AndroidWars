@@ -158,6 +158,8 @@ void listBot()
 		
 		printExtBot(extBot);
 		printSimBot(simBot);
+		
+		std::cout << "\n";
 	}
 }
 
