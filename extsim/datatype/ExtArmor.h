@@ -20,6 +20,8 @@ namespace ExtS {
 			void loadBlock(Script::Block& block);
 			void postProcess();
 			
+			Sim::IdType size();
+			
 		private:
 			struct RuleData {
 				Sim::ArmorD *mSrc;

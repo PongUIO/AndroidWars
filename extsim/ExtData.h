@@ -96,7 +96,7 @@ namespace ExtS {
 				ListenerMap mListeners;
 				ListenerContext mCurrentContext;
 				
-				ExtSim &mExtSim;
+				ExtSim *mExtSim;
 			//@}
 			
 			

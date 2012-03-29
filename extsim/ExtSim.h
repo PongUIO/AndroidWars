@@ -42,6 +42,8 @@ namespace ExtS {
 				{ mData.switchContext(context); }
 				
 				void prepareSim();
+				
+				void reset();
 			//@}
 			
 			/// @name Module accessors

@@ -19,7 +19,7 @@ namespace ExtS {
 		mMap(esim),
 		
 		mCurrentContext(LcNone),
-		mExtSim(esim)
+		mExtSim(&esim)
 	{
 		registerListener("ARMOR", Listener(&mArmor, LcDataLoading) );
 		registerListener("DAMAGE", Listener(&mDamage, LcDataLoading) );

@@ -21,7 +21,7 @@ namespace ExtS {
 	{
 		mSim.startup();
 	}
-
+	
 	void ExtSim::shutdown()
 	{
 		mSim.shutdown();
@@ -30,5 +30,16 @@ namespace ExtS {
 	void ExtSim::prepareSim()
 	{
 		mSim.prepareSim();
+	}
+	
+	/**
+	 * Resets the extended simulation to a state as if it
+	 * was just constructed. Effectively clearing out any changes
+	 * since it was first created.
+	 */
+	void ExtSim::reset()
+	{
+		this->~ExtSim();
+		new(this) ExtSim();
 	}
 }

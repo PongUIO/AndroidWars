@@ -178,6 +178,9 @@ namespace Sim {
 			const std::string getNameOf(IdType id) const
 			{ return mNameIdMgr.getNameOf(id); }
 			
+			IdType size() const
+			{ return mInternal.size(); }
+			
 		private:
 			/**
 			 * Automatically provides an implementation for object creation.

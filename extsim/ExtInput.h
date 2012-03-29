@@ -49,7 +49,7 @@ namespace ExtS {
 	
 	class ExtInputObj {
 		public:
-			ExtInputObj(ExtInput &parent) : mParent(parent) {}
+			ExtInputObj(ExtInput &parent) : mParent(&parent) {}
 			virtual ~ExtInputObj() {}
 			
 			virtual void startup()=0;
@@ -85,7 +85,7 @@ namespace ExtS {
 			virtual uint32_t getLastConstraintViolationCount()=0;
 			
 		protected:
-			ExtInput &mParent;
+			ExtInput *mParent;
 	};
 	
 	class InputData {
@@ -113,14 +113,14 @@ namespace ExtS {
 		public:
 			ExtFactoryInput(ExtInput& parent, ExtSim &extsim,
 				Sim::Simulation *sim) : ExtInputObj(parent),
-				mExtSim(extsim), mViolationCounter(0), mBuffer() {}
+				mExtSim(&extsim), mViolationCounter(0), mBuffer() {}
 			virtual ~ExtFactoryInput() {}
 			
 			void startup() {}
 			void shutdown() {}
 			
 			InputData buildInput(Sim::IdType id) {
-				DB &data = getExtDataComponent<DB>(mExtSim);
+				DB &data = getExtDataComponent<DB>(*mExtSim);
 				
 				const typename DB::DataType *obj = data.getDataById(id);
 				if(obj)
@@ -162,7 +162,7 @@ namespace ExtS {
 					return;
 				}
 				
-				DB &data = getExtDataComponent<DB>(mExtSim);
+				DB &data = getExtDataComponent<DB>(*mExtSim);
 				
 				while(mBuffer.hasInput()) {
 					Sim::Save saveObj = mBuffer.nextInput();
@@ -184,13 +184,13 @@ namespace ExtS {
 					ParamList *param = rule->makeParam();
 					fp >> *param;
 					
-					if(!rule->checkConstrained(param,mExtSim)) {
+					if(!rule->checkConstrained(param,*mExtSim)) {
 						mViolationCounter++;
 						continue;
 					}
 					
 					// Build simulation input
-					rule->makeInput(mExtSim, param);
+					rule->makeInput(*mExtSim, param);
 				}
 			}
 			
@@ -202,7 +202,7 @@ namespace ExtS {
 			virtual bool isValidMode(InputConstraintMode mode)=0;
 			
 		private:
-			ExtSim &mExtSim;
+			ExtSim *mExtSim;
 			
 			uint32_t mViolationCounter;
 			Sim::InputBuffer<Sim::Save> mBuffer;
@@ -262,7 +262,7 @@ namespace ExtS {
 				Sim::IdType playerId=Sim::NoId)
 			{ mConstraintMode=mode; mPlayerId=playerId; }
 			
-			ExtSim &getExtSim() { return mExtSim; }
+			ExtSim &getExtSim() { return *mExtSim; }
 			
 			/// @name Components
 			//@{
@@ -275,7 +275,7 @@ namespace ExtS {
 			//@}
 			
 		private:
-			ExtSim &mExtSim;
+			ExtSim *mExtSim;
 			
 			/// @name Input managers
 			//@{

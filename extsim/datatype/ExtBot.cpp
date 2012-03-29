@@ -21,7 +21,7 @@ namespace ExtS {
 	{
 		// Create the corresponding sim object
 		Sim::BotD *simData =
-			mExtSim.getSim().getData().getBotDb().createType();
+			mExtSim->getSim().getData().getBotDb().createType();
 		
 		obj->mSimData = simData;
 		obj->loadBlock(block, 0);

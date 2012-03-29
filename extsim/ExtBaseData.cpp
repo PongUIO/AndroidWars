@@ -9,9 +9,12 @@ namespace ExtS {
 		mName = block.getDataFirst("Name");
 		mDescription = block.getDataFirst("Description");
 		
-		if(mRule)
-			delete mRule;
-		mRule = rule;
+		if(rule) {
+			if(mRule)
+				delete mRule;
+			
+			mRule = rule;
+		}
 	}
 	
 	void ExtBaseDataObj::postProcess(ExtSim& extsim)

@@ -30,7 +30,7 @@ namespace ExtS {
 
 	void ExtGameData::postProcess()
 	{
-		mExtSim.getSim().getConfiguration().stepTime = mStepTime;
+		mExtSim->getSim().getConfiguration().stepTime = mStepTime;
 	}
 
 }

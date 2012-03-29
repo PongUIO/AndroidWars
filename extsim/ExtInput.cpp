@@ -11,7 +11,7 @@ namespace ExtS {
 	// ExtInput
 	//
 	//
-	ExtInput::ExtInput(ExtSim& esim) : mExtSim(esim),
+	ExtInput::ExtInput(ExtSim& esim) : mExtSim(&esim),
 		mProgram(*this,esim,&esim.getSim()),
 		
 		mConstraintMode(IcmNone),

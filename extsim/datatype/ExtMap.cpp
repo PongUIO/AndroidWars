@@ -23,12 +23,12 @@ namespace ExtS {
 	
 	void ExtMapData::loadBlock(Script::Block& block)
 	{
-		mExtSim.getSim().getConfiguration().tileSize =
+		mExtSim->getSim().getConfiguration().tileSize =
 			ExtData::readValue<double>(block.getDataFirst("TileSize"), 1.0);
 		
 		// Read tile types
 		{
-			Sim::TileDatabase &tileDb = mExtSim.getSim().getData().getTileDb();
+			Sim::TileDatabase &tileDb = mExtSim->getSim().getData().getTileDb();
 			
 			Script::Block *ttBlock = block.getBlock("TILE");
 			if(ttBlock) {
@@ -55,7 +55,7 @@ namespace ExtS {
 		height = ExtData::readValue<uint32_t>(
 			block.getDataFirst("Height"), 16);
 		
-		mExtSim.getSim().getState().getWorld().setDimensions(width,height);
+		mExtSim->getSim().getState().getWorld().setDimensions(width,height);
 		
 		// Read tile data
 		{
@@ -75,7 +75,7 @@ namespace ExtS {
 						ExtData::readValue<uint32_t>(tile[x], 0);
 					
 					if(x<width && y<height) {
-						mExtSim.getSim().getState().getWorld().getTile(x,y).
+						mExtSim->getSim().getState().getWorld().getTile(x,y).
 						setType(tileId);
 					}
 				}

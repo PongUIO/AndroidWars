@@ -18,7 +18,7 @@ namespace ExtS {
 			return;
 		
 		Sim::ArmorD *armorType =
-			mExtSim.getSim().getData().getArmorDb().newArmor(name);
+			mExtSim->getSim().getData().getArmorDb().newArmor(name);
 		
 		RuleData::Rule defaultRule = loadRuleData(block.getDataSimple("Default"), false);
 		armorType->setDefaultRule(defaultRule);
@@ -44,7 +44,7 @@ namespace ExtS {
 	void ExtArmorData::postProcess()
 	{
 		Sim::DamageDatabase &damageDb =
-			mExtSim.getSim().getData().getDamageDb();
+			mExtSim->getSim().getData().getDamageDb();
 		
 		for(RuleDataVec::iterator i=mRuleData.begin(); i!=mRuleData.end(); i++) {
 			RuleData &data = *i;

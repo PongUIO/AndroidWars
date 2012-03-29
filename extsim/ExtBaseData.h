@@ -18,7 +18,7 @@ namespace ExtS {
 	 */
 	class ExtBaseData {
 		public:
-			ExtBaseData(ExtSim &sim) : mExtSim(sim) {}
+			ExtBaseData(ExtSim &sim) : mExtSim(&sim) {}
 			virtual ~ExtBaseData() {}
 			
 			virtual void startup()=0;
@@ -29,7 +29,7 @@ namespace ExtS {
 			virtual void postProcess()=0;
 			
 		protected:
-			ExtSim &mExtSim;
+			ExtSim *mExtSim;
 	};
 	
 	/**
@@ -83,12 +83,13 @@ namespace ExtS {
 				}
 				// If an object already has been allocated with this name:
 				// - Get the previously allocated object
+				// (The new data is appended to this object)
 				else {
 					extObj = Sim::DataCtr<T>::rawGet(id);
 				}
 				
 				// Load data into this object
-				extObj->mExtSim = &mExtSim;
+				extObj->mExtSim = mExtSim;
 				setupObject(block, rule, extObj);
 			}
 			
@@ -96,7 +97,7 @@ namespace ExtS {
 				for(typename Sim::DataCtr<T>::DataVec::iterator i=
 					Sim::DataCtr<T>::mData.begin();
 					i!=Sim::DataCtr<T>::mData.end(); ++i) {
-					(*i)->postProcess(mExtSim);
+					(*i)->postProcess(*mExtSim);
 				}
 			}
 			
