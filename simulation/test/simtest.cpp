@@ -113,23 +113,25 @@ void loadTiles()
 void loadBots()
 {
 	// Create a test bot type
-	Sim::BotD botType;
+	Sim::BotD *botType = new Sim::BotD();
 	Sim::Collision::ColPoints pts;
 	pts.push_back(Sim::Vector(0,0));
 	pts.push_back(Sim::Vector(0,1));
 	pts.push_back(Sim::Vector(1,1));
 	pts.push_back(Sim::Vector(1,0));
 	
-	botType.baseSpeed = 1.0;
-	botType.baseWeight = 75.0;
+	botType->setCollision(new Sim::Collision(pts));
 	
-	botType.cpuCycleSpeed = 5;
-	botType.cpuStorage = 20;
+	botType->baseSpeed = 1.0;
+	botType->baseWeight = 75.0;
 	
-	botType.coreHealth.getCore() = Sim::Health::Hull(0, 50);
-	botType.coreHealth.addAttachment( Sim::Health::Hull(1, 5) );
+	botType->cpuCycleSpeed = 5;
+	botType->cpuStorage = 20;
 	
-	sim.getData().getBotDb().addBot(botType, pts);
+	botType->coreHealth.getCore() = Sim::Health::Hull(0, 50);
+	botType->coreHealth.addAttachment( Sim::Health::Hull(1, 5) );
+	
+	sim.getData().getBotDb().registerCustom(botType, "Base");
 }
 
 void loadWeapons()
@@ -156,6 +158,7 @@ void setupWorld()
 	
 	
 	
+	
 	// Create a test bot
 	Sim::Bot::Config botCfg;
 	DemoWeapon::Config weapCfg;
@@ -177,7 +180,8 @@ void setupWorld()
 		botCfg.mWeapon.addWeapon( weapId );
 	}
 	
-	Sim::IdType botId = sim.getInput().getBotInput().buildInput( botCfg )->getId();
+	Sim::IdType botId = sim.getInput().getBotInput().buildInputImpl<Sim::BaseBot>(
+		botCfg)->getId();
 	
 	// Create a second dummy bot
 	botCfg = Sim::Bot::Config();
@@ -185,7 +189,7 @@ void setupWorld()
 	botCfg.mType = 0;
 	botCfg.mBody.mPos = Sim::Vector(50,50);
 	
-	sim.getInput().getBotInput().buildInput( botCfg );
+	sim.getInput().getBotInput().buildInputImpl<Sim::BaseBot>(botCfg);
 	
 	// Give the bot some input
 	{
@@ -294,7 +298,7 @@ int main(void)
 			botCfg.mType = 0;
 			botCfg.mBody.mPos = Sim::Vector(5,25);
 				
-			botIn.buildInput( botCfg );
+			botIn.buildInputImpl<Sim::BaseBot>( botCfg );
 		}
 	}
 	

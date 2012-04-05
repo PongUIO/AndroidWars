@@ -153,7 +153,7 @@ void listBot()
 	
 	printf("Bot type list:\n");
 	for(unsigned int i=0; i<simBotDb.size(); i++) {
-		const Sim::BotD *simBot = simBotDb.getDataById(i);
+		const Sim::BotD *simBot = static_cast<const Sim::BotD*>(simBotDb.getType(i));
 		const ExtS::ExtBot *extBot = extBotDb.getDataById(i);
 		
 		printExtBot(extBot);
@@ -206,7 +206,7 @@ void setupWorld()
 	botCfg.mType = 0;
 	botCfg.mBody.mPos = Sim::Vector(0,0);
 	
-	sim.getInput().getBotInput().buildInput( botCfg );
+	sim.getInput().getBotInput().buildInputImpl<Sim::BaseBot>( botCfg );
 }
 
 void testSim()

@@ -20,8 +20,8 @@ namespace ExtS {
 		TypeRule* rule, ExtBot* obj)
 	{
 		// Create the corresponding sim object
-		Sim::BotD *simData =
-			mExtSim->getSim().getData().getBotDb().createType();
+		Sim::BotD *simData = new Sim::BotD();
+		mExtSim->getSim().getData().getBotDb().registerCustom(simData, "Base");
 		
 		obj->mSimData = simData;
 		obj->loadBlock(block, 0);

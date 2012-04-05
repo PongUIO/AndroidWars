@@ -6,12 +6,14 @@
 namespace Sim {
 	class BaseBot : public Bot {
 		public:
-			const std::string &getTypeName() {
+			static const std::string &getTypeName() {
 				static std::string typeName = "Base";
 				return typeName;
 			}
 			
-			BaseBot(
+		BaseBot(Simulation* sim, IdType id, IdType typeId,
+			const Bot::State& cfg = State()) : Bot(sim,id,typeId,cfg) {}
+		~BaseBot() {}
 	};
 }
 

@@ -73,12 +73,12 @@ namespace Sim {
 		}
 	}
 	
-	const Sim::BotD* Bot::getTypePtr() const
+	const BotD* Bot::getTypePtr() const
 	{
-		return mSim->getData().getBotDb().getDataById(mTypeId);
+		return static_cast<const BotD*>(mSim->getData().getBotDb().getType(mTypeId));
 	}
 	
-	Sim::Player* Bot::getPlayerPtr() const
+	Player* Bot::getPlayerPtr() const
 	{
 		return &mSim->getState().getPlayerData().getPlayer(mState.mSide);
 	}
@@ -130,15 +130,15 @@ namespace Sim {
 		DefaultUidFactory<Bot>::shutdown();
 	}
 	
-	IdType BotFactory::createBot(const Bot::Config &cfg, IdType typeId)
+	/*IdType BotFactory::createBot(const Bot::Config &cfg)
 	{
 		BotFactory::InsertData insData = insertObject();
 		
-		Bot *bot = new Bot(mSim, typeId, insData.first, cfg);
+		Bot *bot = new Bot(mSim, insData.first, cfg);
 		*insData.second = bot;
 		
 		return insData.first;
-	}
+	}*/
 	
 	void BotFactory::step(double stepTime)
 	{

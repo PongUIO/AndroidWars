@@ -9,13 +9,11 @@ namespace Sim {
 		cpuCycleSpeed(10),
 		cpuStorage(20),
 		
-		coreHealth(0,1),
-		
-		collision(NULL)
+		coreHealth(0,1)
 	{
 	}
 	
-	BotD::~BotD()
+	/*BotD::~BotD()
 	{
 		if(collision)
 			delete collision;
@@ -30,5 +28,5 @@ namespace Sim {
 			sync.writeFloat(d->baseWeight);
 			d->getCollision()->save(sync);
 		}
-	}
+	}*/
 }

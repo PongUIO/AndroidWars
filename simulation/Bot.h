@@ -66,6 +66,7 @@ namespace Sim {
 						mCpu(), mAbility(), mEngine()
 						{}
 					
+					IdType mType;
 					IdType mSide;
 					
 					SensorState mSensor;
@@ -143,132 +144,6 @@ namespace Sim {
 			friend class BotWeapon;
 	};
 	
-	/*class Bot {
-		public:
-			typedef BotDatabase TypeDatabase;
-			
-			**
-			 * Contains information about the state of bot "sensors".
-			 * 
-			 * These are various variables that aid a bot in knowing what
-			 * happens around it, whether it was hit the previous step, etc.
-			 /
-			struct SensorState : private Save::OperatorImpl<SensorState> {
-				IdType mTargetBot;
-				bool mWasHit;
-				
-				void save(Save::BasePtr &fp) const
-					{ fp << mTargetBot << mWasHit; }
-				void load(Save::BasePtr &fp)
-					{ fp >> mTargetBot >> mWasHit; }
-			};
-			
-			**
-			 * Contains temporary information about the bot's
-			 * planned movement.
-			 /
-			struct Engine {
-				double mStrength;
-				Vector mDirection;
-			};
-			
-			**
-			 * Stores information about a bot's current state.
-			 * 
-			 * This includes things such as position, velocity, health,
-			 * cpu, abilities, etc.
-			 /
-			struct State : private Save::OperatorImpl<State> {
-				public:
-					State() : mSide(0),
-						mSensor(), mBody(), mWeapon(),
-						mCpu(), mAbility(), mEngine()
-						{}
-					
-					IdType mSide;
-					
-					SensorState mSensor;
-					Body mBody;
-					Health mHealth;
-					
-					BotWeapon mWeapon;
-					BotCpu mCpu;
-					BotAbility mAbility;
-					Engine mEngine;
-					
-					void save(Save::BasePtr &fp) const;
-					void load(Save::BasePtr &fp);
-			};
-			typedef State Config;
-			
-			Bot(Simulation *sim, IdType id, IdType typeId, const State &cfg=State());
-			~Bot();
-			
-			IdType getId() const { return mId; }
-			IdType getTypeId() const { return mTypeId; }
-			Body &getBody() { return getState().mBody; }
-			Health &getHealth() { return getState().mHealth; }
-			
-			bool isDead() { return mDoRemove; }
-			
-			State &getState() { return mState; }
-			const State &getState() const { return mState; }
-			
-			/// @name Shorthand references to related data
-			//@{
-				const BotD *getTypePtr() const;
-				Player *getPlayerPtr() const;
-			//@}
-			
-		private:
-			/// @name Interaction
-			//@{
-				void prepareStep(double stepTime);
-				void updateCpu(double stepTime);
-				void step(double stepTime);
-				
-				void save(Save::BasePtr &fp) const;
-				void load(Save::BasePtr &fp);
-				
-				void checkDeath();
-			//@}
-			
-			/// @name Input
-			//@{
-				bool isIdle() {
-					return mState.mCpu.getProgramList().size()==0;
-				}
-				
-				void handleInput();
-			//@}
-			
-			**
-			 * @name System data
-			 * Contains data for a bot that is
-			 * used for management of a bot.
-			 /
-			//@{
-				IdType mId;
-				IdType mTypeId;
-				Simulation *mSim;
-				
-				bool mDoRemove;
-			//@}
-			
-			**
-			 * @name Simulation data
-			 * Contains data that is directly related
-			 * to simulation. All these values are used in saving/loading.
-			 /
-			State mState;
-			
-			friend class BotFactory;
-			friend class DefaultUidFactory<Bot>;
-			friend class BotCpu;
-			friend class BotAbility;
-			friend class BotWeapon;
-	};*/
-	
 	class BotFactory : public DefaultUidFactory<Bot> {
 		public:
 			BotFactory(Simulation *sim);
@@ -292,7 +167,7 @@ namespace Sim {
 			
 			/// @name Compatibility
 			//@{
-				IdType createBot(const Bot::Config &cfg, IdType typeId);
+				//IdType createBot(const Bot::Config &cfg);
 				const UidFactory<Bot>::DataList &getBotList() const
 					{ return getData(); }
 			//@}
