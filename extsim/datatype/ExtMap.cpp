@@ -75,7 +75,7 @@ namespace ExtS {
 						ExtData::readValue<uint32_t>(tile[x], 0);
 					
 					if(x<width && y<height) {
-						mExtSim->getSim().getState().getWorld().getTile(x,y).
+						mExtSim->getSim().getState().getWorld().getTile(x,height-1-y).
 						setType(tileId);
 					}
 				}

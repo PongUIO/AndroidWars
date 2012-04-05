@@ -251,7 +251,6 @@ protected:
 				glBindTexture(GL_TEXTURE_2D, textures[mt]);
 				drawTexObj3d(i, j, i+1, j+1, 0);
 			}
-
 		}
 
 		glDisable(GL_TEXTURE_2D);
