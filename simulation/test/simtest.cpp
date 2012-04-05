@@ -153,12 +153,6 @@ void loadData()
 
 void setupWorld()
 {
-	Sim::FactoryInput<Sim::BotFactory> &botInput =
-		sim.getInput().getBotInput();
-	
-	
-	
-	
 	// Create a test bot
 	Sim::Bot::Config botCfg;
 	DemoWeapon::Config weapCfg;
@@ -180,7 +174,7 @@ void setupWorld()
 		botCfg.mWeapon.addWeapon( weapId );
 	}
 	
-	Sim::IdType botId = sim.getInput().getBotInput().buildInputImpl<Sim::BaseBot>(
+	Sim::IdType botId = sim.getInput().getBotInput().buildInput(
 		botCfg)->getId();
 	
 	// Create a second dummy bot
@@ -189,7 +183,7 @@ void setupWorld()
 	botCfg.mType = 0;
 	botCfg.mBody.mPos = Sim::Vector(50,50);
 	
-	sim.getInput().getBotInput().buildInputImpl<Sim::BaseBot>(botCfg);
+	sim.getInput().getBotInput().buildInput(botCfg);
 	
 	// Give the bot some input
 	{
@@ -298,7 +292,7 @@ int main(void)
 			botCfg.mType = 0;
 			botCfg.mBody.mPos = Sim::Vector(5,25);
 				
-			botIn.buildInputImpl<Sim::BaseBot>( botCfg );
+			botIn.buildInput( botCfg );
 		}
 	}
 	

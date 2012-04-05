@@ -113,24 +113,25 @@ namespace Sim {
 	};
 	
 	/**
+	 * This class implements the function that is used to create
+	 * the behaviour class.
+	 */
+	template<class T>
+	class BehaviourT {
+		public:
+			virtual T *createObj(Simulation *sim, IdType id) const=0;
+			IdType mId;
+	};
+	
+	/**
 	 * Implements a database for behaviour implementation classes.
 	 * 
 	 * @param T Base class for behaviour.
 	 * @param Impl Class that implements behaviour, needs getTypeName().
 	 */
-	template<class T>
+	template<class T, class Behaviour=BehaviourT<T> >
 	class DataBehaviourT : public BaseData {
 		public:
-			/**
-			 * This class implements the function that is used to create
-			 * the behaviour class.
-			 */
-			class Behaviour {
-				public:
-					virtual T *createObj(Simulation *sim, IdType id) const=0;
-					IdType mId;
-			};
-			
 			DataBehaviourT() : mInternal(), mNameIdMgr() {}
 			virtual ~DataBehaviourT() {}
 			

@@ -8,8 +8,8 @@ namespace Sim {
 	// Bot
 	//
 	//
-	Bot::Bot(Simulation* sim, IdType id, IdType typeId, const Bot::State& cfg) :
-		mId(id), mTypeId(typeId), mSim(sim), mDoRemove(false), mState(cfg)
+	Bot::Bot(Simulation* sim, IdType id, const Bot::State& cfg) :
+		mId(id), mSim(sim), mDoRemove(false), mState(cfg)
 	{
 		mState.mWeapon.initialize(this);
 		mState.mAbility.initialize(this);
@@ -75,7 +75,7 @@ namespace Sim {
 	
 	const BotD* Bot::getTypePtr() const
 	{
-		return static_cast<const BotD*>(mSim->getData().getBotDb().getType(mTypeId));
+		return mSim->getData().getBotDb().getType(getTypeId());
 	}
 	
 	Player* Bot::getPlayerPtr() const
@@ -92,7 +92,7 @@ namespace Sim {
 	void Bot::State::save(Save::BasePtr &fp) const
 	{
 		// Base variables
-		fp << mSide;
+		fp << mSide << mType;
 		fp << mSensor << mBody << mHealth;
 		
 		// Components
@@ -102,7 +102,7 @@ namespace Sim {
 	void Bot::State::load(Save::BasePtr& fp)
 	{
 		// Base variables
-		fp >> mSide;
+		fp >> mSide >> mType;
 		fp >> mSensor >> mBody >> mHealth;
 		
 		// Components

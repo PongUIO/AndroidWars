@@ -219,7 +219,7 @@ namespace Sim {
 				 */
 				template<typename Impl>
 				Impl *createType(const typename Impl::Config &cfg, IdType id) {
-					const typename DataBehaviourT<T>::Behaviour *b =
+					const BehaviourT<T> *b =
 						getBehaviourFromType<T>(*mSim, Impl::getTypeName());
 					if(!b)
 						return 0;
@@ -251,9 +251,9 @@ namespace Sim {
 				 * @note Making this function a template is a crude hack to
 				 * avoid the necessity of T::Config
 				 */
-				/*template<class Arg>
+				template<class Arg>
 				T *create(const Arg &cfg, IdType id) 
-				{ return new T(mSim, id, cfg); }*/
+				{ return new T(mSim, id, cfg); }
 				
 				/**
 				 * Creates a serialized object and optionally inserts it
@@ -287,7 +287,7 @@ namespace Sim {
 					IdType type;
 					fp >> type;
 					
-					const typename DataBehaviourT<T>::Behaviour *b =
+					const BehaviourT<T> *b =
 						getBehaviourFromType<T>(*mSim, type);
 					
 					T *obj = b->createObj(mSim, internalId);

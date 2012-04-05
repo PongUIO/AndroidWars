@@ -8,7 +8,6 @@
 
 #include "BaseData.h"
 #include "../bot/BotAbility.h"
-#include "../bot/BaseBot.h"
 #include "../Health.h"
 
 namespace Sim {
@@ -16,7 +15,7 @@ namespace Sim {
 	class BotDatabase;
 	class Bot;
 	
-	class BotD : public DataBehaviourT<Bot>::Behaviour {
+	class BotD : public BehaviourT<Bot> {
 		public:
 			BotD();
 			~BotD() {
@@ -24,8 +23,7 @@ namespace Sim {
 					delete mCollision;
 			}
 			
-			virtual Bot* createObj(Simulation* sim, IdType id) const
-			{ return new BaseBot(sim, id, Behaviour::mId); }
+			Bot* createObj(Simulation* sim, IdType id) const;
 			
 			double baseSpeed;
 			double baseWeight;
@@ -52,12 +50,10 @@ namespace Sim {
 			Collision *mCollision;
 	};
 	
-	class BotDatabase : public DataBehaviourT<Bot> {
+	class BotDatabase : public DataBehaviourT<Bot,BotD> {
 		public:
 			BotDatabase() {}
 			virtual ~BotDatabase() {}
-			
-			void registerAllDefault();
 	};
 }
 

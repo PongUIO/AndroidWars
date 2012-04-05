@@ -27,7 +27,7 @@ namespace Sim {
 	 * Allows generic retrieval of behaviours.
 	 */
 	template<class T, class V>
-	const typename DataBehaviourT<T>::Behaviour *
+	const BehaviourT<T> *
 	getBehaviourFromType(Simulation &sim, V val)
 	{ return getDataComponent<typename T::TypeDatabase>(sim).getType(val); }
 }

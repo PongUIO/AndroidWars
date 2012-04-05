@@ -61,7 +61,7 @@ namespace Sim {
 			
 			struct State : private Save::OperatorImpl<State> {
 				public:
-					State() : mSide(0),
+					State() : mType(0), mSide(0),
 						mSensor(), mBody(), mWeapon(),
 						mCpu(), mAbility(), mEngine()
 						{}
@@ -84,7 +84,7 @@ namespace Sim {
 			typedef State Config;
 			
 			IdType getId() const { return mId; }
-			IdType getTypeId() const { return mTypeId; }
+			IdType getTypeId() const { return mState.mType; }
 			
 			State &getState() { return mState; }
 			const State &getState() const { return mState; }
@@ -96,18 +96,18 @@ namespace Sim {
 			const BotD *getTypePtr() const;
 			Player *getPlayerPtr() const;
 			
-			Bot(Simulation *sim, IdType id, IdType typeId, const State &cfg=State());
+			Bot(Simulation *sim, IdType id, const State &cfg=State());
 			~Bot();
 			
 		protected:
 			/// @name Interaction
 			//@{
-				virtual void save(Save::BasePtr &fp) const;
-				virtual void load(Save::BasePtr &fp);
+				void save(Save::BasePtr &fp) const;
+				void load(Save::BasePtr &fp);
 				
-				virtual void prepareStep(double stepTime);
-				virtual void updateCpu(double stepTime);
-				virtual void step(double stepTime);
+				void prepareStep(double stepTime);
+				void updateCpu(double stepTime);
+				void step(double stepTime);
 				
 				void checkDeath();
 				bool isIdle() { return mState.mCpu.getProgramList().size()==0; }
@@ -122,7 +122,6 @@ namespace Sim {
 			//@{
 				// Core data
 				IdType mId;
-				IdType mTypeId;
 				Simulation *mSim;
 				
 				// State flags
@@ -167,7 +166,6 @@ namespace Sim {
 			
 			/// @name Compatibility
 			//@{
-				//IdType createBot(const Bot::Config &cfg);
 				const UidFactory<Bot>::DataList &getBotList() const
 					{ return getData(); }
 			//@}
