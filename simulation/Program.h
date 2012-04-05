@@ -142,8 +142,6 @@ namespace Sim {
 			//@{
 				void deleteInstance(Program* obj) { delete obj; }
 			//@}
-			
-			friend class ReplayManager;
 	};
 }
 

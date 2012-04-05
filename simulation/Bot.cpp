@@ -8,8 +8,8 @@ namespace Sim {
 	// Bot
 	//
 	//
-	Bot::Bot(Simulation* sim, IdType id, const Sim::Bot::State& cfg) :
-		mId(id), mSim(sim), mDoRemove(false), mState(cfg)
+	Bot::Bot(Simulation* sim, IdType id, IdType typeId, const Bot::State& cfg) :
+		mId(id), mTypeId(typeId), mSim(sim), mDoRemove(false), mState(cfg)
 	{
 		mState.mWeapon.initialize(this);
 		mState.mAbility.initialize(this);
@@ -75,7 +75,7 @@ namespace Sim {
 	
 	const Sim::BotD* Bot::getTypePtr() const
 	{
-		return mSim->getData().getBotDb().getDataById(mState.mType);
+		return mSim->getData().getBotDb().getDataById(mTypeId);
 	}
 	
 	Sim::Player* Bot::getPlayerPtr() const
@@ -92,7 +92,7 @@ namespace Sim {
 	void Bot::State::save(Save::BasePtr &fp) const
 	{
 		// Base variables
-		fp << mSide << mType;
+		fp << mSide;
 		fp << mSensor << mBody << mHealth;
 		
 		// Components
@@ -102,7 +102,7 @@ namespace Sim {
 	void Bot::State::load(Save::BasePtr& fp)
 	{
 		// Base variables
-		fp >> mSide >> mType;
+		fp >> mSide;
 		fp >> mSensor >> mBody >> mHealth;
 		
 		// Components
@@ -116,13 +116,9 @@ namespace Sim {
 	BotFactory::BotFactory(Simulation *sim)
 		: DefaultUidFactory<Bot>(sim)
 	{}
-
+	
 	BotFactory::~BotFactory()
 	{}
-	
-	BotFactory& BotFactory::getFactory(Simulation* sim)
-	{	return sim->getState().getBotFactory(); }
-
 	
 	void BotFactory::startup()
 	{
@@ -134,11 +130,11 @@ namespace Sim {
 		DefaultUidFactory<Bot>::shutdown();
 	}
 	
-	IdType BotFactory::createBot(const Bot::Config &cfg)
+	IdType BotFactory::createBot(const Bot::Config &cfg, IdType typeId)
 	{
 		BotFactory::InsertData insData = insertObject();
 		
-		Bot *bot = new Bot(mSim, insData.first, cfg);
+		Bot *bot = new Bot(mSim, typeId, insData.first, cfg);
 		*insData.second = bot;
 		
 		return insData.first;
@@ -165,17 +161,6 @@ namespace Sim {
 	void BotFactory::save(Save::BasePtr& fp)
 	{	DefaultUidFactory<Bot>::save(fp); }
 
-	void Sim::BotFactory::load(Save::BasePtr& fp)
+	void BotFactory::load(Save::BasePtr& fp)
 	{	DefaultUidFactory<Bot>::load(fp); }
-
-	
-	void BotFactory::saveObj(Bot* bot, Save::BasePtr& fp)
-	{	bot->save(fp); }
-
-	Bot* BotFactory::loadObj(IdType id, Save::BasePtr& fp)
-	{
-		Bot *bot = new Bot(mSim, id);
-		bot->load(fp);
-		return bot;
-	}
 }

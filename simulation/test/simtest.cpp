@@ -151,6 +151,11 @@ void loadData()
 
 void setupWorld()
 {
+	Sim::FactoryInput<Sim::BotFactory> &botInput =
+		sim.getInput().getBotInput();
+	
+	
+	
 	// Create a test bot
 	Sim::Bot::Config botCfg;
 	DemoWeapon::Config weapCfg;
