@@ -143,7 +143,7 @@ namespace Sim {
 		if(xInd >= mWidth || yInd >= mHeight)
 			return mOffScreen;
 		else
-			return mData[yInd*mHeight + xInd];
+			return mData[yInd*mWidth + xInd];
 	}
 	
 	
