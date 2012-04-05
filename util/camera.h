@@ -7,7 +7,7 @@
 
 class Camera {
 public:
-        double zoom, dzoom, panfriction, zoomfriction, ratio;
+	double zoom, dzoom, panFriction, zoomFriction, ratio, scrollSpeed;
         int lastX, lastY, xres, yres;
         Sim::Vector pos, delta;
 
@@ -17,8 +17,9 @@ public:
                 dzoom = 0.0;
 		zoom = 1;
 		calcRatio(xres, yres);
-		zoomfriction = 0.9;
-                panfriction = 0.9;
+		zoomFriction = 0.9;
+		panFriction = 0.9;
+		scrollSpeed = 0.002;
         }
         virtual ~Camera() {}
 
@@ -37,14 +38,14 @@ public:
 
         void iter() {
                 if ( 0 < lastX && lastX < xres && 0 < lastY && lastY < yres) {
-                        delta += Sim::Vector((lastX > xres -EDGE ) * (-(lastX - xres + EDGE)*0.001) +
-                                    (lastX < EDGE) * (-(lastX-EDGE)*0.001),
-                                    (lastY < EDGE) * ((lastY - EDGE)*0.001) +
-                                    ((lastY > yres - EDGE)) * ((lastY - yres + EDGE)* 0.001))/2;
+			delta += Sim::Vector((lastX > xres -EDGE ) * (-(lastX - xres + EDGE)*scrollSpeed) +
+				    (lastX < EDGE) * (-(lastX-EDGE)*scrollSpeed),
+				    (lastY < EDGE) * ((lastY - EDGE)*scrollSpeed) +
+				    ((lastY > yres - EDGE)) * ((lastY - yres + EDGE)* scrollSpeed))/2;
                 }
                 pos += delta*zoom;
-                delta *= panfriction;
-                dzoom *= zoomfriction;
+		delta *= panFriction;
+		dzoom *= zoomFriction;
 		zoom *= dzoom + 1;
 
                 if (zoom < 1) {
@@ -56,7 +57,7 @@ public:
                 if (dzoom > 0) {
                         return;
                 }
-                Sim::Vector temp = Sim::Vector( xPixToDouble(lastX), yPixToDouble(lastY))*(-fabs(dzoom*5));
+		Sim::Vector temp = Sim::Vector( xPixToDouble(lastX), yPixToDouble(lastY))*(-fabs(dzoom*5)*(zoom+1));
                 //qDebug("%4.4f %4.4f\n", temp.x, temp.y);
                 pos += temp;
         }

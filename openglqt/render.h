@@ -237,14 +237,13 @@ protected:
 		float mx = cam->xPixToDouble(lastX);
 		float my = cam->yPixToDouble(lastY);
 		int mt;
-		int fx = 0;//cam->xSimLim(0);
-		int tx = 16;//cam->xSimLim(1)+1;
-		int fy = 0;//cam->ySimLim(1);
-		int ty = 8;//cam->ySimLim(0)+1;
+		int fx = cam->xSimLim(-1);
+		int tx = cam->xSimLim(1)+1;
+		int fy = cam->ySimLim(1);
+		int ty = cam->ySimLim(-1)+1;
 		for (i = fx; i < tx; i++) {
 			for (j = fy; j < ty; j++) {
 				mt = wld->getTile(i, j).getType();
-				printf("%d ", mt);
 				if (mt == 0) {
 					continue;
 				}
@@ -252,7 +251,6 @@ protected:
 				glBindTexture(GL_TEXTURE_2D, textures[mt]);
 				drawTexObj3d(i, j, i+1, j+1, 0);
 			}
-			printf("\n", mt);
 
 		}
 

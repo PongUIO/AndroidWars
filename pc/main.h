@@ -221,29 +221,24 @@ public:
 		Sim::Player testSide;
 		sim.getState().getPlayerData().addPlayer(testSide);
 
-		Sim::BotD myBot;
-		myBot.baseSpeed = 100.0;
-		myBot.baseWeight = 75.0;
-		myBot.cpuCycleSpeed = 100;
-		myBot.cpuStorage = 100;
-
-		Sim::Collision::ColPoints cpts;
-		cpts.push_back(Sim::Vector(0,0));
-		cpts.push_back(Sim::Vector(0,1.8));
-		cpts.push_back(Sim::Vector(1.3,1.8));
-		cpts.push_back(Sim::Vector(1.3,0));
-
 		//sim.getData().getBotDb().addBot(myBot, cpts);
 		// Create a test bot
 		Sim::Bot::Config botCfg;
 		botCfg.mSide = 0;
 		botCfg.mType = 0;
 		botCfg.mBody.mPos = Sim::Vector(0,0);
-		uint32_t botId = sim.getState().getBotFactory().createBot( botCfg );
+		int botId = sim.getInput().getBotInput().buildInputImpl<Sim::BaseBot>(botCfg)->getId();
+		botCfg = Sim::Bot::Config();
+		botCfg.mSide = 0;
+		botCfg.mType = 0;
 		botCfg.mBody.mPos = Sim::Vector(0,1);
-		sim.getState().getBotFactory().createBot( botCfg );
+		sim.getInput().getBotInput().buildInputImpl<Sim::BaseBot>(botCfg);
+		botCfg = Sim::Bot::Config();
+		botCfg.mSide = 0;
+		botCfg.mType = 0;
 		botCfg.mBody.mPos = Sim::Vector(0,2);
-		sim.getState().getBotFactory().createBot( botCfg );
+		sim.getInput().getBotInput().buildInputImpl<Sim::BaseBot>(botCfg);
+
 
 		// Send some input to this bot
 		{
