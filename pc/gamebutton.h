@@ -24,10 +24,12 @@ protected:
 	// overridden
 	void mousePressEvent(QMouseEvent * event) {
 		if (func == 0) {
-			sim->gotoPresent();
-			sim->startPhase();
-			cs->setRunning(true);
-			gs->setValue(0);
+			if (!cs->getRunning()) {
+				sim->gotoPresent();
+				sim->startPhase();
+				cs->setRunning(true);
+				gs->setValue(0);
+			}
 		}
 	}
 };

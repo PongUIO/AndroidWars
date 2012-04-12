@@ -55,6 +55,10 @@ public:
 		return selBots.find(b) != selBots.end();
 	}
 
+	int getSelSize() {
+		return selBots.size();
+	}
+
 	void select(uint i) {
 		if (!shift) {
 			selBots.clear();

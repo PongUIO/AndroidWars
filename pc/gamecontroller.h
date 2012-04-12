@@ -46,11 +46,11 @@ public:
 		label2 = new GameButton(states->getSim(), states, 0, slider, parent);
 
 
-                label->setPixmap(QPixmap(":/graphics/temp/temp.png"));
+		label->setPixmap(QPixmap("../testmod/graphics/temp/temp.png"));
                 label->resize(60,60);
-		label2->setPixmap(QPixmap(":/graphics/temp/temp2.png"));
+		label2->setPixmap(QPixmap("../testmod/graphics/temp/temp2.png"));
 		label2->resize(60,60);
-		profiles[0] = QPixmap(":/graphics/profiles/test.png");
+		profiles[0] = QPixmap("../testmod/graphics/profiles/test.png");
 		space = new QSpacerItem(parent->width(), 0, QSizePolicy::Expanding);
 		lower->insertWidget(0, label);
 		lower->insertWidget(1, label2);
@@ -81,6 +81,7 @@ public:
 		//upper->insertWidget(1, slider);
 		upper->insertSpacerItem(0, space);
 		int i = 1;
+		int selected = states->getSelSize();
 		std::list<Sim::Bot*> bots = states->getSim()->getState().getBotFactory().getBotList();
 		std::list<Sim::Bot*>::iterator it;
 		BotSelector *clabel;
@@ -91,6 +92,8 @@ public:
 			upper->insertWidget(i, clabel);
 			clabel->show();
 			i++;
+			if (selected == 1 && states->isSelected((*it)->getId())) {
+			}
 		}
 	}
 

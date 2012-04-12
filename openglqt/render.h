@@ -105,7 +105,6 @@ protected:
 	}
 
 
-
 	// overridden
 	void initializeGL() {
 		// Set up the rendering context, define display lists etc.:
@@ -114,19 +113,30 @@ protected:
                 glEnable(GL_DOUBLE) ;
 
 		//Loading textures.
-		loadAndBind(":/graphics/tiles/empty.png", &data[0], &textures[0]);
-		loadAndBind(":/graphics/tiles/metal.png", &data[1], &textures[1]);
-		loadAndBind(":/graphics/tiles/metal2surf.png", &data[2], &textures[2]);
-		loadAndBind(":/graphics/characters/character1.png", &characters[0], &chartextures[0], 128, 320, false, true);
-		loadAndBind(":/graphics/weapons/testweapon.png", &weapons[0], &weaponstextures[0], 32, 64);
-		loadAndBind(":/graphics/mouse/default.png", &mouse[0], &mousetextures[0],64,64);
-		loadAndBind(":/graphics/mouse/attack.png", &mouse[1], &mousetextures[1],64,64);
-		loadAndBind(":/graphics/weapons/bullet.png", &bullet[0], &bullettextures[0],16,16);
+		loadAndBind("../testmod/graphics/tiles/empty.png", &data[0], &textures[0]);
+		loadAndBind("../testmod/graphics/tiles/metal.png", &data[1], &textures[1]);
+		loadAndBind("../testmod/graphics/tiles/metal2surf.png", &data[2], &textures[2]);
+		loadAndBind("../testmod/graphics/characters/character1.png", &characters[0], &chartextures[0], 128, 320, false, true);
+		loadAndBind("../testmod/graphics/weapons/testweapon.png", &weapons[0], &weaponstextures[0], 32, 64);
+		loadAndBind("../testmod/graphics/mouse/default.png", &mouse[0], &mousetextures[0],64,64);
+		loadAndBind("../testmod/graphics/mouse/attack.png", &mouse[1], &mousetextures[1],64,64);
+		loadAndBind("../testmod/graphics/weapons/bullet.png", &bullet[0], &bullettextures[0],16,16);
+		loadObjFile("../testmod/obj/Android01.obj");
 		this->setAttribute(Qt::WA_NoSystemBackground);
 		QPixmap m;
 		m.convertFromImage(mouse[MOUSE_NORMAL]);
 		this->setCursor(QCursor(m, -1, -1));
 
+	}
+
+	void loadObjFile(const char *path) {
+		QFile f(path);
+		f.open(QFile::QIODevice::ReadOnly);
+		while (!f.atEnd()) {
+			QString str = f.readLine();
+			qDebug() << str;
+		}
+		f.close();
 	}
 
 	void loadAndBind(const char *path, QImage *img, GLuint *bind, GLuint xsize = -1, GLuint ysize = -1, bool vertFlip = false, bool horFlip = false) {

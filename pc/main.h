@@ -60,7 +60,7 @@ public:
 		subMenu = MAIN;
 		//grabKeyboard();
 		states = new ClientStates();
-		loadFiles("../data/");
+		loadFiles("../testmod/data/");
 		initSim();
 		fullScreen = false;
 		p = new QPalette( this->palette() );

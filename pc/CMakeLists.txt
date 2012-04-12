@@ -10,7 +10,6 @@ set(QT_USE_QTOPENGL TRUE)
 
 qt4_wrap_cpp(qtgui_HEADERS_MOC ${qtgui_HEADERS})
 qt4_wrap_ui(qtgui_FORMS_HEADERS ${qtgui_FORMS})
-qt4_add_resources(qtgui_RESOURCES_RCC ${qtgui_RESOURCES})
 
 include(${QT_USE_FILE})
 add_definitions(${QT_DEFINITIONS})
