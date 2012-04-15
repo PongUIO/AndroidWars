@@ -150,6 +150,16 @@ namespace ExtS {
 		
 		return val;
 	}
+	
+	template<>
+	inline bool ExtData::badCastStrategy<bool>(const std::string &str, bool def)
+	{
+		if(str=="false")
+			return false;
+		else if(str=="true")
+			return true;
+		else return def;
+	}
 }
 
 #endif

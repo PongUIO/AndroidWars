@@ -82,17 +82,4 @@ namespace ExtS {
 		return (i==mListeners.end() || !(i->second.mContext&mCurrentContext)) ?
 			0 : i->second.mData;
 	}
-	
-	
-	
-	template<>
-	bool ExtData::badCastStrategy(const std::string &str, bool def)
-	{
-		if(str=="false")
-			return false;
-		else if(str=="true")
-			return true;
-		else
-			return def;
-	}
 }
