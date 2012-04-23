@@ -7,6 +7,7 @@
 #include "../util/camera.h"
 #include "../util/client.h"
 #include "../util/cursordefines.h"
+#include "globj.h"
 
 class GameDrawer : public QGLWidget {
         Q_OBJECT
@@ -54,12 +55,15 @@ public:
 	QPixmap mouseMaps[2];
 	QImage bullet[1];
 	GLuint bullettextures[1];
+
+	GLObj *testbot;
+
 	Camera *cam;
         ClientStates *states;
         QTimer *glTimer, *camTimer;
 	double hitX, hitY;
         GameDrawer(ClientStates *states, QWidget *parent = 0)
-                : QGLWidget(QGLFormat(QGL::SampleBuffers), parent) {
+		: QGLWidget(QGLFormat(QGL::SampleBuffers), parent) {
                 this->parent = parent;
 		cMouse = 0;
 		this->cam = new Camera(0, 0, parent->width(), parent->height());
@@ -121,24 +125,13 @@ protected:
 		loadAndBind("../testmod/graphics/mouse/default.png", &mouse[0], &mousetextures[0],64,64);
 		loadAndBind("../testmod/graphics/mouse/attack.png", &mouse[1], &mousetextures[1],64,64);
 		loadAndBind("../testmod/graphics/weapons/bullet.png", &bullet[0], &bullettextures[0],16,16);
-		loadObjFile("../testmod/obj/Android01.obj");
+		testbot = new GLObj("../testmod/obj/Android01.obj", QVector3D(1., 1., 1.));
 		this->setAttribute(Qt::WA_NoSystemBackground);
 		QPixmap m;
 		m.convertFromImage(mouse[MOUSE_NORMAL]);
 		this->setCursor(QCursor(m, -1, -1));
 
 	}
-
-	void loadObjFile(const char *path) {
-		QFile f(path);
-		f.open(QFile::QIODevice::ReadOnly);
-		while (!f.atEnd()) {
-			QString str = f.readLine();
-			qDebug() << str;
-		}
-		f.close();
-	}
-
 	void loadAndBind(const char *path, QImage *img, GLuint *bind, GLuint xsize = -1, GLuint ysize = -1, bool vertFlip = false, bool horFlip = false) {
 		if (xsize != -1) {
 			img->load(path);
@@ -262,6 +255,8 @@ protected:
 				drawTexObj3d(i, j, i+1, j+1, 0);
 			}
 		}
+
+		testbot->draw();
 
 		glDisable(GL_TEXTURE_2D);
 		glColor4f(0.2f, 1.0f, 0.2f, selAlpha);
