@@ -1,40 +1,42 @@
+#include <string.h>
+
 #include "Save.h"
 
 #include "Common.h"
 
 namespace Sim {
-	uint32_t Save::checksum()
+	uint32_t Save::checksum() const
 	{
 		boost::crc_32_type checkSum;
 		
-		checkSum.process_bytes(&data[0], size());
+		checkSum.process_bytes(getData(), size());
 		return checkSum.checksum();
 	}
 	
-	void Save::append(const Sim::Save& other)
+	void Save::append(const Save& other)
 	{
-		data.insert(data.end(), other.data.begin(), other.data.end());
+		mData.insert(mData.end(), other.mData.begin(), other.mData.end());
 	}
 	
-	void Save::FilePtr::nanoRead(uint8_t* ptr, uint32_t bytes)
+	void Save::FilePtr::nanoRead(void* vptr, uint32_t bytes)
 	{
-		uint32_t extraBytes = 0;
-		if(readPtr+bytes > file.size()) {
-			extraBytes = (readPtr+bytes) - file.size();
-			if(extraBytes > bytes)
-				extraBytes = bytes;
-			memset(ptr+bytes-extraBytes, 0, extraBytes);
-		}
-		memcpy(ptr, &file.data[readPtr], bytes-extraBytes);
-		readPtr += bytes;
+		uint8_t *ptr = static_cast<uint8_t*>(vptr);
+		
+		if(mReadPtr > mSaveRef.size())
+			throw std::out_of_range(
+				"FilePtr::nanoRead() : Attempt to read beyond size");
+		
+		memcpy(ptr, (mSaveRef.getData()+mReadPtr), bytes);
+		mReadPtr += bytes;
 	}
 	
-	void Save::FilePtr::nanoWrite(const uint8_t* ptr, uint32_t bytes)
+	void Save::FilePtr::nanoWrite(const void* vptr, uint32_t bytes)
 	{
-		uint32_t oldSize = file.size();
-		file.data.resize(oldSize+bytes);
-		memcpy(&file.data[oldSize], ptr, bytes);
-		readPtr += bytes;
+		const uint8_t *ptr = static_cast<const uint8_t*>(vptr);
+		
+		uint32_t oldSize = mSaveRef.size();
+		mSaveRef.mData.resize(oldSize+bytes);
+		memcpy(mSaveRef.getData()+oldSize, ptr, bytes);
 	}
 	
 	// Save::BasePtr stream operators
@@ -75,4 +77,5 @@ namespace Sim {
 	STREAM_FUNC(Vector, writeVec(val), val=readVec())
 	STREAM_FUNC(Save, writeSave(val), val=readSave())
 	STREAM_FUNC(bool, writeInt<uint8_t>(val), val=readInt<uint8_t>())
+	STREAM_FUNC(std::string, writeStr(val), val=readStr())
 }
