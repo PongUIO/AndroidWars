@@ -9,8 +9,6 @@ Sim::Simulation sim;
  */
 class DemoWeapon : public Sim::Weapon {
 	public:
-		SIM_WEAPON_HEADER("Test/DemoWeapon")
-		
 		struct Config {
 			Config() {}
 		};
@@ -66,12 +64,23 @@ void startSim()
 
 void loadPrograms()
 {
-	sim.getData().getProgramDb().registerAllDefault();
+	Sim::ProgramDatabase &db = sim.getData().getProgramDb();
+	
+	using namespace Sim::Prog;
+	
+	db.registerImpl<MoveTowards>("MoveTowards");
+	db.registerImpl<Kill>("Kill");
+	db.registerImpl<Shoot>("Shoot");
 }
 
 void loadAbilities()
 {
-	sim.getData().getAbilityDb().registerAllDefault();
+	Sim::AbilityDatabase &db = sim.getData().getAbilityDb();
+	
+	using namespace Sim::Abil;
+	
+	db.registerImpl<ArmorAttachment>("ArmorAttachment");
+	db.registerImpl<CpuBoost>("CpuBoost");
 }
 
 void loadDamageArmor()
@@ -113,30 +122,31 @@ void loadTiles()
 void loadBots()
 {
 	// Create a test bot type
-	Sim::BotD *botType = new Sim::BotD();
+	Sim::BotD botType;
 	Sim::Collision::ColPoints pts;
 	pts.push_back(Sim::Vector(0,0));
 	pts.push_back(Sim::Vector(0,1));
 	pts.push_back(Sim::Vector(1,1));
 	pts.push_back(Sim::Vector(1,0));
 	
-	botType->setCollision(new Sim::Collision(pts));
+	botType.setCollision(new Sim::Collision(pts));
 	
-	botType->baseSpeed = 1.0;
-	botType->baseWeight = 75.0;
+	botType.baseSpeed = 1.0;
+	botType.baseWeight = 75.0;
 	
-	botType->cpuCycleSpeed = 5;
-	botType->cpuStorage = 20;
+	botType.cpuCycleSpeed = 5;
+	botType.cpuStorage = 20;
 	
-	botType->coreHealth.getCore() = Sim::Health::Hull(0, 50);
-	botType->coreHealth.addAttachment( Sim::Health::Hull(1, 5) );
+	botType.coreHealth.getCore() = Sim::Health::Hull(0, 50);
+	botType.coreHealth.addAttachment( Sim::Health::Hull(1, 5) );
 	
-	sim.getData().getBotDb().registerCustom(botType, "Base");
+	Sim::IdType botId = sim.getData().getBotDb().
+		registerImpl<Sim::Bot>("Base",botType);
 }
 
 void loadWeapons()
 {
-	sim.getData().getWeaponDb().registerType<DemoWeapon>();
+	sim.getData().getWeaponDb().registerImpl<DemoWeapon>("DemoWeapon");
 }
 
 // "Loads" simulation data
@@ -157,33 +167,32 @@ void setupWorld()
 	Sim::Bot::Config botCfg;
 	DemoWeapon::Config weapCfg;
 	botCfg.mSide = 0;
-	botCfg.mType = 0;
 	botCfg.mBody.mPos = Sim::Vector(0,0);
 	
 	{
 		using namespace Sim::Abil;
 		
 		Sim::IdType abilId = sim.getInput().getAbilityInput().
-			buildInputImpl<CpuBoost>(CpuBoost::Config(0,10))->getId();
+			buildInputImplStr<CpuBoost>(
+			CpuBoost::Config(0,10),"CpuBoost")->getId();
 		botCfg.mAbility.addAbility(abilId);
 	}
 	
 	{
 		Sim::IdType weapId = sim.getInput().getWeaponInput().
-			buildInputImpl<DemoWeapon>(weapCfg)->getId();
+			buildInputImplStr<DemoWeapon>(weapCfg,"DemoWeapon")->getId();
 		botCfg.mWeapon.addWeapon( weapId );
 	}
 	
-	Sim::IdType botId = sim.getInput().getBotInput().buildInput(
-		botCfg)->getId();
+	Sim::IdType botId = sim.getInput().getBotInput().buildInputImpl<Sim::Bot>(
+		botCfg, 0)->getId();
 	
 	// Create a second dummy bot
 	botCfg = Sim::Bot::Config();
 	botCfg.mSide = 0;
-	botCfg.mType = 0;
 	botCfg.mBody.mPos = Sim::Vector(50,50);
 	
-	sim.getInput().getBotInput().buildInput(botCfg);
+	sim.getInput().getBotInput().buildInputImpl<Sim::Bot>(botCfg, 0);
 	
 	// Give the bot some input
 	{
@@ -195,15 +204,15 @@ void setupWorld()
 			sim.getInput().getCpuInput();
 		
 		
-		Sim::IdType moveId = progInput.buildInputImpl<MoveTowards>(
-			MoveTowards::Config(MoveTowards::DtPosition, Sim::Vector(10,0)))->
-			getId();
+		Sim::IdType moveId = progInput.buildInputImplStr<MoveTowards>(
+			MoveTowards::Config(MoveTowards::DtPosition, Sim::Vector(10,0)),
+			"MoveTowards")->getId();
 		
-		Sim::IdType killId = progInput.buildInputImpl<Kill>(
-			Kill::Config(moveId))->getId();
+		Sim::IdType killId = progInput.buildInputImplStr<Kill>(
+			Kill::Config(moveId), "Kill")->getId();
 		
-		Shoot *shoot = progInput.buildInputImpl<Shoot>(
-			Shoot::Config(0, Sim::Save()));
+		Shoot *shoot = progInput.buildInputImplStr<Shoot>(
+			Shoot::Config(0, Sim::Save()), "Shoot");
 		shoot->setRunningTime(2);
 		
 		cpuInput.registerInput(botId, moveId, 0);
@@ -221,11 +230,11 @@ void setupWorld()
 		Sim::FactoryInput<Sim::AbilityFactory> &abilIn =
 			sim.getInput().getAbilityInput();
 		
-		CpuBoost *sharedBoost = abilIn.buildInputImpl<CpuBoost>(
-			CpuBoost::Config(0, 5));
+		CpuBoost *sharedBoost = abilIn.buildInputImplStr<CpuBoost>(
+			CpuBoost::Config(0, 5), "CpuBoost");
 		ArmorAttachment *armorAtm =
-			abilIn.buildInputImpl<ArmorAttachment>(
-			ArmorAttachment::Config(2, 10));
+			abilIn.buildInputImplStr<ArmorAttachment>(
+			ArmorAttachment::Config(2, 10), "ArmorAttachment");
 		
 		Sim::Player &player = sim.getState().getPlayerData().getPlayer(0);
 		player.mGlobalAbilities.push_back(sharedBoost->getId());
@@ -273,12 +282,13 @@ int main(void)
 			Sim::BotCpuInput &cpuIn =
 				sim.getInput().getCpuInput();
 			
-			MoveTowards *move = progIn.buildInputImpl<MoveTowards>(
-				MoveTowards::Config(MoveTowards::DtPosition, Sim::Vector(-50,0))
+			MoveTowards *move = progIn.buildInputImplStr<MoveTowards>(
+				MoveTowards::Config(MoveTowards::DtPosition, Sim::Vector(-50,0)),
+				"MoveTowards"
 			);
 			
-			Kill *kill = progIn.buildInputImpl<Kill>(
-				Kill::Config(move->getId()));
+			Kill *kill = progIn.buildInputImplStr<Kill>(
+				Kill::Config(move->getId()), "Kill");
 			
 			cpuIn.registerInput(0, move->getId(), 2);
 			cpuIn.registerInput(0, kill->getId(), 8);
@@ -289,10 +299,9 @@ int main(void)
 			
 			Sim::Bot::Config botCfg;
 			botCfg.mSide = 0;
-			botCfg.mType = 0;
 			botCfg.mBody.mPos = Sim::Vector(5,25);
 				
-			botIn.buildInput( botCfg );
+			botIn.buildInputImpl<Sim::Bot>( botCfg, 0 );
 		}
 	}
 	

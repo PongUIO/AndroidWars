@@ -61,6 +61,10 @@
 	Description {
 		Expensive but fragile bot with the ability to layer any armor
 		type on itself.
+		
+		Very vulnerable to phasing weapons, but highly resilient and adaptable.
+		Counters badly composed hostile groups effectively by layering an armor
+		type which is exceptionally resilient against their composition.
 	}
 	
 	Health "Light" 50

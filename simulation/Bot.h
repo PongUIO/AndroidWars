@@ -61,12 +61,11 @@ namespace Sim {
 			
 			struct State : private Save::OperatorImpl<State> {
 				public:
-					State() : mType(0), mSide(0),
+					State() : mSide(0),
 						mSensor(), mBody(), mWeapon(),
 						mCpu(), mAbility(), mEngine()
 						{}
 					
-					IdType mType;
 					IdType mSide;
 					
 					SensorState mSensor;
@@ -84,7 +83,7 @@ namespace Sim {
 			typedef State Config;
 			
 			IdType getId() const { return mId; }
-			IdType getTypeId() const { return mState.mType; }
+			IdType getTypeId() const { return mTypeId; }
 			
 			State &getState() { return mState; }
 			const State &getState() const { return mState; }
@@ -96,7 +95,7 @@ namespace Sim {
 			const BotD *getTypePtr() const;
 			Player *getPlayerPtr() const;
 			
-			Bot(Simulation *sim, IdType id, const State &cfg=State());
+			Bot(Simulation *sim, IdType id, IdType typeId, const State &cfg=State());
 			~Bot();
 			
 		protected:
@@ -122,6 +121,7 @@ namespace Sim {
 			//@{
 				// Core data
 				IdType mId;
+				IdType mTypeId;
 				Simulation *mSim;
 				
 				// State flags

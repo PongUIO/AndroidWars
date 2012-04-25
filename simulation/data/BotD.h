@@ -1,6 +1,8 @@
 #ifndef SIM_BOTD_H
 #define SIM_BOTD_H
 
+#include <boost/shared_ptr.hpp>
+
 #include <vector>
 #include <stdint.h>
 #include "../Save.h"
@@ -15,15 +17,10 @@ namespace Sim {
 	class BotDatabase;
 	class Bot;
 	
-	class BotD : public BehaviourT<Bot> {
+	class BotD {
 		public:
 			BotD();
-			~BotD() {
-				if(mCollision)
-					delete mCollision;
-			}
-			
-			Bot* createObj(Simulation* sim, IdType id) const;
+			~BotD() {}
 			
 			double baseSpeed;
 			double baseWeight;
@@ -41,16 +38,18 @@ namespace Sim {
 			BotAbility::AvailableProgram excludeProgram;
 			
 			const Collision *getCollision() const
-			{ return mCollision; }
+			{ return mCollision.get(); }
 			
 			void setCollision(Collision *c)
-			{ mCollision = c; }
+			{ mCollision = CollisionPtr(c); }
 			
 		private:
-			Collision *mCollision;
+			typedef boost::shared_ptr<Collision> CollisionPtr;
+			
+			CollisionPtr mCollision;
 	};
 	
-	class BotDatabase : public DataBehaviourT<Bot,BotD> {
+	class BotDatabase : public DefaultBehaviourDatabase<Bot,BotD> {
 		public:
 			BotDatabase() {}
 			virtual ~BotDatabase() {}

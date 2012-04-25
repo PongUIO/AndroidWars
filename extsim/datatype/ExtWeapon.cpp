@@ -23,15 +23,16 @@ namespace ExtS {
 	// ExtProgram
 	//
 	//
-	ExtWeapon::ExtWeapon()
+	ExtWeapon::ExtWeapon(ExtSim *esim) : ExtBaseDataObj(esim)
 	{}
 
 	ExtWeapon::~ExtWeapon()
 	{}
 	
-	void ExtWeapon::loadBlock(Script::Block& block, TypeRule* rule)
+	void ExtWeapon::loadBlock(Script::Block& block,
+		Sim::IdType simTypeId, TypeRule* rule)
 	{
-		ExtBaseDataObj::loadBlock(block, rule);
+		ExtBaseDataObj::loadBlock(block, simTypeId, rule);
 		
 		mSizeType = block.getDataFirst("Size");
 		mBaseDamageStr = block.getDataFirst("BaseDamage");

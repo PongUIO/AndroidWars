@@ -366,7 +366,7 @@ namespace Sim {
 					 * Writes \c bytes to the \c Save reference from the
 					 * pointer \c ptr.
 					 */
-					void nanoWrite(const void *ptr, uint32_t bytes);
+					virtual void nanoWrite(const void *ptr, uint32_t bytes);
 					
 					/**
 					 * Reads \c bytes from the \c Save reference and stores
@@ -376,7 +376,7 @@ namespace Sim {
 					 * is such that mReadPtr+bytes > file.size(), this
 					 * exception is thrown.
 					 */
-					void nanoRead(void *ptr, uint32_t bytes);
+					virtual void nanoRead(void *ptr, uint32_t bytes);
 					
 				public:
 					FilePtr(Save &saveObj) :

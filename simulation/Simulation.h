@@ -14,6 +14,13 @@
 
 #include "Common.h"
 
+/**
+ * @namespace Sim
+ * 
+ * @brief Core simulation namespace.
+ * 
+ * The simulation namespace contains everything 
+ */
 namespace Sim {
 	struct Configuration {
 		Configuration() :

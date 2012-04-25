@@ -13,8 +13,6 @@ namespace Sim { namespace Abil {
 	 */
 	class ArmorAttachment : public Ability {
 		public:
-			_SIM_ABILITY_HEADER
-			
 			class Config : public Health::Hull,
 					private Save::OperatorImpl<Config> {
 				public:

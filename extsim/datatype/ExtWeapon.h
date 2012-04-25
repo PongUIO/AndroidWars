@@ -6,10 +6,11 @@
 namespace ExtS {
 	class ExtWeapon : public ExtBaseDataObj {
 		public:
-			ExtWeapon();
+			ExtWeapon(ExtSim *esim);
 			~ExtWeapon();
 			
-			void loadBlock(Script::Block &block, TypeRule *rule);
+			void loadBlock(Script::Block &block,
+				Sim::IdType simTypeId, TypeRule *rule);
 			void postProcess(ExtSim &extsim);
 			
 		private:

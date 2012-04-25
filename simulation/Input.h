@@ -106,20 +106,29 @@ namespace Sim {
 			}
 			
 			/**
-			 * Builds an object using the factory and registers it as
-			 * input.
+			 * Builds an object and registers it as input.
 			 * 
 			 * The object is given an automatic id which should correspond to
 			 * its real id when dispatched.
 			 * 
-			 * @see DefaultUidFactory::createType
+			 * \c Impl must have the following constructor format:
+			 * - <em>Impl(Simulation *sim, IdType id, IdType typeId,
+			 * 		const Impl::Config &cfg);</em>
+			 * 
+			 * @param typeId The identifier of the database object that is
+			 * associated with this particular \c Impl.
+			 * 
+			 * @warning \c typeId is \b strictly required to be an identifer
+			 * to a valid database object. The caller \b must know that
+			 * they're creating a valid \c Impl for the given \c typeId.
 			 */
 			template<class Impl>
-			Impl *buildInputImpl(const typename Impl::Config &cfg) {
+			Impl *buildInputImpl(const typename Impl::Config &cfg,
+			IdType typeId) {
 				T &fact = getStateComponent<T>(*mSim);
 				
 				IdType id = allocateId();
-				Impl *obj = fact.template createType<Impl>(cfg, id);
+				Impl *obj = new Impl(mSim,id,typeId,cfg);
 				
 				if(obj)
 					mTmpBuffer.addInput(obj);
@@ -128,10 +137,24 @@ namespace Sim {
 			}
 			
 			/**
+			 * Convenience implementation to allow the creation of input
+			 * using a name rather than a type identifier.
+			 * 
+			 * @see buildInputImpl
+			 */
+			template<class Impl>
+			Impl *buildInputImplStr(const typename Impl::Config &cfg,
+			const std::string &name) {
+				return buildInputImpl<Impl>(cfg,
+					getDataComponent<typename Impl::TypeDatabase>(*mSim).
+					getIdOf(name));
+			}
+			
+			/**
 			 * Similar to \c buildInputImpl, but creating an object of the
 			 * default generic type.
 			 */
-			template<class Arg>
+			/*template<class Arg>
 			typename T::Type *buildInput(const Arg &cfg) {
 				T &fact = getStateComponent<T>(*mSim);
 				
@@ -141,7 +164,7 @@ namespace Sim {
 					mTmpBuffer.addInput(obj);
 				
 				return obj;
-			}
+			}*/
 			
 			IdType allocateId() {
 				T &fact = getStateComponent<T>(*mSim);

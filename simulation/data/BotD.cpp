@@ -10,10 +10,9 @@ namespace Sim {
 		cpuCycleSpeed(10),
 		cpuStorage(20),
 		
-		coreHealth(0,1)
+		coreHealth(0,1),
+		
+		mCollision()
 	{
 	}
-	
-	Bot* BotD::createObj(Simulation* sim, IdType id) const
-	{	return new Bot(sim, id); }
 }

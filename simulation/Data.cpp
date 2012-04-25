@@ -27,12 +27,12 @@ namespace Sim {
 	
 	void Data::startup()
 	{
-		call( boost::bind(&BaseData::startup, _1, mSim) );
+		call( boost::bind(&BaseDatabase::startup, _1, mSim) );
 	}
 	
 	void Data::shutdown()
 	{
-		rcall( boost::bind(&BaseData::shutdown, _1) );
+		rcall( boost::bind(&BaseDatabase::shutdown, _1) );
 	}
 	
 	void Data::save(Save::BasePtr &fp)

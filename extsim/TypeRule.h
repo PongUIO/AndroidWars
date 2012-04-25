@@ -178,10 +178,17 @@ namespace ExtS {
 			virtual TypeRule *clone()=0;
 			
 			/**
+			 * 
+			 */
+			virtual Sim::IdType registerSimData(ExtSim &esim,
+				const std::string &name) {}
+			
+			/**
 			 * Creates an input object for this typerule from a \c ParamList.
 			 */
 			virtual void makeInput(
-				ExtSim &extsim, const ParamList *param) const=0;
+				ExtSim &extsim, Sim::IdType typeId,
+				const ParamList *param) const=0;
 			bool checkConstrained(ParamList *srcList, ExtSim &extsim) const;
 			
 			void readBlock(Script::Block *block);

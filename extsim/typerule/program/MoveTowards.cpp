@@ -9,8 +9,16 @@ namespace ExtS { namespace Prog {
 		registerRuleParam(new PositionParam("Position"));
 	}
 	
-	void MoveTowardsRule::makeInput(
-		ExtSim& extsim, const ParamList* param) const
+	Sim::IdType MoveTowardsRule::registerSimData(ExtSim& esim,
+		const std::string &name)
+	{
+		return esim.getSim().getData().getProgramDb().
+			registerImpl<Sim::Prog::MoveTowards>(name);
+	}
+
+	
+	void MoveTowardsRule::makeInput(ExtSim& extsim,
+		Sim::IdType simTypeId, const ParamList* param) const
 	{
 		Sim::Vector pos = param->getParam<PositionParam>(0)->getVal();
 		
@@ -19,7 +27,8 @@ namespace ExtS { namespace Prog {
 			Sim::Prog::MoveTowards::Config(
 				Sim::Prog::MoveTowards::DtPosition,
 				pos
-			)
+			),
+			simTypeId
 		);
 	}
 } }

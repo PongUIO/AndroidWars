@@ -10,8 +10,6 @@ namespace Sim {
 		 */
 		class Shoot : public Program {
 			public:
-				_SIM_PROGRAM_HEADER
-				
 				struct Config {
 					uint32_t mTargetIndex;
 					Save mWeapArg;

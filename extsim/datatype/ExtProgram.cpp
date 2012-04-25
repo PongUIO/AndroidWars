@@ -2,7 +2,6 @@
 
 #include "../ExtSim.h"
 
-#include "../typerule/program/ArmorAttachment.h"
 #include "../typerule/program/MoveTowards.h"
 
 namespace ExtS {
@@ -12,8 +11,6 @@ namespace ExtS {
 	ExtProgramData::ExtProgramData(ExtSim &esim) :
 		DefaultExtData<ExtProgram>(esim)
 	{
-		registerTypeRule("Ability/ArmorAttachment",
-			new Prog::ArmorAttachmentRule());
 		registerTypeRule("Base/MoveTowards",
 			new Prog::MoveTowardsRule());
 	}
@@ -26,15 +23,16 @@ namespace ExtS {
 	// ExtProgram
 	//
 	//
-	ExtProgram::ExtProgram()
+	ExtProgram::ExtProgram(ExtSim *esim) : ExtBaseDataObj(esim)
 	{}
 	
 	ExtProgram::~ExtProgram()
 	{}
 
-	void ExtProgram::loadBlock(Script::Block& block, TypeRule* rule)
+	void ExtProgram::loadBlock(Script::Block& block,
+		Sim::IdType simTypeId, TypeRule* rule)
 	{
-		ExtBaseDataObj::loadBlock(block, rule);
+		ExtBaseDataObj::loadBlock(block, simTypeId, rule);
 	}
 	
 	void ExtProgram::postProcess(ExtSim& extsim)

@@ -12,8 +12,6 @@ namespace Sim {
 		 */
 		class Kill : public Program {
 			public:
-				_SIM_PROGRAM_HEADER
-				
 				struct Config {
 					IdType mTargetId;
 					

@@ -13,8 +13,6 @@ namespace Sim {
 		 */
 		class CpuBoost : public Ability {
 			public:
-				_SIM_ABILITY_HEADER
-				
 				struct Config : private Save::OperatorImpl<Config> {
 					double mPercentage;
 					int32_t mAbsolute;

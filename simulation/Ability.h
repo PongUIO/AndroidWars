@@ -10,8 +10,6 @@ namespace Sim {
 	class Bot;
 	class AbilityDatabase;
 	
-	#define _SIM_ABILITY_HEADER static const std::string &getTypeName();
-	
 	/**
 	 * Base class for passive abilities.
 	 */

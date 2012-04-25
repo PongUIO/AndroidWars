@@ -8,14 +8,6 @@ namespace Sim {
 	// Ability
 	//
 	//
-#define _SIM_ABILITY_DEF(baseClass,	type, name) \
-	const std::string &Abil::baseClass::getTypeName() {\
-		static std::string typeName = name; \
-		return typeName; \
-	}
-#include "ability/AbilityDef.def"
-#undef _SIM_ABILITY_DEF
-	
 	void Ability::abort(bool force) { mIsFinished=true; }
 	void Ability::toggleSuspend(bool isSuspended, bool force)
 	{ mIsActive = !isSuspended; }

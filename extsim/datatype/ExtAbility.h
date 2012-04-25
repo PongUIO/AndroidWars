@@ -7,28 +7,15 @@
 namespace ExtS {
 	class ExtSim;
 	
-	class ExtAbility {
+	class ExtAbility : public ExtBaseDataObj {
 		public:
-			ExtAbility();
+			ExtAbility(ExtSim *esim);
 			~ExtAbility();
 			
-			void loadBlock(Script::Block &block, TypeRule *rule);
+			void loadBlock(Script::Block &block,
+				Sim::IdType simTypeId, TypeRule *rule);
 			void postProcess(ExtSim &extsim);
 			
-			const std::string &getName() const { return mName; }
-			const std::string &getDescription() const { return mDescription; }
-			
-			const TypeRule *getRule() const { return mRule; }
-			Sim::IdType getId() const { return mId; }
-			
-		private:
-			Sim::IdType mId;
-			
-			std::string mName;
-			std::string mDescription;
-			
-			TypeRule *mRule;
-			friend class Sim::DataCtr<ExtAbility>;
 	};
 	
 	class ExtAbilityData : public DefaultExtData<ExtAbility> {

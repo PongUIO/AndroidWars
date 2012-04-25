@@ -22,26 +22,20 @@ namespace ExtS {
 				std::string mType;
 			};
 			
-			ExtBot();
+			ExtBot(ExtSim *esim);
 			~ExtBot();
 			
-			void loadBlock(Script::Block &block, TypeRule *rule);
+			void loadBlock(Script::Block &block,
+				Sim::IdType simTypeId, TypeRule *rule);
 			void postProcess(ExtSim &extsim);
 			
-			//const std::string &getName() const { return mName; }
-			//const std::string &getDescription() const { return mDescription; }
-			
 			uint32_t getBaseCost() const { return mBaseCost; }
-			//Sim::IdType getId() const { return mId; }
 			
 		private:
+			void loadSimBot(Script::Block &block, Sim::BotD *simBot);
+			
 			/// @name Extended data
 			//@{
-				/*Sim::IdType mId;
-				
-				std::string mName;
-				std::string mDescription;*/
-				
 				uint32_t mBaseCost;
 			//@}
 			
@@ -50,8 +44,6 @@ namespace ExtS {
 			
 			/// @name Temporary data
 			//@{
-				Sim::BotD *mSimData;
-				
 				struct HealthHull : public Sim::Health::Hull {
 					std::string mType;
 					
@@ -64,9 +56,6 @@ namespace ExtS {
 				HealthHull mCoreHealth;
 				AttachmentVec mAttachmentHealth;
 			//@}
-			
-			friend class ExtBotData;
-			friend class Sim::DataCtr<ExtBot>;
 	};
 	
 	class ExtBotData : public DefaultExtData<ExtBot> {
@@ -77,13 +66,6 @@ namespace ExtS {
 			void startup() {}
 			void shutdown() {}
 			
-			void setupObject(Script::Block& block,
-				TypeRule* rule, ExtBot* obj);
-			
-		private:
-			void loadSimBot(Script::Block& block, Sim::BotD *simBot);
-			
-			friend class ExtBot;
 	};
 }
 

@@ -29,7 +29,7 @@ namespace Sim {
 		double friction;     ///< The friction for the tile
 	};
 	
-	class TileDatabase : public DataT<TileD> {
+	class TileDatabase : public DefaultDatabase<TileD> {
 		public:
 			TileDatabase() {}
 			virtual ~TileDatabase() {}
@@ -37,23 +37,11 @@ namespace Sim {
 			/// @name Compatibility layer
 			//@{
 				const TileD &getTile(IdType type) const
-				{ return *getDataById(type); }
+				{ return *getType(type); }
 				
 				IdType addTile(const TileD &tile)
-				{ return addType(new TileD(tile) ); }
+				{ return registerObj(new TileD(tile) ); }
 			//@}
-			
-			void save(Save::BasePtr &fp) {
-				fp.writeInt<uint32_t>(mData.size());
-				for(DataVec::iterator i=mData.begin(); i!=mData.end(); i++) {
-					TileD *t = *i;
-					
-					fp.writeInt(t->colMask);
-					fp.writeFloat(t->blastResist);
-					fp.writeFloat(t->bounce);
-					fp.writeFloat(t->friction);
-				}
-			}
 			
 	};
 }

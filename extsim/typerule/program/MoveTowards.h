@@ -7,14 +7,16 @@ namespace ExtS { namespace Prog {
 	class MoveTowardsRule : public TypeRule {
 		public:
 			MoveTowardsRule();
-			~MoveTowardsRule() {}
+			virtual ~MoveTowardsRule() {}
 			
 			virtual TypeRule* clone()
 			{ return new MoveTowardsRule(*this); }
 			
-			virtual void makeInput(ExtSim &extsim, const ParamList* param) const;
+			virtual Sim::IdType registerSimData(ExtSim& esim,
+				const std::string& name);
 			
-		private:
+			virtual void makeInput(ExtSim &extsim,
+				Sim::IdType simTypeId, const ParamList* param) const;
 	};
 } }
 

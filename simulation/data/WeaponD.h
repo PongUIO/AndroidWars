@@ -6,7 +6,7 @@
 namespace Sim {
 	class Weapon;
 	
-	class WeaponDatabase : public DataBehaviourT<Weapon> {
+	class WeaponDatabase : public DefaultBehaviourDatabase<Weapon> {
 		public:
 			WeaponDatabase() {}
 			virtual ~WeaponDatabase() {}

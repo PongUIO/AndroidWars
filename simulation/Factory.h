@@ -199,65 +199,12 @@ namespace Sim {
 			/// @name Object creation
 			//@{
 				/**
-				 * Creates an object based on an implementation.
-				 * May create any valid inheritor of the type this factory uses.
+				 * Loads and creates an object from a serialized stream \c fp.
 				 * 
-				 * The created object is not associated with the simulation,
-				 * and as such it must be deleted manually.
+				 * @param fp Source stream to read the object from.
+				 * @param doInsert If true, the object is added to the factory.
 				 * 
-				 * To actually make the object active in the simulation, it
-				 * has to be serialized and then added as input.
-				 * 
-				 * This function uses Impl::getTypeName() to find the
-				 * typeid of the new object.
-				 * 
-				 * @warning This is not intended to be used directly, but
-				 * rather through the \c Input class.
-				 * 
-				 * @return A pointer to the new object if successful, or NULL if
-				 * the type is not registered to the simulation.
-				 */
-				template<typename Impl>
-				Impl *createType(const typename Impl::Config &cfg, IdType id) {
-					const BehaviourT<T> *b =
-						getBehaviourFromType<T>(*mSim, Impl::getTypeName());
-					if(!b)
-						return 0;
-					
-					return new Impl(mSim, id, b->mId, cfg);
-				}
-				
-				/**
-				 * Convenience function to create a type and
-				 * directly serialize it.
-				 */
-				template<typename Impl>
-				void createAndSerializeType(Save::BasePtr &fp,
-					const typename Impl::Config &cfg) {
-					Impl *obj = createType<Impl>(cfg, NoId);
-					
-					if(obj) {
-						saveObj(obj, fp);
-						delete obj;
-					}
-				}
-				
-				/**
-				 * Creates an object directly.
-				 * 
-				 * The created object is not associated with the simulation,
-				 * and as such must be deleted manually.
-				 * 
-				 * @note Making this function a template is a crude hack to
-				 * avoid the necessity of T::Config
-				 */
-				template<class Arg>
-				T *create(const Arg &cfg, IdType id) 
-				{ return new T(mSim, id, cfg); }
-				
-				/**
-				 * Creates a serialized object and optionally inserts it
-				 * into the factory.
+				 * @return A pointer to the newly created object.
 				 */
 				T *createSerialized(Save::BasePtr &fp, bool doInsert=true) {
 					typename UidFactory<T>::InsertData insData;
@@ -287,8 +234,8 @@ namespace Sim {
 					IdType type;
 					fp >> type;
 					
-					const BehaviourT<T> *b =
-						getBehaviourFromType<T>(*mSim, type);
+					const typename T::TypeDatabase::Type *b =
+						getDataObjFromType<T>(*mSim, type);
 					
 					T *obj = b->createObj(mSim, internalId);
 					obj->load(fp);

@@ -6,7 +6,7 @@
 namespace Sim {
 	class Bullet;
 	
-	class BulletDatabase : public DataBehaviourT<Bullet> {
+	class BulletDatabase : public DefaultBehaviourDatabase<Bullet> {
 		public:
 			BulletDatabase() {}
 			virtual ~BulletDatabase() {}

@@ -1,2 +1,0 @@
-_SIM_ABILITY_DEF(CpuBoost,			TypeBase, "Base/CpuBoost")
-_SIM_ABILITY_DEF(ArmorAttachment,	TypeBase, "Base/ArmorAttachment")

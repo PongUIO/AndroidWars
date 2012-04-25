@@ -6,12 +6,10 @@
 namespace Sim {
 	class Ability;
 	
-	class AbilityDatabase : public DataBehaviourT<Ability> {
+	class AbilityDatabase : public DefaultBehaviourDatabase<Ability> {
 		public:
 			AbilityDatabase() {}
 			virtual ~AbilityDatabase() {}
-			
-			void registerAllDefault();
 	};
 }
 

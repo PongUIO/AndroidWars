@@ -17,13 +17,6 @@ namespace Sim {
 	class Bot;
 	class BotCpu;
 	
-	/**
-	 * Required for any program implementation.
-	 * 
-	 * This declares a function for the typename of the program.
-	 */
-#define _SIM_PROGRAM_HEADER static const std::string &getTypeName();
-	
 	class Program {
 		public:
 			typedef ProgramDatabase TypeDatabase;

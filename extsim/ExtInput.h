@@ -122,7 +122,7 @@ namespace ExtS {
 			InputData buildInput(Sim::IdType id) {
 				DB &data = getExtDataComponent<DB>(*mExtSim);
 				
-				const typename DB::DataType *obj = data.getDataById(id);
+				const typename DB::DataType *obj = data.getType(id);
 				if(obj)
 					return InputData(obj->getRule()->makeParam(), id);
 				
@@ -172,7 +172,7 @@ namespace ExtS {
 					fp >> id;
 					
 					// Read the source data object and typerule
- 					const typename DB::DataType *dataObj = data.getDataById(id);
+ 					const typename DB::Type *dataObj = data.getType(id);
 					const TypeRule *rule = dataObj ? dataObj->getRule() : 0;
 					
 					if(!(dataObj || rule)) {
@@ -190,7 +190,7 @@ namespace ExtS {
 					}
 					
 					// Build simulation input
-					rule->makeInput(*mExtSim, param);
+					rule->makeInput(*mExtSim, dataObj->getId(), param);
 				}
 			}
 			

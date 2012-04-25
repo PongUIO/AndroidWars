@@ -24,11 +24,13 @@ namespace Sim {
 	T &getInputComponent(Simulation &sim);
 	
 	/**
-	 * Allows generic retrieval of behaviours.
+	 * Allows generic retrieval of database objects based on a type.
+	 * 
+	 * @param V Either a \c std::string or \c IdType value to lookup.
 	 */
 	template<class T, class V>
-	const BehaviourT<T> *
-	getBehaviourFromType(Simulation &sim, V val)
+	const typename T::TypeDatabase::Type *
+	getDataObjFromType(Simulation &sim, V val)
 	{ return getDataComponent<typename T::TypeDatabase>(sim).getType(val); }
 }
 

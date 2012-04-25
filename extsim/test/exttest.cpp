@@ -154,7 +154,7 @@ void listBot()
 	printf("Bot type list:\n");
 	for(unsigned int i=0; i<simBotDb.size(); i++) {
 		const Sim::BotD *simBot = static_cast<const Sim::BotD*>(simBotDb.getType(i));
-		const ExtS::ExtBot *extBot = extBotDb.getDataById(i);
+		const ExtS::ExtBot *extBot = extBotDb.getType(i);
 		
 		printExtBot(extBot);
 		printSimBot(simBot);
@@ -173,7 +173,7 @@ void testParam()
 	
 	ExtS::ExtProgramData &progDb = extSim.getData().getProgramDb();
 	for(Sim::IdType i=0; i<progDb.size(); ++i) {
-		const ExtS::ExtProgram *prog = progDb.getDataById(i);
+		const ExtS::ExtProgram *prog = progDb.getType(i);
 		std::cout << prog->getName() << "\n\tDescription: " <<
 			prog->getDescription() << "\n";
 		
@@ -203,10 +203,9 @@ void setupWorld()
 	
 	Sim::Bot::Config botCfg;
 	botCfg.mSide = 0;
-	botCfg.mType = 0;
 	botCfg.mBody.mPos = Sim::Vector(0,0);
 	
-	sim.getInput().getBotInput().buildInput( botCfg );
+	sim.getInput().getBotInput().buildInputImpl<Sim::Bot>( botCfg, 0 );
 }
 
 void testSim()
@@ -259,8 +258,6 @@ int main(void)
 	
 	// [bootstrap]
 	extSim.startup();
-	extSim.getSim().getData().getProgramDb().registerAllDefault();
-	extSim.getSim().getData().getAbilityDb().registerAllDefault();
 	
 	// [data loading]
 	extSim.switchDataContext(ExtS::ExtData::LcDataLoading);

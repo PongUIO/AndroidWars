@@ -11,10 +11,6 @@ namespace Sim {
 	class WeaponDatabase;
 	class Bot;
 	
-#define SIM_WEAPON_HEADER(name) \
-	static const std::string &getTypeName() \
-	{ static std::string typeName = name; return typeName; }
-	
 	/**
 	 * Base class for a weapon.
 	 */

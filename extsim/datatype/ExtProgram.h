@@ -9,26 +9,12 @@ namespace ExtS {
 	
 	class ExtProgram : public ExtBaseDataObj {
 		public:
-			ExtProgram();
+			ExtProgram(ExtSim *esim);
 			~ExtProgram();
 			
-			void loadBlock(Script::Block& block, TypeRule* rule);
+			void loadBlock(Script::Block& block,
+				Sim::IdType simTypeId, TypeRule* rule);
 			void postProcess(ExtSim &extsim);
-			
-			/*const std::string &getName() const { return mName; }
-			const std::string &getDescription() const { return mDescription; }
-			
-			const TypeRule *getRule() const { return mRule; }
-			Sim::IdType getId() const { return mId; }*/
-			
-		private:
-			/*Sim::IdType mId;
-			
-			std::string mName;
-			std::string mDescription;
-			
-			TypeRule *mRule;
-			friend class Sim::DataCtr<ExtProgram>;*/
 	};
 	
 	class ExtProgramData : public DefaultExtData<ExtProgram> {

@@ -9,18 +9,6 @@ namespace Sim {
 	//
 	//
 	/**
-	 * This implements the getTypeName() function for all
-	 * internal program types.
-	 */
-#define _SIM_PROGRAM_DEF(baseClass,		type,	name) \
-	const std::string &Prog::baseClass::getTypeName() {\
-		static std::string typeName = name; \
-		return typeName; \
-	}
-#include "program/ProgramDef.def"
-#undef _SIM_PROGRAM_DEF
-	
-	/**
 	 * Called just as a program is added to the CPU of a bot.
 	 */
 	void Program::start(Bot* bot, BotCpu* cpu)

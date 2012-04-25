@@ -11,8 +11,9 @@ add_library(AWExtSim
 	param/Position.cpp
 	param/IdList.cpp
 	
-	typerule/program/ArmorAttachment.cpp
 	typerule/program/MoveTowards.cpp
+	
+	typerule/bot/DefaultBot.cpp
 	
 	datatype/ExtGame.cpp
 	datatype/ExtMap.cpp
@@ -28,5 +29,5 @@ if(COMP_EXTSIM_TEST AND Boost_FILESYSTEM_FOUND)
 	add_executable(../ExtSimTest test/exttest.cpp)
 	target_link_libraries(../ExtSimTest AWSim AWExtSim DaScript ${Boost_FILESYSTEM_LIBRARY})
 	
-	add_definitions(-DDATADIR="${CMAKE_HOME_DIRECTORY}/data/")
+	add_definitions(-DDATADIR="${CMAKE_HOME_DIRECTORY}/testmod/data/")
 endif(COMP_EXTSIM_TEST AND Boost_FILESYSTEM_FOUND)

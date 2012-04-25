@@ -13,7 +13,7 @@ namespace Sim {
 	/**
 	 * This class contains an index of tile collision objects.
 	 */
-	class TileCol : public BaseData {
+	class TileCol : public BaseDatabase {
 		public:
 			/**
 			 * The datatype used to describe a collision tile.

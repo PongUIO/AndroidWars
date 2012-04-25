@@ -46,36 +46,29 @@ namespace Sim {
 			friend class ArmorDatabase;
 	};
 	
-	class ArmorDatabase : public DataT<ArmorD> {
+	class ArmorDatabase : public DefaultDatabase<ArmorD> {
 		public:
 			ArmorDatabase() {}
 			virtual ~ArmorDatabase() {}
 			
-			const ArmorD *getArmor(IdType id) const
-			{ return getDataById(id); }
-			
-			const ArmorD *getArmor(const std::string &name) const
-			{ return getDataById(mNameIdMgr.getIdOf(name)); }
-			
-			IdType getIdOf(const std::string &name) const
-			{ return mNameIdMgr.getIdOf(name); }
-			
-			std::string getNameOf(IdType id) const
-			{ return mNameIdMgr.getNameOf(id); }
-			
-			ArmorD *newArmor(const std::string &name)
-			{
-				ArmorD *data = new ArmorD();
-				IdType id = addType(data);
-				data->mId = id;
+			/// @name Compatibility layer
+			//@{
+				const ArmorD *getArmor(IdType id) const
+				{ return getType(id); }
 				
-				mNameIdMgr.connect(id,name);
+				const ArmorD *getArmor(const std::string &name) const
+				{ return getType(name); }
 				
-				return data;
-			}
+				ArmorD *newArmor(const std::string &name)
+				{
+					IdType typeId = registerObj(0,name);
+					ArmorD *data = new ArmorD();
+					reseatObj(typeId, data);
+					
+					return data;
+				}
+			//@}
 			
-		private:
-			NameIdMgr mNameIdMgr;
 	};
 }
 

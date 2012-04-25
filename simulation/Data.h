@@ -31,7 +31,7 @@ namespace Sim {
 	_SIM_X(DamageDatabase, Damage) \
 	_SIM_X(TileCol, TileCol)
 	
-	class Data : private CallGroup<BaseData>  {
+	class Data : private CallGroup<BaseDatabase>  {
 		public:
 			Data(Simulation *sim);
 			~Data();

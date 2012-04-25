@@ -19,7 +19,7 @@ namespace ExtS {
 	// ExtAbility
 	// 
 	// 
-	ExtAbility::ExtAbility() : mName(), mRule(0)
+	ExtAbility::ExtAbility(ExtSim *esim) : ExtBaseDataObj(esim)
 	{}
 
 	ExtAbility::~ExtAbility()

@@ -4,10 +4,13 @@ namespace ExtS {
 	// ExtBaseData
 	// 
 	// 
-	void ExtBaseDataObj::loadBlock(Script::Block& block, TypeRule *rule)
+	void ExtBaseDataObj::loadBlock(Script::Block& block,
+		Sim::IdType simTypeId, TypeRule *rule)
 	{
 		mName = block.getDataFirst("Name");
 		mDescription = block.getDataFirst("Description");
+		
+		mId = simTypeId;
 		
 		if(rule) {
 			if(mRule)

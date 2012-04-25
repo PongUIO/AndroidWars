@@ -6,14 +6,10 @@
 namespace Sim {
 	class Program;
 	
-	class ProgramDatabase : public DataBehaviourT<Program> {
+	class ProgramDatabase : public DefaultBehaviourDatabase<Program> {
 		public:
 			ProgramDatabase() {}
 			virtual ~ProgramDatabase() {}
-			
-			void registerBase();
-			void registerAbility();
-			void registerAllDefault();
 	};
 }
 

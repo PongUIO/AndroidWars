@@ -27,36 +27,28 @@ namespace Sim {
 	/**
 	 * Manages all damage types.
 	 */
-	class DamageDatabase : public DataT<DamageD> {
+	class DamageDatabase : public DefaultDatabase<DamageD> {
 		public:
 			DamageDatabase() {}
 			virtual ~DamageDatabase() {}
 			
-			const DamageD *getDamage(IdType id) const
-			{ return getDataById(id); }
-			
-			const DamageD *getDamage(const std::string &name) const
-			{ return getDataById(mNameIdMgr.getIdOf(name)); }
-			
-			IdType getIdOf(const std::string &name) const
-			{ return mNameIdMgr.getIdOf(name); }
-			
-			std::string getNameOf(IdType id) const
-			{ return mNameIdMgr.getNameOf(id); }
-			
-			DamageD *newDamage(const std::string &name)
-			{
-				DamageD *data = new DamageD();
-				IdType id = addType(data);
-				data->mId = id;
+			/// @name Compatibility layer
+			//@{
+				const DamageD *getDamage(IdType id) const
+				{ return getType(id); }
 				
-				mNameIdMgr.connect(id, name);
+				const DamageD *getDamage(const std::string &name) const
+				{ return getType(name); }
 				
-				return data;
-			}
-		
-		private:
-			NameIdMgr mNameIdMgr;
+				DamageD *newDamage(const std::string &name)
+				{
+					IdType typeId = registerObj(0,name);
+					DamageD *data = new DamageD();
+					reseatObj(typeId,data);
+					
+					return data;
+				}
+			//@}
 	};
 }
 

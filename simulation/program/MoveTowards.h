@@ -15,8 +15,6 @@ namespace Sim {
 		 */
 		class MoveTowards : public Program {
 			public:
-				_SIM_PROGRAM_HEADER
-				
 				enum DestinationType {
 					/// Locks onto a single bot based on the given target
 					DtBotLock=0,

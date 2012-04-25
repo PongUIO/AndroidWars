@@ -4,57 +4,36 @@
 #include "../../simulation/Simulation.h"
 #include "../ExtSim.h"
 
+#include "../typerule/bot/DefaultBot.h"
+
 namespace ExtS {
 	// ExtBotData
 	//
 	//
 	ExtBotData::ExtBotData(ExtSim &esim): DefaultExtData<ExtBot>(esim)
 	{
-		mIgnoreRule=true;
+		// A blank string identifies the default type,
+		// or the type selected if no "Base" parameter is defined
+		// in a script block
+		registerTypeRule("", new Bot::DefaultBot());
 	}
 	
 	ExtBotData::~ExtBotData()
 	{}
 	
-	void ExtBotData::setupObject(Script::Block& block,
-		TypeRule* rule, ExtBot* obj)
-	{
-		// Create the corresponding sim object
-		Sim::BotD *simData = new Sim::BotD();
-		mExtSim->getSim().getData().getBotDb().registerCustom(simData, "Base");
-		
-		obj->mSimData = simData;
-		obj->loadBlock(block, 0);
-		
-		loadSimBot(block, simData);
-	}
-
-	
-	void ExtBotData::loadSimBot(Script::Block& block, Sim::BotD *simBot)
-	{
-		simBot->baseSpeed = ExtData::readValue<double>(
-			block.getDataFirst("Speed"), 0);
-		
-		// Load debug data
-		Sim::Collision::ColPoints pts;
-		pts.push_back(Sim::Vector(0,0));
-		pts.push_back(Sim::Vector(0,1));
-		pts.push_back(Sim::Vector(1,1));
-		pts.push_back(Sim::Vector(1,0));
-		
-		simBot->setCollision(new Sim::Collision(pts));
-	}
-	
 	// ExtBot
 	//
 	//
-	ExtBot::ExtBot() {}
+	ExtBot::ExtBot(ExtSim *esim) : ExtBaseDataObj(esim) {}
 	ExtBot::~ExtBot() {}
 	
-	void ExtBot::loadBlock(Script::Block& block, TypeRule* rule)
+	void ExtBot::loadBlock(Script::Block& block,
+		Sim::IdType simTypeId, TypeRule* rule)
 	{
 		// Load standard data
-		ExtBaseDataObj::loadBlock(block, rule);
+		ExtBaseDataObj::loadBlock(block, simTypeId, rule);
+		loadSimBot(block,
+			mExtSim->getSim().getData().getBotDb().getType(getId()));
 		
 		// Load extended data
 		{
@@ -99,16 +78,34 @@ namespace ExtS {
 		ExtBaseDataObj::postProcess(extsim);
 		
 		Sim::ArmorDatabase &armorDb = extsim.getSim().getData().getArmorDb();
-		
 		mCoreHealth.postProcess(armorDb);
-		mSimData->coreHealth.getCore() = mCoreHealth;
+		
+		Sim::BotD *simData = extsim.getSim().getData().getBotDb().
+			getType(getId());
+		
+		simData->coreHealth.getCore() = mCoreHealth;
 		
 		for(AttachmentVec::iterator i=mAttachmentHealth.begin();
 			i!=mAttachmentHealth.end(); ++i) {
 			(*i).postProcess(armorDb);
 			
-			mSimData->coreHealth.addAttachment(*i);
+			simData->coreHealth.addAttachment(*i);
 		}
+	}
+	
+	void ExtBot::loadSimBot(Script::Block& block, Sim::BotD *simBot)
+	{
+		simBot->baseSpeed = ExtData::readValue<double>(
+			block.getDataFirst("Speed"), 0);
+		
+		// Load debug data
+		Sim::Collision::ColPoints pts;
+		pts.push_back(Sim::Vector(0,0));
+		pts.push_back(Sim::Vector(0,1));
+		pts.push_back(Sim::Vector(1,1));
+		pts.push_back(Sim::Vector(1,0));
+		
+		simBot->setCollision(new Sim::Collision(pts));
 	}
 
 	// ExtBot::HealthHull
