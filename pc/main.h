@@ -228,16 +228,16 @@ public:
 		botCfg.mType = 0;
 		botCfg.mBody.mPos = Sim::Vector(0,0);
 		int botId = sim.getInput().getBotInput().buildInput(botCfg)->getId();
-		botCfg = Sim::Bot::Config();
-		botCfg.mSide = 0;
-		botCfg.mType = 0;
-		botCfg.mBody.mPos = Sim::Vector(0,1);
-		sim.getInput().getBotInput().buildInput(botCfg);
-		botCfg = Sim::Bot::Config();
-		botCfg.mSide = 0;
-		botCfg.mType = 0;
-		botCfg.mBody.mPos = Sim::Vector(0,2);
-		sim.getInput().getBotInput().buildInput(botCfg);
+		Sim::Bot::Config botCfg2;
+		botCfg2.mSide = 0;
+		botCfg2.mType = 0;
+		botCfg2.mBody.mPos = Sim::Vector(0,1);
+		sim.getInput().getBotInput().buildInput(botCfg2);
+		Sim::Bot::Config botCfg3;
+		botCfg3.mSide = 0;
+		botCfg3.mType = 0;
+		botCfg3.mBody.mPos = Sim::Vector(0,2);
+		sim.getInput().getBotInput().buildInput(botCfg3);
 
 
 		// Send some input to this bot
