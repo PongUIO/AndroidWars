@@ -4,6 +4,7 @@
 #include<QStyle>
 #include<QLineEdit>
 #include "Simulation.h"
+#include "../util/client.h"
 
 class GameSlider : public QSlider {
 	Q_OBJECT
@@ -11,9 +12,9 @@ public:
 	Sim::Simulation *sim;
 	QLineEdit *qle;
 	bool replay;
-	GameSlider(Sim::Simulation *sim, QWidget *parent = 0) : QSlider(Qt::Horizontal,parent) {
+	ClientStates *cs;
+	GameSlider(Sim::Simulation *sim, ClientStates *cs, QWidget *parent = 0) : QSlider(Qt::Horizontal,parent), cs(cs), sim(sim) {
 		replay = false;
-		this->sim = sim;
 		qle = new QLineEdit(parent);
 		setRange(0, 100);
 		resize(250, height());
@@ -24,9 +25,11 @@ public:
 
 	}
 	void sliderChange(SliderChange sc) {
+
 		if (sc == QAbstractSlider::SliderValueChange) {
 			QString str = "%1";
 			qle->setText(str.arg(value()));
+			cs->setOffset(value());
 			update();
 			updatePhase();
 		}
@@ -41,6 +44,7 @@ public:
 		if (value() == 0) {
 			sim->gotoPresent();
 		} else {
+			sim->gotoPresent();
 			if (replay) {
 				sim->getReplayManager().rewind(value(), 0);
 			} else {

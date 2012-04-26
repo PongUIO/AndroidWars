@@ -4,15 +4,16 @@
 #include<boost/unordered_set.hpp>
 #include "cursordefines.h"
 #include "Simulation.h"
-#include<QDebug>
 
 class ClientStates {
 private:
 	boost::unordered_set<uint> selBots;
 	Sim::Simulation *sim;
 	bool shift, ctrl, menu, gameStepping;
+	int offset;
 public:
 	ClientStates() {
+		offset = 0;
 		shift = ctrl = gameStepping = false;
 		menu = true;
 		sim = NULL;
@@ -20,6 +21,10 @@ public:
 
 	Sim::Simulation* getSim() {
 		return sim;
+	}
+
+	void setOffset(int i) {
+		offset = i;
 	}
 
 	void setSim(Sim::Simulation *in) {
@@ -72,7 +77,7 @@ public:
 		}
 		std::list<Sim::Bot*> bots = sim->getState().getBotFactory().getBotList();
 		std::list<Sim::Bot*>::iterator bot;
-		if (button == Qt::LeftButton) {
+		if (button) {
 			if (!shift) {
 				selBots.clear();
 			}
@@ -84,20 +89,21 @@ public:
 					return;
 				}
 			}
-		} else if (button == Qt::RightButton) {
+		} else if (button == 0) {
 			for (bot = bots.begin(); bot != bots.end(); bot++) {
 				if (isSelected((*bot)->getId())) {
+					sim->gotoPresent();
 					Sim::Input &inMgr = sim->getInput();
 					Sim::ProgramFactory &progFact = sim->getState().getProgramFactory();
 
 					using namespace Sim::Prog;
-					MoveTowards *move = inMgr.getProgramInput().buildInputImpl<MoveTowards>(
-						    MoveTowards::Config(MoveTowards::DtPosition, Sim::Vector(x, y))
+					MoveTowards *move = inMgr.getProgramInput().buildInputImplStr<MoveTowards>(
+						    MoveTowards::Config(MoveTowards::DtPosition, Sim::Vector(x, y)), "MoveTowards"
 						    );
-					Kill *kill = inMgr.getProgramInput().buildInputImpl<Kill>(
-						    Kill::Config(move->getId()));
-					inMgr.getCpuInput().registerInput((*bot)->getId(), move->getId(), 10);
-					inMgr.getCpuInput().registerInput((*bot)->getId(), kill->getId(), 20);
+					//Kill *kill = inMgr.getProgramInput().buildInputImpl<Kill>(
+					//Kill::Config(move->getId()));
+					inMgr.getCpuInput().registerInput((*bot)->getId(), move->getId(), offset);
+					//inMgr.getCpuInput().registerInput((*bot)->getId(), kill->getId(), 20);
 				}
 			}
 		}

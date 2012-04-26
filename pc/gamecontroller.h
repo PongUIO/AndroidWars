@@ -26,12 +26,10 @@ public:
 	//buttons
 	GameButton *label, *label2;
 	GameSlider *slider;
-        GameController(ClientStates *states, QWidget *parent = 0) {
-		this->states = states;
-                this->parent = parent;
+	GameController(ClientStates *states, QWidget *parent = 0) : states(states), parent(parent) {
 
-               drawer = new GameDrawer(states, parent);
-                drawer->setMouseTracking(true);
+		drawer = new GameDrawer(states, parent);
+		drawer->setMouseTracking(true);
                 iconHolder  = new QVBoxLayout(parent);
 		lower = new QHBoxLayout();
 		upper = new QHBoxLayout();
@@ -40,7 +38,7 @@ public:
 		iconHolder->insertLayout(0, upper);
 		parent->setWindowTitle(QApplication::translate("childwidget", "Child widget"));
 
-                slider = new GameSlider(states->getSim(), parent);
+		slider = new GameSlider(states->getSim(), states, parent);
 
 		label = new GameButton(states->getSim(), states, 0, slider, parent);
 		label2 = new GameButton(states->getSim(), states, 0, slider, parent);

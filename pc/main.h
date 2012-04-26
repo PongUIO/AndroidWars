@@ -216,7 +216,7 @@ public:
 		config.stepTime = 0.01;
 		sim.startup();
 
-		sim.getData().getProgramDb().registerAllDefault();
+		//sim.getData().getProgramDb().registerAllDefault();
 
 		Sim::Player testSide;
 		sim.getState().getPlayerData().addPlayer(testSide);
@@ -225,19 +225,19 @@ public:
 		// Create a test bot
 		Sim::Bot::Config botCfg;
 		botCfg.mSide = 0;
-		botCfg.mType = 0;
+		//botCfg.mType = 0;
 		botCfg.mBody.mPos = Sim::Vector(0,0);
-		int botId = sim.getInput().getBotInput().buildInput(botCfg)->getId();
+		int botId = sim.getInput().getBotInput().buildInputImpl<Sim::Bot>(botCfg, 0)->getId();
 		Sim::Bot::Config botCfg2;
 		botCfg2.mSide = 0;
-		botCfg2.mType = 0;
+		//botCfg2.mType = 0;
 		botCfg2.mBody.mPos = Sim::Vector(0,1);
-		sim.getInput().getBotInput().buildInput(botCfg2);
+		sim.getInput().getBotInput().buildInputImpl<Sim::Bot>(botCfg2, 0);
 		Sim::Bot::Config botCfg3;
 		botCfg3.mSide = 0;
-		botCfg3.mType = 0;
+		//botCfg3.mType = 0;
 		botCfg3.mBody.mPos = Sim::Vector(0,2);
-		sim.getInput().getBotInput().buildInput(botCfg3);
+		sim.getInput().getBotInput().buildInputImpl<Sim::Bot>(botCfg3, 0);
 
 
 		// Send some input to this bot
@@ -246,14 +246,14 @@ public:
 			Sim::ProgramFactory &progFact = sim.getState().getProgramFactory();
 
 			using namespace Sim::Prog;
-			Sim::IdType moveId = inMgr.getProgramInput().buildInputImpl<MoveTowards>(
-						MoveTowards::Config(MoveTowards::DtPosition, Sim::Vector(10,0)))->
+			Sim::IdType moveId = inMgr.getProgramInput().buildInputImplStr<MoveTowards>(
+						MoveTowards::Config(MoveTowards::DtPosition, Sim::Vector(10,0)), "MoveTowards")->
 					getId();
 
-			Kill *kill = inMgr.getProgramInput().buildInputImpl<Kill>(
-						Kill::Config(moveId));
+			//Kill *kill = inMgr.getProgramInput().buildInputImpl<Kill>(
+			//			Kill::Config(moveId));
 			inMgr.getCpuInput().registerInput(botId, moveId, 0);
-			inMgr.getCpuInput().registerInput(botId, kill->getId(), 20);
+			//inMgr.getCpuInput().registerInput(botId, kill->getId(), 20);
 		}
 
 		Sim::TileDatabase &db = sim.getData().getTileDb();

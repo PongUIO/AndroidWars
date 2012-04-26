@@ -105,7 +105,7 @@ protected:
                 int h = height();
 		hitX = cam->xToSimX(event->x());
 		hitY = cam->yToSimY(event->y());
-		states->registerClick(cam->xToSimX(event->x()), cam->yToSimY(event->y()), event->button());
+		states->registerClick(cam->xToSimX(event->x()), cam->yToSimY(event->y()), event->button() == Qt::LeftButton);
 	}
 
 

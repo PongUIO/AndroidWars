@@ -25,10 +25,9 @@ protected:
 	void mousePressEvent(QMouseEvent * event) {
 		if (func == 0) {
 			if (!cs->getRunning()) {
-				sim->gotoPresent();
+				gs->setValue(0);
 				sim->startPhase();
 				cs->setRunning(true);
-				gs->setValue(0);
 			}
 		}
 	}
