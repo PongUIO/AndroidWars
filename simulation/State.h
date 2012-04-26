@@ -35,6 +35,44 @@ namespace Sim {
 	
 	class State : private CallGroup<StateObj> {
 		public:
+			/**
+			 * Describes the current active state this simulation
+			 * \c State object is in.
+			 * 
+			 * This is used to enforce and assure that \c State logic is
+			 * performed in a reasonable manner. Violations of this
+			 * behaviour will result in assertions being raised.
+			 */
+			enum StateType {
+				/// \c State is in this state before \c startup and after
+				/// \c shutdown has been called.
+				/// 
+				/// Valid calls: \c startup
+				StUninitialized,
+				
+				/// \c State is in this state after \c startup and before
+				/// \c shutdown has been called, and outside of any
+				/// \c startPhase, \c step, and \c endPhase phase
+				/// processing.
+				/// 
+				/// Valid calls: \c startPhase, \c shutdown, \c save
+				StIdle,
+				
+				/// \c State is in this state after a call to
+				/// \c startPhase, and there are still more calls to
+				/// \c step before \c endPhase may be called.
+				/// 
+				/// Valid calls: \c step
+				StInPhase,
+				
+				/// \c State is in this state after the final call to
+				/// \c step during a phase (where the current state was
+				/// \c StInPhase).
+				/// 
+				/// Valid calls: \c endPhase
+				StEndPhase
+			};
+			
 			/// @name Initialization
 			//@{
 				State(Simulation *sim);
@@ -42,7 +80,7 @@ namespace Sim {
 				
 				void operator=(const State &other);
 				
-				void startup();
+				void startup(uint32_t phaseLen);
 				void shutdown();
 			//@}
 			
@@ -74,7 +112,7 @@ namespace Sim {
 
 				uint32_t getCurPhaseStep() { return mCtrl.mCurPhaseStep; }
 				uint32_t getCurPhase() { return mCtrl.mCurPhase; }
-				bool isInPhase() { return mCtrl.mInPhase; }
+				StateType getStateType() { return StateType(curState()); }
 			//@}
 			
 		private:
@@ -91,20 +129,26 @@ namespace Sim {
 			//@{
 				uint32_t &curPhaseStep() { return mCtrl.mCurPhaseStep; }
 				uint32_t &curPhase() { return mCtrl.mCurPhase; }
+				uint32_t &curState() { return mCtrl.mCurState; }
+				uint32_t &phaseLength() { return mCtrl.mPhaseLength; }
 				
 				struct StateControl :
 				private Save::OperatorImpl<StateControl> {
-					StateControl() : mCurPhaseStep(0), mCurPhase(0), mInPhase(false)
+					StateControl() : mCurPhaseStep(0), mCurPhase(0),
+						mPhaseLength(0), mCurState(StUninitialized)
 						{}
 					
 					uint32_t mCurPhaseStep;
 					uint32_t mCurPhase;
-					bool mInPhase;
+					uint32_t mPhaseLength;
+					uint32_t mCurState;
 					
 					void save(Save::BasePtr &fp) const
-					{ fp << mCurPhaseStep << mCurPhase << mInPhase; }
+					{ fp << mCurPhaseStep << mCurPhase << mPhaseLength
+						<< mCurState; }
 					void load(Save::BasePtr &fp)
-					{ fp >> mCurPhaseStep >> mCurPhase >> mInPhase; }
+					{ fp >> mCurPhaseStep >> mCurPhase >> mPhaseLength
+						>> mCurState; }
 				};
 				StateControl mCtrl;
 			//@}

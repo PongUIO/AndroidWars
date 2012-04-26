@@ -43,7 +43,7 @@ namespace Sim {
 	void Simulation::clear()
 	{
 		mState = State(this);
-		mState.startup();
+		mState.startup(mConfiguration.phaseLength);
 	}
 	
 	void Simulation::prepareSim()

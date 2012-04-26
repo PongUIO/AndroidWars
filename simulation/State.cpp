@@ -1,3 +1,5 @@
+#include <assert.h>
+
 #include "State.h"
 #include "Bot.h"
 #include "World.h"
@@ -46,43 +48,73 @@ namespace Sim {
 		registerCallObj(&mAbilityFactory);
 	}
 	
-	void State::startup()
+	void State::startup(uint32_t phaseLen)
 	{
+		assert(curState() == StUninitialized &&
+			"Invalid state for call");
+		
+		phaseLength() = phaseLen;
+		
 		curPhase() = 0;
 		curPhaseStep() = 0;
+		curState() = StIdle;
 		
 		call( boost::bind(&StateObj::startup, _1) );
 	}
 
 	void State::shutdown()
-	{	rcall( boost::bind(&StateObj::shutdown, _1) ); }
+	{
+		assert(curState() == StIdle &&
+			"Invalid state for call");
+		
+		rcall( boost::bind(&StateObj::shutdown, _1) );
+		
+		curState() = StUninitialized;
+		
+	}
 	
 	void State::startPhase()
 	{
-		mCtrl.mInPhase = true;
+		assert(curState() == StIdle &&
+			"Invalid state for call");
+		
 		curPhaseStep() = 0;
+		curState() = StInPhase;
 		
 		call( boost::bind(&StateObj::startPhase, _1) );
 	}
 	
 	void State::step(double stepTime)
 	{
+		assert(curState() == StInPhase &&
+			"Invalid state for call");
+		
 		call( boost::bind(&StateObj::step, _1, stepTime) );
 		
 		curPhaseStep()++;
+		
+		if(curPhaseStep() >= phaseLength())
+			curState() = StEndPhase;
 	}
 	
 	void State::endPhase()
 	{
+		assert(curState() == StEndPhase &&
+			"Invalid state for call");
+		
 		call( boost::bind(&StateObj::endPhase, _1) );
 		
 		curPhase()++;
 		curPhaseStep() = 0;
-		mCtrl.mInPhase = false;
+		
+		curState() = StIdle;
 	}
 	
 	void State::save(Save::BasePtr &fp)
 	{
+		assert(curState() == StIdle &&
+			"Invalid state for call");
+		
 		fp << mCtrl;
 		
 		call( boost::bind(&StateObj::save, _1, boost::ref(fp)) );
