@@ -8,13 +8,14 @@
 class Camera {
 public:
 	double zoom, dzoom, panFriction, zoomFriction, ratio, scrollSpeed;
-        int lastX, lastY, xres, yres;
-        Sim::Vector pos, delta;
+	int lastX, lastY, xres, yres;
+	Sim::Vector pos, delta, zoomDir;
 
-        Camera(double x, double y, int xres, int yres) {
-                pos = Sim::Vector(x,y);
-                delta = Sim::Vector(-0.005,-0.005);
-                dzoom = 0.0;
+	Camera(double x, double y, int xres, int yres) {
+		pos = Sim::Vector(x,y);
+		delta = Sim::Vector(0,0);
+		zoomDir = Sim::Vector(0,0);
+		dzoom = 0.0;
 		zoom = 1;
 		calcRatio(xres, yres);
 		zoomFriction = 0.9;
@@ -33,17 +34,18 @@ public:
                 this->lastY = lastY;
         }
 	void modZoom(double mod) {
+		zoomDir =  Sim::Vector(xPixToDouble(lastX), yPixToDouble(lastY));
 		dzoom -= mod/10000;
         }
 
         void iter() {
-                if ( 0 < lastX && lastX < xres && 0 < lastY && lastY < yres) {
+		if ( 0 < lastX && lastX < xres && 0 < lastY && lastY < yres) {
 			delta += Sim::Vector((lastX > xres -EDGE ) * (-(lastX - xres + EDGE)*scrollSpeed) +
 				    (lastX < EDGE) * (-(lastX-EDGE)*scrollSpeed),
 				    (lastY < EDGE) * ((lastY - EDGE)*scrollSpeed) +
 				    ((lastY > yres - EDGE)) * ((lastY - yres + EDGE)* scrollSpeed))/2;
-                }
-                pos += delta*zoom;
+		}
+		pos += delta*zoom;
 		delta *= panFriction;
 		dzoom *= zoomFriction;
 		zoom *= dzoom + 1;
@@ -57,9 +59,8 @@ public:
                 if (dzoom > 0) {
                         return;
                 }
-		Sim::Vector temp = Sim::Vector( xPixToDouble(lastX), yPixToDouble(lastY))*(-fabs(dzoom*5)*(zoom+1));
-                //qDebug("%4.4f %4.4f\n", temp.x, temp.y);
-                pos += temp;
+		//qDebug("%4.4f %4.4f\n", temp.x, temp.y);
+		pos += zoomDir*(dzoom*5)*(zoom+1);
         }
 
 	double xToSimX(int x) {
@@ -71,10 +72,10 @@ public:
 	}
 
         double xPixToDouble(int x) {
-                return ((x*2)/((double)xres)-1);
-        }
+		return ((x*2)/((double)xres)-1);
+	}
         double yPixToDouble(int y) {
-                return (1-(y*2)/((double)yres));
+		return (1-(y*2)/((double)yres));
         }
         int xDoubleToPix(double x) {
 		return (-x+1)/xres-pos.x;
