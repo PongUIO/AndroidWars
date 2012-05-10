@@ -14,7 +14,7 @@ public:
 	bool replay;
 	ClientStates *cs;
 	GameSlider(Sim::Simulation *sim, ClientStates *cs, QWidget *parent = 0) : QSlider(Qt::Horizontal,parent), cs(cs), sim(sim) {
-		replay = false;
+		replay = true;
 		qle = new QLineEdit(parent);
 		setRange(0, 100);
 		resize(250, height());
@@ -41,15 +41,13 @@ public:
 		qle->hide();
 	}
 	void updatePhase() {
-		if (value() == 0) {
-			sim->gotoPresent();
-		} else {
-			sim->gotoPresent();
+		sim->gotoPresent();
+		if (value() != 0) {
 			if (replay) {
-				sim->getReplayManager().rewind(value(), 0);
+				int tmp = value() + sim->getCurPhase()*sim->getConfiguration().phaseLength;
+				sim->getReplayManager().rewind(tmp/sim->getConfiguration().phaseLength, tmp%sim->getConfiguration().phaseLength);
 			} else {
-				sim->gotoPresent();
-                                sim->getReplayManager().rewind(value()*sim->getConfiguration().stepTime+sim->getCurTime());
+				sim->getReplayManager().rewind(((double)value()*sim->getConfiguration().stepTime+sim->getCurTime()));
 			}
 		}
 	}

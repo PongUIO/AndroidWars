@@ -9,6 +9,7 @@ class GLObj {
 		QGLBuffer indiceBuff;
 		QGLBuffer verticeBuff;
 		GLObj(QString file, QVector3D scale) {
+			//glNewList(list, GL_COMPILE);
 			indiceBuff = QGLBuffer(QGLBuffer::IndexBuffer);
 			verticeBuff = QGLBuffer(QGLBuffer::VertexBuffer);
 			int i;
@@ -44,16 +45,22 @@ class GLObj {
 				//qDebug() << vertices[i];
 			}
 			qDebug() << verticeBuff.create();
-			verticeBuff.allocate( &vertices, vertices.size()*sizeof(QVector3D));
+			verticeBuff.bind();
+			verticeBuff.allocate( &vertices[0], vertices.size()*sizeof(QVector3D));
 			qDebug() << indiceBuff.create();
-			indiceBuff.allocate( &indices, indices.size()*sizeof(qreal));
+			indiceBuff.allocate( &indices[0], indices.size()*sizeof(GLint));
+			indiceBuff.bind();
 			qDebug() << indiceBuff.isCreated();
 			qDebug() << verticeBuff.isCreated();
 			f.close();
+			QVector3D testVec = QVector3D(0,0,0);
+			qDebug() << vertices[1];
+			qDebug() << verticeBuff.read(sizeof(testVec), &testVec, sizeof(QVector3D));
+			qDebug() << testVec;
+		}
+		void init() {
 		}
 		void draw() {
-			return;
-			qDebug() << "draw";
 			glEnableClientState(GL_VERTEX_ARRAY);
 			glEnableClientState(GL_NORMAL_ARRAY);
 			glColor3f(1.,1.,1.);
@@ -66,6 +73,7 @@ class GLObj {
 			}
 			glDisableClientState(GL_VERTEX_ARRAY);
 			glDisableClientState(GL_NORMAL_ARRAY);
+			glEndList();
 		}
 };
 

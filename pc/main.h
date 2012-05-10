@@ -37,7 +37,7 @@ public slots:
 		} else if ( sim.hasPhaseStep() ) {
 			sim.step();
 		} else {
-			sim.endPhase(true);
+			sim.endPhase(false);
 			states->setRunning(false);
 		}
 	}
