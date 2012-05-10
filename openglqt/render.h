@@ -126,16 +126,6 @@ protected:
 		loadAndBind("../testmod/graphics/mouse/default.png", &mouse[0], &mousetextures[0],64,64);
 		loadAndBind("../testmod/graphics/mouse/attack.png", &mouse[1], &mousetextures[1],64,64);
 		loadAndBind("../testmod/graphics/weapons/bullet.png", &bullet[0], &bullettextures[0],16,16);
-		testbuf = new QGLBuffer();
-		qDebug() << testbuf->create();
-		qDebug() << testbuf->bind();
-		testbuf->allocate(sizeof(QVector3D
-					 ));
-		QVector3D a = QVector3D(1.,2.,3.);
-		QVector3D b = QVector3D(0.,0.,0.);
-		testbuf->write(0, &a, sizeof(QVector3D));
-		qDebug() << testbuf->read(0, &b, sizeof(QVector3D));
-		qDebug() << b;
 		testbot = new GLObj("../testmod/obj/Android01.obj", QVector3D(1., 1., 1.));
 		this->setAttribute(Qt::WA_NoSystemBackground);
 		QPixmap m;

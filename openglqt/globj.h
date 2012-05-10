@@ -57,22 +57,26 @@ class GLObj {
 			qDebug() << vertices[1];
 			qDebug() << verticeBuff.read(sizeof(testVec), &testVec, sizeof(QVector3D));
 			qDebug() << testVec;
+
+			indiceBuff.release();
+			verticeBuff.release();
 		}
 		void init() {
 		}
 		void draw() {
 			glEnableClientState(GL_VERTEX_ARRAY);
-			glEnableClientState(GL_NORMAL_ARRAY);
+			glEnableClientState(GL_INDEX_ARRAY);
 			glColor3f(1.,1.,1.);
+			glVertexPointer(3, GL_FLOAT, 0, NULL);
 			if (verticeBuff.bind()) {
 				if (indiceBuff.bind())  {
-					glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+					glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, NULL);
 					indiceBuff.release();
 				}
 				verticeBuff.release();
 			}
 			glDisableClientState(GL_VERTEX_ARRAY);
-			glDisableClientState(GL_NORMAL_ARRAY);
+			glDisableClientState(GL_INDEX_ARRAY);
 			glEndList();
 		}
 };
