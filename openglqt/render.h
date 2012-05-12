@@ -116,6 +116,7 @@ protected:
 		glClearColor( 0.0, 0.0, 0.0, 0.0 );
 		//glEnable(GL_DEPTH_TEST);
                 glEnable(GL_DOUBLE) ;
+		glPushClientAttrib( GL_CLIENT_VERTEX_ARRAY_BIT );
 
 		//Loading textures.
 		loadAndBind("../testmod/graphics/tiles/empty.png", &data[0], &textures[0]);
@@ -126,7 +127,7 @@ protected:
 		loadAndBind("../testmod/graphics/mouse/default.png", &mouse[0], &mousetextures[0],64,64);
 		loadAndBind("../testmod/graphics/mouse/attack.png", &mouse[1], &mousetextures[1],64,64);
 		loadAndBind("../testmod/graphics/weapons/bullet.png", &bullet[0], &bullettextures[0],16,16);
-		testbot = new GLObj("../testmod/obj/Android01.obj", QVector3D(1., 1., 1.));
+		testbot = new GLObj("../testmod/obj/test.obj", QVector3D(1., 1., 1.));
 		this->setAttribute(Qt::WA_NoSystemBackground);
 		QPixmap m;
 		m.convertFromImage(mouse[MOUSE_NORMAL]);
@@ -257,10 +258,11 @@ protected:
 			}
 		}
 
-		testbot->draw();
 
 		glDisable(GL_TEXTURE_2D);
+		testbot->draw();
 		glColor4f(0.2f, 1.0f, 0.2f, selAlpha);
+					//drawObj3d(0,0,0.1,0.1,0.1);
 		for (bot = bots.begin(); bot != bots.end(); bot++) {
 			if (states->isSelected((*bot)->getId())) {
 				Sim::Vector pos = (*bot)->getBody().mPos;
