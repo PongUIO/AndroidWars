@@ -18,7 +18,7 @@ class GLObj {
 			int i, j;
 			QFile f(file);
 			f.open(QFile::QIODevice::ReadOnly);
-			float max[3] = {0, 0, 2};
+			float max[3] = {-9999, -9999, -9999};
 			float min[3] = {9999, 9999, 9999};
 			while (!f.atEnd()) {
 				QString str = f.readLine();
@@ -34,11 +34,8 @@ class GLObj {
 					}
 					vertices.push_back(QVector3D(arr[0], arr[1], arr[2]));
 				} else if (qsl.at(0) == "f") {
-					qDebug() << "next";
 					for (i = 0; i < qsl.size()-1; i ++) {
 						QStringList qsl2 = qsl.at(i+1).split("/");
-
-						qDebug() << qsl2.at(0);
 						indices.push_back(qsl2.at(0).toUInt()-1);
 					}
 				}
@@ -46,17 +43,12 @@ class GLObj {
 			f.close();
 			QVector3D minVec = QVector3D(min[0], min[1], min[2]);
 			QVector3D maxVec = QVector3D(max[0], max[1], max[2]);
-			qDebug() << minVec;
-			qDebug() << maxVec;
 			QVector3D diff = maxVec - minVec;
 			QVector3D scaleCorrected = QVector3D(1./diff.x(), 1./diff.y(), 1./diff.z()) * scale;
 			QVector3D offset = QVector3D(0.,0.,0.);
 			for (i = 0; i < vertices.size(); i++) {
 				vertices[i] = (vertices[i] - minVec)*scaleCorrected+offset;
-				qDebug() << vertices[i];
 			}
-			qDebug() << vertices[0];
-			qDebug() << indices[0] << indices[1] << indices[2];
 			bufVert = QGLBuffer(QGLBuffer::VertexBuffer);
 			bufInd = QGLBuffer(QGLBuffer::IndexBuffer);
 			qDebug() << bufVert.create();
