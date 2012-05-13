@@ -5,7 +5,7 @@
 class GLObj {
 	public:
 		QVector<QVector3D> vertices;
-		QVector<GLint> indices;
+		QVector<GLuint> indices;
 		QGLBuffer indiceBuff;
 		QGLBuffer verticeBuff;
 		QGLBuffer bufVert, bufInd;
@@ -18,7 +18,7 @@ class GLObj {
 			int i, j;
 			QFile f(file);
 			f.open(QFile::QIODevice::ReadOnly);
-			float max[3] = {0, 0, 0};
+			float max[3] = {0, 0, 2};
 			float min[3] = {9999, 9999, 9999};
 			while (!f.atEnd()) {
 				QString str = f.readLine();
@@ -26,22 +26,20 @@ class GLObj {
 				if (qsl.at(0) == "v") {
 					float arr[3];
 					for (i = 0; i < 3; i ++) {
-						if (i == 2) {
-							arr[i] = -0.3+arr[0];
-						} else {
-							arr[i] = qsl.at(i+1).toFloat();
-						}
+						arr[i] = qsl.at(i+1).toFloat();
+
 						max[i] = ((max[i] < arr[i] || !max[i] ) ? arr[i] : max[i]);
 						min[i] = ((min[i] > arr[i] ) ? arr[i] : min[i]);
 
 					}
 					vertices.push_back(QVector3D(arr[0], arr[1], arr[2]));
 				} else if (qsl.at(0) == "f") {
-					for (i = 0; i < 1; i ++) {
+					qDebug() << "next";
+					for (i = 0; i < qsl.size()-1; i ++) {
 						QStringList qsl2 = qsl.at(i+1).split("/");
-						for (j = 0; j<3; j++) {
-							indices.push_back(qsl2.at(j).toInt());
-						}
+
+						qDebug() << qsl2.at(0);
+						indices.push_back(qsl2.at(0).toUInt()-1);
 					}
 				}
 			}
@@ -55,6 +53,7 @@ class GLObj {
 			QVector3D offset = QVector3D(0.,0.,0.);
 			for (i = 0; i < vertices.size(); i++) {
 				vertices[i] = (vertices[i] - minVec)*scaleCorrected+offset;
+				qDebug() << vertices[i];
 				//qDebug() << vertices[i];
 			}
 			qDebug() << vertices[0];
@@ -64,11 +63,13 @@ class GLObj {
 			qDebug() << bufVert.create();
 			qDebug() << bufVert.bind();
 			bufVert.allocate(&vertices[0], sizeof(QVector3D)*vertices.size());
+			qDebug() << bufVert.size();
 			bufVert.setUsagePattern(QGLBuffer::DynamicDraw);
 			//bufVert.release();
 			qDebug() << bufInd.create();
 			qDebug() << bufInd.bind();
-			bufInd.allocate(&indices[0], sizeof(unsigned int)*indices.size());
+			bufInd.allocate(&indices[0], sizeof(GLuint)*indices.size());
+			qDebug() << bufInd.size();
 			bufInd.setUsagePattern(QGLBuffer::DynamicDraw);
 			/*qDebug() << verticeBuff.create();
 			verticeBuff.bind();
@@ -103,14 +104,12 @@ class GLObj {
 
 			glLoadIdentity();
 
-			// Tell OpenGL that the vertice-buffer only contains x- and y-coordinates.
-			"draw";
 			bufVert.bind();
 
 			bufInd.bind();
-			// Draw the triangles stored in the graphics-memory
 			glEnableClientState( GL_VERTEX_ARRAY );
 			glVertexPointer(3, GL_FLOAT, 0, 0);
+			//glDrawArrays(GL_TRIANGLES, 0, 60);
 			glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 			glDisableClientState( GL_VERTEX_ARRAY );
 			bufVert.release();

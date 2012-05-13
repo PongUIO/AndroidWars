@@ -117,6 +117,7 @@ protected:
 		//glEnable(GL_DEPTH_TEST);
                 glEnable(GL_DOUBLE) ;
 		glPushClientAttrib( GL_CLIENT_VERTEX_ARRAY_BIT );
+		//glCullFace(GL_FRONT_AND_BACK);
 
 		//Loading textures.
 		loadAndBind("../testmod/graphics/tiles/empty.png", &data[0], &textures[0]);
@@ -127,7 +128,10 @@ protected:
 		loadAndBind("../testmod/graphics/mouse/default.png", &mouse[0], &mousetextures[0],64,64);
 		loadAndBind("../testmod/graphics/mouse/attack.png", &mouse[1], &mousetextures[1],64,64);
 		loadAndBind("../testmod/graphics/weapons/bullet.png", &bullet[0], &bullettextures[0],16,16);
-		testbot = new GLObj("../testmod/obj/test.obj", QVector3D(1., 1., 1.));
+		//testbot = new GLObj("../testmod/obj/test.obj", QVector3D(0.9, 0.9, 0.9));
+		testbot = new GLObj("../testmod/obj/Android01.obj", QVector3D(1., 1., 1.));
+		//testbot = new GLObj("../testmod/obj/cube.obj", QVector3D(1., 1., 1.));
+		//testbot = new GLObj("../testmod/obj/box.obj", QVector3D(0.9, 0.9, 0.9));
 		this->setAttribute(Qt::WA_NoSystemBackground);
 		QPixmap m;
 		m.convertFromImage(mouse[MOUSE_NORMAL]);
