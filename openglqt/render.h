@@ -128,10 +128,7 @@ protected:
 		loadAndBind("../testmod/graphics/mouse/default.png", &mouse[0], &mousetextures[0],64,64);
 		loadAndBind("../testmod/graphics/mouse/attack.png", &mouse[1], &mousetextures[1],64,64);
 		loadAndBind("../testmod/graphics/weapons/bullet.png", &bullet[0], &bullettextures[0],16,16);
-		//testbot = new GLObj("../testmod/obj/test.obj", QVector3D(0.9, 0.9, 0.9));
 		testbot = new GLObj("../testmod/obj/Android01.obj", QVector3D(1., 1., 1.));
-		//testbot = new GLObj("../testmod/obj/cube.obj", QVector3D(1., 1., 1.));
-		//testbot = new GLObj("../testmod/obj/box.obj", QVector3D(0.9, 0.9, 0.9));
 		this->setAttribute(Qt::WA_NoSystemBackground);
 		QPixmap m;
 		m.convertFromImage(mouse[MOUSE_NORMAL]);
@@ -212,11 +209,6 @@ protected:
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
 		glColor4f(1.0f, 1.0f, 0.f, 1.0f);
-		/*glBegin(GL_TRIANGLES);
-		glVertex3f(hitX,hitY,-1);
-		glVertex3f(hitX,hitY+1,0);
-		glVertex3f(hitX+1,hitY+1,0);
-		glEnd();*/
 
 		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 		std::list<Sim::Bot*> bots = sim->getState().getBotFactory().getBotList();
@@ -224,18 +216,18 @@ protected:
 
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glEnable(GL_BLEND);
-		glEnable(GL_TEXTURE_2D);
+		//glEnable(GL_TEXTURE_2D);
 		for (bot = bots.begin(); bot != bots.end(); bot++) {
 			Sim::Vector pos = (*bot)->getBody().mPos;
 			Sim::Vector col = (*bot)->getTypePtr()->getCollision()->getBboxHigh();
+			testbot->draw(pos.x, pos.y);
 			//glTexSubImage2D(GL_TEXTURE_2D, 0, 0,0 , characters[mt].width(), characters[mt].height(),  GL_RGBA, GL_UNSIGNED_BYTE, characters[mt].bits() );
 			//glBindTexture(GL_TEXTURE_2D, weaponstextures[0]);
 			//drawTexObj3d(pos.x+0.3, pos.y+1.3, pos.x+1.3, pos.y+1.3);
-
-			glBindTexture(GL_TEXTURE_2D, chartextures[0]);
+			/*glBindTexture(GL_TEXTURE_2D, chartextures[0]);
 			drawTexObj3d(pos.x, pos.y, pos.x+col.x, pos.y+col.y, 0);
 
-			glBindTexture(GL_TEXTURE_2D, 0);
+			glBindTexture(GL_TEXTURE_2D, 0);*/
 			/*glBlendFunc(GL_ONE, GL_ONE);
 			//glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -250,6 +242,7 @@ protected:
 		int tx = cam->xSimLim(1)+1;
 		int fy = cam->ySimLim(1);
 		int ty = cam->ySimLim(-1)+1;
+		glEnable(GL_TEXTURE_2D);
 		for (i = fx; i < tx; i++) {
 			for (j = fy; j < ty; j++) {
 				mt = wld->getTile(i, j).getType();
@@ -264,9 +257,7 @@ protected:
 
 
 		glDisable(GL_TEXTURE_2D);
-		testbot->draw();
 		glColor4f(0.2f, 1.0f, 0.2f, selAlpha);
-					//drawObj3d(0,0,0.1,0.1,0.1);
 		for (bot = bots.begin(); bot != bots.end(); bot++) {
 			if (states->isSelected((*bot)->getId())) {
 				Sim::Vector pos = (*bot)->getBody().mPos;

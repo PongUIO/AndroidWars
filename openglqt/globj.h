@@ -54,7 +54,6 @@ class GLObj {
 			for (i = 0; i < vertices.size(); i++) {
 				vertices[i] = (vertices[i] - minVec)*scaleCorrected+offset;
 				qDebug() << vertices[i];
-				//qDebug() << vertices[i];
 			}
 			qDebug() << vertices[0];
 			qDebug() << indices[0] << indices[1] << indices[2];
@@ -65,87 +64,36 @@ class GLObj {
 			bufVert.allocate(&vertices[0], sizeof(QVector3D)*vertices.size());
 			qDebug() << bufVert.size();
 			bufVert.setUsagePattern(QGLBuffer::DynamicDraw);
-			//bufVert.release();
 			qDebug() << bufInd.create();
 			qDebug() << bufInd.bind();
 			bufInd.allocate(&indices[0], sizeof(GLuint)*indices.size());
 			qDebug() << bufInd.size();
 			bufInd.setUsagePattern(QGLBuffer::DynamicDraw);
-			/*qDebug() << verticeBuff.create();
-			verticeBuff.bind();
-			verticeBuff.allocate( &vertices[0], vertices.size()*sizeof(QVector3D));
-			qDebug() << indiceBuff.create();
-			indiceBuff.bind();
-			indiceBuff.allocate( &indices[0], indices.size()*sizeof(GLint));
-			qDebug() << indiceBuff.isCreated();
-			qDebug() << verticeBuff.isCreated();
-			verticeBuff.setUsagePattern(QGLBuffer::StaticDraw);
-			indiceBuff.setUsagePattern(QGLBuffer::StaticDraw);
-			QVector3D testVec = QVector3D(0,0,0);
-			qDebug() << vertices[1];
-			qDebug() << verticeBuff.read(sizeof(testVec), &testVec, sizeof(QVector3D));
-			qDebug() << testVec;*/
-
-		//	indiceBuff.release();
-		//	verticeBuff.release();
 		}
 		void init() {
 		}
-		void draw() {
+		void draw(float x, float y) {
 
 			//glClear(GL_COLOR_BUFFER_BIT);
 			glMatrixMode(GL_PROJECTION);
 
-			// Set viewpoint
-			glLoadIdentity();
-			glOrtho(-1, 1, -1, 1, -1, 1);
+			glTranslatef( x, y, 0);
+			glRotatef(90, 0,1,0);
 
-			glMatrixMode(GL_MODELVIEW);
-
-			glLoadIdentity();
-
+			glColor3f(1., 1., 1.);
 			bufVert.bind();
 
 			bufInd.bind();
 			glEnableClientState( GL_VERTEX_ARRAY );
 			glVertexPointer(3, GL_FLOAT, 0, 0);
-			//glDrawArrays(GL_TRIANGLES, 0, 60);
 			glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 			glDisableClientState( GL_VERTEX_ARRAY );
 			bufVert.release();
 			bufInd.release();
 
-			// Cleanup + show the user the triangles
-	//		glFlush();
-	//		glFinish();
-//			swapBuffers();
-			/*
-			glMatrixMode(GL_PROJECTION);
-			glLoadIdentity();
-			glOrtho(-1, 1, -1, 1, -1, 1);
-			//glEnableClientState(GL_INDEX_ARRAY);
-			glColor3f(1.,0.,1.);
-			if (verticeBuff.bind()) {
-				if (indiceBuff.bind())  {
-					glEnableClientState(GL_VERTEX_ARRAY);
-					glVertexPointer(3, GL_FLOAT, 0, 0);
-					glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-					indiceBuff.release();
-				}
-				verticeBuff.release();
-			}
-			glDisableClientState(GL_VERTEX_ARRAY);*/
-			//glDisableClientState(GL_INDEX_ARRAY);
-			//glEndList();
+			glRotatef(-90, 0,1,0);
+			glTranslatef( -x, -y, 0);
 		}
-	void drawObj3d(double xf, double yf, double xt, double yt, double z) {
-		glBegin(GL_QUADS);
-		glVertex3f(xf,yt,z);
-		glVertex3f(xf,yf,z);
-		glVertex3f(xt,yf,z);
-		glVertex3f(xt,yt,z);
-		glEnd();
-	}
 };
 
 #endif // GLOBJ_H
