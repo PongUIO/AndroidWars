@@ -38,7 +38,7 @@ class GLObj {
 				} else if (qsl.at(0) == "f") {
 					for (i = 0; i < qsl.size()-1; i ++) {
 						QStringList qsl2 = qsl.at(i+1).split("/");
-						for (j =0; j < 1; j++) {
+						for (j =0; j <	1; j++) {
 							indices.push_back(qsl2.at(j).toUInt()-1);
 						}
 					}
@@ -46,7 +46,7 @@ class GLObj {
 					for (i = 0; i < 3; i++) {
 						tex.push_back(qsl.at(i+1).toFloat());
 					}
-				} else if (qsl.at(0) == "vt") {
+				} else if (qsl.at(0) == "vn") {
 					for (i = 0; i < 3; i++) {
 						norm.push_back(qsl.at(i+1).toFloat());
 					}

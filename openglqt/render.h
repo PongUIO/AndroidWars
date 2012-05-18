@@ -44,8 +44,8 @@ public:
 	bool dirAlpha;
 
 	QVector<GLObj*> robots;
+	QVector<GLObj*> terrain;
 	QImage data[3];
-	GLuint textures[3];
 	QImage weapons[1];
 	GLuint weaponstextures[1];
 	QImage bg[1];
@@ -120,13 +120,11 @@ protected:
 		//glCullFace(GL_FRONT_AND_BACK);
 
 		//Loading textures.
-		loadAndBind("../testmod/graphics/tiles/empty.png", &data[0], &textures[0]);
-		loadAndBind("../testmod/graphics/tiles/metal.png", &data[1], &textures[1]);
-		loadAndBind("../testmod/graphics/tiles/metal2surf.png", &data[2], &textures[2]);
 		loadAndBind("../testmod/graphics/weapons/testweapon.png", &weapons[0], &weaponstextures[0], 32, 64);
 		loadAndBind("../testmod/graphics/mouse/default.png", &mouse[0], &mousetextures[0],64,64);
 		loadAndBind("../testmod/graphics/mouse/attack.png", &mouse[1], &mousetextures[1],64,64);
 		loadAndBind("../testmod/graphics/weapons/bullet.png", &bullet[0], &bullettextures[0],16,16);
+		terrain.push_back(new GLObj("../testmod/obj/box.obj", QVector3D(1., 1., 1.)));
 		robots.push_back(new GLObj("../testmod/obj/Android01.obj", QVector3D(1., 1., 1.)));
 		this->setAttribute(Qt::WA_NoSystemBackground);
 		QPixmap m;
@@ -234,7 +232,7 @@ protected:
 		int tx = cam->xSimLim(1)+1;
 		int fy = cam->ySimLim(1);
 		int ty = cam->ySimLim(-1)+1;
-		glEnable(GL_TEXTURE_2D);
+		//glEnable(GL_TEXTURE_2D);
 		for (i = fx; i < tx; i++) {
 			for (j = fy; j < ty; j++) {
 				mt = wld->getTile(i, j).getType();
@@ -242,13 +240,14 @@ protected:
 					continue;
 				}
 				//glTexSubImage2D(GL_TEXTURE_2D, 0, 0,0 , data[mt].width(), data[mt].height(),  GL_RGBA, GL_UNSIGNED_BYTE, data[mt].bits() );
-				glBindTexture(GL_TEXTURE_2D, textures[mt]);
-				drawTexObj3d(i, j, i+1, j+1, 0);
+				//glBindTexture(GL_TEXTURE_2D, textures[mt]);
+				//drawTexObj3d(i, j, i+1, j+1, 0);
+				terrain[mt-1]->draw(i,j);
 			}
 		}
 
 
-		glDisable(GL_TEXTURE_2D);
+		//glDisable(GL_TEXTURE_2D);
 		glDisable(GL_BLEND);
 		glFlush();
 		glFinish();
