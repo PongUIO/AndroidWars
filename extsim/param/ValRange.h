@@ -21,28 +21,26 @@ namespace ExtS {
 			
 			virtual RuleParameter *clone() { return new ValRange<T>(*this); }
 			
-			virtual void readBlock(Script::Block *block) {
-				Script::Block *paramBlock, *constraintBlock;
-				
-				paramBlock = block->getBlock("PARAM");
-				constraintBlock = block->getBlock("CONSTRAINT");
+			virtual void readNode(DaScript::Node &node) {
+				DaScript::Node &paramNode = node.getNode("PARAM");
+				DaScript::Node &constraintNode = node.getNode("CONSTRAINT");
 				
 				// Read default value
-				if(paramBlock) {
-					Script::Data &paramData = getBlockData(paramBlock);
+				if(paramNode.isValid()) {
+					DaScript::Node &paramData = getNodeData(paramNode);
 					
 					mVal = ExtData::readValue<T>(paramData.getArg(0), T());
 				}
 				
 				// Read constraint
-				Script::Data &constrData = getBlockData(constraintBlock);
-				if(constraintBlock && constrData.isDefined()) {
+				DaScript::Node &constrData = getNodeData(constraintNode);
+				if(constrData.isValid()) {
 					setDefinedConstraint();
 					
 					typedef std::vector<std::string> StringVec;
 					StringVec rangeVec;
 					
-					for(size_t i=0; i<constrData.argCount(); ++i) {
+					for(size_t i=0, nc=constrData.getNodeCount(); i<nc; ++i) {
 						StringVec rangeParam;
 						boost::split(rangeParam, constrData.getArg(i),
 							boost::is_any_of(">"),

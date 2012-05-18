@@ -4,7 +4,7 @@
 #include <boost/unordered_map.hpp>
 #include <boost/shared_ptr.hpp>
 
-#include "../dascript/script.h"
+#include "../dascript/dascript.h"
 #include "../simulation/Save.h"
 #include "../simulation/Common.h"
 
@@ -66,7 +66,7 @@ namespace ExtS {
 			
 			virtual RuleParameter *clone()=0;
 			
-			virtual void readBlock(Script::Block *block)=0;
+			virtual void readNode(DaScript::Node &node)=0;
 			virtual void postProcess(ExtSim &extsim) {}
 			
 			virtual void callback()=0;
@@ -86,10 +86,8 @@ namespace ExtS {
 			{ return !mIsConstraintDefined; }
 			
 		protected:
-			Script::Data &getBlockData(Script::Block *block) const
-			{ return block ?
-				block->getDataSimple(getDataName()) :
-				Script::Data::emptyData(); }
+			DaScript::Node &getNodeData(DaScript::Node &node) const
+			{ return node.getNodeSimple(getDataName()); }
 			
 			void setDefinedConstraint() { mIsConstraintDefined=true; }
 			
@@ -181,7 +179,7 @@ namespace ExtS {
 			 * 
 			 */
 			virtual Sim::IdType registerSimData(ExtSim &esim,
-				const std::string &name) {}
+				const std::string &name) { return Sim::IdType(0); }
 			
 			/**
 			 * Creates an input object for this typerule from a \c ParamList.
@@ -191,7 +189,7 @@ namespace ExtS {
 				const ParamList *param) const=0;
 			bool checkConstrained(ParamList *srcList, ExtSim &extsim) const;
 			
-			void readBlock(Script::Block *block);
+			void readNode(DaScript::Node &node);
 			void postProcess(ExtSim &extsim);
 			
 			ParamList *makeParam() const;
@@ -210,7 +208,7 @@ namespace ExtS {
 			TypeRuleMgr();
 			~TypeRuleMgr();
 			
-			TypeRule *loadRuleBlock(Script::Block &block);
+			TypeRule *loadRuleNode(DaScript::Node &node);
 			
 			void registerTypeRule(const std::string &name, TypeRule *rule)
 			{ mRuleMap[name] = rule; }

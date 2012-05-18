@@ -1,3 +1,46 @@
+#BASE_TILE
+	/*
+		Type takes the parameters [tileTypeName] [collisionMask]
+		
+		[collisionMask] is a bitfield determining what this tile collides
+		with.
+		
+		The bits are as follows:
+			bit 0: Bot
+			bit 1: Bullet
+	*/
+	Type "Air" "00"
+	Type "Ground" "11"
+#
+
+#BASE_SLOPE
+	/*
+		Slope takes the parameters [xpos] [ypos] [side] [lslope] [rslope]
+		
+		The default collision object for a tile is a full box
+		(side=Left, lslope=rslope=0). Tile coordinates are such that the
+		top left position is xpos=0, ypos=0.
+		
+		[side] is the base collision side, and ranges from 0-3,
+		where 0=Left, 1=Up, 2=Right, 3=Down. The corresponding name may
+		be used as well in place of a number.
+		
+		[lslope] and [rslope] determines the inverse length of the edges,
+		and may be any number from 0-7. This is scaled with TileSize above
+		using the following formula (1-slope/8)*TileSize.
+		
+		Collision object format:
+		
+				Left slope
+				+-----+
+				|      \
+		Base   |       \
+		(Left) |        \
+				+---------+
+				Right slope
+	*/
+#
+
 #MAP
 	Name "Test Map"
 	
@@ -5,19 +48,7 @@
 	Height 8
 	TileSize 1
 	
-	#TILE
-		Comment {
-			Type takes the parameters [tileTypeName] [collisionMask]
-			
-			[collisionMask] is a bitfield determining what this tile collides
-			with.
-			
-			The bits are as follows:
-				bit 0: Bot
-				bit 1: Bullet
-		}
-		Type "Air" "00"
-		Type "Ground" "11"
+	#TILE &/BASE_TILE
 	#
 	
 	TileData {
@@ -31,31 +62,6 @@
 		0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 	}
 	
-	#SLOPE
-		Comment {
-			Slope takes the parameters [xpos] [ypos] [side] [lslope] [rslope]
-			
-			The default collision object for a tile is a full box
-			(side=Left, lslope=rslope=0). Tile coordinates are such that the
-			top left position is xpos=0, ypos=0.
-			
-			[side] is the base collision side, and ranges from 0-3,
-			where 0=Left, 1=Up, 2=Right, 3=Down. The corresponding name may
-			be used as well in place of a number.
-			
-			[lslope] and [rslope] determines the inverse length of the edges,
-			and may be any number from 0-7. This is scaled with TileSize above
-			using the following formula (1-slope/8)*TileSize.
-			
-			Collision object format:
-			
-			      Left slope
-			       +-----+
-			       |      \
-			Base   |       \
-			(Left) |        \
-			       +---------+
-			      Right slope
-		}
+	#SLOPE &/BASE_SLOPE
 	#
 #

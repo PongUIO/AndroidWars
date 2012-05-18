@@ -28,10 +28,12 @@ namespace ExtS {
 			delete mRule;
 	}
 	
-	void ExtAbility::loadBlock(Script::Block& block, TypeRule* rule)
+	void ExtAbility::loadNode(DaScript::Node& node, TypeRule* rule)
 	{
-		mName = block.getDataFirst("Name");
-		mDescription = block.getDataFirst("Description");
+		node.readChain().
+			nodearg("Name",mName).
+			nodearg("Description",mDescription)
+		;
 		if(mRule)
 			delete mRule;
 		mRule = rule;

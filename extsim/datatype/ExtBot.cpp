@@ -27,47 +27,45 @@ namespace ExtS {
 	ExtBot::ExtBot(ExtSim *esim) : ExtBaseDataObj(esim) {}
 	ExtBot::~ExtBot() {}
 	
-	void ExtBot::loadBlock(Script::Block& block,
+	void ExtBot::loadNode(DaScript::Node& node,
 		Sim::IdType simTypeId, TypeRule* rule)
 	{
 		// Load standard data
-		ExtBaseDataObj::loadBlock(block, simTypeId, rule);
-		loadSimBot(block,
+		ExtBaseDataObj::loadNode(node, simTypeId, rule);
+		loadSimBot(node,
 			mExtSim->getSim().getData().getBotDb().getType(getId()));
 		
 		// Load extended data
 		{
 			mBaseCost = ExtData::readValue<uint32_t>(
-				block.getDataFirst("BaseCost"), 0);
+				node.getNodeFirst("BaseCost"), 0);
 			
 			// Load weapon slots
-			Script::Block *slotBlock = block.getBlock("WEAPONS");
-			for(size_t i=0; i<slotBlock->getSize(); i++) {
-				Script::Data *slotData = slotBlock->getDataIndex(i);
+			DaScript::Node &slotNode = node.getNode("WEAPONS");
+			
+			for(size_t i=slotNode.indexOf("Slot"); i!=DaScript::Node::NoPos;
+			i=slotNode.nextIndexOf("Slot",i)) {
+				DaScript::Node &data = slotNode.getNode(i);
 				
-				if(slotData->getId() == "Slot") {
-					const std::string &slotType = slotData->getArg(0);
-					int slotCount = ExtData::readValue<int>(slotData->getArg(1), 1);
-					
-					for(int sc=0; sc<slotCount; sc++)
-						mWeaponSlot.push_back( WeaponSlot(slotType) );
-				}
+				const std::string &slotType = data.getArg(0);
+				int slotCount = ExtData::readValue<int>(data.getArg(1), 1);
+				
+				for(int sc=0; sc<slotCount; sc++)
+					mWeaponSlot.push_back( WeaponSlot(slotType) );
 			}
 		}
 		
 		// Load temporary data
 		{
 			// Load attachments
-			mCoreHealth.loadData(block.getDataSimple("Health"));
+			mCoreHealth.loadData(node.getNodeSimple("Health"));
 			
-			Script::Block *atmBlock = block.getBlock("ATTACHMENTS");
-			if(atmBlock) {
-				for(size_t hi=0; hi<atmBlock->getSize(); ++hi) {
-					Script::Data *healthData = atmBlock->getDataIndex(hi);
-					if(healthData) {
-						mAttachmentHealth.push_back(HealthHull());
-						mAttachmentHealth.back().loadData(*healthData);
-					}
+			DaScript::Node &atmNode = node.getNode("ATTACHMENTS");
+			if(atmNode.isValid()) {
+				for(size_t hi=0, sz=atmNode.getNodeCount(); hi<sz; ++hi) {
+					DaScript::Node &healthNode = atmNode.getNode(hi);
+					mAttachmentHealth.push_back(HealthHull());
+					mAttachmentHealth.back().loadData(healthNode);
 				}
 			}
 		}
@@ -93,10 +91,10 @@ namespace ExtS {
 		}
 	}
 	
-	void ExtBot::loadSimBot(Script::Block& block, Sim::BotD *simBot)
+	void ExtBot::loadSimBot(DaScript::Node& node, Sim::BotD *simBot)
 	{
 		simBot->baseSpeed = ExtData::readValue<double>(
-			block.getDataFirst("Speed"), 0);
+			node.getNodeFirst("Speed"), 0);
 		
 		// Load debug data
 		Sim::Collision::ColPoints pts;
@@ -111,13 +109,13 @@ namespace ExtS {
 	// ExtBot::HealthHull
 	//
 	//
-	void ExtBot::HealthHull::loadData(Script::Data& data)
+	void ExtBot::HealthHull::loadData(DaScript::Node& data)
 	{
 		mType = data.getArg(0);
 		
 		int health, maxHealth;
 		health = maxHealth = ExtData::readValue<int>(data.getArg(1), 1);
-		if(data.argCount()==3)
+		if(data.getNodeCount()==3)
 			health = ExtData::readValue<int>(data.getArg(2), maxHealth);
 		
 		addMaxHealth(maxHealth, false);

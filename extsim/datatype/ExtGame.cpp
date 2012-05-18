@@ -19,13 +19,14 @@ namespace ExtS {
 	void ExtGameData::shutdown()
 	{}
 	
-	void ExtGameData::loadBlock(Script::Block& block)
+	void ExtGameData::loadNode(DaScript::Node& node)
 	{
-		mName = block.getDataFirst("Name");
-		mDescription = block.getDataFirst("Description");
+		node.readChain().
+			node("Name").arg(mName).endnode().
+			node("Description").arg(mDescription).endnode();
 		
 		mStepTime = ExtData::readValue<double>(
-			block.getDataFirst("StepTime"), 1.0);
+			node.getNodeFirst("StepTime"), 1.0);
 	}
 
 	void ExtGameData::postProcess()

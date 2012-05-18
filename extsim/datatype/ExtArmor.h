@@ -17,7 +17,7 @@ namespace ExtS {
 			void startup() {}
 			void shutdown() {}
 			
-			void loadBlock(Script::Block& block);
+			void loadNode(DaScript::Node& block);
 			void postProcess();
 			
 			Sim::IdType size();
@@ -34,7 +34,7 @@ namespace ExtS {
 				RuleVec mRule;
 			};
 			
-			RuleData::Rule loadRuleData(const Script::Data &data,
+			RuleData::Rule loadRuleData(const DaScript::Node &node,
 				bool loadType=true);
 			
 			typedef std::vector<RuleData> RuleDataVec;

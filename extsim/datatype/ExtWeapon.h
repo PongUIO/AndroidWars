@@ -9,7 +9,7 @@ namespace ExtS {
 			ExtWeapon(ExtSim *esim);
 			~ExtWeapon();
 			
-			void loadBlock(Script::Block &block,
+			void loadNode(DaScript::Node &node,
 				Sim::IdType simTypeId, TypeRule *rule);
 			void postProcess(ExtSim &extsim);
 			
@@ -25,8 +25,8 @@ namespace ExtS {
 			ExtWeaponData(ExtSim& esim);
 			virtual ~ExtWeaponData();
 			
-			Script::Block &getTypeRuleBlock(Script::Block& block)
-			{ return *block.getBlockSimple("CREATERULE"); }
+			DaScript::Node &getTypeRuleNode(DaScript::Node& node)
+			{ return node.getNode("CREATERULE"); }
 			
 			void startup() {}
 			void shutdown() {}

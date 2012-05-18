@@ -29,10 +29,10 @@ namespace ExtS {
 	ExtProgram::~ExtProgram()
 	{}
 
-	void ExtProgram::loadBlock(Script::Block& block,
+	void ExtProgram::loadNode(DaScript::Node& node,
 		Sim::IdType simTypeId, TypeRule* rule)
 	{
-		ExtBaseDataObj::loadBlock(block, simTypeId, rule);
+		ExtBaseDataObj::loadNode(node, simTypeId, rule);
 	}
 	
 	void ExtProgram::postProcess(ExtSim& extsim)

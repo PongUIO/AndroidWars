@@ -10,11 +10,11 @@ namespace ExtS {
 	ExtDamageData::~ExtDamageData()
 	{}
 	
-	void ExtDamageData::loadBlock(Script::Block& block)
+	void ExtDamageData::loadNode(DaScript::Node& node)
 	{
 		Sim::DamageDatabase &damageDb = mExtSim->getSim().getData().getDamageDb();
 		
-		const std::string &name = block.getDataFirst("Name");
+		const std::string &name = node.getNodeFirst("Name");
 		if(name.empty() || damageDb.getDamage(name)!=0)
 			return;
 		

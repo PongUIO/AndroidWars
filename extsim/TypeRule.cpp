@@ -25,11 +25,11 @@ namespace ExtS {
 		return true;
 	}
 	
-	void TypeRule::readBlock(Script::Block* block)
+	void TypeRule::readNode(DaScript::Node &node)
 	{
 		for(RuleParamVec::iterator i=mRuleParam.begin(); i!=mRuleParam.end();
 			++i) {
-			(*i)->readBlock(block);
+			(*i)->readNode(node);
 		}
 	}
 	
@@ -105,15 +105,15 @@ namespace ExtS {
 	 * @return A newly created TypeRule object if the script block matched
 	 * a rule, or NULL if no rule matched.
 	 */
-	TypeRule *TypeRuleMgr::loadRuleBlock(Script::Block& block)
+	TypeRule *TypeRuleMgr::loadRuleNode(DaScript::Node& node)
 	{
-		const std::string &baseRuleName = block.getDataFirst("Base");
+		const std::string &baseRuleName = node.getNodeFirst("Base");
 		TypeRule *rule = 0;
 		
 		RuleMap::iterator i = mRuleMap.find(baseRuleName);
 		if(i != mRuleMap.end()) {
 			rule = i->second->clone();
-			rule->readBlock(&block);
+			rule->readNode(node);
 		}
 		
 		return rule;

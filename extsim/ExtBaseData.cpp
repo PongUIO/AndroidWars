@@ -4,11 +4,11 @@ namespace ExtS {
 	// ExtBaseData
 	// 
 	// 
-	void ExtBaseDataObj::loadBlock(Script::Block& block,
+	void ExtBaseDataObj::loadNode(DaScript::Node& node,
 		Sim::IdType simTypeId, TypeRule *rule)
 	{
-		mName = block.getDataFirst("Name");
-		mDescription = block.getDataFirst("Description");
+		mName = node.getNodeFirst("Name");
+		mDescription = node.getNodeFirst("Description");
 		
 		mId = simTypeId;
 		

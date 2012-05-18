@@ -1,6 +1,6 @@
 #include "ExtData.h"
 
-#include "../dascript/script.h"
+#include "../dascript/dascript.h"
 
 namespace ExtS {
 #define _EXTS_X(type, name) \
@@ -43,20 +43,19 @@ namespace ExtS {
 	 */
 	void ExtData::loadScript(const std::string& data)
 	{
-		Script daScr;
+		DaScript daScr;
 		daScr.compile(data);
 		
 		if(daScr.getError().size()>0)
 			return;
 		
-		for(size_t i=0; i<daScr.getRoot().getSize(); i++) {
-			Script::Block *block = daScr.getRoot().getBlockIndex(i);
-			if(block) {
-				ExtBaseData *listener = getListener(block->getId());
-				
-				if(listener)
-					listener->loadBlock(*block);
-			}
+		size_t nodeCount = daScr.getRoot().getNodeCount();
+		for(size_t i=0; i<nodeCount; i++) {
+			DaScript::Node &node = daScr.getRoot().getNode(i);
+			ExtBaseData *listener = getListener(node.getId());
+			
+			if(listener)
+				listener->loadNode(node);
 		}
 	}
 	
@@ -83,3 +82,12 @@ namespace ExtS {
 			0 : i->second.mData;
 	}
 }
+
+// Template implementations for DaScript
+//
+//
+#define DASCRIPT_READCHAIN_VALUE(type) \
+	template<> \
+	void DaScript::Node::ReadChain::readValue(type &dst, const std::string &arg) { \
+		\
+	}

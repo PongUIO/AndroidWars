@@ -4,7 +4,7 @@
 #include <vector>
 #include <boost/lexical_cast.hpp>
 
-#include "../dascript/script.h"
+#include "../dascript/dascript.h"
 #include "../simulation/Common.h"
 #include "../simulation/data/BaseData.h"
 #include "TypeRule.h"
@@ -24,7 +24,7 @@ namespace ExtS {
 			virtual void startup()=0;
 			virtual void shutdown()=0;
 			
-			virtual void loadBlock(Script::Block &block)=0;
+			virtual void loadNode(DaScript::Node &node)=0;
 			
 			virtual void postProcess()=0;
 			
@@ -48,16 +48,16 @@ namespace ExtS {
 			virtual ~DefaultExtData()
 			{}
 			
-			virtual void setupObject(Script::Block &block,
+			virtual void setupObject(DaScript::Node &node,
 				TypeRule *rule, Sim::IdType typeId, T *obj) {
-				obj->loadBlock(block, typeId, rule);
+				obj->loadNode(node, typeId, rule);
 			}
 			
-			virtual Script::Block &getTypeRuleBlock(Script::Block &block)
-			{ return block; }
+			virtual DaScript::Node &getTypeRuleNode(DaScript::Node &node)
+			{ return node; }
 			
-			virtual void loadBlock(Script::Block& block) {
-				const std::string &name = block.getDataFirst("Name");
+			virtual void loadNode(DaScript::Node &node) {
+				const std::string &name = node.getNodeFirst("Name");
 				
 				// Ignore data if it doesn't have a name
 				if(name.empty())
@@ -73,7 +73,7 @@ namespace ExtS {
 				// - Create an object
 				if(id == Sim::NoId) {
 					// Ignore data if the block does not define any rule
-					rule = loadRuleBlock(getTypeRuleBlock(block));
+					rule = loadRuleNode(getTypeRuleNode(node));
 					if(!rule)
 						return;
 					
@@ -96,7 +96,7 @@ namespace ExtS {
 				}
 				
 				// Load data into this object
-				setupObject(block, rule, id, extObj);
+				setupObject(node, rule, id, extObj);
 			}
 			
 			virtual void postProcess() {
@@ -119,7 +119,7 @@ namespace ExtS {
 					delete mRule;
 			}
 			
-			virtual void loadBlock(Script::Block &block,
+			virtual void loadNode(DaScript::Node &node,
 				Sim::IdType simTypeId, TypeRule *rule);
 			virtual void postProcess(ExtSim &extsim);
 			
