@@ -12,11 +12,16 @@
 namespace ExtS {
 	class ExtSim;
 	
+	struct NodeListener {
+		virtual void loadNode(DaScript::Node &node)=0;
+		virtual void postProcess()=0;
+	};
+	
 	/**
 	 * Base virtual class for processing and storing data.
 	 * 
 	 */
-	class ExtBaseData {
+	class ExtBaseData : public NodeListener {
 		public:
 			ExtBaseData(ExtSim &sim) : mExtSim(&sim) {}
 			virtual ~ExtBaseData() {}
@@ -25,7 +30,6 @@ namespace ExtS {
 			virtual void shutdown()=0;
 			
 			virtual void loadNode(DaScript::Node &node)=0;
-			
 			virtual void postProcess()=0;
 			
 		protected:
@@ -104,6 +108,8 @@ namespace ExtS {
 					Sim::DefaultDatabase<T>::getType(i)->postProcess(*mExtSim);
 				}
 			}
+			
+		private:
 	};
 	
 	/**

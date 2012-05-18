@@ -49,13 +49,13 @@ namespace ExtS {
 		if(daScr.getError().size()>0)
 			return;
 		
-		size_t nodeCount = daScr.getRoot().getNodeCount();
-		for(size_t i=0; i<nodeCount; i++) {
+		for(size_t i=0, nc=daScr.getRoot().getNodeCount(); i<nc; i++) {
 			DaScript::Node &node = daScr.getRoot().getNode(i);
-			ExtBaseData *listener = getListener(node.getId());
 			
-			if(listener)
-				listener->loadNode(node);
+			ListenerMapPair lmp = mListeners.equal_range(node.getId());
+			for(ListenerMap::iterator i=lmp.first; i!=lmp.second; ++i) {
+				i->second.mData->loadNode(node);
+			}
 		}
 	}
 	
@@ -73,14 +73,7 @@ namespace ExtS {
 	
 	void ExtData::registerListener(const std::string& blockTag,
 		const Listener &listener)
-	{	mListeners[blockTag] = listener; }
-	
-	ExtBaseData* ExtData::getListener(const std::string& tag)
-	{
-		ListenerMap::iterator i=mListeners.find(tag);
-		return (i==mListeners.end() || !(i->second.mContext&mCurrentContext)) ?
-			0 : i->second.mData;
-	}
+	{	mListeners.insert( std::make_pair(blockTag,listener) ); }
 }
 
 // Template implementations for DaScript
