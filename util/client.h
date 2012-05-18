@@ -71,9 +71,9 @@ public:
 		selBots.insert(i);
 	}
 
-	void registerClick(double x, double y, int button) {
+	int registerClick(double x, double y, int button) {
 		if (sim == NULL || gameStepping) {
-			return;
+			return 1;
 		}
 		std::list<Sim::Bot*> bots = sim->getState().getBotFactory().getBotList();
 		std::list<Sim::Bot*>::iterator bot;
@@ -86,7 +86,7 @@ public:
 				Sim::Vector col = (*bot)->getTypePtr()->getCollision()->getBboxHigh();
 				if ( pos.x < x && x < pos.x + col.x && pos.y < y && y < pos.y + col.y) {
 					selBots.insert((*bot)->getId());
-					return;
+					return 1;
 				}
 			}
 		} else if (button == 0) {
@@ -107,7 +107,9 @@ public:
 					//inMgr.getCpuInput().registerInput((*bot)->getId(), kill->getId(), 20);
 				}
 			}
+			return 1;
 		}
+		return 0;
 	}
 
 };

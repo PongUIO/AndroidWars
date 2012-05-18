@@ -1,5 +1,6 @@
 #BOT
 	Name "Vanisher"
+	Obj "/obj/Android01.obj"
 	BaseCost 200
 	
 	Description {

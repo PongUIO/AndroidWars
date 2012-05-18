@@ -50,7 +50,7 @@ public:
 	GameController *gc;
 	ExtS::ExtSim eSim;
 	Sim::Simulation &sim;
-        QSize size;
+	QSize size;
 	std::vector< std::vector<QWidget*> > menus;
 	QTimer *gameTimer;
 	double lastUpdate;
@@ -67,10 +67,10 @@ public:
 		p->setColor( QPalette::Background, Qt::black );
 		setPalette( *p );
 		gameRunning = false;
-                gc = new GameController(states, this);
-                gc->hideAll();
-                registerForResize(gc->drawer);
-                resize(700,700);
+		gc = new GameController(states, this);
+		gc->hideAll();
+		registerForResize(gc->drawer);
+		resize(700,700);
 		initMenus();
 		gameTimer = new QTimer(this);
 		connect(gameTimer, SIGNAL(timeout()), this, SLOT(gameStep()));

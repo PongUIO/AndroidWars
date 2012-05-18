@@ -10,42 +10,42 @@
 #include "globj.h"
 
 class GameDrawer : public QGLWidget {
-        Q_OBJECT
+	Q_OBJECT
 
 public slots:
 	void redraw() {
 		paintGL();
 	}
 
-        void tick() {
-                if (states->menuOpen()) {
-                        return;
-                }
-                cam->setLastPos(lastX, lastY);
-                cam->iter();
-                if (dirAlpha) {
-                        selAlpha += 0.003;
-                } else {
-                        selAlpha -= 0.003;
-                }
-                if (selAlpha > 0.5) {
-                        dirAlpha = false;
-                } else if (selAlpha < 0.2) {
-                        dirAlpha = true;
-                }
-        }
+	void tick() {
+		if (states->menuOpen()) {
+			return;
+		}
+		cam->setLastPos(lastX, lastY);
+		cam->iter();
+		if (dirAlpha) {
+			selAlpha += 0.01;
+		} else {
+			selAlpha -= 0.01;
+		}
+		if (selAlpha > 0.5) {
+			dirAlpha = false;
+		} else if (selAlpha < 0.2) {
+			dirAlpha = true;
+		}
+	}
 
 public:
+	QWidget *parent;
 	int lastX, lastY, cMouse;
 	double mouseSize;
 	bool fullScreen;
 	float selAlpha;
 	bool dirAlpha;
-	QWidget *parent;
+
+	QVector<GLObj*> robots;
 	QImage data[3];
 	GLuint textures[3];
-	QImage characters[1];
-	GLuint chartextures[1];
 	QImage weapons[1];
 	GLuint weaponstextures[1];
 	QImage bg[1];
@@ -56,16 +56,13 @@ public:
 	QImage bullet[1];
 	GLuint bullettextures[1];
 
-	GLObj *testbot;
-	QGLBuffer *testbuf;
-
 	Camera *cam;
-        ClientStates *states;
-        QTimer *glTimer, *camTimer;
+	ClientStates *states;
+	QTimer *glTimer, *camTimer;
 	double hitX, hitY;
-        GameDrawer(ClientStates *states, QWidget *parent = 0)
+	GameDrawer(ClientStates *states, QWidget *parent = 0)
 		: QGLWidget(QGLFormat(QGL::SampleBuffers), parent) {
-                this->parent = parent;
+		this->parent = parent;
 		cMouse = 0;
 		this->cam = new Camera(0, 0, parent->width(), parent->height());
 		lastX = width()/2;
@@ -75,38 +72,41 @@ public:
 		selAlpha = 0.3;
 		dirAlpha = false;
 		fullScreen = false;
-                glTimer = new QTimer(parent);
-                connect(glTimer, SIGNAL(timeout()), this, SLOT(redraw()));
-                camTimer = new QTimer(parent);
-                connect(camTimer, SIGNAL(timeout()), this, SLOT(tick()));
+		glTimer = new QTimer(parent);
+		connect(glTimer, SIGNAL(timeout()), this, SLOT(redraw()));
+		camTimer = new QTimer(parent);
+		connect(camTimer, SIGNAL(timeout()), this, SLOT(tick()));
 		hitX = hitY = 0;
-        }
+	}
 
-        void stopTimers() {
-                glTimer->stop();
-                camTimer->stop();
-        }
-        void startTimers() {
-                glTimer->start(0);
-                camTimer->start(40);
-        }
+	void stopTimers() {
+		glTimer->stop();
+		camTimer->stop();
+	}
+	void startTimers() {
+		glTimer->start(0);
+		camTimer->start(40);
+	}
 protected:
 	// overriden
-        void mouseMoveEvent(QMouseEvent * event) {
-                lastX = event->pos().x();
+	void mouseMoveEvent(QMouseEvent * event) {
+		lastX = event->pos().x();
 		lastY = event->pos().y();
 	}
 
 	// overridden
-        void mousePressEvent(QMouseEvent * event) {
-                if (states->menuOpen()) {
-                        return;
-                }
-                int w = width();
-                int h = height();
+	void mousePressEvent(QMouseEvent * event) {
+		if (states->menuOpen()) {
+			return;
+		}
+		int w = width();
+		int h = height();
 		hitX = cam->xToSimX(event->x());
 		hitY = cam->yToSimY(event->y());
-		states->registerClick(cam->xToSimX(event->x()), cam->yToSimY(event->y()), event->button() == Qt::LeftButton);
+		if (!states->registerClick(cam->xToSimX(event->x()), cam->yToSimY(event->y()), event->button() == Qt::LeftButton)) {
+			states->registerClick(cam->xToSimXBack(event->x()), cam->yToSimYBack(event->y()), event->button() == Qt::LeftButton);
+
+		}
 	}
 
 
@@ -115,7 +115,7 @@ protected:
 		// Set up the rendering context, define display lists etc.:
 		glClearColor( 0.0, 0.0, 0.0, 0.0 );
 		//glEnable(GL_DEPTH_TEST);
-                glEnable(GL_DOUBLE) ;
+		glEnable(GL_DOUBLE) ;
 		glPushClientAttrib( GL_CLIENT_VERTEX_ARRAY_BIT );
 		//glCullFace(GL_FRONT_AND_BACK);
 
@@ -123,12 +123,11 @@ protected:
 		loadAndBind("../testmod/graphics/tiles/empty.png", &data[0], &textures[0]);
 		loadAndBind("../testmod/graphics/tiles/metal.png", &data[1], &textures[1]);
 		loadAndBind("../testmod/graphics/tiles/metal2surf.png", &data[2], &textures[2]);
-		loadAndBind("../testmod/graphics/characters/character1.png", &characters[0], &chartextures[0], 128, 320, false, true);
 		loadAndBind("../testmod/graphics/weapons/testweapon.png", &weapons[0], &weaponstextures[0], 32, 64);
 		loadAndBind("../testmod/graphics/mouse/default.png", &mouse[0], &mousetextures[0],64,64);
 		loadAndBind("../testmod/graphics/mouse/attack.png", &mouse[1], &mousetextures[1],64,64);
 		loadAndBind("../testmod/graphics/weapons/bullet.png", &bullet[0], &bullettextures[0],16,16);
-		testbot = new GLObj("../testmod/obj/Android01.obj", QVector3D(1., 1., 1.));
+		robots.push_back(new GLObj("../testmod/obj/Android01.obj", QVector3D(1., 1., 1.)));
 		this->setAttribute(Qt::WA_NoSystemBackground);
 		QPixmap m;
 		m.convertFromImage(mouse[MOUSE_NORMAL]);
@@ -146,14 +145,14 @@ protected:
 	}
 
 	// overridden
-        void resizeGL( int w, int h) {
+	void resizeGL( int w, int h) {
 		glViewport( 0, 0, (GLint)w, (GLint)h);
 		cam->calcRatio(w, h);
 	}
 
-        void resizeEvent(QResizeEvent *event) {
-                resize(event->size().width(), event->size().height());
-                resizeGL(event->size().width(), event->size().height());
+	void resizeEvent(QResizeEvent *event) {
+		resize(event->size().width(), event->size().height());
+		resizeGL(event->size().width(), event->size().height());
 	}
 
 	void wheelEvent(QWheelEvent *event) {
@@ -196,8 +195,8 @@ protected:
 
 
 	// overridden
-        void paintGL() {
-                Sim::Simulation *sim = states->getSim();
+	void paintGL() {
+		Sim::Simulation *sim = states->getSim();
 		Sim::World *wld = &(states->getSim()->getState().getWorld());
 		int i, j;
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -208,9 +207,7 @@ protected:
 		glTranslatef(cam->pos.x,cam->pos.y,-1-cam->zoom);
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
-		glColor4f(1.0f, 1.0f, 0.f, 1.0f);
 
-		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 		std::list<Sim::Bot*> bots = sim->getState().getBotFactory().getBotList();
 		std::list<Sim::Bot*>::iterator bot;
 
@@ -220,20 +217,15 @@ protected:
 		for (bot = bots.begin(); bot != bots.end(); bot++) {
 			Sim::Vector pos = (*bot)->getBody().mPos;
 			Sim::Vector col = (*bot)->getTypePtr()->getCollision()->getBboxHigh();
-			testbot->draw(pos.x, pos.y);
-			//glTexSubImage2D(GL_TEXTURE_2D, 0, 0,0 , characters[mt].width(), characters[mt].height(),  GL_RGBA, GL_UNSIGNED_BYTE, characters[mt].bits() );
-			//glBindTexture(GL_TEXTURE_2D, weaponstextures[0]);
-			//drawTexObj3d(pos.x+0.3, pos.y+1.3, pos.x+1.3, pos.y+1.3);
-			/*glBindTexture(GL_TEXTURE_2D, chartextures[0]);
-			drawTexObj3d(pos.x, pos.y, pos.x+col.x, pos.y+col.y, 0);
-
-			glBindTexture(GL_TEXTURE_2D, 0);*/
-			/*glBlendFunc(GL_ONE, GL_ONE);
-			//glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-
-			glEnable(GL_TEXTURE_2D);*/
+			if (states->isSelected((*bot)->getId())) {
+				glColor4f(0.2f, 1.0f, 0.2f, selAlpha);
+			} else {
+				glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+			}
+			robots[(*bot)->getTypeId()]->draw(pos.x, pos.y);
 
 		}
+		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
 		float mx = cam->xPixToDouble(lastX);
 		float my = cam->yPixToDouble(lastY);
@@ -257,14 +249,6 @@ protected:
 
 
 		glDisable(GL_TEXTURE_2D);
-		glColor4f(0.2f, 1.0f, 0.2f, selAlpha);
-		for (bot = bots.begin(); bot != bots.end(); bot++) {
-			if (states->isSelected((*bot)->getId())) {
-				Sim::Vector pos = (*bot)->getBody().mPos;
-				Sim::Vector col = (*bot)->getTypePtr()->getCollision()->getBboxHigh();
-				drawObj3d(pos.x, pos.y, pos.x+col.x, pos.y+col.y,0);
-			}
-		}
 		glDisable(GL_BLEND);
 		glFlush();
 		glFinish();

@@ -70,6 +70,13 @@ public:
 	double yToSimY(int y) {
 		return ((yPixToDouble(y))*(zoom+1)*ratio*2-pos.y);
 	}
+	double xToSimXBack(int x) {
+		return ((xPixToDouble(x))*(zoom+2)*2-pos.x);
+	}
+
+	double yToSimYBack(int y) {
+		return ((yPixToDouble(y))*(zoom+2)*ratio*2-pos.y);
+	}
 
         double xPixToDouble(int x) {
 		return ((x*2)/((double)xres)-1);
