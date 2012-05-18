@@ -140,7 +140,7 @@ void loadBots()
 	botType.coreHealth.getCore() = Sim::Health::Hull(0, 50);
 	botType.coreHealth.addAttachment( Sim::Health::Hull(1, 5) );
 	
-	Sim::IdType botId = sim.getData().getBotDb().
+	sim.getData().getBotDb().
 		registerImpl<Sim::Bot>("Base",botType);
 }
 

@@ -125,8 +125,6 @@ namespace Sim {
 			template<class Impl>
 			Impl *buildInputImpl(const typename Impl::Config &cfg,
 			IdType typeId) {
-				T &fact = getStateComponent<T>(*mSim);
-				
 				IdType id = allocateId();
 				Impl *obj = new Impl(mSim,id,typeId,cfg);
 				

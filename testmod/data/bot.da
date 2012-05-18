@@ -12,10 +12,10 @@
 	Weight 5
 	Speed 80
 	
-	Comment "Registers a passive ability for this bot"
+	// Registers a passive ability for this bot
 	Ability "Jammer"
 	
-	Comment {
+	/*
 		Slot takes the parameters [size] [count].
 		
 		If count is absent, it is assumed to be 1.
@@ -25,7 +25,7 @@
 		0: Small
 		1: Small
 		2: Medium
-	}
+	*/
 	#WEAPONS
 		Slot Small 2
 		Slot Medium 1
@@ -38,12 +38,12 @@
 			PT 1 1
 			PT 0 1
 			
-			Comment {
+			/*
 				Registers the firing position for a weapon index for this
 				stance.
 				
 				Slot takes the parameters [weaponIndex] [xPos] [yPos].
-			}
+			*/
 			
 			#WEAPON
 				Firing 0 0.25 0.75
@@ -103,7 +103,7 @@
 		this bot.
 	}
 	
-	Comment {
+	/*
 		Note that passive abilities like this one are defined as extended
 		data. This is because the extended simulation has to manually
 		give a bot abilities when a bot using this ability is created.
@@ -115,9 +115,9 @@
 		the extended simulation. For example, any bot that can call
 		Ability/ArmorAttachment could in theory give themselves armor of any
 		strength or type.
-	}
+	*/
 	
-	Comment "Parameters used to initialize the jammer"
+	// Parameters used to initialize the jammer
 	#PARAM
 		Multiplier 0.5
 		MinRange 5

@@ -12,7 +12,7 @@ namespace ExtS {
 			ExtProgram(ExtSim *esim);
 			~ExtProgram();
 			
-			void loadBlock(Script::Block& block,
+			void loadNode(DaScript::Node& node,
 				Sim::IdType simTypeId, TypeRule* rule);
 			void postProcess(ExtSim &extsim);
 	};

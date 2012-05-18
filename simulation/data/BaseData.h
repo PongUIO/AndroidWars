@@ -241,7 +241,7 @@ namespace Sim {
 	class Behaviour : public SharedMeta {
 		public:
 			Behaviour(IdType id, const SharedMeta &meta) :
-				mId(id), SharedMeta(meta) {}
+				SharedMeta(meta), mId(id) {}
 			virtual ~Behaviour() {}
 			
 			/**

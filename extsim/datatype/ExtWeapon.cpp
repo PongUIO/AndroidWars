@@ -29,13 +29,14 @@ namespace ExtS {
 	ExtWeapon::~ExtWeapon()
 	{}
 	
-	void ExtWeapon::loadBlock(Script::Block& block,
+	void ExtWeapon::loadNode(DaScript::Node& node,
 		Sim::IdType simTypeId, TypeRule* rule)
 	{
-		ExtBaseDataObj::loadBlock(block, simTypeId, rule);
+		ExtBaseDataObj::loadNode(node, simTypeId, rule);
 		
-		mSizeType = block.getDataFirst("Size");
-		mBaseDamageStr = block.getDataFirst("BaseDamage");
+		node.readChain().
+			node("Size").arg(mSizeType).endnode().
+			node("BaseDamage").arg(mBaseDamageStr).endnode();
 	}
 	
 	void ExtWeapon::postProcess(ExtSim& extsim)

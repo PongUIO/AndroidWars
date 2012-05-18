@@ -26,7 +26,7 @@ struct IdListListener : public ExtS::Listener<ExtS::IdList<T> > {
 			i!=idSet.end(); ++i) {
 			std::cout << *i << " ";
 		}
-		std::cout << (p->isAlwaysValid()?"(all)":"");
+		//std::cout << (p->isAlwaysValid()?"(all)":"");
 		std::cout << (p->isConstraintUndefined()?"(identity)":"");
 	}
 };

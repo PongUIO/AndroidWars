@@ -11,25 +11,24 @@ namespace ExtS {
 	ExtArmorData::~ExtArmorData()
 	{}
 	
-	void ExtArmorData::loadBlock(Script::Block& block)
+	void ExtArmorData::loadNode(DaScript::Node& node)
 	{
-		const std::string &name = block.getDataFirst("Name");
+		const std::string &name = node.getNodeFirst("Name");
 		if(name.empty())
 			return;
 		
 		Sim::ArmorD *armorType =
 			mExtSim->getSim().getData().getArmorDb().newArmor(name);
 		
-		RuleData::Rule defaultRule = loadRuleData(block.getDataSimple("Default"), false);
+		RuleData::Rule defaultRule = loadRuleData(node.getNodeSimple("Default"), false);
 		armorType->setDefaultRule(defaultRule);
 		
 		RuleData ruleData;
 		ruleData.mSrc = armorType;
 		
-		Script::Block::DataRange ruleRange = block.getData("Rule");
-		for(Script::Block::DataMap::iterator i=ruleRange.first;
-			i!=ruleRange.second; i++) {
-			ruleData.mRule.push_back( loadRuleData(i->second, true) );
+		for(size_t i=node.indexOf("Rule"); i!=DaScript::Node::NoPos;
+		i=node.nextIndexOf("Rule",i)) {
+			ruleData.mRule.push_back( loadRuleData(node.getNode(i), true) );
 		}
 		
 		mRuleData.push_back(ruleData);
@@ -63,16 +62,16 @@ namespace ExtS {
 		mRuleData.clear();
 	}
 	
-	ExtArmorData::RuleData::Rule ExtArmorData::loadRuleData(const Script::Data& data,
-		bool loadType)
+	ExtArmorData::RuleData::Rule ExtArmorData::loadRuleData(
+		const DaScript::Node& node, bool loadType)
 	{
 		int ind=0;
 		RuleData::Rule rule;
 		
 		if(loadType)
-			rule.mDmgType = data.getArg(ind++);
-		rule.mMultiplier = ExtData::readValue<double>(data.getArg(ind++), 1.0);
-		rule.mIsIgnoring = ExtData::readValue<bool>(data.getArg(ind++), false);
+			rule.mDmgType = node.getArg(ind++);
+		rule.mMultiplier = ExtData::readValue<double>(node.getArg(ind++), 1.0);
+		rule.mIsIgnoring = ExtData::readValue<bool>(node.getArg(ind++), false);
 		
 		return rule;
 	}

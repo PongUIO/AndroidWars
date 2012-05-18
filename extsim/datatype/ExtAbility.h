@@ -12,7 +12,7 @@ namespace ExtS {
 			ExtAbility(ExtSim *esim);
 			~ExtAbility();
 			
-			void loadBlock(Script::Block &block,
+			void loadNode(DaScript::Node &node,
 				Sim::IdType simTypeId, TypeRule *rule);
 			void postProcess(ExtSim &extsim);
 			

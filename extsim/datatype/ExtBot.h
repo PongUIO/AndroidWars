@@ -25,14 +25,14 @@ namespace ExtS {
 			ExtBot(ExtSim *esim);
 			~ExtBot();
 			
-			void loadBlock(Script::Block &block,
+			void loadNode(DaScript::Node &node,
 				Sim::IdType simTypeId, TypeRule *rule);
 			void postProcess(ExtSim &extsim);
 			
 			uint32_t getBaseCost() const { return mBaseCost; }
 			
 		private:
-			void loadSimBot(Script::Block &block, Sim::BotD *simBot);
+			void loadSimBot(DaScript::Node &node, Sim::BotD *simBot);
 			
 			/// @name Extended data
 			//@{
@@ -47,7 +47,7 @@ namespace ExtS {
 				struct HealthHull : public Sim::Health::Hull {
 					std::string mType;
 					
-					void loadData(Script::Data &data);
+					void loadData(DaScript::Node &data);
 					void postProcess(Sim::ArmorDatabase &armorDb);
 				};
 				typedef std::vector<HealthHull> AttachmentVec;

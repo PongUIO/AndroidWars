@@ -14,7 +14,7 @@ namespace ExtS {
 			void startup();
 			void shutdown();
 			
-			void loadBlock(Script::Block& block);
+			void loadNode(DaScript::Node& node);
 			
 			void postProcess();
 			

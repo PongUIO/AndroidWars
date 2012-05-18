@@ -21,29 +21,25 @@ namespace ExtS {
 	void ExtMapData::shutdown()
 	{}
 	
-	void ExtMapData::loadBlock(Script::Block& block)
+	void ExtMapData::loadNode(DaScript::Node& node)
 	{
 		mExtSim->getSim().getConfiguration().tileSize =
-			ExtData::readValue<double>(block.getDataFirst("TileSize"), 1.0);
+			ExtData::readValue<double>(node.getNodeFirst("TileSize"), 1.0);
 		
 		// Read tile types
 		{
 			Sim::TileDatabase &tileDb = mExtSim->getSim().getData().getTileDb();
 			
-			Script::Block *ttBlock = block.getBlock("TILE");
-			if(ttBlock) {
-				for(size_t i=0; i<ttBlock->getSize(); ++i) {
-					Script::Data *ttData = ttBlock->getDataIndex(i);
-					if(ttData) {
-						Sim::TileD td;
-						
-						td.colMask = (Sim::TileD::ColMask)
-							ExtData::readBitfield<uint32_t>(
-							ttData->getArg(1), 0);
-						
-						tileDb.addTile(td);
-					}
-				}
+			DaScript::Node &ttNode = node.getNode("TILE");
+			for(size_t i=0, nc=ttNode.getNodeCount(); i<nc; ++i) {
+				DaScript::Node &ttData = ttNode.getNode(i);
+				Sim::TileD td;
+				
+				td.colMask = (Sim::TileD::ColMask)
+					ExtData::readBitfield<uint32_t>(
+					ttData.getArg(1), 0);
+				
+				tileDb.addTile(td);
 			}
 		}
 		
@@ -51,15 +47,15 @@ namespace ExtS {
 		uint32_t width, height;
 		
 		width = ExtData::readValue<uint32_t>(
-			block.getDataFirst("Width"), 32);
+			node.getNodeFirst("Width"), 32);
 		height = ExtData::readValue<uint32_t>(
-			block.getDataFirst("Height"), 16);
+			node.getNodeFirst("Height"), 16);
 		
 		mExtSim->getSim().getState().getWorld().setDimensions(width,height);
 		
 		// Read tile data
 		{
-			std::string tileData = block.getDataFirst("TileData");
+			std::string tileData = node.getNodeFirst("TileData");
 			typedef std::vector<std::string> StringVec;
 			
 			StringVec rowData;

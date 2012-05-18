@@ -19,35 +19,34 @@ namespace ExtS {
 			typedef std::vector<std::string> StringVec;
 			typedef boost::unordered_set<Sim::IdType> IdSet;
 			
-			IdList(const std::string& dataName) : RuleParameter(dataName),
-				mIsAlwaysValid(false) {}
+			IdList(const std::string& dataName) : RuleParameter(dataName) {}
 			virtual ~IdList() {}
 			
 			RuleParameter *clone() { return new IdList<T>(*this); }
 			
-			void readBlock(Script::Block* block) {
-				Script::Block *paramBlock, *constraintBlock;
-				
-				paramBlock = block->getBlock("PARAM");
-				constraintBlock = block->getBlock("CONSTRAINT");
+			void readNode(DaScript::Node &node) {
+				DaScript::Node &paramNode = node.getNode("PARAM");
+				DaScript::Node &constraintNode = node.getNode("CONSTRAINT");
 				
 				// Read default value
-				if(paramBlock) {
-					Script::Data &paramData = getBlockData(paramBlock);
+				if(paramNode.isValid()) {
+					DaScript::Node &paramData = getNodeData(paramNode);
 					mIdName = paramData.getArg(0);
 				}
 				
 				// Read constraints
-				Script::Data &constraintData = getBlockData(constraintBlock);
-				if(constraintBlock && constraintData.isDefined()) {
+				DaScript::Node &constraintData = getNodeData(constraintNode);
+				if(constraintData.isValid()) {
 					setDefinedConstraint();
 					
-					for(size_t i=0; i<constraintData.argCount(); ++i)
+					for(size_t i=0, nc=constraintData.getNodeCount(); i<nc;++i)
 						mIdNameVec.push_back(constraintData.getArg(i));
 				}
 			}
 			
 			void postProcess(ExtSim& extsim) {
+				bool whiteList = true;
+				IdSet deny;
 				typename T::DatabaseType &db =
 					Sim::getDataComponent<typename T::DatabaseType>(
 					extsim.getSim());
@@ -57,22 +56,52 @@ namespace ExtS {
 				
 				// Translate constraints
 				for(StringVec::iterator i=mIdNameVec.begin();
-					i!=mIdNameVec.end(); ++i) {
-					if(*i == "*")
-						mIsAlwaysValid=true;
-					else {
+				    i!=mIdNameVec.end(); ++i) {
+					size_t len = i->length();
+					
+					if (i->at(0) == '+') {
+						whiteList = true;
+					} else if (i->at(0) == '-') {
+						whiteList = false;
+					} else if (i->at(len-1) == '*') {
+						std::string candidate;
+						
+						// wildcard at the end of string,
+						// we iterate over every name
+						// and accept every completion
+						for (Sim::IdType j = 0; j < db.size(); j++) {
+							candidate = db.getNameOf(j);
+							size_t cand_len = candidate.length();
+							
+							// candidate shorter than
+							// possible completion or
+							// doesn't fit description
+							if (cand_len < len || candidate.substr(0, len-1) != *i)
+								continue;
+							
+							whiteList ?
+								mIdSet.insert(j) :
+								deny.insert(j);
+						}
+					} else {
 						Sim::IdType id = db.getIdOf(*i);
-						mIdSet.insert(id);
+						
+						whiteList ?
+							mIdSet.insert(id) :
+							deny.insert(id);
 					}
 				}
 				mIdNameVec.clear();
+				
+				// filter through denied IdTypes
+				for (IdSet::iterator i = deny.begin(); i != deny.end(); i++)
+					mIdSet.erase(*i);
 			}
-			
+		
 			bool isValid(const RuleParameter* param, ExtSim& extsim) const {
 				const IdList<T> *srcList = static_cast<const IdList<T>*>(param);
 				
-				return mIsAlwaysValid ||
-					mIdSet.find(srcList->getId())!=mIdSet.end();
+				return mIdSet.find(srcList->getId())!=mIdSet.end();
 			}
 			
 			void callback()
@@ -81,17 +110,16 @@ namespace ExtS {
 			void save(Sim::Save::BasePtr& fp) const {
 				fp << mId;
 				fp.writeUnorderedSet(mIdSet);
-				fp << mIsAlwaysValid;
+				//fp << mIsAlwaysValid;
 			}
 			void load(Sim::Save::BasePtr& fp) {
 				fp >> mId;
 				fp.readUnorderedSet(mIdSet);
-				fp >> mIsAlwaysValid;
+				//fp >> mIsAlwaysValid;
 			}
 			
 			Sim::IdType getId() const { return mId; }
 			const IdSet &getIdSet() const { return mIdSet; }
-			bool isAlwaysValid() const { return mIsAlwaysValid; }
 			
 		private:
 			// Value
@@ -101,7 +129,6 @@ namespace ExtS {
 			// Constraint
 			StringVec mIdNameVec;
 			IdSet mIdSet;
-			bool mIsAlwaysValid;
 	};
 }
 
