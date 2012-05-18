@@ -5,7 +5,6 @@
 #include <QDebug>
 
 #include "main.h"
-#include "ui.h"
 #include "../openglqt/render.h"
 #include "../util/camera.h"
 #include "menubutton.h"
