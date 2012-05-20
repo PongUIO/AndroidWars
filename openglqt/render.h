@@ -130,6 +130,7 @@ protected:
 		QPixmap m;
 		m.convertFromImage(mouse[MOUSE_NORMAL]);
 		this->setCursor(QCursor(m, -1, -1));
+		glDisable(GL_TEXTURE_2D);
 
 	}
 	void loadAndBind(const char *path, QImage *img, GLuint *bind, GLuint xsize = -1, GLuint ysize = -1, bool vertFlip = false, bool horFlip = false) {
@@ -200,7 +201,6 @@ protected:
 		glClear(GL_COLOR_BUFFER_BIT);
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
-		//glFrustum(-cam->zoom, cam->zoom, -cam->zoom*cam->ratio, cam->zoom*cam->ratio, 0.5, 2);
 		glFrustum(-1, 1, -1*cam->ratio, 1*cam->ratio, 0.5, 2.1+cam->zoom);
 		glTranslatef(cam->pos.x,cam->pos.y,-1-cam->zoom);
 		glMatrixMode(GL_MODELVIEW);
@@ -232,22 +232,20 @@ protected:
 		int tx = cam->xSimLim(1)+1;
 		int fy = cam->ySimLim(1);
 		int ty = cam->ySimLim(-1)+1;
-		//glEnable(GL_TEXTURE_2D);
+//		glEnable(GL_TEXTURE_2D);
 		for (i = fx; i < tx; i++) {
 			for (j = fy; j < ty; j++) {
 				mt = wld->getTile(i, j).getType();
 				if (mt == 0) {
 					continue;
 				}
-				//glTexSubImage2D(GL_TEXTURE_2D, 0, 0,0 , data[mt].width(), data[mt].height(),  GL_RGBA, GL_UNSIGNED_BYTE, data[mt].bits() );
-				//glBindTexture(GL_TEXTURE_2D, textures[mt]);
+				//glBindTexture(GL_TEXTURE_2D, mousetextures[0]);
 				//drawTexObj3d(i, j, i+1, j+1, 0);
 				terrain[mt-1]->draw(i,j);
 			}
 		}
 
 
-		//glDisable(GL_TEXTURE_2D);
 		glDisable(GL_BLEND);
 		glFlush();
 		glFinish();
