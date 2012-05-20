@@ -54,8 +54,9 @@ public:
 	std::vector< std::vector<QWidget*> > menus;
 	QTimer *gameTimer;
 	double lastUpdate;
-
+	QSettings *settings;
 	MainWidget (QWidget *parent = 0) : QWidget(parent), sim(eSim.getSim()) {
+		settings = new QSettings("PongUIO", "AndroidWars");
 		dispState = MENU;
 		subMenu = MAIN;
 		//grabKeyboard();
