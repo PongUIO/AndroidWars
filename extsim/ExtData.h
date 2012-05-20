@@ -43,10 +43,10 @@ namespace ExtS {
 			};
 			
 			struct Listener {
-				Listener(ExtBaseData *data=0, ListenerContext context=LcNone) :
+				Listener(NodeListener *data=0, ListenerContext context=LcNone) :
 					mData(data), mContext(context) {}
 				
-				ExtBaseData *mData;
+				NodeListener *mData;
 				ListenerContext mContext;
 			};
 			
@@ -66,6 +66,9 @@ namespace ExtS {
 				void postProcess();
 				void switchContext(ListenerContext ctx)
 				{ mCurrentContext = ctx; }
+				
+				void registerListener(const std::string &blockTag,
+				const Listener &listener);
 			//@}
 			
 			/// @name Database retrieval
@@ -79,10 +82,6 @@ namespace ExtS {
 			//@}
 			
 		private:
-			void registerListener(const std::string &blockTag,
-				const Listener &listener);
-			ExtBaseData *getListener(const std::string &tag);
-			
 			/// @name Databases
 			//@{
 #define _EXTS_X(type, name) type m##name;
@@ -92,7 +91,8 @@ namespace ExtS {
 			
 			/// @name Internal
 			//@{
-				typedef boost::unordered_map<std::string, Listener> ListenerMap;
+				typedef boost::unordered_multimap<std::string, Listener> ListenerMap;
+				typedef std::pair<ListenerMap::iterator,ListenerMap::iterator> ListenerMapPair;
 				ListenerMap mListeners;
 				ListenerContext mCurrentContext;
 				
