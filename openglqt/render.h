@@ -8,6 +8,7 @@
 #include "../util/client.h"
 #include "../util/cursordefines.h"
 #include "globj.h"
+#include "gamemap.h"
 
 class GameDrawer : public QGLWidget {
 	Q_OBJECT
@@ -59,6 +60,7 @@ public:
 	Camera *cam;
 	ClientStates *states;
 	QTimer *glTimer, *camTimer;
+	GameMap gm;
 	double hitX, hitY;
 	GameDrawer(ClientStates *states, QWidget *parent = 0)
 		: QGLWidget(QGLFormat(QGL::SampleBuffers), parent) {
@@ -113,7 +115,7 @@ protected:
 	// overridden
 	void initializeGL() {
 		// Set up the rendering context, define display lists etc.:
-		glClearColor( 0.0, 0.0, 0.0, 0.0 );
+		glClearColor( 0.1, 0.1, 0.1, 0.0 );
 		//glEnable(GL_DEPTH_TEST);
 		glEnable(GL_DOUBLE) ;
 		glPushClientAttrib( GL_CLIENT_VERTEX_ARRAY_BIT );
@@ -220,7 +222,7 @@ protected:
 			} else {
 				glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 			}
-			robots[(*bot)->getTypeId()]->draw(pos.x, pos.y);
+			robots[(*bot)->getTypeId()]->draw(pos.x, pos.y, 0);
 
 		}
 		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
@@ -241,7 +243,7 @@ protected:
 				}
 				//glBindTexture(GL_TEXTURE_2D, mousetextures[0]);
 				//drawTexObj3d(i, j, i+1, j+1, 0);
-				terrain[mt-1]->draw(i,j);
+				terrain[mt-1]->draw(i, j, 0);
 			}
 		}
 
