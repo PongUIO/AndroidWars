@@ -86,6 +86,9 @@ class GLObj {
 	void scaleAndCenter(QVector3D scale) {
 		int i;
 		QVector3D diff = maxVec - minVec;
+		if ((scale - diff).length() < pow(10,-10)) {
+			return;
+		}
 		QVector3D scaleCorrected = QVector3D(1./diff.x(), 1./diff.y(), 1./diff.z()) * scale;
 		QVector3D offset = QVector3D(0.,0.,0.);
 		for (i = 0; i < vertices.size(); i++) {

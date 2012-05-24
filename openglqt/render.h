@@ -60,7 +60,7 @@ public:
 	Camera *cam;
 	ClientStates *states;
 	QTimer *glTimer, *camTimer;
-	GameMap gm;
+	GameMap *gm;
 	double hitX, hitY;
 	GameDrawer(ClientStates *states, QWidget *parent = 0)
 		: QGLWidget(QGLFormat(QGL::SampleBuffers), parent) {
@@ -79,6 +79,7 @@ public:
 		camTimer = new QTimer(parent);
 		connect(camTimer, SIGNAL(timeout()), this, SLOT(tick()));
 		hitX = hitY = 0;
+		gm = new GameMap(cam);
 	}
 
 	void stopTimers() {
@@ -114,9 +115,10 @@ protected:
 
 	// overridden
 	void initializeGL() {
+		Sim::World *wld = &(states->getSim()->getState().getWorld());
 		// Set up the rendering context, define display lists etc.:
 		glClearColor( 0.1, 0.1, 0.1, 0.0 );
-		//glEnable(GL_DEPTH_TEST);
+		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_DOUBLE) ;
 		glPushClientAttrib( GL_CLIENT_VERTEX_ARRAY_BIT );
 		//glCullFace(GL_FRONT_AND_BACK);
@@ -127,6 +129,8 @@ protected:
 		loadAndBind("../testmod/graphics/mouse/attack.png", &mouse[1], &mousetextures[1],64,64);
 		loadAndBind("../testmod/graphics/weapons/bullet.png", &bullet[0], &bullettextures[0],16,16);
 		terrain.push_back(new GLObj("../testmod/obj/box.obj", QVector3D(1., 1., 1.)));
+		gm->registerPiece(terrain[0], 1,1,1);
+		gm->setWorld(wld);
 		robots.push_back(new GLObj("../testmod/obj/Android01.obj", QVector3D(1., 1., 1.)));
 		this->setAttribute(Qt::WA_NoSystemBackground);
 		QPixmap m;
@@ -201,9 +205,10 @@ protected:
 		Sim::World *wld = &(states->getSim()->getState().getWorld());
 		int i, j;
 		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_DEPTH_BUFFER_BIT);
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
-		glFrustum(-1, 1, -1*cam->ratio, 1*cam->ratio, 1, 2.1+cam->zoom);
+		glFrustum(-1, 1, -1*cam->ratio, 1*cam->ratio, 1, 5.1+cam->zoom);
 		glTranslatef(cam->pos.x,cam->pos.y,-1-cam->zoom);
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
@@ -225,29 +230,7 @@ protected:
 			robots[(*bot)->getTypeId()]->draw(pos.x, pos.y, 0);
 
 		}
-		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-
-		float mx = cam->xPixToDouble(lastX);
-		float my = cam->yPixToDouble(lastY);
-		int mt;
-		int fx = cam->xSimLim(-1);
-		int tx = cam->xSimLim(1)+1;
-		int fy = cam->ySimLim(1);
-		int ty = cam->ySimLim(-1)+1;
-//		glEnable(GL_TEXTURE_2D);
-		for (i = fx; i < tx; i++) {
-			for (j = fy; j < ty; j++) {
-				mt = wld->getTile(i, j).getType();
-				if (mt == 0) {
-					continue;
-				}
-				//glBindTexture(GL_TEXTURE_2D, mousetextures[0]);
-				//drawTexObj3d(i, j, i+1, j+1, 0);
-				terrain[mt-1]->draw(i, j, 0);
-			}
-		}
-
-
+		gm->draw();
 		glDisable(GL_BLEND);
 		glFlush();
 		glFinish();
