@@ -64,18 +64,18 @@ public:
         }
 
 	double xToSimX(int x) {
-		return ((xPixToDouble(x))*(zoom+1)*2-pos.x);
+		return ((xPixToDouble(x))*(zoom+1)-pos.x);
 	}
 
 	double yToSimY(int y) {
-		return ((yPixToDouble(y))*(zoom+1)*ratio*2-pos.y);
+		return ((yPixToDouble(y))*(zoom+1)*ratio-pos.y);
 	}
 	double xToSimXBack(int x) {
-		return ((xPixToDouble(x))*(zoom+2)*2-pos.x);
+		return ((xPixToDouble(x))*(zoom+2)-pos.x);
 	}
 
 	double yToSimYBack(int y) {
-		return ((yPixToDouble(y))*(zoom+2)*ratio*2-pos.y);
+		return ((yPixToDouble(y))*(zoom+2)*ratio-pos.y);
 	}
 
         double xPixToDouble(int x) {
@@ -91,10 +91,10 @@ public:
 		return (y+1)/yres-pos.y;
         }
 	int ySimLim(int i) {
-		return yToSimY(i*yres);
+		return yToSimY(i*yres*1.4);
 	}
 	int xSimLim(int i) {
-		return xToSimX(i*yres);
+		return xToSimX(i*yres*1.4);
 	}
 };
 #endif

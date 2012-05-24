@@ -203,7 +203,7 @@ protected:
 		glClear(GL_COLOR_BUFFER_BIT);
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
-		glFrustum(-1, 1, -1*cam->ratio, 1*cam->ratio, 0.5, 2.1+cam->zoom);
+		glFrustum(-1, 1, -1*cam->ratio, 1*cam->ratio, 1, 2.1+cam->zoom);
 		glTranslatef(cam->pos.x,cam->pos.y,-1-cam->zoom);
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
