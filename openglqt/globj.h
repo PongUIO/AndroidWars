@@ -5,9 +5,9 @@
 class GLObj {
 	public:
 	QVector<QVector3D> vertices;
-	QVector<GLfloat> tex;
-	QVector<GLfloat> norm;
+	QVector<GLfloat> tex, norm;
 	QVector<GLuint> indices;
+	void * offset[2];
 	QGLBuffer bufInt;
 	QGLBuffer bufFloat;
 	QVector3D minVec, maxVec;
@@ -15,6 +15,7 @@ class GLObj {
 		//glNewList(list, GL_COMPILE);
 		bufFloat = QGLBuffer(QGLBuffer::IndexBuffer);
 		bufInt = QGLBuffer(QGLBuffer::VertexBuffer);
+
 		loadFile(file);
 		scaleAndCenter(scale);
 		initBuf();
@@ -27,20 +28,33 @@ class GLObj {
 		glTranslatef( x, y, z);
 		glRotatef(90, 0,1,0);
 
-		bufFloat.bind();
 
-		bufInt.bind();
 		glEnableClientState( GL_VERTEX_ARRAY );
+		if (offset[0]) {
+			glEnableClientState( GL_TEXTURE_COORD_ARRAY );
+		}
+		bufFloat.bind();
 		glVertexPointer(3, GL_FLOAT, 0, 0);
-		//glIndexPointer(GL_UNSIGNED_INT, 2*sizeof(GLuint), 0);
-		//glDrawArrays(GL_TRIANGLES, 0, indices.size());
+		if (offset[0] != ((void *) (vertices.size() * sizeof(QVector3D)))) {
+			glTexCoordPointer(3, GL_FLOAT, 0, offset[0]);
+			if (offset[0] != offset[1]) {
+				glNormalPointer(GL_FLOAT, 0, offset[1]);
+			}
+		}
+		bufInt.bind();
+		glIndexPointer(GL_UNSIGNED_INT, 2*sizeof(GLuint), 0);
 		glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 		glDisableClientState( GL_VERTEX_ARRAY );
+		glDisableClientState( GL_TEXTURE_COORD_ARRAY );
 		bufFloat.release();
 		bufInt.release();
 
 		glRotatef(-90, 0,1,0);
 		glTranslatef( -x, -y, -z);
+	}
+	void updateOffsets() {
+		offset[0] = (void *) (vertices.size() * sizeof(QVector3D));
+		offset[1] = offset[0] + (tex.size() * sizeof(GLfloat));
 	}
 	void loadFile(QString file) {
 		int i, j;
@@ -86,6 +100,7 @@ class GLObj {
 	void scaleAndCenter(QVector3D scale) {
 		int i;
 		QVector3D diff = maxVec - minVec;
+
 		if ((scale - diff).length() < pow(10,-10)) {
 			return;
 		}
@@ -98,6 +113,7 @@ class GLObj {
 		maxVec = scale;
 	}
 	void initBuf() {
+		updateOffsets();
 		bufFloat = QGLBuffer(QGLBuffer::VertexBuffer);
 		bufInt = QGLBuffer(QGLBuffer::IndexBuffer);
 		qDebug() << bufFloat.create();
@@ -106,11 +122,10 @@ class GLObj {
 		bufFloat.allocate(sizeof(QVector3D)*vertices.size() + sizeof(GLfloat)*(tex.size() + norm.size()));
 		bufFloat.write(0, &vertices[0] , sizeof(QVector3D)*vertices.size());
 		if (tex.size() != 0 ) {
-			bufFloat.write( sizeof(QVector3D)*vertices.size()*vertices.size(), &tex[0], sizeof(GLfloat)*tex.size());
+			bufFloat.write((long) offset[0], &tex[0], sizeof(GLfloat)*tex.size());
 		}
 		if (norm.size() != 0 ) {
-			bufFloat.write( sizeof(QVector3D)*vertices.size()*vertices.size() + norm.size()*sizeof(GLfloat),
-			&norm[0], sizeof(GLfloat)*norm.size());
+			bufFloat.write((long) offset[1], &norm[0], sizeof(GLfloat)*norm.size());
 		}
 		qDebug() << bufFloat.size();
 		bufFloat.setUsagePattern(QGLBuffer::DynamicDraw);
