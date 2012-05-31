@@ -1,7 +1,6 @@
 #ifndef GLOBJ_H
 #define GLOBJ_H
 #include <QtOpenGL>
-#include <limits>
 
 class CacheEntry {
 public:
