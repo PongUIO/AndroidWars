@@ -4,8 +4,7 @@
 
 class GLObj {
 	public:
-	QVector<QVector3D> vertices;
-	QVector<GLfloat> tex, norm;
+	QVector<QVector3D> vertices, tex, norm;
 	QVector<GLuint> indices;
 	void * offset[2];
 	QGLBuffer bufInt;
@@ -30,13 +29,13 @@ class GLObj {
 
 
 		glEnableClientState( GL_VERTEX_ARRAY );
+		glEnableClientState( GL_TEXTURE_COORD_ARRAY );
 		if (offset[0]) {
-			glEnableClientState( GL_TEXTURE_COORD_ARRAY );
 		}
 		bufFloat.bind();
 		glVertexPointer(3, GL_FLOAT, 0, 0);
+		glTexCoordPointer(3, GL_FLOAT, 0, offset[0]);
 		if (offset[0] != ((void *) (vertices.size() * sizeof(QVector3D)))) {
-			glTexCoordPointer(3, GL_FLOAT, 0, offset[0]);
 			if (offset[0] != offset[1]) {
 				glNormalPointer(GL_FLOAT, 0, offset[1]);
 			}
@@ -54,9 +53,11 @@ class GLObj {
 	}
 	void updateOffsets() {
 		offset[0] = (void *) (vertices.size() * sizeof(QVector3D));
-		offset[1] = offset[0] + (tex.size() * sizeof(GLfloat));
+		offset[1] = offset[0] + (tex.size() * sizeof(QVector3D));
 	}
 	void loadFile(QString file) {
+		QVector<GLuint> temp;
+		QVector<QVector3D> tmpVert, tmpTex, tmpNorm;
 		int i, j;
 		QFile f(file);
 		f.open(QFile::QIODevice::ReadOnly);
@@ -75,23 +76,25 @@ class GLObj {
 					min[i] = ((min[i] > arr[i] ) ? arr[i] : min[i]);
 
 				}
-				vertices.push_back(QVector3D(arr[0], arr[1], arr[2]));
+				tmpVert.push_back(QVector3D(arr[0], arr[1], arr[2]));
 			} else if (qsl.at(0) == "f") {
 				for (i = 0; i < qsl.size()-1; i ++) {
 					QStringList qsl2 = qsl.at(i+1).split("/");
-					for (j =0; j < 1; j++) {
-						indices.push_back(qsl2.at(j).toUInt()-1);
+					for (j =0; j < 3; j++) {
+						temp.push_back(qsl2.at(j).toUInt()-1);
 					}
 				}
 			} else if (qsl.at(0) == "vt") {
-				for (i = 0; i < 3; i++) {
-					tex.push_back(qsl.at(i+1).toFloat());
-				}
+				tmpTex.push_back(QVector3D(qsl.at(1).toFloat(), qsl.at(2).toFloat(), qsl.at(3).toFloat()));
 			} else if (qsl.at(0) == "vn") {
-				for (i = 0; i < 3; i++) {
-					norm.push_back(qsl.at(i+1).toFloat());
-				}
+				tmpNorm.push_back(QVector3D(qsl.at(1).toFloat(), qsl.at(2).toFloat(), qsl.at(3).toFloat()));
 			}
+		}
+		for (int i = 0; i < temp.size(); i+=3) {
+			vertices.push_back(tmpVert[temp[i]]);
+			tex.push_back(tmpTex[temp[i+1]]);
+			norm.push_back(tmpNorm[temp[i+2]]);
+			indices.push_back(i/3);
 		}
 		f.close();
 		minVec = QVector3D(min[0], min[1], min[2]);
@@ -119,13 +122,13 @@ class GLObj {
 		qDebug() << bufFloat.create();
 		qDebug() << bufFloat.bind();
 		//bufFloat.allocate(&vertices[0], sizeof(QVector3D)*vertices.size());
-		bufFloat.allocate(sizeof(QVector3D)*vertices.size() + sizeof(GLfloat)*(tex.size() + norm.size()));
+		bufFloat.allocate(sizeof(QVector3D)*vertices.size() + sizeof(QVector3D)*(tex.size() + norm.size()));
 		bufFloat.write(0, &vertices[0] , sizeof(QVector3D)*vertices.size());
 		if (tex.size() != 0 ) {
-			bufFloat.write((long) offset[0], &tex[0], sizeof(GLfloat)*tex.size());
+			bufFloat.write((long) offset[0], &tex[0], sizeof(QVector3D)*tex.size());
 		}
 		if (norm.size() != 0 ) {
-			bufFloat.write((long) offset[1], &norm[0], sizeof(GLfloat)*norm.size());
+			bufFloat.write((long) offset[1], &norm[0], sizeof(QVector3D)*norm.size());
 		}
 		qDebug() << bufFloat.size();
 		bufFloat.setUsagePattern(QGLBuffer::DynamicDraw);

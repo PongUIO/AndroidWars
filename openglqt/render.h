@@ -56,6 +56,8 @@ public:
 	QPixmap mouseMaps[2];
 	QImage bullet[1];
 	GLuint bullettextures[1];
+	QImage checkImage;
+	GLuint check;
 
 	Camera *cam;
 	ClientStates *states;
@@ -128,6 +130,7 @@ protected:
 		loadAndBind("../testmod/graphics/mouse/default.png", &mouse[0], &mousetextures[0],64,64);
 		loadAndBind("../testmod/graphics/mouse/attack.png", &mouse[1], &mousetextures[1],64,64);
 		loadAndBind("../testmod/graphics/weapons/bullet.png", &bullet[0], &bullettextures[0],16,16);
+		loadAndBind("../testmod/graphics/debug/checker.png", &checkImage, &check,256, 256);
 		terrain.push_back(new GLObj("../testmod/obj/box.obj", QVector3D(1., 1., 1.)));
 		gm->registerPiece(terrain[0], 1,1,1);
 		gm->setWorld(wld);
@@ -219,8 +222,8 @@ protected:
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		//glEnable(GL_TEXTURE_2D);
-		//glBindTexture(GL_TEXTURE_2D, weaponstextures[0]);
+		glEnable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, check);
 		for (bot = bots.begin(); bot != bots.end(); bot++) {
 			Sim::Vector pos = (*bot)->getBody().mPos;
 			Sim::Vector col = (*bot)->getTypePtr()->getCollision()->getBboxHigh();

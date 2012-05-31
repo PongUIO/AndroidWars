@@ -94,7 +94,7 @@ public:
 		return yToSimY(i*yres*1.4);
 	}
 	int xSimLim(int i) {
-		return xToSimX(i*yres*1.4);
+		return xToSimX(i*xres*1.4);
 	}
 };
 #endif
