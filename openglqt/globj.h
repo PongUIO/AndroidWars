@@ -28,8 +28,8 @@ class GLObj {
 	QVector3D minVec, maxVec;
 	GLObj(QString file, QVector3D scale) {
 		//glNewList(list, GL_COMPILE);
-		bufFloat = QGLBuffer(QGLBuffer::IndexBuffer);
-		bufInt = QGLBuffer(QGLBuffer::VertexBuffer);
+		bufFloat = QGLBuffer(QGLBuffer::VertexBuffer);
+		bufInt = QGLBuffer(QGLBuffer::IndexBuffer);
 
 		loadFile(file);
 		scaleAndCenter(scale);
