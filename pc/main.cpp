@@ -18,17 +18,8 @@
 int main(int argc, char *argv[]) {
         //QApplication::setGraphicsSystem(QLatin1String("opengl"));
         QApplication app(argc, argv);
-/*        QGraphicsView view;
-        view.setViewport(new QGLWidget(
-            QGLFormat(QGL::SampleBuffers)));
-        view.setViewportUpdateMode(
-            QGraphicsView::FullViewportUpdate);
-        view.setScene(new QGraphicsScene);
-        view.scene()->addWidget(mainw);
-        view.show();*/
         MainWidget *mainw = new MainWidget();
-        mainw->show();
-	app.exec();
-	//delete menu;
-	return 0;//main.exec();
+	mainw->show();
+	mainw->setWindowTitle("AndroidWars - development");
+	return app.exec();
 }

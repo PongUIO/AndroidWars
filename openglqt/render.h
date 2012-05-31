@@ -207,7 +207,6 @@ protected:
 	void paintGL() {
 		Sim::Simulation *sim = states->getSim();
 		Sim::World *wld = &(states->getSim()->getState().getWorld());
-		int i, j;
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClear(GL_DEPTH_BUFFER_BIT);
 		glMatrixMode(GL_PROJECTION);

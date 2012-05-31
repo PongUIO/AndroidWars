@@ -1,6 +1,7 @@
 #ifndef GLOBJ_H
 #define GLOBJ_H
 #include <QtOpenGL>
+#include <limits>
 
 class CacheEntry {
 public:
@@ -21,6 +22,7 @@ class GLObj {
 	public:
 	QVector<QVector3D> vertices;
 	QVector<GLuint> indices;
+	size_t indNum;
 	QGLBuffer bufInt;
 	QGLBuffer bufFloat;
 	QVector3D minVec, maxVec;
@@ -47,10 +49,10 @@ class GLObj {
 		bufFloat.bind();
 		glVertexPointer(3, GL_FLOAT, 3*sizeof(QVector3D), 0);
 		glTexCoordPointer(3, GL_FLOAT,3*sizeof(QVector3D), (void *) sizeof(QVector3D));
-		//glNormalPointer(GL_FLOAT, 3*sizeof(QVector3D), (void *) (2*sizeof(QVector3D)));
+		glNormalPointer(GL_FLOAT, 3*sizeof(QVector3D), (void *) (2*sizeof(QVector3D)));
 		bufInt.bind();
 		glIndexPointer(GL_UNSIGNED_INT, 2*sizeof(GLuint), 0);
-		glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, indNum, GL_UNSIGNED_INT, 0);
 		bufFloat.release();
 		bufInt.release();
 		glDisableClientState( GL_VERTEX_ARRAY );
@@ -66,8 +68,9 @@ class GLObj {
 		int i, j, k;
 		QFile f(file);
 		f.open(QFile::QIODevice::ReadOnly);
-		float max[3] = {-9999, -9999, -9999};
-		float min[3] = {9999, 9999, 9999};
+		bool first = true;
+		float max[3] = {0, 0, 0};
+		float min[3] = {0, 0, 0};
 		QRegExp reg(" +");
 		while (!f.atEnd()) {
 			QString str = f.readLine();
@@ -77,10 +80,11 @@ class GLObj {
 				for (i = 0; i < 3; i ++) {
 					arr[i] = qsl.at(i+1).toFloat();
 
-					max[i] = ((max[i] < arr[i] || !max[i] ) ? arr[i] : max[i]);
-					min[i] = ((min[i] > arr[i] ) ? arr[i] : min[i]);
+					max[i] = ((max[i] < arr[i] || !max[i] || first ) ? arr[i] : max[i]);
+					min[i] = ((min[i] > arr[i] || first ) ? arr[i] : min[i]);
 
 				}
+				first = false;
 				tmpVert.push_back(QVector3D(arr[0], arr[1], arr[2]));
 			} else if (qsl.at(0) == "f") {
 				for (i = 0; i < qsl.size()-1; i ++) {
@@ -141,14 +145,13 @@ class GLObj {
 		bufInt = QGLBuffer(QGLBuffer::IndexBuffer);
 		qDebug() << bufFloat.create();
 		qDebug() << bufFloat.bind();
-		//bufFloat.allocate(&vertices[0], sizeof(QVector3D)*vertices.size());
-		bufFloat.allocate(sizeof(QVector3D)*vertices.size());
-		bufFloat.write(0, &vertices[0] , sizeof(QVector3D)*vertices.size());
+		bufFloat.allocate(&vertices[0], sizeof(QVector3D)*vertices.size());
 		qDebug() << bufFloat.size();
 		bufFloat.setUsagePattern(QGLBuffer::DynamicDraw);
 		qDebug() << bufInt.create();
 		qDebug() << bufInt.bind();
 		bufInt.allocate(&indices[0], sizeof(GLuint)*indices.size());
+		indNum = indices.size();
 		qDebug() << bufInt.size();
 		bufInt.setUsagePattern(QGLBuffer::DynamicDraw);
 	}
