@@ -29,7 +29,7 @@ namespace ExtS {
 	ExtProgram::~ExtProgram()
 	{}
 
-	void ExtProgram::loadNode(DaScript::Node& node,
+	void ExtProgram::loadNode(Nepeta::Node& node,
 		Sim::IdType simTypeId, TypeRule* rule)
 	{
 		ExtBaseDataObj::loadNode(node, simTypeId, rule);

@@ -1,17 +1,23 @@
-#ifndef _DASCRIPT__DETAIL__
-#error This file should not be included from anywhere but dascript.h
+/**
+ * This file is part of the Nepeta project.
+ * 
+ * Licensed under GNU LGPL (see license.txt and README)
+ */
+#ifndef _NEPETA__DETAIL__
+#error This file should not be included from anywhere but nepeta.h
 
 // To satisfy the IDE parser
-#include "dascript.h"
+#include "nepeta.h"
 #endif
 
 // Creating references
 //
 /**
  * @brief Inserts a new reference to \p ref in this node.
- * The referenced node must originate from the same \c DaScript.
+ * 
+ * @note The referenced node must originate from the same \c Nepeta object.
  */
-inline void DaScript::Node::createReference(Node &ref, size_t ins)
+inline void Nepeta::Node::createReference(Node &ref, size_t ins)
 {
 	if(ref.mHost == mHost) {
 		if(ins >= mRefs.size())
@@ -24,7 +30,12 @@ inline void DaScript::Node::createReference(Node &ref, size_t ins)
 
 // Removing references
 //
-inline void DaScript::Node::removeReference(size_t index)
+/**
+ * @brief Removes the reference corresponding to the given \p index.
+ * 
+ * @see removeNode
+ */
+inline void Nepeta::Node::removeReference(size_t index)
 {
 	if(index < getReferenceCount()) {
 		Node *ref = mRefs[index];
@@ -33,7 +44,12 @@ inline void DaScript::Node::removeReference(size_t index)
 	}
 }
 
-inline void DaScript::Node::removeReferenceGroup(size_t is, size_t ie)
+/**
+ * @brief Removes a group of references from the node.
+ * 
+ * @see removeNodeGroup(size_t,size_t)
+ */
+inline void Nepeta::Node::removeReferenceGroup(size_t is, size_t ie)
 {
 	if(is < getReferenceCount()) {
 		ie = (ie >= getReferenceCount()) ? getReferenceCount() : ie;
@@ -44,7 +60,10 @@ inline void DaScript::Node::removeReferenceGroup(size_t is, size_t ie)
 	}
 }
 
-inline void DaScript::Node::removeReferenceGroup(const std::string &id)
+/**
+ * @brief Removes all references to nodes that have the given id.
+ */
+inline void Nepeta::Node::removeReferenceGroup(const std::string &id)
 {
 	for(size_t i=0; i<getReferenceCount(); ++i) {
 		if(mRefs[i]->getId() == id)
@@ -52,7 +71,10 @@ inline void DaScript::Node::removeReferenceGroup(const std::string &id)
 	}
 }
 
-inline void DaScript::Node::clearReferences()
+/**
+ * @brief Removes all references from this node.
+ */
+inline void Nepeta::Node::clearReferences()
 {
 	for(size_t i=0; i<getReferenceCount(); ++i)
 		mRefs[i]->mHasRef.erase(this);
@@ -67,7 +89,8 @@ inline void DaScript::Node::clearReferences()
 
 // Other
 //
-inline size_t DaScript::Node::nextIndexOfRef(const std::string &id,
+/// @internal
+inline size_t Nepeta::Node::nextIndexOfRef(const std::string &id,
 	size_t index) const
 {
 	index++;
@@ -79,7 +102,8 @@ inline size_t DaScript::Node::nextIndexOfRef(const std::string &id,
 	return NoPos;
 }
 
-inline size_t DaScript::Node::indexOfRef(const Node &ptr) const
+/// @internal
+inline size_t Nepeta::Node::indexOfRef(const Node &ptr) const
 {
 	for(size_t i=0;i<getReferenceCount(); ++i) {
 		if(&getReference(i) == &ptr)
@@ -89,7 +113,8 @@ inline size_t DaScript::Node::indexOfRef(const Node &ptr) const
 	return NoPos;
 }
 
-inline const DaScript::Node& DaScript::Node::getReferencedNode(
+/// @internal
+inline const Nepeta::Node& Nepeta::Node::getReferencedNode(
 	size_t index) const
 {
 	index -= mNodes.size();

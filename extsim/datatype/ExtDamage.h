@@ -12,7 +12,7 @@ namespace ExtS {
 			void startup() {}
 			void shutdown() {}
 
-			void loadNode(DaScript::Node& node);
+			void loadNode(Nepeta::Node& node);
 			void postProcess();
 	};
 }

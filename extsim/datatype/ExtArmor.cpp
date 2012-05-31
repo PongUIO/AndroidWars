@@ -11,7 +11,7 @@ namespace ExtS {
 	ExtArmorData::~ExtArmorData()
 	{}
 	
-	void ExtArmorData::loadNode(DaScript::Node& node)
+	void ExtArmorData::loadNode(Nepeta::Node& node)
 	{
 		const std::string &name = node.getNodeFirst("Name");
 		if(name.empty())
@@ -26,7 +26,7 @@ namespace ExtS {
 		RuleData ruleData;
 		ruleData.mSrc = armorType;
 		
-		for(size_t i=node.indexOf("Rule"); i!=DaScript::Node::NoPos;
+		for(size_t i=node.indexOf("Rule"); i!=Nepeta::NoPos;
 		i=node.nextIndexOf("Rule",i)) {
 			ruleData.mRule.push_back( loadRuleData(node.getNode(i), true) );
 		}
@@ -63,7 +63,7 @@ namespace ExtS {
 	}
 	
 	ExtArmorData::RuleData::Rule ExtArmorData::loadRuleData(
-		const DaScript::Node& node, bool loadType)
+		const Nepeta::Node& node, bool loadType)
 	{
 		int ind=0;
 		RuleData::Rule rule;

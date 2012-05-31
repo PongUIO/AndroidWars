@@ -27,7 +27,7 @@ namespace ExtS {
 	ExtBot::ExtBot(ExtSim *esim) : ExtBaseDataObj(esim) {}
 	ExtBot::~ExtBot() {}
 	
-	void ExtBot::loadNode(DaScript::Node& node,
+	void ExtBot::loadNode(Nepeta::Node& node,
 		Sim::IdType simTypeId, TypeRule* rule)
 	{
 		// Load standard data
@@ -41,11 +41,11 @@ namespace ExtS {
 				node.getNodeFirst("BaseCost"), 0);
 			
 			// Load weapon slots
-			DaScript::Node &slotNode = node.getNode("WEAPONS");
+			Nepeta::Node &slotNode = node.getNode("WEAPONS");
 			
-			for(size_t i=slotNode.indexOf("Slot"); i!=DaScript::Node::NoPos;
+			for(size_t i=slotNode.indexOf("Slot"); i!=Nepeta::NoPos;
 			i=slotNode.nextIndexOf("Slot",i)) {
-				DaScript::Node &data = slotNode.getNode(i);
+				Nepeta::Node &data = slotNode.getNode(i);
 				
 				const std::string &slotType = data.getArg(0);
 				int slotCount = ExtData::readValue<int>(data.getArg(1), 1);
@@ -60,10 +60,10 @@ namespace ExtS {
 			// Load attachments
 			mCoreHealth.loadData(node.getNodeSimple("Health"));
 			
-			DaScript::Node &atmNode = node.getNode("ATTACHMENTS");
+			Nepeta::Node &atmNode = node.getNode("ATTACHMENTS");
 			if(atmNode.isValid()) {
 				for(size_t hi=0, sz=atmNode.getNodeCount(); hi<sz; ++hi) {
-					DaScript::Node &healthNode = atmNode.getNode(hi);
+					Nepeta::Node &healthNode = atmNode.getNode(hi);
 					mAttachmentHealth.push_back(HealthHull());
 					mAttachmentHealth.back().loadData(healthNode);
 				}
@@ -91,7 +91,7 @@ namespace ExtS {
 		}
 	}
 	
-	void ExtBot::loadSimBot(DaScript::Node& node, Sim::BotD *simBot)
+	void ExtBot::loadSimBot(Nepeta::Node& node, Sim::BotD *simBot)
 	{
 		simBot->baseSpeed = ExtData::readValue<double>(
 			node.getNodeFirst("Speed"), 0);
@@ -109,7 +109,7 @@ namespace ExtS {
 	// ExtBot::HealthHull
 	//
 	//
-	void ExtBot::HealthHull::loadData(DaScript::Node& data)
+	void ExtBot::HealthHull::loadData(Nepeta::Node& data)
 	{
 		mType = data.getArg(0);
 		

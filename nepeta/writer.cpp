@@ -1,25 +1,23 @@
+/**
+ * This file is part of the Nepeta project.
+ * 
+ * Licensed under GNU LGPL (see license.txt and README)
+ */
 #include <sstream>
-#include "dascript.h"
-#include "daparser.h"
-#include "dacodec.h"
+#include "nepeta.h"
+#include "nepparser.h"
+#include "nepcodec.h"
 
-std::string DaScript::errorStr(const DaScript::Error& err)
+/**
+ * @brief Generates an error string for the given error.
+ */
+std::string Nepeta::errorStr(const Nepeta::Error& err)
 {
 	std::ostringstream res;
 	
 	res << ( (err.type < WarningStart) ? "(error) " : "(warning) ");
 	switch(err.type)
 	{
-		case ErrNoCloseString:
-			res << "String not closed, starting at L:" <<
-				err.stLine << ", C:" << err.stCol;
-			break;
-			
-		case ErrBlockNoClosing:
-			res << "Block not closed, starting at L:" <<
-				err.stLine << ", C:" << err.stCol;
-			break;
-			
 		case ErrIllegalCharacter: {
 			res << "Illegal character ";
 			
@@ -34,37 +32,58 @@ std::string DaScript::errorStr(const DaScript::Error& err)
 			res << " occured at L:" << err.stLine << ", C:" << err.stCol;
 			break;
 		}
-			
-		case ErrPrematureEnd:
-			res << "Script came to an abrupt end starting L:"<<
+		
+		case ErrPrematureEnd: {
+			res << "Nested node came to an abrupt end starting L:"<<
 				err.stLine << ", C:" << err.stCol;
 			break;
+		}
 		
-		case ErrCircularRef:
+		case ErrCommentNotClosed: {
+			res << "Comment was never closed, starting at L:"<<
+				err.stLine << ", C:" << err.stCol;
+			break;
+		}
+		
+		case ErrNoCloseString: {
+			res << "String not closed, starting at L:" <<
+				err.stLine << ", C:" << err.stCol;
+			break;
+		}
+		
+		case ErrBlockNoClosing: {
+			res << "Block not closed, starting at L:" <<
+				err.stLine << ", C:" << err.stCol;
+			break;
+		}
+		
+		case ErrCircularRef: {
 			res << "Circular reference detected in reference '" << err.msg <<
 				"' at L:"<<err.stLine <<", C:" << err.stCol <<
 				". Silently corrected.";
 			break;
+		}
 		
-		case ErrInvalidRef:
+		case ErrInvalidRef: {
 			res << "Invalid reference '" << err.msg << "' at L:"<<err.stLine <<
 				", C:" << err.stCol;
 			break;
+		}
 		
-		case WarnReqNewline:
+		case WarnReqNewline: {
 			res << "New line expected at L:"<<err.stLine <<
 				", C:" << err.stCol << ". Extraneous data ignored.";
 			break;
+		}
 	}
 	
 	return res.str();
 }
 
 /**
- * Creates a complete string of all error messages that occured during
- * compilation.
+ * @brief Generates an error string for all error messages from compilation.
  */
-std::string DaScript::fullErrorStr()
+std::string Nepeta::fullErrorStr()
 {
 	std::stringstream res;
 	
@@ -76,13 +95,14 @@ std::string DaScript::fullErrorStr()
 }
 
 /**
- * Creates a string from the contained data. The resulting string may
- * be parsed by the \c DaParser and replicate the data.
+ * @brief Creates a string from the contained node tree.
+ * The resulting string may be parsed by the \c NepParser and
+ * replicate the data.
  */
-std::string DaScript::makeString(bool useRelRef)
+std::string Nepeta::makeString(bool useRelRef)
 {
-	std::stringstream res;
-	makeNodeString(res,getRoot(),useRelRef,0);
+	std::ostringstream res;
+	getRoot().makeString(res,useRelRef,0);
 	
 	return res.str();
 }
@@ -111,9 +131,9 @@ static ArgType checkArgType(const std::string &arg)
 	
 	for(size_t i=0; i<arg.size() && i<1024; ++i) {
 		char ch = arg[i];
-		if( DaParser::isNewline(ch) )
+		if( NepParser::isNewline(ch) )
 			type = AtText;
-		else if( type==AtWord && !DaParser::checkWord(ch) )
+		else if( type==AtWord && !NepParser::checkIdentifier(ch) )
 			type = AtString;
 		else if( (ch>=0 && ch<=8) || (ch>=11 && ch <=31 && ch!=13) ||
 			ch==127) {
@@ -127,9 +147,18 @@ static ArgType checkArgType(const std::string &arg)
 #define IND std::string(ind,'\t')
 
 /**
- * Writes an argument based on the format of the string
+ * @brief Writes an argument based on the format of the string.
+ * 
+ * This function tries to auto-detect the format of the string, and
+ * writes it using a suitable argument format. Type analysis is done
+ * only for a limited length of the argument.
+ * 
+ * @warning This function is not yet guaranteed to write all arguments
+ * correctly. However it is only very rarely that an argument string should
+ * fail.
  */
-void DaScript::makeArg(std::stringstream& str, const std::string& arg, int ind)
+void Nepeta::Node::makeArgString(std::ostringstream& str,
+	const std::string& arg, int ind)
 {
 	switch( checkArgType(arg) ) {
 		case AtWord: {
@@ -165,16 +194,11 @@ void DaScript::makeArg(std::stringstream& str, const std::string& arg, int ind)
 		}
 		
 		case AtBinary: {
-			DaBase64 base64;
+			NepBase64 base64;
 			std::string out = arg;
-			base64.encode(out);
 			
 			str << " { base64";
-			for(size_t i=0; i<out.size(); ++i) {
-				if( (i % (70-ind*6)) == 0 )
-					str << "\n" << IND;
-				str << out[i];
-			}
+			base64.encode(str,ind,out);
 			str << "\n" << std::string(ind-1,'\t') << "}";
 			break;
 		}
@@ -182,36 +206,41 @@ void DaScript::makeArg(std::stringstream& str, const std::string& arg, int ind)
 	}
 }
 
-void DaScript::makeNodeString(std::stringstream& str, Node &node,
-	bool useRelRef, int ind)
+/**
+ * @brief Writes the node and all its nested data to an output stream.
+ * 
+ * @param useRelRef If true, references are written relative to the node.
+ * @param ind The indentation level to write the node at.
+ */
+void Nepeta::Node::makeString(std::ostringstream& str, bool useRelRef, int ind)
 {
-	if(node.getId().size()>0) {
-		str << IND << (node.getNodeCount()>0?"#":"") << node.getId();
+	if(getId().size()>0) {
+		str << IND << (getNodeCount()>0?"#":"") << getId();
 		ind++;
 	}
 	
 	// Write references
-	for(size_t i=0; i<node.getReferenceCount(); i++) {
-		str << " &" << node.getReference(i).buildLookupString(
-			useRelRef ? &node : 0);
+	for(size_t i=0; i<getReferenceCount(); i++) {
+		str << " &" << getReference(i).buildLookupString(
+			useRelRef ? this : 0);
 	}
 	
 	// Write arguments
-	if(node.getId().size() > 0) {
-		for(size_t i=0; i<node.getArgCount(); ++i) {
-			const std::string &ref = node.getArg(i);
-			makeArg(str, ref, ind);
+	if(getId().size() > 0) {
+		for(size_t i=0; i<getArgCount(); ++i) {
+			const std::string &ref = getArg(i);
+			makeArgString(str, ref, ind);
 		}
 		str << std::endl;
 	}
 	
 	// Write sub-nodes
-	size_t nodeCount = node.getNodeCount(false);
+	size_t nodeCount = getNodeCount(false);
 	for(size_t i=0; i<nodeCount; i++) {
-		makeNodeString(str, node.getNode(i,false), useRelRef, ind);
+		getNode(i,false).makeString(str, useRelRef, ind);
 	}
 	
-	if(node.getId().size()>0 && node.getNodeCount()>0) {
+	if(getId().size()>0 && getNodeCount()>0) {
 		ind--;
 		str << IND << "#" << std::endl;
 	}

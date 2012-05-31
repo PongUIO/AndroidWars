@@ -1,1 +1,5 @@
 license.txt envelops all code contributed by PongUIO (group).
+
+Everything within nepeta/* is taken from the nepeta project
+(see https://github.com/Thekian/nepeta for further details), and is
+licensed under LGPL.

@@ -21,19 +21,19 @@ namespace ExtS {
 			
 			virtual RuleParameter *clone() { return new ValRange<T>(*this); }
 			
-			virtual void readNode(DaScript::Node &node) {
-				DaScript::Node &paramNode = node.getNode("PARAM");
-				DaScript::Node &constraintNode = node.getNode("CONSTRAINT");
+			virtual void readNode(Nepeta::Node &node) {
+				Nepeta::Node &paramNode = node.getNode("PARAM");
+				Nepeta::Node &constraintNode = node.getNode("CONSTRAINT");
 				
 				// Read default value
 				if(paramNode.isValid()) {
-					DaScript::Node &paramData = getNodeData(paramNode);
+					Nepeta::Node &paramData = getNodeData(paramNode);
 					
 					mVal = ExtData::readValue<T>(paramData.getArg(0), T());
 				}
 				
 				// Read constraint
-				DaScript::Node &constrData = getNodeData(constraintNode);
+				Nepeta::Node &constrData = getNodeData(constraintNode);
 				if(constrData.isValid()) {
 					setDefinedConstraint();
 					

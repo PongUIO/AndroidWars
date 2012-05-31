@@ -4,7 +4,7 @@
 #include <boost/unordered_map.hpp>
 #include <boost/shared_ptr.hpp>
 
-#include "../dascript/dascript.h"
+#include "nepeta.h"
 #include "../simulation/Save.h"
 #include "../simulation/Common.h"
 
@@ -66,7 +66,7 @@ namespace ExtS {
 			
 			virtual RuleParameter *clone()=0;
 			
-			virtual void readNode(DaScript::Node &node)=0;
+			virtual void readNode(Nepeta::Node &node)=0;
 			virtual void postProcess(ExtSim &extsim) {}
 			
 			virtual void callback()=0;
@@ -86,7 +86,7 @@ namespace ExtS {
 			{ return !mIsConstraintDefined; }
 			
 		protected:
-			DaScript::Node &getNodeData(DaScript::Node &node) const
+			Nepeta::Node &getNodeData(Nepeta::Node &node) const
 			{ return node.getNodeSimple(getDataName()); }
 			
 			void setDefinedConstraint() { mIsConstraintDefined=true; }
@@ -189,7 +189,7 @@ namespace ExtS {
 				const ParamList *param) const=0;
 			bool checkConstrained(ParamList *srcList, ExtSim &extsim) const;
 			
-			void readNode(DaScript::Node &node);
+			void readNode(Nepeta::Node &node);
 			void postProcess(ExtSim &extsim);
 			
 			ParamList *makeParam() const;
@@ -208,7 +208,7 @@ namespace ExtS {
 			TypeRuleMgr();
 			~TypeRuleMgr();
 			
-			TypeRule *loadRuleNode(DaScript::Node &node);
+			TypeRule *loadRuleNode(Nepeta::Node &node);
 			
 			void registerTypeRule(const std::string &name, TypeRule *rule)
 			{ mRuleMap[name] = rule; }

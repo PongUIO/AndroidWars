@@ -28,7 +28,7 @@ namespace ExtS {
 			delete mRule;
 	}
 	
-	void ExtAbility::loadNode(DaScript::Node& node, TypeRule* rule)
+	void ExtAbility::loadNode(Nepeta::Node& node, TypeRule* rule)
 	{
 		node.readChain().
 			nodearg("Name",mName).

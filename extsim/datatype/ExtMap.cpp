@@ -21,7 +21,7 @@ namespace ExtS {
 	void ExtMapData::shutdown()
 	{}
 	
-	void ExtMapData::loadNode(DaScript::Node& node)
+	void ExtMapData::loadNode(Nepeta::Node& node)
 	{
 		mExtSim->getSim().getConfiguration().tileSize =
 			ExtData::readValue<double>(node.getNodeFirst("TileSize"), 1.0);
@@ -30,9 +30,9 @@ namespace ExtS {
 		{
 			Sim::TileDatabase &tileDb = mExtSim->getSim().getData().getTileDb();
 			
-			DaScript::Node &ttNode = node.getNode("TILE");
+			Nepeta::Node &ttNode = node.getNode("TILE");
 			for(size_t i=0, nc=ttNode.getNodeCount(); i<nc; ++i) {
-				DaScript::Node &ttData = ttNode.getNode(i);
+				Nepeta::Node &ttData = ttNode.getNode(i);
 				Sim::TileD td;
 				
 				td.colMask = (Sim::TileD::ColMask)

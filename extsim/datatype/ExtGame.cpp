@@ -19,7 +19,7 @@ namespace ExtS {
 	void ExtGameData::shutdown()
 	{}
 	
-	void ExtGameData::loadNode(DaScript::Node& node)
+	void ExtGameData::loadNode(Nepeta::Node& node)
 	{
 		node.readChain().
 			node("Name").arg(mName).endnode().

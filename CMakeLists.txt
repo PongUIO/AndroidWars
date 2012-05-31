@@ -32,12 +32,13 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${LINKFLAGS}")
 add_definitions(${CPPFLAGS})
 include_directories(${Boost_INCLUDE_DIR})
 
-add_subdirectory(dascript/)
+add_subdirectory(nepeta/)
+
+include_directories(${NEPETA_INCLUDE_DIR})
+
 add_subdirectory(simulation/)
 add_subdirectory(timeline/)
 add_subdirectory(extsim/)
-
-include_directories(${DASCRIPT_INCLUDE_DIR})
 
 if(COMP_GUI)
 	add_subdirectory(pc/)

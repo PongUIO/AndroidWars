@@ -4,7 +4,7 @@
 #include <vector>
 #include <boost/lexical_cast.hpp>
 
-#include "../dascript/dascript.h"
+#include "nepeta.h"
 #include "../simulation/Common.h"
 #include "../simulation/data/BaseData.h"
 #include "TypeRule.h"
@@ -13,7 +13,7 @@ namespace ExtS {
 	class ExtSim;
 	
 	struct NodeListener {
-		virtual void loadNode(DaScript::Node &node)=0;
+		virtual void loadNode(Nepeta::Node &node)=0;
 		virtual void postProcess()=0;
 	};
 	
@@ -29,7 +29,7 @@ namespace ExtS {
 			virtual void startup()=0;
 			virtual void shutdown()=0;
 			
-			virtual void loadNode(DaScript::Node &node)=0;
+			virtual void loadNode(Nepeta::Node &node)=0;
 			virtual void postProcess()=0;
 			
 		protected:
@@ -52,15 +52,15 @@ namespace ExtS {
 			virtual ~DefaultExtData()
 			{}
 			
-			virtual void setupObject(DaScript::Node &node,
+			virtual void setupObject(Nepeta::Node &node,
 				TypeRule *rule, Sim::IdType typeId, T *obj) {
 				obj->loadNode(node, typeId, rule);
 			}
 			
-			virtual DaScript::Node &getTypeRuleNode(DaScript::Node &node)
+			virtual Nepeta::Node &getTypeRuleNode(Nepeta::Node &node)
 			{ return node; }
 			
-			virtual void loadNode(DaScript::Node &node) {
+			virtual void loadNode(Nepeta::Node &node) {
 				const std::string &name = node.getNodeFirst("Name");
 				
 				// Ignore data if it doesn't have a name
@@ -125,7 +125,7 @@ namespace ExtS {
 					delete mRule;
 			}
 			
-			virtual void loadNode(DaScript::Node &node,
+			virtual void loadNode(Nepeta::Node &node,
 				Sim::IdType simTypeId, TypeRule *rule);
 			virtual void postProcess(ExtSim &extsim);
 			

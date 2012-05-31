@@ -25,7 +25,7 @@ namespace ExtS {
 		return true;
 	}
 	
-	void TypeRule::readNode(DaScript::Node &node)
+	void TypeRule::readNode(Nepeta::Node &node)
 	{
 		for(RuleParamVec::iterator i=mRuleParam.begin(); i!=mRuleParam.end();
 			++i) {
@@ -105,7 +105,7 @@ namespace ExtS {
 	 * @return A newly created TypeRule object if the script block matched
 	 * a rule, or NULL if no rule matched.
 	 */
-	TypeRule *TypeRuleMgr::loadRuleNode(DaScript::Node& node)
+	TypeRule *TypeRuleMgr::loadRuleNode(Nepeta::Node& node)
 	{
 		const std::string &baseRuleName = node.getNodeFirst("Base");
 		TypeRule *rule = 0;

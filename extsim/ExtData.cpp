@@ -1,6 +1,6 @@
 #include "ExtData.h"
 
-#include "../dascript/dascript.h"
+#include "nepeta.h"
 
 namespace ExtS {
 #define _EXTS_X(type, name) \
@@ -43,14 +43,14 @@ namespace ExtS {
 	 */
 	void ExtData::loadScript(const std::string& data)
 	{
-		DaScript daScr;
+		Nepeta daScr;
 		daScr.compile(data);
 		
 		if(daScr.getError().size()>0)
 			return;
 		
 		for(size_t i=0, nc=daScr.getRoot().getNodeCount(); i<nc; i++) {
-			DaScript::Node &node = daScr.getRoot().getNode(i);
+			Nepeta::Node &node = daScr.getRoot().getNode(i);
 			
 			ListenerMapPair lmp = mListeners.equal_range(node.getId());
 			for(ListenerMap::iterator i=lmp.first; i!=lmp.second; ++i) {
@@ -76,11 +76,11 @@ namespace ExtS {
 	{	mListeners.insert( std::make_pair(blockTag,listener) ); }
 }
 
-// Template implementations for DaScript
+// Template implementations for Nepeta
 //
 //
 #define DASCRIPT_READCHAIN_VALUE(type) \
 	template<> \
-	void DaScript::Node::ReadChain::readValue(type &dst, const std::string &arg) { \
+	void Nepeta::Node::ReadChain::readValue(type &dst, const std::string &arg) { \
 		\
 	}

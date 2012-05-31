@@ -1,13 +1,18 @@
-#ifndef TOKEN_H
-#define TOKEN_H
+/**
+ * This file is part of the Nepeta project.
+ * 
+ * Licensed under GNU LGPL (see license.txt and README)
+ */
+#ifndef _NEPPARSER_H
+#define _NEPPARSER_H
 
 #include <vector>
 #include <string>
-#include <stack>
 
-#include "dascript.h"
+#include "nepeta.h"
+#include "nepcodec.h"
 
-class DaParser {
+class NepParser {
 	public:
 		/// @name Character classes
 		//@{
@@ -21,7 +26,6 @@ class DaParser {
 		
 		/// @name Token classes
 		//@{
-			static bool checkWord(char ch);
 			static bool checkHash(char ch);
 			static bool checkComment(char ch);
 			static bool checkIdentifier(char ch);
@@ -32,12 +36,12 @@ class DaParser {
 		
 		/// @name Helper functions
 		//@{
-			size_t helpFindIndent();
 			void helpGenIdent(size_t &idStart, size_t &idEnd);
 			bool helpSeekNewline(bool checkWhite);
-			bool helpGenBuffer(std::string &arg, size_t baseInd);
-			
-			void skipComment();
+			bool helpGenBuffer(std::string &arg, size_t baseInd,
+				char endMarker='}');
+			bool helpGenString(std::string &arg, char endMarker='\"');
+			void helpSkipComment();
 			
 			bool notEof()
 			{ return mCur<mStr->size(); }
@@ -51,50 +55,54 @@ class DaParser {
 			{ return mStr->substr(st,en-st); }
 		
 			void iterCur();
+			
+			size_t getCurLine() const { return mLine; }
+			size_t getCurCol() const { return mCol; }
+			size_t getCurPos() const { return mCur; }
 		//@}
 		
 		/// @name Argument parsing contexts
 		//@{
-			void genArgWord(DaScript::Node &data);
-			void genArgString(DaScript::Node &data);
-			void genArgBlock(DaScript::Node &data);
-			void genArgReference(DaScript::Node &data);
+			void genArgWord(Nepeta::Node &data);
+			void genArgString(Nepeta::Node &data);
+			void genArgBlock(Nepeta::Node &data);
+			void genArgReference(Nepeta::Node &data);
 		//@}
 		
 		/// @name Top-level contexts
 		//@{
-			void genCtxArg(DaScript::Node &data);
-			void genCtxBlock(DaScript::Node &curBlock);
-			bool genCtxData(DaScript::Node &curBlock);
+			void genCtxArg(Nepeta::Node &data);
+			void genCtxBlock(Nepeta::Node &node);
+			bool genCtxData(Nepeta::Node &node);
 		//@}
 		
 		/// @name Parsing interface
 		//@{
-			DaParser(DaScript &scr);
-			~DaParser() {}
+			NepParser(Nepeta &scr);
+			~NepParser() {}
 			
 			void parse(const std::string &str);
 			void resolveReferences();
-			DaCodec::CodecPack &getCodec() { return mCodec; }
+			NepCodec::CodecPack &getCodec() { return mCodec; }
+			
+			void setupGenerator(const std::string &str,
+			size_t stLine=1, size_t stCol=1);
 		//@}
 		
 	private:
-		void setupGenerator(const std::string &str,
-			size_t stLine=1, size_t stCol=1);
-		
 		size_t mCur;
 		size_t mLine, mCol;
 		const std::string *mStr;
-		DaCodec::CodecPack mCodec;
+		NepCodec::CodecPack mCodec;
 		
-		DaScript &mScript;
+		Nepeta &mScript;
 		
 		struct Reference {
-			Reference(DaScript::Node *src=0, const std::string &ref="",
+			Reference(Nepeta::Node *src=0, const std::string &ref="",
 				size_t line=0, size_t col=0) :
 				mSrc(src), mRef(ref), mLine(line), mCol(col) {}
 			
-			DaScript::Node *mSrc;
+			Nepeta::Node *mSrc;
 			std::string mRef;
 			size_t mLine, mCol;
 		};

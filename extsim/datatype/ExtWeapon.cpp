@@ -29,7 +29,7 @@ namespace ExtS {
 	ExtWeapon::~ExtWeapon()
 	{}
 	
-	void ExtWeapon::loadNode(DaScript::Node& node,
+	void ExtWeapon::loadNode(Nepeta::Node& node,
 		Sim::IdType simTypeId, TypeRule* rule)
 	{
 		ExtBaseDataObj::loadNode(node, simTypeId, rule);

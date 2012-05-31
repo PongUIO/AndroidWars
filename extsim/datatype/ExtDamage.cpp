@@ -10,7 +10,7 @@ namespace ExtS {
 	ExtDamageData::~ExtDamageData()
 	{}
 	
-	void ExtDamageData::loadNode(DaScript::Node& node)
+	void ExtDamageData::loadNode(Nepeta::Node& node)
 	{
 		Sim::DamageDatabase &damageDb = mExtSim->getSim().getData().getDamageDb();
 		

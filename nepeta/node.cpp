@@ -1,31 +1,38 @@
-#include <stdio.h>
+/**
+ * This file is part of the Nepeta project.
+ * 
+ * Licensed under GNU LGPL (see license.txt and README)
+ */
 #include <sstream>
 #include <deque>
 #include <limits>
 
-#include "dascript.h"
+#include "nepeta.h"
 
-const std::string DaScript::Node::sEmpty = "";
+/// Common empty string object
+const std::string Nepeta::Node::sEmpty = "";
 
 /// Special value marking an invalid or nonexistent index.
 /// Set to the maximum value of \c size_t.
-const size_t DaScript::Node::NoPos = std::numeric_limits<size_t>::max();
+const size_t Nepeta::NoPos = std::numeric_limits<size_t>::max();
 
-// DaScript::Node
+// Nepeta::Node
 //
 //
 /**
- * Analyses the reference table to determine if any
- * circular references exist. Returns the index
- * of the first such circular reference found, or
+ * @brief Detects circular references.
+ * Analyses the references for this node to determine if any
+ * circular references exist.
+ * 
+ * @return The index of the first such circular reference found, or
  * \c NoPos otherwise.
  */
-size_t DaScript::Node::getCircularReference() const {
+size_t Nepeta::Node::getCircularReference() const {
 	ConstNodeSet nset;
 	return hasCircularReferenceInt(nset);
 }
 
-size_t DaScript::Node::hasCircularReferenceInt(ConstNodeSet &nset) const {
+size_t Nepeta::Node::hasCircularReferenceInt(ConstNodeSet &nset) const {
 	if(nset.count(this))
 		return 0;
 	
@@ -46,7 +53,7 @@ size_t DaScript::Node::hasCircularReferenceInt(ConstNodeSet &nset) const {
  * convenience wrapper around \c getNodeId() that makes
  * the returned node valid by setting its identifier.
  */
-DaScript::Node &DaScript::Node::getNodeSimple(const std::string &id) {
+Nepeta::Node &Nepeta::Node::getNodeSimple(const std::string &id) {
 	Node *tmp = &getNode(indexOf(id));
 	if(tmp->isEmpty())
 		tmp = &createNode(id);
@@ -65,10 +72,13 @@ static inline size_t readNum(const std::string &str, size_t start, size_t end)
 }
 
 /**
+ * @brief Finds a node relative to this, given an input "directory" string
+ * 
  * Tries to find the given node based on the input
  * string. The string has a format according to the
  * following mini-language, which is very similar
- * to common *nix directory traversal:
+ * to common *nix directory traversal (parenthesis identify optional elements,
+ * a '|' identify a branching either/or):
  * 
  * (/)(nodeId|..)([index])(/)...
  * 
@@ -89,7 +99,7 @@ static inline size_t readNum(const std::string &str, size_t start, size_t end)
  * ignored, and some mistyping (especially a forgotten closing ']') is
  * silently ignored.
  */
-DaScript::Node& DaScript::Node::lookupNode(const std::string& dir, bool useRef)
+Nepeta::Node& Nepeta::Node::lookupNode(const std::string& dir, bool useRef)
 {
 	size_t i=0;			// String index
 	Node *base=this;	// Current node
@@ -157,9 +167,16 @@ DaScript::Node& DaScript::Node::lookupNode(const std::string& dir, bool useRef)
 }
 
 /**
- * Returns the ranking for the nested \p node in this node.
+ * @brief Finds the index for the nested @p node in this node.
+ * 
+ * This is essentially equivalent to:
+ * @code
+ * true == (&node == &this->getNode(this->getNodeIdIndex(node)))
+ * @endcode
+ * 
+ * @return The node index if successful, or @c NoPos if not found.
  */
-size_t DaScript::Node::getNodeIdIndex(const Node& node)
+size_t Nepeta::Node::getNodeIdIndex(const Node& node)
 {
 	size_t nodeCount = getNodeCount();
 	size_t count = 0;
@@ -176,23 +193,24 @@ size_t DaScript::Node::getNodeIdIndex(const Node& node)
 }
 
 struct LookupData {
-	LookupData(DaScript::Node *n=0, size_t i=0) : node(n), idIndex(i) {}
-	DaScript::Node *node;
+	LookupData(Nepeta::Node *n=0, size_t i=0) : node(n), idIndex(i) {}
+	Nepeta::Node *node;
 	size_t idIndex;
 };
 
 /**
- * Constructs a string suitable for parsing by \c lookupNode for this
- * node. The returned string is always an absolute path.
+ * @brief Constructs a string suitable for parsing by @c lookupNode.
+ * 
+ * If @p relativeTo is not null, the string returned is relative to that node.
  */
-std::string DaScript::Node::buildLookupString(Node *relativeTo)
+std::string Nepeta::Node::buildLookupString(Node *relativeTo)
 {
 	// Setup variables
 	std::string str = "";
 	
 	// Build the lookup stack
 	std::deque<LookupData> Lstack;
-	DaScript::Node *cur = this, *parent = this;
+	Nepeta::Node *cur = this, *parent = this;
 	while( (parent = parent->getParent()) ) {
 		size_t idIndex = (parent ? parent->getNodeIdIndex(*cur) : NoPos);
 		

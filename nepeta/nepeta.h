@@ -1,5 +1,10 @@
-#ifndef SCRIPT_H
-#define SCRIPT_H
+/**
+ * This file is part of the Nepeta project.
+ * 
+ * Licensed under GNU LGPL (see license.txt and README)
+ */
+#ifndef _NEPETA_H
+#define _NEPETA_H
 
 #include <string>
 #include <set>
@@ -8,23 +13,32 @@
 
 #include <stdint.h>
 
-class DaCodec {
+/**
+ * @brief 
+ */
+class Nepeta {
 	public:
-		typedef std::map<std::string, DaCodec*> CodecPack;
+		static const size_t NoPos;
 		
-		DaCodec() {}
-		virtual ~DaCodec() {}
-		
-		virtual void encode(std::string &str)=0;
-		virtual void decode(std::string &str)=0;
-		
-	private:
-};
-
-class DaScript {
-	public:
 		/**
-		 * Node object.
+		 * @brief Holds the data for a node iterator.
+		 * 
+		 * The actual iteration is done in the node's interface.
+		 * @see Node
+		 */
+		struct Iterator {
+			size_t index;	///< Current children node index.
+			size_t absIndex;///< Absolute node index for \c getNode().
+			size_t curRef;	///< Current reference. \c NoPos if original node
+			
+			/// Marks the index of the last reference to iterate.
+			/// Iteration ends just before this index.
+			size_t endRef;
+		};
+		
+		/**
+		 * @brief Nepeta node object.
+		 * 
 		 * Contains an identifier, an argument list, a list of nested nodes,
 		 * and a list of references.
 		 */
@@ -35,7 +49,7 @@ class DaScript {
 				typedef std::set<Node*> NodeSet;
 				typedef std::vector<std::string> ArgVector;
 				
-				Node(DaScript *src, Node *parent=0, const std::string &id="",
+				Node(Nepeta *src, Node *parent=0, const std::string &id="",
 					uint32_t line=0, uint32_t col=0) :
 					mId(id), mLine(line), mCol(col),
 					mParent(parent), mHost(src),
@@ -49,58 +63,23 @@ class DaScript {
 					mNodes(), mArgs(), mRefs(), mHasRef()
 				{	*this = ref; }
 				
-				Node &operator=(const DaScript::Node &other) {
-					if(this != &other) {
-						// Remove everything in this node
-						clear();
-						
-						// Copy metadata
-						mId = other.mId;
-						mLine = other.mLine;
-						mCol = other.mCol;
-						mParent = other.mParent;
-						mHost = other.mHost;
-						
-						// Copy nodes
-						for(NodeVector::const_iterator i=other.mNodes.begin();
-							i!=other.mNodes.end(); ++i) {
-							mNodes.push_back(new Node(**i));
-						}
-						
-						// Copy arguments
-						mArgs = other.mArgs;
-						
-						// Note: References are not copied, as it is
-						// not possible to trivially detect the reference
-						// mappings. Rebuilding references must be done
-						// manually.
-					}
-					
-					return *this;
-				}
-				
 			public:
 				/// @name System
 				/// Manages special functions related for the
 				/// node system.
 				//@{
-					static const size_t NoPos;
-					
 					/**
-					 * Returns a reference to the special "empty" node.
-					 * This node always hold the same pointer for a script object.
-					 *
-					 * This node has the following important properties:
-					 * - The empty node, while possible to modify, always
-					 * 	resets its value every time this is called.
-					 * - The node may be modified, but no modifications are
-					 * 	changed long-term.
+					 * @brief Returns a reference to the special "empty" node.
+					 * This node always hold the same pointer value for a
+					 * script object.
 					 */
 					Node &getEmpty() const
 					{	return mHost->getEmpty(); }
 					
 					/**
-					 * Erases all data in the node recursively.
+					 * @brief Erases all data in the node recursively.
+					 * After a call to this, the node contains the same data
+					 * as the empty node.
 					 */
 					void clear() {
 						setId("");
@@ -115,7 +94,7 @@ class DaScript {
 				/// its identifier and parent node.
 				//@{
 					/**
-					 * Returns \c true if this node is a "valid" node.
+					 * @brief Returns @c true if this node is a "valid" node.
 					 * A valid node is a node with its identifier set to a
 					 * non-empty string.
 					 */
@@ -138,17 +117,15 @@ class DaScript {
 				/// @name Basic argument interface
 				/// Interface for creating, accessing, and removing arguments.
 				//@{
+					/// Returns the number of arguments this node has.
 					size_t getArgCount() const { return mArgs.size(); }
 					
-					/**
-					 * Creates a new argument and appends it to the end of
-					 * the argument list.
-					 */
+					/// Creates a new argument for this node.
 					std::string &createArg(const std::string &str="")
 					{	setArg(getArgCount(),str); return mArgs.back(); }
 					
 					/**
-					 * Sets the argument string at the given index.
+					 * @brief Sets the argument string at the given index.
 					 * The argument list is resized to fit.
 					 */
 					void setArg(size_t index=0, const std::string &str="") {
@@ -158,15 +135,15 @@ class DaScript {
 					}
 					
 					/**
-					 * Returns the argument for this node at the given index.
+					 * @brief Returns the argument for the given index.
 					 * Out-of-bounds arguments return an empty string.
 					 */
 					const std::string &getArg(size_t index=0) const
 					{ return (index<getArgCount()) ? mArgs[index] : sEmpty; }
 					
 					/**
-					 * Removes an argument, shifting
-					 * the argument list as needed.
+					 * @brief Removes an argument from the node.
+					 * The argument list is shifted as needed.
 					 */
 					void removeArg(size_t index=0) {
 						if(index<getArgCount())
@@ -267,6 +244,24 @@ class DaScript {
 				//@}
 				
 				/**
+				 * @name Iterator interface
+				 * Contains the interface to use iterators. Iterators are a
+				 * faster alternative to \c indexOf() and \c nextIndexOf().
+				 */
+				//@{
+					Iterator begin(const std::string &id="", bool useRef=true)
+						const;
+					Iterator beginRef(const std::string &id="") const;
+					void next(Iterator &i, const std::string &id="") const;
+					
+					bool hasNext(const Iterator &it) const;
+					const Node &getIterNode(const Iterator &i) const;
+					Node &getIterNode(const Iterator &i)
+					{	return const_cast<Node&>(static_cast<const Node&>(
+							*this).getIterNode(i)); }
+				//@}
+				
+				/**
 				 * @name Extended node interface
 				 * Contains functions that are more advanced or are intended
 				 * to be for the convenience of the user.
@@ -291,113 +286,156 @@ class DaScript {
 				 */
 				//@{
 					/**
-					 * Contains a write-chain.
-					 * 
+					 * @brief Contains a write-chain.
 					 * A write chain is a a chain of functions allowing
 					 * recursive node and argument building in a simple manner.
 					 */
-					class NodeWriteChain {
+					class WriteChain {
 						public:
-							NodeWriteChain(Node &node,
-								NodeWriteChain *parent=0) :
+							WriteChain(Node &node,
+								WriteChain *parent=0) :
 								mNode(node), mParent(parent) {}
 							
 							/**
-							 * Creates and appends a new argument with the
-							 * given value for the active node.
+							 * @brief Template function for chained writing.
+							 * This may be specialized to implement writers
+							 * for different data types.
 							 */
-							NodeWriteChain &arg(const std::string &str="")
-							{	mNode.createArg(str); return *this; }
+							template<class T>
+							void writeArg(const T &val)
+							{	createarg() = val; }
+							
+							/// Writes a new argument to the node
+							template<class T>
+							WriteChain &arg(const T &val=T())
+							{	writeArg(val); return *this; }
 							
 							/**
-							 * Creates a new nested node for the active node.
+							 * @brief Creates a new nested node.
 							 * All successive chained operations after this
 							 * operate on the new node.
 							 */
-							NodeWriteChain node(const std::string &id)
-							{	return NodeWriteChain(
+							WriteChain node(const std::string &id)
+							{	return WriteChain(
 								mNode.createNode(id),this); }
 							
 							/**
-							 * Ends operations on a nested node, closing
-							 * an associated \c node() call.
+							 * @brief Ends operations on a nested node.
+							 * This closes an associated \c node() call.
 							 */
-							NodeWriteChain &endnode()
+							WriteChain &endnode()
 							{	return *mParent; }
+							
+							/**
+							 * @brief Creates a node and its first argument.
+							 * This is a convenience function that merges
+							 * a call to node().arg().endnode().
+							 */
+							template<class T>
+							WriteChain &nodearg(const std::string &id,
+								const T &arg=T())
+							{	return node(id).arg(arg).endnode(); }
+							
+							/// @name Specialization tools
+							//@{
+								/// Creates a new argument for the node
+								std::string &createarg()
+								{	return mNode.createArg(); }
+							//@}
 							
 						private:
 							Node &mNode;
-							NodeWriteChain *mParent;
+							WriteChain *mParent;
 					};
 					
 					/**
-					 * Contains a read-chain.
-					 * 
+					 * @brief Contains a read-chain.
 					 * Allows reading from a node using chained functions.
 					 */
-					class NodeReadChain {
+					class ReadChain {
 						public:
-							NodeReadChain(const Node &node,
-								NodeReadChain *parent=0) :
+							ReadChain(const Node &node,
+								ReadChain *parent=0) :
 								mNode(node), mArgIndex(0), mParent(parent) {}
 							
 							/**
-							 * May be specialized to provide argument readers
+							 * @brief Template function for chained reading.
+							 * This may be specialized to implement readers
 							 * for other types, the default implementation
 							 * catches any type that provides an assignment
-							 * operator to assign to strings.
+							 * operator to assign to \c std::string.
 							 */
 							template<class T>
-							void readArg(T &dst, const std::string &str)
-							{	dst = str; }
+							void readArg(T &dst)
+							{	dst = nextarg(); }
 							
 							/**
-							 * Read an argument using a template function.
+							 * @brief Reads an argument from the current node.
+							 * The result is stored in \p val.
 							 * 
-							 * The argument is stored in the output parameter
-							 * \p val.
+							 * @see readArg
 							 */
 							template<class T>
-							NodeReadChain &argt(T &val)
-							{	readArg(val,mNode.getArg(mArgIndex++));
-								return *this; }
+							ReadChain &arg(T &val)
+							{ readArg(val); return *this; }
 							
-							/**
-							 * Reads an argument from the current chain,
-							 * storing the result in \p str. Basically the
-							 * "default" version of \c argt().
-							 */
-							NodeReadChain &arg(std::string &str)
-							{ return argt<std::string>(str); }
-							
-							/**
-							 * Returns a node chain for the first node with
-							 * the given identifier.
-							 */
-							NodeReadChain node(const std::string &id)
-							{	return NodeReadChain(
+							/// Returns a node chain for a child node.
+							ReadChain node(const std::string &id)
+							{	return ReadChain(
 								mNode.getNode(mNode.indexOf(id)),this); }
 							
 							/**
-							 * Ends operations on a nested node, closing an
-							 * associated \c node() call.
+							 * @brief Ends operations on a child node,
+							 * This closes an associated \c node() call.
 							 */
-							NodeReadChain &endnode()
+							ReadChain &endnode()
 							{	return *mParent; }
+							
+							/**
+							 * @brief Reads a node and its first argument.
+							 * This is a convenience function to read a node
+							 * and its first argument directly, without having
+							 * to call node().arg().endnode().
+							 */
+							template<class T>
+							ReadChain &nodearg(const std::string &id,
+								T &v)
+							{	return node(id).arg(v).endnode(); }
+							
+							/// @name Specialization tools
+							//@{
+								/// Reads the next node argument.
+								const std::string &nextarg()
+								{	return mNode.getArg(mArgIndex++); }
+								
+								/// Gets the number of arguments for the node.
+								size_t argcount()
+								{	return mNode.getArgCount(); }
+							//@}
 							
 						private:
 							const Node &mNode;
 							size_t mArgIndex;
-							NodeReadChain *mParent;
+							ReadChain *mParent;
 					};
 					
 					/// Constructs a write chain for the current node.
-					NodeWriteChain writeChain()
-					{ return NodeWriteChain(*this); }
+					WriteChain writeChain()
+					{ return WriteChain(*this); }
 					
 					/// Constructs a read chain for the current node.
-					NodeReadChain readChain() const
-					{ return NodeReadChain(*this); }
+					ReadChain readChain() const
+					{ return ReadChain(*this); }
+				//@}
+				
+				/// @name Output
+				//@{
+					void makeString(std::ostringstream &str,
+						bool relRef, int ind
+					);
+					void makeArgString(std::ostringstream& str,
+						const std::string& arg, int ind
+					);
 				//@}
 				
 			private:
@@ -407,7 +445,7 @@ class DaScript {
 				uint32_t mLine;
 				uint32_t mCol;
 				Node *mParent;		///< Parent node.
-				DaScript *mHost;	///< Script owning this node.
+				Nepeta *mHost;	///< Script owning this node.
 				
 				NodeVector mNodes;	///< Nested nodes for this node.
 				ArgVector mArgs;	///< String arguments for this node.
@@ -417,24 +455,27 @@ class DaScript {
 				
 				static const std::string sEmpty;	///< "empty" string.
 				
-				friend class DaScript;
+				friend class Nepeta;
 		};
 		
 		/**
-		 * Enumeration for possible error types.
+		 * @brief Enumeration for all possible error types.
 		 */
 		enum ErrorType {
-			/// A string was opened but never closed. 
-			ErrNoCloseString = 0,
-			
-			/// An argument block was opened but never closed.
-			ErrBlockNoClosing,
-			
 			/// An illegal character occurred.
-			ErrIllegalCharacter,
+			ErrIllegalCharacter = 0,
 			
 			/// The script came to an abrupt end without closing the node
 			ErrPrematureEnd,
+			
+			/// A comment was opened but never closed
+			ErrCommentNotClosed,
+			
+			/// A string was opened but never closed. 
+			ErrNoCloseString,
+			
+			/// An argument block was opened but never closed.
+			ErrBlockNoClosing,
 			
 			/// A circular reference was detected and ignored
 			ErrCircularRef,
@@ -446,22 +487,20 @@ class DaScript {
 			/// data was ignored.
 			WarnReqNewline,
 			
+			/// The starting value for warnings.
 			WarningStart = WarnReqNewline
 		};
 		
-		/**
-		 * Contains information about errors
-		 * that occured during compilation.
-		 */
+		/// Contains information about a compilation error.
 		struct Error {
 			Error(ErrorType type) : type(type), msg(""),
 				stLine(0), stCol(0), enLine(0), enCol(0)
 				{}
 			
-			ErrorType type;
-			std::string msg;
-			size_t stLine,stCol;
-			size_t enLine,enCol;
+			ErrorType type;			///< Error type
+			std::string msg;		///< Additional message
+			size_t stLine,stCol;	///< Starting line/col for the error
+			size_t enLine,enCol;	///< Ending line/col for the error
 		};
 		typedef std::vector<Error> ErrorVec;
 		
@@ -474,7 +513,7 @@ class DaScript {
 		
 		std::string makeString(bool useRelRef=true);
 		
-		/// Clears all data in this object
+		/// Clears all data in this Nepeta object
 		void clear() {
 			mRoot.clear();
 			mErrors.clear();
@@ -488,15 +527,7 @@ class DaScript {
 		Node &getEmpty()
 		{	mEmpty.clear(); return mEmpty; }
 		
-		DaScript() :
-			mRoot(this), mEmpty(this), mErrors() {}
-		~DaScript() {}
-		
-	private:
-		Node mRoot;
-		Node mEmpty;
-		ErrorVec mErrors;
-		
+		/// Inserts a new compilation error
 		void addError(ErrorType type, const std::string &msg,
 			size_t sL, size_t sC, size_t eL=0, size_t eC=0)
 		{
@@ -509,17 +540,22 @@ class DaScript {
 			mErrors.push_back( err );
 		}
 		
-		void makeArg(std::stringstream& str, const std::string& arg, int ind);
-		void makeNodeString(std::stringstream &str, Node &node, bool relRef,
-			int ind);
+		Nepeta() :
+			mRoot(this), mEmpty(this), mErrors() {}
+		~Nepeta() {}
 		
-		friend class DaParser;
+	private:
+		Node mRoot;
+		Node mEmpty;
+		ErrorVec mErrors;
+		
 		friend class Node;
 };
 
-#define _DASCRIPT__DETAIL__
-#include "detail/danode.h"
-#include "detail/dareference.h"
-#undef _DASCRIPT__DETAIL__
+#define _NEPETA__DETAIL__
+#include "detail/nepnode.h"
+#include "detail/nepreference.h"
+#include "detail/nepiterator.h"
+#undef _NEPETA__DETAIL__
 
 #endif

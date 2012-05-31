@@ -24,18 +24,18 @@ namespace ExtS {
 			
 			RuleParameter *clone() { return new IdList<T>(*this); }
 			
-			void readNode(DaScript::Node &node) {
-				DaScript::Node &paramNode = node.getNode("PARAM");
-				DaScript::Node &constraintNode = node.getNode("CONSTRAINT");
+			void readNode(Nepeta::Node &node) {
+				Nepeta::Node &paramNode = node.getNode("PARAM");
+				Nepeta::Node &constraintNode = node.getNode("CONSTRAINT");
 				
 				// Read default value
 				if(paramNode.isValid()) {
-					DaScript::Node &paramData = getNodeData(paramNode);
+					Nepeta::Node &paramData = getNodeData(paramNode);
 					mIdName = paramData.getArg(0);
 				}
 				
 				// Read constraints
-				DaScript::Node &constraintData = getNodeData(constraintNode);
+				Nepeta::Node &constraintData = getNodeData(constraintNode);
 				if(constraintData.isValid()) {
 					setDefinedConstraint();
 					

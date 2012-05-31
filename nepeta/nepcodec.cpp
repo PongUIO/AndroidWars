@@ -1,10 +1,19 @@
-#include "dacodec.h"
+/**
+ * This file is part of the Nepeta project.
+ * 
+ * Licensed under GNU LGPL (see license.txt and README)
+ */
+#include "nepcodec.h"
 
-const char *DaBase64::base64chars =
+const char *NepBase64::base64chars =
 	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 	"0123456789+/";
 
-char DaBase64::base64dchars[] =
+/**
+ * Contains the conversion table from a base64 encoded character to
+ * its numerical value.
+ */
+char NepBase64::base64dchars[] =
 	{
 		-1,-1,-1,-1,-1,-1,-1,-1, -1,-1,-1,-1,-1,-1,-1,-1,	// 000 - 063
 		-1,-1,-1,-1,-1,-1,-1,-1, -1,-1,-1,-1,-1,-1,-1,-1,	//

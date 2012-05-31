@@ -27,7 +27,7 @@ target_link_libraries(AWExtSim AWSim)
 
 if(COMP_EXTSIM_TEST AND Boost_FILESYSTEM_FOUND)
 	add_executable(../ExtSimTest test/exttest.cpp)
-	target_link_libraries(../ExtSimTest AWSim AWExtSim DaScript ${Boost_FILESYSTEM_LIBRARY})
+	target_link_libraries(../ExtSimTest AWSim AWExtSim nepeta ${Boost_FILESYSTEM_LIBRARY})
 	
 	add_definitions(-DDATADIR="${CMAKE_HOME_DIRECTORY}/testmod/data/")
 endif(COMP_EXTSIM_TEST AND Boost_FILESYSTEM_FOUND)

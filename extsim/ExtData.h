@@ -32,7 +32,7 @@ namespace ExtS {
 	 * Contains the databases for data related to the extended simulation,
 	 * as well as a system to load these databases through script strings.
 	 * 
-	 * Scripts are assumed to be in the DaScript language.
+	 * Scripts are assumed to be in the Nepeta language.
 	 */
 	class ExtData {
 		public:

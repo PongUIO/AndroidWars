@@ -9,7 +9,7 @@ namespace ExtS {
 			ExtWeapon(ExtSim *esim);
 			~ExtWeapon();
 			
-			void loadNode(DaScript::Node &node,
+			void loadNode(Nepeta::Node &node,
 				Sim::IdType simTypeId, TypeRule *rule);
 			void postProcess(ExtSim &extsim);
 			
@@ -25,7 +25,7 @@ namespace ExtS {
 			ExtWeaponData(ExtSim& esim);
 			virtual ~ExtWeaponData();
 			
-			DaScript::Node &getTypeRuleNode(DaScript::Node& node)
+			Nepeta::Node &getTypeRuleNode(Nepeta::Node& node)
 			{ return node.getNode("CREATERULE"); }
 			
 			void startup() {}
