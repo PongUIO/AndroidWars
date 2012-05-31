@@ -157,7 +157,8 @@ protected:
 
 	void resizeEvent(QResizeEvent *event) {
 		resize(event->size().width(), event->size().height());
-		resizeGL(event->size().width(), event->size().height());
+		resizeGL(event->size().width()
+, event->size().height());
 	}
 
 	void wheelEvent(QWheelEvent *event) {
@@ -216,9 +217,10 @@ protected:
 		std::list<Sim::Bot*> bots = sim->getState().getBotFactory().getBotList();
 		std::list<Sim::Bot*>::iterator bot;
 
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		//glEnable(GL_TEXTURE_2D);
+		//glBindTexture(GL_TEXTURE_2D, weaponstextures[0]);
 		for (bot = bots.begin(); bot != bots.end(); bot++) {
 			Sim::Vector pos = (*bot)->getBody().mPos;
 			Sim::Vector col = (*bot)->getTypePtr()->getCollision()->getBboxHigh();
@@ -231,6 +233,7 @@ protected:
 
 		}
 		gm->draw();
+		glDisable(GL_TEXTURE_2D);
 		glDisable(GL_BLEND);
 		glFlush();
 		glFinish();
