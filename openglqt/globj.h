@@ -2,6 +2,21 @@
 #define GLOBJ_H
 #include <QtOpenGL>
 
+class CacheEntry {
+public:
+	int vert, tex, norm;
+	CacheEntry() { vert = 0; tex = 0; norm = 0; }
+	CacheEntry(int v, int t, int n) {
+		vert = v;
+		tex = t;
+		norm = n;
+	}
+	bool operator == (const CacheEntry &other) const {
+		return (other.norm == norm && other.vert == vert && other.tex == tex);
+	}
+
+};
+
 class GLObj {
 	public:
 	QVector<QVector3D> vertices;
@@ -47,7 +62,8 @@ class GLObj {
 	void loadFile(QString file) {
 		QVector<GLuint> temp;
 		QVector<QVector3D> tmpVert, tmpTex, tmpNorm;
-		int i, j;
+		QVector<CacheEntry> cache;
+		int i, j, k;
 		QFile f(file);
 		f.open(QFile::QIODevice::ReadOnly);
 		float max[3] = {-9999, -9999, -9999};
@@ -80,11 +96,27 @@ class GLObj {
 			}
 		}
 		f.close();
+		bool found;
+		k = 0;
 		for (int i = 0; i < temp.size(); i+=3) {
-			vertices.push_back(tmpVert[temp[i]]);
-			vertices.push_back(tmpTex[temp[i+1]]);
-			vertices.push_back(tmpNorm[temp[i+2]]);
-			indices.push_back(i/3);
+			found = false;
+			CacheEntry tmp = CacheEntry(temp[i], temp[i+1], temp[i+2]);
+			for (j = 0; j < cache.size(); j++) {
+				if (cache[j] == tmp) {
+					found = true;
+					break;
+				}
+			}
+			if (!found) {
+				vertices.push_back(tmpVert[temp[i]]);
+				vertices.push_back(tmpTex[temp[i+1]]);
+				vertices.push_back(tmpNorm[temp[i+2]]);
+				indices.push_back(k);
+				cache.push_back(CacheEntry(temp[i], temp[i+1], temp[i+2]));
+				k++;
+			} else {
+				indices.push_back(j);
+			}
 		}
 		minVec = QVector3D(min[0], min[1], min[2]);
 		maxVec = QVector3D(max[0], max[1], max[2]);
