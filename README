@@ -9,6 +9,7 @@ qmake
 make
 cmake
 QT standard libraries + QT OpenGL libraries.
+boost
 
 To compile and run:
 mkdir build
