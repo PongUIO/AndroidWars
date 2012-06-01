@@ -29,7 +29,6 @@ class GLObj {
                 initBuf();
         }
 	GLObj(QString file, QVector3D scale) {
-		//glNewList(list, GL_COMPILE);
 		loadFile(file);
 		scaleAndCenter(scale);
 		initBuf();
@@ -61,7 +60,7 @@ class GLObj {
 		glTranslatef( -x, -y, -z);
 	}
 	void loadFile(QString file) {
-		QVector<GLuint> temp;
+		QVector<GLuint> tmpInd;
 		QVector<QVector3D> tmpVert, tmpTex, tmpNorm;
 		QVector<CacheEntry> cache;
 		int i, j, k;
@@ -89,7 +88,7 @@ class GLObj {
 				for (i = 0; i < qsl.size()-1; i ++) {
 					QStringList qsl2 = qsl.at(i+1).split("/");
 					for (j =0; j < 3; j++) {
-						temp.push_back(qsl2.at(j).toUInt()-1);
+						tmpInd.push_back(qsl2.at(j).toUInt()-1);
 					}
 				}
 			} else if (qsl.at(0) == "vt") {
@@ -101,21 +100,21 @@ class GLObj {
 		f.close();
 		bool found;
 		k = 0;
-		for (int i = 0; i < temp.size(); i+=3) {
+		for (int i = 0; i < tmpInd.size(); i+=3) {
 			found = false;
-			CacheEntry tmp = CacheEntry(temp[i], temp[i+1], temp[i+2]);
+			CacheEntry tmpEntry = CacheEntry(tmpInd[i], tmpInd[i+1], tmpInd[i+2]);
 			for (j = 0; j < cache.size(); j++) {
-				if (cache[j] == tmp) {
+				if (cache[j] == tmpEntry) {
 					found = true;
 					break;
 				}
 			}
 			if (!found) {
-				vertices.push_back(tmpVert[temp[i]]);
-				vertices.push_back(tmpTex[temp[i+1]]);
-				vertices.push_back(tmpNorm[temp[i+2]]);
+				vertices.push_back(tmpVert[tmpInd[i]]);
+				vertices.push_back(tmpTex[tmpInd[i+1]]);
+				vertices.push_back(tmpNorm[tmpInd[i+2]]);
 				indices.push_back(k);
-                                cache.push_back(tmp);
+                                cache.push_back(tmpEntry);
 				k++;
 			} else {
 				indices.push_back(j);
