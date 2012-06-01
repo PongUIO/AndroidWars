@@ -58,13 +58,12 @@ public:
 	}
 	void genMap() {
 
-	}
+        }
+        bool inMap(int x, int y) {
+                return ((0 <= x && x < this->x && 0 <= y && y < this->y) ? 1 : 0);
+        }
 	int getPiece(int x, int y) {
-		if (0 <= x && x < this->x && 0 <= y && y < this->y) {
-			return map[x][y];
-		} else {
-			return offmap;
-		}
+                return map[x][y];
 	}
 	void setOffmap(int i) {
 		offmap = i;
@@ -83,19 +82,25 @@ public:
 //		glEnable(GL_TEXTURE_2D);
 		for (i = fx; i < tx; i++) {
 			for (j = fy; j < ty; j++) {
-				mt = wld->getTile(i, j).getType();
-				if (mt == 0) {
-					mt = getPiece(i, j);
-					if (mt != -1) {
-						glColor4f(1.0f, 0.f, 0.f, 1.0f);
-						pieces[mt-1].r->draw(i,j,-1);
-					}
-				} else {
-					glColor4f(0.f, 1.0f, 0.f, 1.0f);
-					//glBindTexture(GL_TEXTURE_2D, mousetextures[0]);
-					//drawTexObj3d(i, j, i+1, j+1, 0);
-					pieces[mt-1].r->draw(i, j, 0);
-				}
+                                if (inMap(i, j)) {
+                                        mt = wld->getTile(i, j).getType();
+                                } else {
+                                        mt = offmap;
+                                }
+                                if (mt == 0) {
+                                        mt = getPiece(i, j);
+                                        if (mt != -1) {
+                                                glColor4f(1.0f, 0.f, 0.f, 1.0f);
+                                                pieces[mt-1].r->draw(i,j,-1);
+                                        }
+                                } else {
+                                        if (mt > 0) {
+                                                glColor4f(0.f, 1.0f, 0.f, 1.0f);
+                                                //glBindTexture(GL_TEXTURE_2D, mousetextures[0]);
+                                                //drawTexObj3d(i, j, i+1, j+1, 0);
+                                                pieces[mt-1].r->draw(i, j, 0);
+                                        }
+                                }
 			}
 		}
 	}

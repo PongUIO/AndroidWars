@@ -121,7 +121,8 @@ protected:
 		// Set up the rendering context, define display lists etc.:
 		glClearColor( 0.1, 0.1, 0.1, 0.0 );
 		glEnable(GL_DEPTH_TEST);
-		glEnable(GL_DOUBLE) ;
+                glEnable(GL_DOUBLE);
+                glEnable(GL_CULL_FACE);
 		glPushClientAttrib( GL_CLIENT_VERTEX_ARRAY_BIT );
 		//glCullFace(GL_FRONT_AND_BACK);
 
@@ -133,7 +134,8 @@ protected:
 		loadAndBind("../testmod/graphics/debug/checker.png", &checkImage, &check,256, 256);
 		terrain.push_back(new GLObj("../testmod/obj/box.obj", QVector3D(1., 1., 1.)));
 		gm->registerPiece(terrain[0], 1,1,1);
-		gm->setWorld(wld);
+                gm->setWorld(wld);
+                gm->setOffmap(1);
 		robots.push_back(new GLObj("../testmod/obj/Android01.obj", QVector3D(1., 1., 1.)));
 		this->setAttribute(Qt::WA_NoSystemBackground);
 		QPixmap m;

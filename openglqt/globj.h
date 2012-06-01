@@ -1,7 +1,6 @@
 #ifndef GLOBJ_H
 #define GLOBJ_H
 #include <QtOpenGL>
-#include <limits>
 
 class CacheEntry {
 public:
@@ -25,12 +24,13 @@ class GLObj {
 	size_t indNum;
 	QGLBuffer bufInt;
 	QGLBuffer bufFloat;
-	QVector3D minVec, maxVec;
+        QVector3D minVec, maxVec;
+        GLObj(QString file) {
+                loadFile(file);
+                initBuf();
+        }
 	GLObj(QString file, QVector3D scale) {
 		//glNewList(list, GL_COMPILE);
-		bufFloat = QGLBuffer(QGLBuffer::VertexBuffer);
-		bufInt = QGLBuffer(QGLBuffer::IndexBuffer);
-
 		loadFile(file);
 		scaleAndCenter(scale);
 		initBuf();
@@ -116,7 +116,7 @@ class GLObj {
 				vertices.push_back(tmpTex[temp[i+1]]);
 				vertices.push_back(tmpNorm[temp[i+2]]);
 				indices.push_back(k);
-				cache.push_back(CacheEntry(temp[i], temp[i+1], temp[i+2]));
+                                cache.push_back(tmp);
 				k++;
 			} else {
 				indices.push_back(j);
@@ -142,8 +142,8 @@ class GLObj {
 	}
 	void initBuf() {
 		bufFloat = QGLBuffer(QGLBuffer::VertexBuffer);
-		bufInt = QGLBuffer(QGLBuffer::IndexBuffer);
-		qDebug() << bufFloat.create();
+                bufInt = QGLBuffer(QGLBuffer::IndexBuffer);
+                qDebug() << bufFloat.create();
 		qDebug() << bufFloat.bind();
 		bufFloat.allocate(&vertices[0], sizeof(QVector3D)*vertices.size());
 		qDebug() << bufFloat.size();
