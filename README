@@ -3,3 +3,16 @@ license.txt envelops all code contributed by PongUIO (group).
 Everything within nepeta/* is taken from the nepeta project
 (see https://github.com/Thekian/nepeta for further details), and is
 licensed under LGPL.
+
+To compile you will need the following:
+qmake
+make
+cmake
+QT standard libraries + QT OpenGL libraries.
+
+To compile and run:
+mkdir build
+cd build
+cmake ..
+make -j 2
+./qtgui

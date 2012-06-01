@@ -29,9 +29,9 @@ public slots:
 		} else {
 			selAlpha -= 0.01;
 		}
-		if (selAlpha > 0.5) {
+                if (selAlpha > 1) {
 			dirAlpha = false;
-		} else if (selAlpha < 0.2) {
+                } else if (selAlpha < 0.6) {
 			dirAlpha = true;
 		}
 	}
@@ -65,15 +65,14 @@ public:
 	GameMap *gm;
 	double hitX, hitY;
 	GameDrawer(ClientStates *states, QWidget *parent = 0)
-		: QGLWidget(QGLFormat(QGL::SampleBuffers), parent) {
+                : QGLWidget(QGLFormat(QGL::SampleBuffers), parent), states(states) {
 		this->parent = parent;
 		cMouse = 0;
 		this->cam = new Camera(0, 0, parent->width(), parent->height());
 		lastX = width()/2;
 		lastY = height()/2;
-		this->states = states;
 		mouseSize = 0.07;
-		selAlpha = 0.3;
+                selAlpha = 0.8;
 		dirAlpha = false;
 		fullScreen = false;
 		glTimer = new QTimer(parent);
@@ -117,23 +116,21 @@ protected:
 
 	// overridden
 	void initializeGL() {
-		Sim::World *wld = &(states->getSim()->getState().getWorld());
-		// Set up the rendering context, define display lists etc.:
+                Sim::World *wld = &(states->getSim()->getState().getWorld());
 		glClearColor( 0.1, 0.1, 0.1, 0.0 );
 		glEnable(GL_DEPTH_TEST);
                 glEnable(GL_DOUBLE);
                 glEnable(GL_CULL_FACE);
-		glPushClientAttrib( GL_CLIENT_VERTEX_ARRAY_BIT );
-		//glCullFace(GL_FRONT_AND_BACK);
+                glCullFace(GL_BACK);
+                glPushClientAttrib( GL_CLIENT_VERTEX_ARRAY_BIT );
 
-		//Loading textures.
+                // Loading textures and obj-files.
 		loadAndBind("../testmod/graphics/weapons/testweapon.png", &weapons[0], &weaponstextures[0], 32, 64);
 		loadAndBind("../testmod/graphics/mouse/default.png", &mouse[0], &mousetextures[0],64,64);
 		loadAndBind("../testmod/graphics/mouse/attack.png", &mouse[1], &mousetextures[1],64,64);
 		loadAndBind("../testmod/graphics/weapons/bullet.png", &bullet[0], &bullettextures[0],16,16);
-		loadAndBind("../testmod/graphics/debug/checker.png", &checkImage, &check,256, 256);
-		terrain.push_back(new GLObj("../testmod/obj/box.obj", QVector3D(1., 1., 1.)));
-		gm->registerPiece(terrain[0], 1,1,1);
+                loadAndBind("../testmod/graphics/debug/checker.png", &checkImage, &check, 256, 256);
+                gm->registerPiece(new GLObj("../testmod/obj/box.obj", QVector3D(1., 1., 1.)));
                 gm->setWorld(wld);
                 gm->setOffmap(1);
 		robots.push_back(new GLObj("../testmod/obj/Android01.obj", QVector3D(1., 1., 1.)));
@@ -225,7 +222,8 @@ protected:
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glEnable(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D, check);
-		for (bot = bots.begin(); bot != bots.end(); bot++) {
+                gm->draw();
+                for (bot = bots.begin(); bot != bots.end(); bot++) {
 			Sim::Vector pos = (*bot)->getBody().mPos;
 			Sim::Vector col = (*bot)->getTypePtr()->getCollision()->getBboxHigh();
 			if (states->isSelected((*bot)->getId())) {
@@ -236,7 +234,6 @@ protected:
 			robots[(*bot)->getTypeId()]->draw(pos.x, pos.y, 0);
 
 		}
-		gm->draw();
 		glDisable(GL_TEXTURE_2D);
 		glDisable(GL_BLEND);
 		glFlush();

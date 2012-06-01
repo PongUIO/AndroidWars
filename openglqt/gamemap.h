@@ -18,7 +18,10 @@ public:
 	Piece(GLObj *go, QVector3D scale) {
 		r = go;
 		r->scaleAndCenter(scale);
-	}
+        }
+        Piece(GLObj *go) {
+                r = go;
+        }
 };
 
 class GameMap {
@@ -37,7 +40,10 @@ public:
 	void registerPiece(GLObj *go, int x, int y, float z) {
 		pieces.push_back(Piece(go, QVector3D(x,y,z)));
 	}
-	void updateDimensions() {
+        void registerPiece(GLObj *go) {
+                pieces.push_back(Piece(go));
+        }
+        void updateDimensions() {
 		if (!wld) {
 			return;
 		}
@@ -79,7 +85,6 @@ public:
 		int tx = cam->xSimLim(1)+1;
 		int fy = cam->ySimLim(1);
 		int ty = cam->ySimLim(-1)+1;
-//		glEnable(GL_TEXTURE_2D);
 		for (i = fx; i < tx; i++) {
 			for (j = fy; j < ty; j++) {
                                 if (inMap(i, j)) {
@@ -96,8 +101,6 @@ public:
                                 } else {
                                         if (mt > 0) {
                                                 glColor4f(0.f, 1.0f, 0.f, 1.0f);
-                                                //glBindTexture(GL_TEXTURE_2D, mousetextures[0]);
-                                                //drawTexObj3d(i, j, i+1, j+1, 0);
                                                 pieces[mt-1].r->draw(i, j, 0);
                                         }
                                 }

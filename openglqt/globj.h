@@ -22,8 +22,7 @@ class GLObj {
 	QVector<QVector3D> vertices;
 	QVector<GLuint> indices;
 	size_t indNum;
-	QGLBuffer bufInt;
-	QGLBuffer bufFloat;
+        QGLBuffer bufInt, bufFloat;
         QVector3D minVec, maxVec;
         GLObj(QString file) {
                 loadFile(file);
@@ -143,17 +142,19 @@ class GLObj {
 	void initBuf() {
 		bufFloat = QGLBuffer(QGLBuffer::VertexBuffer);
                 bufInt = QGLBuffer(QGLBuffer::IndexBuffer);
-                qDebug() << bufFloat.create();
-		qDebug() << bufFloat.bind();
+
+                bufFloat.create();
+                bufFloat.bind();
 		bufFloat.allocate(&vertices[0], sizeof(QVector3D)*vertices.size());
-		qDebug() << bufFloat.size();
-		bufFloat.setUsagePattern(QGLBuffer::DynamicDraw);
-		qDebug() << bufInt.create();
-		qDebug() << bufInt.bind();
+                bufFloat.size();
+                bufFloat.setUsagePattern(QGLBuffer::StaticDraw);
+
+                bufInt.create();
+                bufInt.bind();
 		bufInt.allocate(&indices[0], sizeof(GLuint)*indices.size());
 		indNum = indices.size();
-		qDebug() << bufInt.size();
-		bufInt.setUsagePattern(QGLBuffer::DynamicDraw);
+                bufInt.size();
+                bufInt.setUsagePattern(QGLBuffer::StaticDraw);
 	}
 };
 
