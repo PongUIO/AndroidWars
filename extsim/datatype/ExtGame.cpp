@@ -22,11 +22,9 @@ namespace ExtS {
 	void ExtGameData::loadNode(Nepeta::Node& node)
 	{
 		node.readChain().
-			node("Name").arg(mName).endnode().
-			node("Description").arg(mDescription).endnode();
-		
-		mStepTime = ExtData::readValue<double>(
-			node.getNodeFirst("StepTime"), 1.0);
+			nodearg("Name", mName).
+			nodearg("Description", mDescription).
+			nodearg("StepTime", mStepTime);
 	}
 
 	void ExtGameData::postProcess()

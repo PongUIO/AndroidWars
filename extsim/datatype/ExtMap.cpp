@@ -23,8 +23,12 @@ namespace ExtS {
 	
 	void ExtMapData::loadNode(Nepeta::Node& node)
 	{
-		mExtSim->getSim().getConfiguration().tileSize =
-			ExtData::readValue<double>(node.getNodeFirst("TileSize"), 1.0);
+		uint32_t width, height;
+		
+		node.readChain().
+			nodearg("TileSize", mExtSim->getSim().getConfiguration().tileSize).
+			nodearg("Width", width).
+			nodearg("Height", height);
 		
 		// Read tile types
 		{
@@ -43,14 +47,7 @@ namespace ExtS {
 			}
 		}
 		
-		// Read dimensions
-		uint32_t width, height;
-		
-		width = ExtData::readValue<uint32_t>(
-			node.getNodeFirst("Width"), 32);
-		height = ExtData::readValue<uint32_t>(
-			node.getNodeFirst("Height"), 16);
-		
+		// Set dimensions
 		mExtSim->getSim().getState().getWorld().setDimensions(width,height);
 		
 		// Read tile data
