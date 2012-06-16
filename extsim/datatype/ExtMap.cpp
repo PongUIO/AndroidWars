@@ -25,10 +25,10 @@ namespace ExtS {
 	{
 		uint32_t width, height;
 		
-		node.readChain().
-			nodearg("TileSize", mExtSim->getSim().getConfiguration().tileSize).
-			nodearg("Width", width).
-			nodearg("Height", height);
+		width = ExtData::readValue(node.getNodeFirst("Width"), 1);
+		height = ExtData::readValue(node.getNodeFirst("Height"), 1);
+		mExtSim->getSim().getConfiguration().tileSize =
+			ExtData::readValue(node.getNodeFirst("TileSize") ,1.0);
 		
 		// Read tile types
 		{

@@ -23,8 +23,8 @@ namespace ExtS {
 	{
 		node.readChain().
 			nodearg("Name", mName).
-			nodearg("Description", mDescription).
-			nodearg("StepTime", mStepTime);
+			nodearg("Description", mDescription);
+		mStepTime = ExtData::readValue(node.getNodeFirst("StepTime"), 1.0);
 	}
 
 	void ExtGameData::postProcess()

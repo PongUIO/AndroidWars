@@ -75,12 +75,3 @@ namespace ExtS {
 		const Listener &listener)
 	{	mListeners.insert( std::make_pair(blockTag,listener) ); }
 }
-
-// Template implementations for Nepeta
-//
-//
-#define DASCRIPT_READCHAIN_VALUE(type) \
-	template<> \
-	void Nepeta::Node::ReadChain::readValue(type &dst, const std::string &arg) { \
-		\
-	}
