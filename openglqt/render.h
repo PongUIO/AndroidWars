@@ -64,8 +64,10 @@ public:
 	QTimer *glTimer, *camTimer;
 	GameMap *gm;
 	double hitX, hitY;
+	QVector3D scaleTest;
 	GameDrawer(ClientStates *states, QWidget *parent = 0)
                 : QGLWidget(QGLFormat(QGL::SampleBuffers), parent), states(states) {
+		scaleTest = QVector3D(1,1,1);
 		this->parent = parent;
 		cMouse = 0;
 		this->cam = new Camera(0, 0, parent->width(), parent->height());
