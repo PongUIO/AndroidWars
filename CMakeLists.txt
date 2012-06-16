@@ -39,6 +39,7 @@ include_directories(${NEPETA_INCLUDE_DIR})
 add_subdirectory(simulation/)
 add_subdirectory(timeline/)
 add_subdirectory(extsim/)
+add_subdirectory(sound/)
 
 if(COMP_GUI)
 	add_subdirectory(pc/)
