@@ -23,3 +23,7 @@ HEADERS += main.h ../openglqt/render.h ../util/camera.h \
     ../openglqt/gamemap.h
 SOURCES += main.cpp
 QT += opengl
+
+OTHER_FILES += \
+    ../shaders/animation.frag \
+    ../shaders/animation.vert

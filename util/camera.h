@@ -51,8 +51,8 @@ public:
 		zoom *= dzoom + 1;
 
                 if (zoom < 1) {
-                        zoom = 1;
-                } else if (zoom > 32) {
+			zoom = 1;
+		} else if (zoom > 32) {
                         zoom = 32;
                 }
 
