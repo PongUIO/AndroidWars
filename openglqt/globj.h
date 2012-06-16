@@ -23,12 +23,15 @@ class GLObj {
 	QVector<GLuint> indices;
 	size_t indNum;
         QGLBuffer bufInt, bufFloat;
-        QVector3D minVec, maxVec;
+	QVector3D minVec, maxVec;
+	bool init;
         GLObj(QString file) {
+		init = false;
                 loadFile(file);
                 initBuf();
         }
 	GLObj(QString file, QVector3D scale) {
+		init = false;
 		loadFile(file);
 		scaleAndCenter(scale);
 		initBuf();
@@ -139,21 +142,28 @@ class GLObj {
 		maxVec = scale;
 	}
 	void initBuf() {
-		bufFloat = QGLBuffer(QGLBuffer::VertexBuffer);
-                bufInt = QGLBuffer(QGLBuffer::IndexBuffer);
+		if (!init) {
+			bufFloat = QGLBuffer(QGLBuffer::VertexBuffer);
+			bufInt = QGLBuffer(QGLBuffer::IndexBuffer);
+			bufFloat.create();
+			bufFloat.bind();
+			bufFloat.allocate(sizeof(QVector3D)*vertices.size());
+			bufInt.create();
+			bufInt.bind();
+			bufInt.allocate(sizeof(GLuint)*indices.size());
+			init = true;
+		}
 
-                bufFloat.create();
-                bufFloat.bind();
-		bufFloat.allocate(&vertices[0], sizeof(QVector3D)*vertices.size());
-                bufFloat.size();
-                bufFloat.setUsagePattern(QGLBuffer::StaticDraw);
+		initVert();
 
-                bufInt.create();
-                bufInt.bind();
-		bufInt.allocate(&indices[0], sizeof(GLuint)*indices.size());
+		bufInt.write(0, &indices[0], sizeof(GLuint)*indices.size());
 		indNum = indices.size();
-                bufInt.size();
                 bufInt.setUsagePattern(QGLBuffer::StaticDraw);
+	}
+	void initVert() {
+		bufFloat.bind();
+		bufFloat.write(0, &vertices[0], sizeof(QVector3D)*vertices.size());
+		bufFloat.setUsagePattern(QGLBuffer::StaticDraw);
 	}
 };
 

@@ -43,6 +43,7 @@ public:
 	bool fullScreen;
 	float selAlpha;
 	bool dirAlpha;
+	QGLShaderProgram *testShader;
 
 	QVector<GLObj*> robots;
 	QVector<GLObj*> terrain;
@@ -64,8 +65,10 @@ public:
 	QTimer *glTimer, *camTimer;
 	GameMap *gm;
 	double hitX, hitY;
+	QVector3D scaleTest;
 	GameDrawer(ClientStates *states, QWidget *parent = 0)
                 : QGLWidget(QGLFormat(QGL::SampleBuffers), parent), states(states) {
+		scaleTest = QVector3D(1,1,1);
 		this->parent = parent;
 		cMouse = 0;
 		this->cam = new Camera(0, 0, parent->width(), parent->height());
@@ -138,10 +141,17 @@ protected:
 		QPixmap m;
 		m.convertFromImage(mouse[MOUSE_NORMAL]);
 		this->setCursor(QCursor(m, -1, -1));
+		testShader = new QGLShaderProgram(this);
+		testShader->addShader(loadShader("../shaders/animation.vert", QGLShader::Vertex));
+		testShader->addShader(loadShader("../shaders/animation.frag", QGLShader::Fragment));
+
+		if (testShader) {
+			testShader->link();
+		}
 		glDisable(GL_TEXTURE_2D);
 
 	}
-	void loadAndBind(const char *path, QImage *img, GLuint *bind, GLuint xsize = -1, GLuint ysize = -1, bool vertFlip = false, bool horFlip = false) {
+	void loadAndBind(QString path, QImage *img, GLuint *bind, GLuint xsize = -1, GLuint ysize = -1, bool vertFlip = false, bool horFlip = false) {
 		if (xsize != -1) {
 			img->load(path);
 			*img = (*img).scaled(xsize, ysize).mirrored(horFlip, vertFlip);
@@ -149,6 +159,17 @@ protected:
 			img->load(path);
 		}
 		*bind = bindTexture(*img);
+	}
+
+	QGLShader* loadShader(QString path, QGLShader::ShaderType type) {
+		QGLShader *ret = new QGLShader(type, this);
+		if (ret->compileSourceFile(path)) {
+			qDebug() << ret->sourceCode();
+			return ret;
+		} else {
+			qDebug() << "Shader compile error" << ret->log();
+			return NULL;
+		}
 	}
 
 	// overridden
@@ -204,6 +225,7 @@ protected:
 
 	// overridden
 	void paintGL() {
+		//testShader->bind();
 		Sim::Simulation *sim = states->getSim();
 		Sim::World *wld = &(states->getSim()->getState().getWorld());
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -222,7 +244,8 @@ protected:
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glEnable(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D, check);
-                gm->draw();
+		testShader->setUniformValue("tex", 5);
+		gm->draw();
                 for (bot = bots.begin(); bot != bots.end(); bot++) {
 			Sim::Vector pos = (*bot)->getBody().mPos;
 			Sim::Vector col = (*bot)->getTypePtr()->getCollision()->getBboxHigh();

@@ -18,10 +18,10 @@ public:
 	Piece(GLObj *go, QVector3D scale) {
 		r = go;
 		r->scaleAndCenter(scale);
-        }
-        Piece(GLObj *go) {
-                r = go;
-        }
+	}
+	Piece(GLObj *go) {
+		r = go;
+	}
 };
 
 class GameMap {
@@ -40,10 +40,10 @@ public:
 	void registerPiece(GLObj *go, int x, int y, float z) {
 		pieces.push_back(Piece(go, QVector3D(x,y,z)));
 	}
-        void registerPiece(GLObj *go) {
-                pieces.push_back(Piece(go));
-        }
-        void updateDimensions() {
+	void registerPiece(GLObj *go) {
+		pieces.push_back(Piece(go));
+	}
+	void updateDimensions() {
 		if (!wld) {
 			return;
 		}
@@ -64,12 +64,12 @@ public:
 	}
 	void genMap() {
 
-        }
-        bool inMap(int x, int y) {
-                return ((0 <= x && x < this->x && 0 <= y && y < this->y) ? 1 : 0);
-        }
+	}
+	bool inMap(int x, int y) {
+		return ((0 <= x && x < this->x && 0 <= y && y < this->y) ? 1 : 0);
+	}
 	int getPiece(int x, int y) {
-                return map[x][y];
+		return map[x][y];
 	}
 	void setOffmap(int i) {
 		offmap = i;
@@ -87,23 +87,23 @@ public:
 		int ty = cam->ySimLim(-1)+1;
 		for (i = fx; i < tx; i++) {
 			for (j = fy; j < ty; j++) {
-                                if (inMap(i, j)) {
-                                        mt = wld->getTile(i, j).getType();
-                                } else {
-                                        mt = offmap;
-                                }
-                                if (mt == 0) {
-                                        mt = getPiece(i, j);
-                                        if (mt != -1) {
-                                                glColor4f(1.0f, 0.f, 0.f, 1.0f);
-                                                pieces[mt-1].r->draw(i,j,-1);
-                                        }
-                                } else {
-                                        if (mt > 0) {
-                                                glColor4f(0.f, 0.0f, 1.f, 1.0f);
-                                                pieces[mt-1].r->draw(i, j, 0);
-                                        }
-                                }
+				if (inMap(i, j)) {
+					mt = wld->getTile(i, j).getType();
+				} else {
+					mt = offmap;
+				}
+				if (mt == 0) {
+					mt = getPiece(i, j);
+					if (mt != -1) {
+						glColor4f(1.0f, 0.f, 0.f, 1.0f);
+						pieces[mt-1].r->draw(i,j,-1);
+					}
+				} else {
+					if (mt > 0) {
+						glColor4f(0.f, 0.0f, 1.f, 1.0f);
+						pieces[mt-1].r->draw(i, j, 0);
+					}
+				}
 			}
 		}
 	}

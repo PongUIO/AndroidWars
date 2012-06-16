@@ -8,8 +8,10 @@ To compile you will need the following:
 qmake
 make
 cmake
-QT standard libraries + QT OpenGL libraries.
-boost
+QT standard libraries + QT OpenGL libraries. (just get qtcreator)
+boost (just get libboost-dev)
+libopenal-dev
+libalut-dev
 
 To compile and run:
 mkdir build
