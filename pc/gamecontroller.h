@@ -36,7 +36,6 @@ public:
 		iconHolder->insertLayout(0, lower);
 		iconHolder->insertSpacing(1, -1);
 		iconHolder->insertLayout(0, upper);
-		parent->setWindowTitle(QApplication::translate("childwidget", "Child widget"));
 
 		slider = new GameSlider(states->getSim(), states, parent);
 
@@ -56,7 +55,7 @@ public:
 		lower->setAlignment(Qt::AlignBottom);
 		upper->setAlignment(Qt::AlignTop);
                 updateGUI();
-    }
+	}
         void showAll() {
                 label->show();
                 label2->show();

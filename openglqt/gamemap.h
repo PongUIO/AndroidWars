@@ -100,7 +100,7 @@ public:
                                         }
                                 } else {
                                         if (mt > 0) {
-                                                glColor4f(0.f, 1.0f, 0.f, 1.0f);
+                                                glColor4f(0.f, 0.0f, 1.f, 1.0f);
                                                 pieces[mt-1].r->draw(i, j, 0);
                                         }
                                 }
