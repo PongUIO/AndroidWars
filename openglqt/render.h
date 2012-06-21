@@ -1,7 +1,7 @@
 #ifndef RENDER_H
 #define RENDER_H
 #include<QtGui>
-#include<qgl.h>
+#include<QtOpenGL/qgl.h>
 #include<iostream>
 #include "Simulation.h"
 #include "../util/camera.h"
@@ -59,6 +59,8 @@ public:
 	GLuint bullettextures[1];
 	QImage checkImage;
 	GLuint check;
+	QImage redImage;
+	GLuint red;
 
 	Camera *cam;
 	ClientStates *states;
@@ -133,6 +135,7 @@ protected:
 		loadAndBind("../testmod/graphics/mouse/attack.png", &mouse[1], &mousetextures[1],64,64);
 		loadAndBind("../testmod/graphics/weapons/bullet.png", &bullet[0], &bullettextures[0],16,16);
 		loadAndBind("../testmod/graphics/debug/checker.png", &checkImage, &check, 256, 256);
+		loadAndBind("../testmod/graphics/debug/red.png", &redImage, &red, 100, 100);
 		gm->registerPiece(new GLObj("../testmod/obj/box.obj", QVector3D(1., 1., 1.)));
 		gm->setWorld(wld);
 		gm->setOffmap(1);
@@ -141,7 +144,7 @@ protected:
 		QPixmap m;
 		m.convertFromImage(mouse[MOUSE_NORMAL]);
 		this->setCursor(QCursor(m, -1, -1));
-		testShader = new QGLShaderProgram(this);
+		testShader = new QGLShaderProgram(context()->currentContext(), this);
 		testShader->addShader(loadShader("../shaders/animation.vert", QGLShader::Vertex));
 		testShader->addShader(loadShader("../shaders/animation.frag", QGLShader::Fragment));
 
@@ -165,6 +168,7 @@ protected:
 		QGLShader *ret = new QGLShader(type, this);
 		if (ret->compileSourceFile(path)) {
 			qDebug() << ret->sourceCode();
+			ret->setProperty("tex", red);
 			return ret;
 		} else {
 			qDebug() << "Shader compile error" << ret->log();
@@ -225,7 +229,7 @@ protected:
 
 	// overridden
 	void paintGL() {
-		//testShader->bind();
+		testShader->bind();
 		Sim::Simulation *sim = states->getSim();
 		Sim::World *wld = &(states->getSim()->getState().getWorld());
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -244,12 +248,13 @@ protected:
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glEnable(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D, check);
-		testShader->setUniformValue("tex", 5);
+		testShader->bind();
 		gm->draw();
 		for (bot = bots.begin(); bot != bots.end(); bot++) {
 			Sim::Vector pos = (*bot)->getBody().mPos;
 			Sim::Vector col = (*bot)->getTypePtr()->getCollision()->getBboxHigh();
 			if (states->isSelected((*bot)->getId())) {
+
 				glColor4f(0.2f, 1.0f, 0.2f, selAlpha);
 			} else {
 				glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
@@ -257,6 +262,7 @@ protected:
 			robots[(*bot)->getTypeId()]->draw(pos.x, pos.y, 0);
 
 		}
+		testShader->release();
 		glDisable(GL_TEXTURE_2D);
 		glDisable(GL_BLEND);
 		glFlush();

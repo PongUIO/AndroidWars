@@ -26,7 +26,7 @@ SOURCES += main.cpp \
     gamebutton.cpp \
     gamecontroller.cpp \
     gameslider.cpp \
-    menubutton.cpp \
+    menubutton.cpp
 QT += opengl
 
 OTHER_FILES += \

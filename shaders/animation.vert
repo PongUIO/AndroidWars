@@ -1,9 +1,11 @@
 #version 120
-varying vec2 TexCoord;
+varying highp vec4 qt_TexCoord0;
+varying vec2 tex;
+
 void main(void)
 {
-	//gl_Position = ftransform();
-	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
-	//TexCoord = vec2(1,0);
-	TexCoord = gl_MultiTexCoord0.st;
+	gl_Position = ftransform();
+	tex = gl_MultiTexCoord0.xy;
+	gl_FrontColor = gl_Color;
+	gl_FrontSecondaryColor = gl_SecondaryColor;
 }
