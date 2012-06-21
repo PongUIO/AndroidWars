@@ -66,8 +66,6 @@ namespace Sim {
 			uint32_t mPhaseSaveInterval;
 			uint32_t mPresentPhase;
 			
-			uint32_t mLocalLastProgramId;
-			
 			Simulation *mSim;
 			
 			friend class Simulation;

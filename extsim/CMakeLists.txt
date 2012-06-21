@@ -8,6 +8,8 @@ add_library(AWExtSim
 	
 	ExtProgramInput.cpp
 	
+	input/ReplayTree.cpp
+	
 	param/Position.cpp
 	param/IdList.cpp
 	
