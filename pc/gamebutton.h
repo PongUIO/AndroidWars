@@ -13,23 +13,9 @@ public:
 	Sim::Simulation *sim;
 	GameSlider *gs;
 	ClientStates *cs;
-	GameButton(Sim::Simulation *sim, ClientStates *states, int func, GameSlider *gs, QWidget *parent = 0)
-                : QLabel(parent) {
-                this->gs = gs;
-		this->func = func;
-		this->sim = sim;
-		this->cs = states;
-	}
-protected:
+	GameButton(Sim::Simulation *sim, ClientStates *states, int func, GameSlider *gs, QWidget *parent = 0);
+private:
 	// overridden
-	void mousePressEvent(QMouseEvent * event) {
-		if (func == 0) {
-			if (!cs->getRunning()) {
-				gs->setValue(0);
-				sim->startPhase();
-				cs->setRunning(true);
-			}
-		}
-	}
+	void mousePressEvent(QMouseEvent *ev);
 };
-#endif
+#endif // GAMEBUTTON_H

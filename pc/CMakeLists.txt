@@ -1,4 +1,5 @@
-set(qtgui_SOURCES main.cpp)
+set(qtgui_SOURCES main.cpp botselector.cpp gamebutton.cpp
+	gamecontroller.cpp gameslider.cpp menubutton.cpp)
 set(qtgui_HEADERS main.h ../openglqt/render.h ../util/camera.h
 	menubutton.h gamecontroller.h gamebutton.h
 	../util/cursordefines.h ../util/client.h

@@ -10,18 +10,23 @@ LIBS += -L../build/ -lAWSim
 
 # Input
 HEADERS += main.h ../openglqt/render.h ../util/camera.h \
-    menubutton.h \
-    gamecontroller.h \
-    gamebutton.h \
     ../util/cursordefines.h \
     ../util/client.h \
-    botselector.h \
     main.h \
-    menudefines.h \
-    gameslider.h \
     ../openglqt/globj.h \
-    ../openglqt/gamemap.h
-SOURCES += main.cpp
+    ../openglqt/gamemap.h \
+    botselector.h \
+    gamebutton.h \
+    gamecontroller.h \
+    gameslider.h \
+    menudefines.h \
+    menubutton.h
+SOURCES += main.cpp \
+    botselector.cpp \
+    gamebutton.cpp \
+    gamecontroller.cpp \
+    gameslider.cpp \
+    menubutton.cpp \
 QT += opengl
 
 OTHER_FILES += \

@@ -5,22 +5,14 @@
 class MenuButton : public QPushButton {
 	Q_OBJECT
 public:
-        State type;
-        int value;
+	State type;
+	int value;
 	QWidget *parent;
-        MenuButton(State type, int value, QWidget *parent = 0)
-                : QPushButton(parent) {
-		this->parent = parent;
-		this->value = value;
-                this->type = type;
-                setFont(QFont("Arial", 30));
-	}
+	MenuButton(State type, int value, QWidget *parent = 0);
 signals:
-        void onClick(State type, int value);
-protected:
-	// overridden
-        void mousePressEvent(QMouseEvent * event) {
-		emit onClick(type, value);
-	}
+	void onClick(State type, int value);
+private:
+	void mousePressEvent(QMouseEvent *e);
 };
-#endif
+
+#endif // MENUBUTTON_H

@@ -7,15 +7,11 @@ class BotSelector : public QLabel {
 public:
 	uint botId;
 	ClientStates *states;
-	BotSelector(uint botId, ClientStates *states, QWidget *parent = 0)
-		: QLabel(parent) {
-		this->botId = botId;
-		this->states = states;
-	}
-protected:
+	BotSelector(uint botId, ClientStates *states, QWidget *parent = 0);
+private:
 	// overridden
-	void mousePressEvent(QMouseEvent * event) {
-		states->select(botId);
-	}
+	void mousePressEvent(QMouseEvent *ev);
+
 };
-#endif
+
+#endif // BOTSELECTOR_H
