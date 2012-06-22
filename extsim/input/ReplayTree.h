@@ -20,31 +20,28 @@ namespace ExtS {
 		public:
 			/// Identifies the types of data stored in this node
 			enum NodeType {
-				/// Identifier for node with no data
-				NtNone			= 0x00,
-				/// Mask for a node with all data types
-				NtAll			= ~0,
-				
 				/// Copy of the simulation state
-				NtSimulation	= 0x01,
+				NtSimulation	= 0,
 				/// Iterative save of raw input
-				NtInput			= 0x02,
+				NtInput			= 1,
 				/// Save of the \c TimelineManager for this phase
-				NtTimeline		= 0x04,
+				NtTimeline		= 2,
+				
+				NtMax
 			};
 			
-			ReplayNode() : mType(NtNone), mSave() {}
+			ReplayNode() {}
 			~ReplayNode() {}
 			
-			const Sim::Save &getData() const { return mSave; }
-			Sim::Save &getData() { return mSave; }
+			const Sim::Save &getData(NodeType type) const
+			{ return mSave[type]; }
+			Sim::Save &getData(NodeType type) { return mSave[type]; }
 			
-			uint32_t getNodeType() const { return mType; }
-			void setNodeType(uint32_t type) { mType = type; }
+			bool isTypeSet(NodeType type) const
+			{ return mSave[type].size()>0; }
 			
 		private:
-			uint32_t mType;
-			Sim::Save mSave;
+			Sim::Save mSave[NtMax];
 	};
 	
 	/**
@@ -71,6 +68,7 @@ namespace ExtS {
 		private:
 			ReplayBranch(ReplayBranch *parent=0) :
 				mOffset(0), mPresent(0), mParent(parent) {}
+			~ReplayBranch();
 			
 			void clearRefBranches();
 			
@@ -89,6 +87,7 @@ namespace ExtS {
 			/// Marks the "present" phase, all nodes before this is
 			/// defined constant/unmodifiable.
 			size_t mPresent;
+			
 			ReplayBranch *mParent;
 			
 			friend class ReplayTree;

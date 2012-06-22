@@ -8,6 +8,12 @@ namespace ExtS {
 	// ReplayBranch
 	//
 	//
+	ReplayBranch::~ReplayBranch()
+	{
+		for(NodeVec::iterator i=mNodes.begin(); i!=mNodes.end(); ++i)
+			delete *i;
+	}
+	
 	/**
 	 * @brief Gets the node corresponding to the given phase.
 	 * 
@@ -75,7 +81,6 @@ namespace ExtS {
 	/// @copydoc getBranch
 	ReplayBranch* ReplayTree::getBranch(size_t index)
 	{	return const_cast<ReplayBranch*>(getBranch(index)); }
-
 	
 	/**
 	 * @brief Creates a new timeline branch.
