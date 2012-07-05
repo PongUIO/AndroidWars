@@ -3,7 +3,7 @@ set(qtgui_SOURCES main.cpp botselector.cpp gamebutton.cpp
 set(qtgui_HEADERS main.h ../openglqt/render.h ../util/camera.h
 	menubutton.h gamecontroller.h gamebutton.h
 	../util/cursordefines.h ../util/client.h
-	botselector.h main.h gameslider.h)
+	botselector.h main.h gameslider.h ../openglqt/skeletalsystem.h)
 
 set(QT_USE_QTOPENGL TRUE)
 

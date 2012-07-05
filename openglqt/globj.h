@@ -18,18 +18,18 @@ public:
 };
 
 class GLObj {
-	public:
+public:
 	QVector<QVector3D> vertices;
 	QVector<GLuint> indices;
 	size_t indNum;
-        QGLBuffer bufInt, bufFloat;
+	QGLBuffer bufInt, bufFloat;
 	QVector3D minVec, maxVec;
 	bool init;
-        GLObj(QString file) {
+	GLObj(QString file) {
 		init = false;
-                loadFile(file);
-                initBuf();
-        }
+		loadFile(file);
+		initBuf();
+	}
 	GLObj(QString file, QVector3D scale) {
 		init = false;
 		loadFile(file);
@@ -73,6 +73,7 @@ class GLObj {
 		float max[3] = {0, 0, 0};
 		float min[3] = {0, 0, 0};
 		QRegExp reg(" +");
+
 		while (!f.atEnd()) {
 			QString str = f.readLine();
 			QStringList qsl = str.split(reg);
@@ -117,7 +118,7 @@ class GLObj {
 				vertices.push_back(tmpTex[tmpInd[i+1]]);
 				vertices.push_back(tmpNorm[tmpInd[i+2]]);
 				indices.push_back(k);
-                                cache.push_back(tmpEntry);
+				cache.push_back(tmpEntry);
 				k++;
 			} else {
 				indices.push_back(j);
@@ -158,7 +159,7 @@ class GLObj {
 
 		bufInt.write(0, &indices[0], sizeof(GLuint)*indices.size());
 		indNum = indices.size();
-                bufInt.setUsagePattern(QGLBuffer::StaticDraw);
+		bufInt.setUsagePattern(QGLBuffer::StaticDraw);
 	}
 	void initVert() {
 		bufFloat.bind();

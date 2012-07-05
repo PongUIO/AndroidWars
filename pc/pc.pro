@@ -20,7 +20,8 @@ HEADERS += main.h ../openglqt/render.h ../util/camera.h \
     gamecontroller.h \
     gameslider.h \
     menudefines.h \
-    menubutton.h
+    menubutton.h \
+    ../openglqt/skeletalsystem.h
 SOURCES += main.cpp \
     botselector.cpp \
     gamebutton.cpp \

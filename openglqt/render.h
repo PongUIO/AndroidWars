@@ -7,6 +7,7 @@
 #include "../util/camera.h"
 #include "../util/client.h"
 #include "../util/cursordefines.h"
+#include "skeletalsystem.h"
 #include "globj.h"
 #include "gamemap.h"
 
@@ -137,6 +138,7 @@ protected:
 		loadAndBind("../testmod/graphics/debug/checker.png", &checkImage, &check, 256, 256);
 		loadAndBind("../testmod/graphics/debug/red.png", &redImage, &red, 100, 100);
 		gm->registerPiece(new GLObj("../testmod/obj/box.obj", QVector3D(1., 1., 1.)));
+		gm->registerPiece(new GLObj("../testmod/obj/boxtrans.obj", QVector3D(1., 1., 1.)));
 		gm->setWorld(wld);
 		gm->setOffmap(1);
 		robots.push_back(new GLObj("../testmod/obj/Android01.obj", QVector3D(1., 1., 1.)));
@@ -231,7 +233,6 @@ protected:
 	void paintGL() {
 		testShader->bind();
 		Sim::Simulation *sim = states->getSim();
-		Sim::World *wld = &(states->getSim()->getState().getWorld());
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClear(GL_DEPTH_BUFFER_BIT);
 		glMatrixMode(GL_PROJECTION);
@@ -249,6 +250,7 @@ protected:
 		glEnable(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D, check);
 		testShader->bind();
+		testShader->setAttributeValue("testtween", 0.5);
 		gm->draw();
 		for (bot = bots.begin(); bot != bots.end(); bot++) {
 			Sim::Vector pos = (*bot)->getBody().mPos;
