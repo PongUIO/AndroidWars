@@ -1,8 +1,7 @@
 #ifndef SOUND_H
 #define SOUND_H
 
-#include <alut.h>
-#include <alure.h>
+#include <al.h>
 #include <string>
 
 namespace Snd

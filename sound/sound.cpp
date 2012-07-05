@@ -1,3 +1,5 @@
+#include <alure.h>
+
 #include "sound.h"
 
 namespace Snd
@@ -17,19 +19,19 @@ namespace Snd
 	
 	void Sound::startup()
 	{
-		alutInit(0, 0);
+		alureInitDevice(0, 0);
 
 	}
 
 	void Sound::shutdown()
 	{
-		alutExit();
+		alureShutdownDevice();
 
 	}
 	
 	ALuint Sound::load(const std::string& filename)
 	{
-		return alutCreateBufferFromFile(filename.c_str());
+		return alureCreateBufferFromFile(filename.c_str());
 
 	}
 	
