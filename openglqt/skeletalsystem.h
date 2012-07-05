@@ -15,17 +15,19 @@ class Bone {
 		}
 		void calcMatrix() {
 			rotOrigin = origin;
-			Bone *tmp = this;
+			Bone *tmp = previous;
 			QList<Bone*> order;
 			while (tmp != NULL) {
-				tmp = tmp->previous;
 				order.push_back(tmp);
+				tmp = tmp->previous;
 			}
 			while (order.size() != 0) {
 				tmp = order.last();
 				order.pop_back();
 				rot *= tmp->rot;
-				rotOrigin = rotOrigin * tmp->rot;
+				rotOrigin = tmp->rot * rotOrigin;
+				qDebug() << "debug";
+				qDebug() << tmp->rot * rotOrigin;
 			}
 		}
 
