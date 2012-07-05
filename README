@@ -4,7 +4,7 @@ Everything within nepeta/* is taken from the nepeta project
 (see https://github.com/Thekian/nepeta for further details), and is
 licensed under LGPL.
 
-To compile you will need the following:
+To compile you will need the following (on Debian-based distros: setupenvironment.sh):
 qmake
 make
 cmake
@@ -12,6 +12,7 @@ QT standard libraries + QT OpenGL libraries. (just get qtcreator)
 boost (just get libboost-dev)
 libopenal-dev
 libalut-dev
+libvorbis-dev
 
 To compile and run:
 mkdir build
