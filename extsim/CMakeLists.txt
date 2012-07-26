@@ -5,6 +5,7 @@ add_library(AWExtSim
 	#ExtBaseData.cpp
 	#TypeRule.cpp
 	CommonTemplate.cpp
+	CommonLoad.cpp
 	
 	#ExtProgramInput.cpp
 	

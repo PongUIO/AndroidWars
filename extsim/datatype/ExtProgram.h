@@ -12,7 +12,7 @@ namespace ExtS {
 			ExtProgram(ExtSim &esim, Sim::IdType id);
 			~ExtProgram();
 			
-			void loadNode(Nepeta::Node& node);
+			void loadNode(const Nepeta::Node& node);
 			void postProcess();
 	};
 	

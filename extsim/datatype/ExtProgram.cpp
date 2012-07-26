@@ -28,7 +28,7 @@ namespace ExtS {
 	ExtProgram::~ExtProgram()
 	{}
 
-	void ExtProgram::loadNode(Nepeta::Node& node)
+	void ExtProgram::loadNode(const Nepeta::Node& node)
 	{
 		ExtDataObjBase::loadNode(node);
 	}

@@ -6,8 +6,8 @@ namespace ExtS {
 	// values from Nepeta. This is to make it easier to alter
 	// these names if necessary
 	namespace Load {
-		static const char *Name = "Name";
-		static const char *Description = "Description";
+		extern const char *Name;
+		extern const char *Description;
 	}
 }
 

@@ -14,6 +14,10 @@ namespace ExtS {
 			ReplayManager(ExtSim &esim);
 			~ReplayManager();
 			
+			void selectBranch();
+			
+			const ReplayTree &getReplayTree() const { return mTree; }
+			
 		private:
 			/// @name Configuration
 			//@{
