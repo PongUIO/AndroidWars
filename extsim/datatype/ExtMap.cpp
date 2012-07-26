@@ -3,13 +3,14 @@
 #include "ExtMap.h"
 
 #include "../ExtData.h"
+#include "../util/TypeConv.h"
 #include "../ExtSim.h"
 
 namespace ExtS {
 	// ExtMapData
 	//
 	//
-	ExtMapData::ExtMapData(ExtSim& sim): ExtBaseData(sim)
+	ExtMapData::ExtMapData(ExtSim& esim): ExtDataComponent(), mExtSim(esim)
 	{}
 	
 	ExtMapData::~ExtMapData()
@@ -21,26 +22,26 @@ namespace ExtS {
 	void ExtMapData::shutdown()
 	{}
 	
-	void ExtMapData::loadNode(Nepeta::Node& node)
+	void ExtMapData::loadNode(const Nepeta::Node& node)
 	{
 		uint32_t width, height;
 		
-		width = ExtData::readValue(node.getNodeFirst("Width"), 1);
-		height = ExtData::readValue(node.getNodeFirst("Height"), 1);
-		mExtSim->getSim().getConfiguration().tileSize =
-			ExtData::readValue(node.getNodeFirst("TileSize") ,1.0);
+		width = convValue(node.getNodeFirst("Width"), 1);
+		height = convValue(node.getNodeFirst("Height"), 1);
+		mExtSim.getSim().getConfiguration().tileSize =
+			convValue(node.getNodeFirst("TileSize") ,1.0);
 		
 		// Read tile types
 		{
-			Sim::TileDatabase &tileDb = mExtSim->getSim().getData().getTileDb();
+			Sim::TileDatabase &tileDb = mExtSim.getSim().getData().getTileDb();
 			
-			Nepeta::Node &ttNode = node.getNode("TILE");
-			for(size_t i=0, nc=ttNode.getNodeCount(); i<nc; ++i) {
-				Nepeta::Node &ttData = ttNode.getNode(i);
+			const Nepeta::Node &ttNode = node.getNode("TILE");
+			for(Nepeta::Iterator i=node.begin("TILE"); node.hasNext(i);
+			node.next(i,"TILE")) {
+				const Nepeta::Node &ttData = ttNode.getIterNode(i);
 				Sim::TileD td;
-				
 				td.colMask = (Sim::TileD::ColMask)
-					ExtData::readBitfield<uint32_t>(
+					convBitfield<uint32_t>(
 					ttData.getArg(1), 0);
 				
 				tileDb.addTile(td);
@@ -48,7 +49,7 @@ namespace ExtS {
 		}
 		
 		// Set dimensions
-		mExtSim->getSim().getState().getWorld().setDimensions(width,height);
+		mExtSim.getSim().getState().getWorld().setDimensions(width,height);
 		
 		// Read tile data
 		{
@@ -65,11 +66,11 @@ namespace ExtS {
 				
 				for(uint32_t x=0; x<tile.size(); ++x) {
 					uint32_t tileId =
-						ExtData::readValue<uint32_t>(tile[x], 0);
+						convValue<uint32_t>(tile[x], 0);
 					
 					if(x<width && y<height) {
-						mExtSim->getSim().getState().getWorld().getTile(x,height-1-y).
-						setType(tileId);
+						mExtSim.getSim().getState().getWorld().
+						getTile(x,height-1-y).setType(tileId);
 					}
 				}
 			}

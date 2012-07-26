@@ -2,8 +2,6 @@
 
 #include "../ExtSim.h"
 
-#include "../typerule/program/MoveTowards.h"
-
 namespace ExtS {
 	// ExtProgramData
 	//
@@ -11,8 +9,8 @@ namespace ExtS {
 	ExtProgramData::ExtProgramData(ExtSim &esim) :
 		DefaultExtData<ExtProgram>(esim)
 	{
-		registerTypeRule("Base/MoveTowards",
-			new Prog::MoveTowardsRule());
+		/*registerTypeRule("Base/MoveTowards",
+			new Prog::MoveTowardsRule());*/
 	}
 	
 	ExtProgramData::~ExtProgramData()
@@ -23,20 +21,20 @@ namespace ExtS {
 	// ExtProgram
 	//
 	//
-	ExtProgram::ExtProgram(ExtSim *esim) : ExtBaseDataObj(esim)
+	ExtProgram::ExtProgram(ExtSim &esim, Sim::IdType id) :
+		ExtDataObjBase(esim,id)
 	{}
 	
 	ExtProgram::~ExtProgram()
 	{}
 
-	void ExtProgram::loadNode(Nepeta::Node& node,
-		Sim::IdType simTypeId, TypeRule* rule)
+	void ExtProgram::loadNode(Nepeta::Node& node)
 	{
-		ExtBaseDataObj::loadNode(node, simTypeId, rule);
+		ExtDataObjBase::loadNode(node);
 	}
 	
-	void ExtProgram::postProcess(ExtSim& extsim)
+	void ExtProgram::postProcess()
 	{
-		ExtBaseDataObj::postProcess(extsim);
+		ExtDataObjBase::postProcess();
 	}
 }

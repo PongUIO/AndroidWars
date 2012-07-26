@@ -1,26 +1,28 @@
 #include "ExtArmor.h"
+
 #include "../ExtData.h"
+#include "../util/TypeConv.h"
 
 #include "../ExtSim.h"
 #include "../../simulation/data/WeaponD.h"
 
 namespace ExtS {
-	ExtArmorData::ExtArmorData(ExtSim &esim): ExtBaseData(esim)
+	ExtArmorData::ExtArmorData(ExtSim &esim): ExtDataComponent(), mExtSim(esim)
 	{}
 	
 	ExtArmorData::~ExtArmorData()
 	{}
 	
-	void ExtArmorData::loadNode(Nepeta::Node& node)
+	void ExtArmorData::loadNode(const Nepeta::Node& node)
 	{
 		const std::string &name = node.getNodeFirst("Name");
 		if(name.empty())
 			return;
 		
 		Sim::ArmorD *armorType =
-			mExtSim->getSim().getData().getArmorDb().newArmor(name);
+			mExtSim.getSim().getData().getArmorDb().newArmor(name);
 		
-		RuleData::Rule defaultRule = loadRuleData(node.getNodeSimple("Default"), false);
+		RuleData::Rule defaultRule = loadRuleData(node.getNode("Default"), false);
 		armorType->setDefaultRule(defaultRule);
 		
 		RuleData ruleData;
@@ -43,7 +45,7 @@ namespace ExtS {
 	void ExtArmorData::postProcess()
 	{
 		Sim::DamageDatabase &damageDb =
-			mExtSim->getSim().getData().getDamageDb();
+			mExtSim.getSim().getData().getDamageDb();
 		
 		for(RuleDataVec::iterator i=mRuleData.begin(); i!=mRuleData.end(); i++) {
 			RuleData &data = *i;
@@ -70,8 +72,8 @@ namespace ExtS {
 		
 		if(loadType)
 			rule.mDmgType = node.getArg(ind++);
-		rule.mMultiplier = ExtData::readValue<double>(node.getArg(ind++), 1.0);
-		rule.mIsIgnoring = ExtData::readValue<bool>(node.getArg(ind++), false);
+		rule.mMultiplier = convValue<double>(node.getArg(ind++), 1.0);
+		rule.mIsIgnoring = convValue<bool>(node.getArg(ind++), false);
 		
 		return rule;
 	}

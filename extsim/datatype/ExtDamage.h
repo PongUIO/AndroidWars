@@ -1,10 +1,12 @@
 #ifndef EXTSIM_EXTDAMAGE_H
 #define EXTSIM_EXTDAMAGE_H
 
-#include "../ExtBaseData.h"
+#include "../ExtDataComponent.h"
 
 namespace ExtS {
-	class ExtDamageData : public ExtBaseData {
+	class ExtSim;
+	
+	class ExtDamageData : public ExtDataComponent {
 		public:
 			ExtDamageData(ExtSim& esim);
 			virtual ~ExtDamageData();
@@ -12,8 +14,11 @@ namespace ExtS {
 			void startup() {}
 			void shutdown() {}
 
-			void loadNode(Nepeta::Node& node);
+			void loadNode(const Nepeta::Node& node);
 			void postProcess();
+			
+		private:
+			ExtSim &mExtSim;
 	};
 }
 

@@ -78,7 +78,6 @@ public:
 		resetTimer();
 	}
 	void loadFiles(QString path) {
-		eSim.switchDataContext(ExtS::ExtData::ListenerContext(ExtS::ExtData::LcContentLoading |ExtS::ExtData::LcDataLoading));
 		QDir dir(path);
 		QStringList filters;
 		filters << "*.da";

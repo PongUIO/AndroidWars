@@ -10,8 +10,8 @@ namespace ExtS {
 	ExtSim::ExtSim() :
 		mSim(),
 		
-		mData(*this),
-		mInput(*this)
+		mData(*this)
+		//mInput(*this)
 	{}
 
 	ExtSim::~ExtSim()

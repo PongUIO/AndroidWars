@@ -3,7 +3,7 @@
 
 #include "../../simulation/Vector.h"
 
-#include "../TypeRule.h"
+#include "../object/ParamList.h"
 #include "../ExtData.h"
 
 #include "ValRange.h"

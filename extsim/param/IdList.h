@@ -4,7 +4,7 @@
 #include <boost/unordered_set.hpp>
 
 #include "../ExtSim.h"
-#include "../TypeRule.h"
+#include "../object/ParamList.h"
 #include "../../simulation/Common.h"
 
 namespace ExtS {
@@ -37,7 +37,7 @@ namespace ExtS {
 				// Read constraints
 				Nepeta::Node &constraintData = getNodeData(constraintNode);
 				if(constraintData.isValid()) {
-					setDefinedConstraint();
+					setConstraintDefined();
 					
 					for(size_t i=0, nc=constraintData.getNodeCount(); i<nc;++i)
 						mIdNameVec.push_back(constraintData.getArg(i));
@@ -98,7 +98,7 @@ namespace ExtS {
 					mIdSet.erase(*i);
 			}
 		
-			bool isValid(const RuleParameter* param, ExtSim& extsim) const {
+			bool isConstrained(const RuleParameter* param, ExtSim& extsim) const {
 				const IdList<T> *srcList = static_cast<const IdList<T>*>(param);
 				
 				return mIdSet.find(srcList->getId())!=mIdSet.end();

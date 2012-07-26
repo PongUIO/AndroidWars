@@ -4,7 +4,8 @@
 #include <stdint.h>
 #include <vector>
 
-#include "../ExtBaseData.h"
+#include "../DefaultExtData.h"
+#include "../object/ExtDataObj.h"
 
 #include "../../simulation/Health.h"
 
@@ -14,7 +15,7 @@ namespace Sim
 namespace ExtS {
 	class ExtBotData;
 	
-	class ExtBot : public ExtBaseDataObj {
+	class ExtBot : public ExtDataObjBase {
 		public:
 			struct WeaponSlot {
 				WeaponSlot(const std::string &type) : mType(type) {}
@@ -22,17 +23,16 @@ namespace ExtS {
 				std::string mType;
 			};
 			
-			ExtBot(ExtSim *esim);
+			ExtBot(ExtSim &esim, Sim::IdType id);
 			~ExtBot();
 			
-			void loadNode(Nepeta::Node &node,
-				Sim::IdType simTypeId, TypeRule *rule);
-			void postProcess(ExtSim &extsim);
+			void loadNode(const Nepeta::Node &node);
+			void postProcess();
 			
 			uint32_t getBaseCost() const { return mBaseCost; }
 			
 		private:
-			void loadSimBot(Nepeta::Node &node, Sim::BotD *simBot);
+			void loadSimBot(const Nepeta::Node &node, Sim::BotD *simBot);
 			
 			/// @name Extended data
 			//@{
@@ -47,7 +47,7 @@ namespace ExtS {
 				struct HealthHull : public Sim::Health::Hull {
 					std::string mType;
 					
-					void loadData(Nepeta::Node &data);
+					void loadData(const Nepeta::Node &data);
 					void postProcess(Sim::ArmorDatabase &armorDb);
 				};
 				typedef std::vector<HealthHull> AttachmentVec;

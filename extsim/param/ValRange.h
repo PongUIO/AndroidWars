@@ -1,8 +1,8 @@
 #ifndef EXTSIM_VALRANGE_H
 #define EXTSIM_VALRANGE_H
 
-#include "../TypeRule.h"
-#include "../ExtData.h"
+#include "../object/ParamList.h"
+#include "../util/TypeConv.h"
 
 namespace ExtS {
 	/**
@@ -29,13 +29,13 @@ namespace ExtS {
 				if(paramNode.isValid()) {
 					Nepeta::Node &paramData = getNodeData(paramNode);
 					
-					mVal = ExtData::readValue<T>(paramData.getArg(0), T());
+					mVal = convValue<T>(paramData.getArg(0), T());
 				}
 				
 				// Read constraint
 				Nepeta::Node &constrData = getNodeData(constraintNode);
 				if(constrData.isValid()) {
-					setDefinedConstraint();
+					setConstraintDefined();
 					
 					typedef std::vector<std::string> StringVec;
 					StringVec rangeVec;
@@ -49,11 +49,11 @@ namespace ExtS {
 						ValPair valPair = std::make_pair<T,T>(T(),T());
 						if(rangeParam.size()==1) {
 							valPair.first = valPair.second =
-							ExtData::readValue<T>(rangeParam.front(),0);
+							convValue<T>(rangeParam.front(),0);
 						} else if(rangeParam.size()>=2) {
-							valPair.first = ExtData::readValue<T>(
+							valPair.first = convValue<T>(
 								rangeParam.front(),0);
-							valPair.second = ExtData::readValue<T>(
+							valPair.second = convValue<T>(
 								rangeParam.back(),0);
 						}
 						
@@ -65,7 +65,7 @@ namespace ExtS {
 			virtual void callback()
 			{ ListenerSlot< ValRange<T> >::raiseListener(this); }
 			
-			virtual bool isValid(const RuleParameter* param, ExtSim& extsim) const {
+			virtual bool isConstrained(const RuleParameter* param, ExtSim& extsim) const {
 				const ValRange<T> *valSrc = static_cast<const ValRange<T>*>(param);
 				
 				T val = valSrc->getVal();

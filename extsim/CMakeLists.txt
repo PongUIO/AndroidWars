@@ -1,21 +1,25 @@
 add_library(AWExtSim
 	ExtSim.cpp
 	ExtData.cpp
-	ExtInput.cpp
-	ExtBaseData.cpp
-	TypeRule.cpp
+	#ExtInput.cpp
+	#ExtBaseData.cpp
+	#TypeRule.cpp
 	CommonTemplate.cpp
 	
-	ExtProgramInput.cpp
+	#ExtProgramInput.cpp
 	
 	input/ReplayTree.cpp
 	
 	param/Position.cpp
 	param/IdList.cpp
 	
-	typerule/program/MoveTowards.cpp
+	object/ExtDataObj.cpp
+	object/TypeRule.cpp
+	object/ParamList.cpp
 	
-	typerule/bot/DefaultBot.cpp
+	#typerule/program/MoveTowards.cpp
+	
+	#typerule/bot/DefaultBot.cpp
 	
 	datatype/ExtGame.cpp
 	datatype/ExtMap.cpp
@@ -27,9 +31,15 @@ add_library(AWExtSim
 	)
 target_link_libraries(AWExtSim AWSim)
 
-if(COMP_EXTSIM_TEST AND Boost_FILESYSTEM_FOUND)
-	add_executable(../ExtSimTest test/exttest.cpp)
-	target_link_libraries(../ExtSimTest AWSim AWExtSim nepeta ${Boost_FILESYSTEM_LIBRARY})
+if(COMP_EXTSIM_TEST)
+	set(ES_LIBS "AWSim AWExtSim nepeta ${Boost_FILESYSTEM_LIBRARY}")
+	
+	if(Boost_FILESYSTEM_FOUND)
+		add_executable(../ExtSimTest test/exttest.cpp)
+		target_link_libraries(../ExtSimTest ${ES_LIBS})
+	endif()
+	
+	add_executable(../ConvTest test/convtest.cpp)
 	
 	add_definitions(-DDATADIR="${CMAKE_HOME_DIRECTORY}/testmod/data/")
-endif(COMP_EXTSIM_TEST AND Boost_FILESYSTEM_FOUND)
+endif()

@@ -4,12 +4,15 @@
 #include <vector>
 #include <string>
 
-#include "../ExtBaseData.h"
+#include "../ExtDataComponent.h"
+
 #include "../../simulation/data/ArmorD.h"
 
 
 namespace ExtS {
-	class ExtArmorData : public ExtBaseData {
+	class ExtSim;
+	
+	class ExtArmorData : public ExtDataComponent {
 		public:
 			ExtArmorData(ExtSim& esim);
 			virtual ~ExtArmorData();
@@ -17,12 +20,14 @@ namespace ExtS {
 			void startup() {}
 			void shutdown() {}
 			
-			void loadNode(Nepeta::Node& block);
+			void loadNode(const Nepeta::Node& block);
 			void postProcess();
 			
 			Sim::IdType size();
 			
 		private:
+			ExtSim &mExtSim;
+			
 			struct RuleData {
 				Sim::ArmorD *mSrc;
 				

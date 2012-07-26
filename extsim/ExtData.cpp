@@ -1,6 +1,9 @@
+#include <boost/foreach.hpp>
 #include "ExtData.h"
 
 #include "nepeta.h"
+
+#define foreach BOOST_FOREACH
 
 namespace ExtS {
 #define _EXTS_X(type, name) \
@@ -18,17 +21,17 @@ namespace ExtS {
 		mGame(esim),
 		mMap(esim),
 		
-		mCurrentContext(LcNone),
-		mExtSim(&esim)
+		mExtSim(esim)
 	{
-		registerListener("ARMOR", Listener(&mArmor, LcDataLoading) );
-		registerListener("DAMAGE", Listener(&mDamage, LcDataLoading) );
-		registerListener("BOT", Listener(&mBot, LcDataLoading) );
-		registerListener("PROGRAM", Listener(&mProgram, LcDataLoading) );
-		registerListener("WEAPON", Listener(&mWeapon, LcDataLoading) );
-		registerListener("GAME", Listener(&mGame, LcDataLoading) );
+		mActiveListener = mDefaultListener = new ListenerGroup();
 		
-		registerListener("MAP", Listener(&mMap, LcContentLoading) );
+		registerListener("ARMOR", &mArmor);
+		registerListener("DAMAGE", &mDamage);
+		registerListener("BOT", &mBot);
+		registerListener("PROGRAM", &mProgram);
+		registerListener("WEAPON", &mWeapon);
+		registerListener("GAME", &mGame);
+		registerListener("MAP", &mMap);
 	}
 	
 	ExtData::~ExtData()
@@ -49,29 +52,73 @@ namespace ExtS {
 		if(daScr.getError().size()>0)
 			return;
 		
-		for(size_t i=0, nc=daScr.getRoot().getNodeCount(); i<nc; i++) {
-			Nepeta::Node &node = daScr.getRoot().getNode(i);
-			
-			ListenerMapPair lmp = mListeners.equal_range(node.getId());
-			for(ListenerMap::iterator i=lmp.first; i!=lmp.second; ++i) {
-				i->second.mData->loadNode(node);
-			}
-		}
+		for(Nepeta::Iterator i=daScr.getRoot().begin();
+		daScr.getRoot().hasNext(i); daScr.getRoot().next(i))
+			mActiveListener->loadNode(daScr.getRoot().getIterNode(i));
 	}
 	
 	/**
-	 * Calls \c BaseData::postProcess for all listeners.
+	 * @brief Performs post processing for the active listener
 	 */
 	void ExtData::postProcess()
+	{	mActiveListener->postProcess(); }
+	
+	void ExtData::registerListener(const std::string& blockTag, DataListener* entry)
+	{	mActiveListener->registerListener(blockTag, entry); }
+
+	void ExtData::switchContext(ListenerGroup* ctx)
 	{
-		for(ListenerMap::iterator i=mListeners.begin();
-			i!=mListeners.end(); i++) {
-			if(i->second.mContext & mCurrentContext)
-				i->second.mData->postProcess();
-		}
+		mActiveListener = ctx;
+		if(mActiveListener == 0)
+			mActiveListener = mDefaultListener;
 	}
 	
-	void ExtData::registerListener(const std::string& blockTag,
-		const Listener &listener)
-	{	mListeners.insert( std::make_pair(blockTag,listener) ); }
+	// ListenerEntry
+	// 
+	// 
+	void ListenerEntry::loadNode(const Nepeta::Node& node)
+	{
+		foreach(DataListener *listener, mListeners)
+			listener->loadNode(node);
+	}
+	
+	void ListenerEntry::postProcess()
+	{
+		foreach(DataListener *listener, mListeners)
+			listener->postProcess();
+	}
+	
+	// ListenerGroup
+	// |
+	// 
+	ListenerGroup::~ListenerGroup()
+	{
+		foreach(ListenerMap::value_type& entry, mListenerMap)
+			delete entry.second;
+	}
+	
+	void ListenerGroup::loadNode(const Nepeta::Node& node)
+	{
+		ListenerMap::iterator i=mListenerMap.find(node.getId());
+		if(i!=mListenerMap.end())
+			i->second->loadNode(node);
+	}
+
+	void ListenerGroup::postProcess()
+	{
+		foreach(ListenerMap::value_type& entry, mListenerMap)
+			entry.second->postProcess();
+	}
+	
+	void ListenerGroup::registerListener(const std::string& str,
+		DataListener* L)
+	{
+		ListenerMap::iterator i=mListenerMap.insert(
+		std::make_pair(str,static_cast<ListenerEntry*>(0)) ).first;
+		
+		if(i->second == 0)
+			i->second = new ListenerEntry();
+		
+		i->second->registerListener(L);
+	}
 }

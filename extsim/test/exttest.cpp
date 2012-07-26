@@ -11,6 +11,8 @@
 #include "../param/Position.h"
 #include "../param/ValRange.h"
 
+#include "../object/TypeRule.h"
+
 ExtS::ExtSim extSim = ExtS::ExtSim();
 Sim::Simulation &sim = extSim.getSim();
 
@@ -26,8 +28,7 @@ struct IdListListener : public ExtS::Listener<ExtS::IdList<T> > {
 			i!=idSet.end(); ++i) {
 			std::cout << *i << " ";
 		}
-		//std::cout << (p->isAlwaysValid()?"(all)":"");
-		std::cout << (p->isConstraintUndefined()?"(identity)":"");
+		std::cout << (p->isConstraintDefined()?"":"(identity)");
 	}
 };
 
@@ -58,9 +59,9 @@ void loadFiles()
 	fs::directory_iterator endIter;
 	for(fs::directory_iterator i( DATADIR ); i!=endIter; ++i) {
 		if( fs::is_regular_file(i->status()) ) {
-			printf("Loading script %s\n", i->string().c_str());
+			printf("Loading script %s\n", i->path().string().c_str());
 			
-			std::ifstream ifs(i->string().c_str());
+			std::ifstream ifs(i->path().string().c_str());
 			std::string str;
 			
 			ifs.seekg(0, std::ios::end);
@@ -178,7 +179,7 @@ void testParam()
 			prog->getDescription() << "\n";
 		
 		const ExtS::TypeRule *rule;
-		if(prog && (rule=prog->getRule())!=0) {
+		/*if(prog && (rule=prog->getRule())!=0) {
 			ExtS::ParamList *param = rule->makeParam();
 			const ExtS::TypeRule::RuleParamVec &paramVec =
 				param->getRuleParamVec();
@@ -191,7 +192,7 @@ void testParam()
 			}
 			
 			delete param;
-		}
+		}*/
 	}
 }
 
@@ -260,12 +261,6 @@ int main(void)
 	extSim.startup();
 	
 	// [data loading]
-	extSim.switchDataContext(ExtS::ExtData::LcDataLoading);
-	loadFiles();
-	extSim.postProcessData();
-	
-	// [content loading]
-	extSim.switchDataContext(ExtS::ExtData::LcContentLoading);
 	loadFiles();
 	extSim.postProcessData();
 	
