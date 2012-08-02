@@ -3,7 +3,11 @@ moc*
 ui_*
 pc/pc
 pc/Makefile
-build/*
+**/build/*
 simulation/test/simtest
 simulation/doc/**
 *.kdev4*
+*~
+*.build
+*.out
+
