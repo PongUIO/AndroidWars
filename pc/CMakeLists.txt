@@ -1,19 +1,25 @@
-set(qtgui_SOURCES main.cpp botselector.cpp gamebutton.cpp
-	gamecontroller.cpp gameslider.cpp menubutton.cpp)
-set(qtgui_HEADERS main.h ../openglqt/render.h ../util/camera.h
-	menubutton.h gamecontroller.h gamebutton.h
-	../util/cursordefines.h ../util/client.h
-	botselector.h main.h gameslider.h ../openglqt/skeletalsystem.h)
+find_package(Qt4 COMPONENTS QtCore QtOpenGL QtGui)
 
-set(QT_USE_QTOPENGL TRUE)
+set(COMP_GUI true CACHE BOOL "Compile GUI")
 
-qt4_wrap_cpp(qtgui_HEADERS_MOC ${qtgui_HEADERS})
-qt4_wrap_ui(qtgui_FORMS_HEADERS ${qtgui_FORMS})
+if(Qt4_FOUND AND COMP_GUI)
+	set(qtgui_SOURCES main.cpp botselector.cpp gamebutton.cpp
+		gamecontroller.cpp gameslider.cpp menubutton.cpp)
+	set(qtgui_HEADERS main.h ../openglqt/render.h ../util/camera.h
+		menubutton.h gamecontroller.h gamebutton.h
+		../util/cursordefines.h ../util/client.h
+		botselector.h main.h gameslider.h ../openglqt/skeletalsystem.h)
 
-include(${QT_USE_FILE})
-add_definitions(${QT_DEFINITIONS})
-include_directories(${CMAKE_SOURCE_DIR}/simulation/)
+	set(QT_USE_QTOPENGL TRUE)
 
-add_executable(../qtgui ${qtgui_SOURCES} ${qtgui_HEADERS_MOC} ${qtgui_FORMS_HEADERS} ${qtgui_RESOURCES_RCC})
+	qt4_wrap_cpp(qtgui_HEADERS_MOC ${qtgui_HEADERS})
+	qt4_wrap_ui(qtgui_FORMS_HEADERS ${qtgui_FORMS})
 
-target_link_libraries(../qtgui ${QT_LIBRARIES} AWSim AWExtSim nepeta)
+	include(${QT_USE_FILE})
+	add_definitions(${QT_DEFINITIONS})
+	include_directories(${CMAKE_SOURCE_DIR}/simulation/)
+
+	add_executable(../qtgui ${qtgui_SOURCES} ${qtgui_HEADERS_MOC} ${qtgui_FORMS_HEADERS} ${qtgui_RESOURCES_RCC})
+
+	target_link_libraries(../qtgui ${QT_LIBRARIES} AWSim AWExtSim nepeta)
+endif()
