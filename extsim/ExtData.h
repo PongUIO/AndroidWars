@@ -17,7 +17,7 @@
 #include "datatype/ExtGame.h"
 #include "datatype/ExtMap.h"
 
-namespace ExtS {
+namespace exts {
 #define _EXTS_X_EXTDATA_COMPONENTS \
 	_EXTS_X(ExtArmorData, Armor) \
 	_EXTS_X(ExtDamageData, Damage) \

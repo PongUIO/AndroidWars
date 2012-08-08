@@ -6,7 +6,7 @@
 #include "../ExtSim.h"
 #include "../../simulation/data/WeaponD.h"
 
-namespace ExtS {
+namespace exts {
 	ExtArmorData::ExtArmorData(ExtSim &esim): ExtDataComponent(), mExtSim(esim)
 	{}
 	

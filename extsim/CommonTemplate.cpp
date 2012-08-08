@@ -2,7 +2,7 @@
 
 #include "ExtSim.h"
 
-namespace ExtS {
+namespace exts {
 #define _EXTS_X(type, name) \
 	template<> type &getExtSimComponent(ExtSim& extsim) \
 	{ return extsim.getComponent<type>(); }

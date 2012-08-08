@@ -48,7 +48,7 @@ public:
 	int subMenu;
 	ClientStates *states;
 	GameController *gc;
-	ExtS::ExtSim eSim;
+	exts::ExtSim eSim;
 	Sim::Simulation &sim;
 	QSize size;
 	std::vector< std::vector<QWidget*> > menus;

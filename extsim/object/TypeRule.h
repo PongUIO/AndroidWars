@@ -6,30 +6,34 @@
 #include "nepeta.h"
 #include "../../simulation/Common.h"
 
-namespace ExtS {
+namespace exts {
 	class ExtSim;
 	class ParamList;
 	
 	class TypeRule {
 		public:
-			TypeRule(ExtSim &esim) : mExtSim(esim) {}
+			TypeRule(ExtSim &esim) : mExtSim(esim), mId(Sim::NoId) {}
 			
 			virtual TypeRule *clone()=0;
-			virtual void load(Nepeta::Node &node);
+			virtual void load(Nepeta::Node &node)=0;
 			
-			virtual void makeInput(Sim::IdType typeId, const ParamList *param)=0;
-			virtual void buildTimelineData(const ParamList *param)=0;
-			virtual Sim::IdType registerSimData(const std::string &name)=0;
+			virtual void makeInput(const ParamList *param) const=0;
+			virtual void buildTimelineData(const ParamList *param) const=0;
+			virtual Sim::IdType registerSimData(const std::string &name) const=0;
 			
-			virtual bool checkConstrained(const ParamList *param) const;
+			bool checkConstrained(const ParamList *param) const;
 			ParamList *makeParam() const;
 			
 			const ParamList *getRefParam() const { return mRefParam; }
+			const Sim::IdType getId() const { return mId; }
 			
 		protected:
 			ExtSim &mExtSim;
 			
 			ParamList *mRefParam;
+			Sim::IdType mId;
+			
+			friend class TypeRuleMgr;
 	};
 }
 

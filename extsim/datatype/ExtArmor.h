@@ -9,7 +9,7 @@
 #include "../../simulation/data/ArmorD.h"
 
 
-namespace ExtS {
+namespace exts {
 	class ExtSim;
 	
 	class ExtArmorData : public ExtDataComponent {

@@ -2,7 +2,7 @@
 
 #include "../ExtSim.h"
 
-namespace ExtS {
+namespace exts {
 	// ExtProgramData
 	//
 	//

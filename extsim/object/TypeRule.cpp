@@ -1,7 +1,12 @@
 #include "TypeRule.h"
 #include "ParamList.h"
 
-namespace ExtS {
+namespace exts {
+	ParamList* TypeRule::makeParam() const
+	{
+		return new ParamList(*mRefParam);
+	}
+	
 	bool TypeRule::checkConstrained(const ParamList* param) const
 	{
 		if(mRefParam->size() != param->size())

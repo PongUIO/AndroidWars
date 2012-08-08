@@ -1,9 +1,8 @@
 add_library(AWExtSim
 	ExtSim.cpp
 	ExtData.cpp
-	#ExtInput.cpp
-	#ExtBaseData.cpp
-	#TypeRule.cpp
+	InputBarrier.cpp
+	TypeRuleMgr.cpp
 	CommonTemplate.cpp
 	CommonLoad.cpp
 	
@@ -18,7 +17,7 @@ add_library(AWExtSim
 	object/TypeRule.cpp
 	object/ParamList.cpp
 	
-	#typerule/program/MoveTowards.cpp
+	typerule/program/MoveTowards.cpp
 	
 	#typerule/bot/DefaultBot.cpp
 	

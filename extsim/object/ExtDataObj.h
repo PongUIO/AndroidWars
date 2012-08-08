@@ -6,7 +6,7 @@
 #include "nepeta.h"
 #include "../../simulation/Common.h"
 
-namespace ExtS {
+namespace exts {
 	class ExtSim;
 	
 	class ExtDataObjBase {

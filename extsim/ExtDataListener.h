@@ -5,7 +5,7 @@
 
 #include "nepeta.h"
 
-namespace ExtS {
+namespace exts {
 	struct DataListener {
 		virtual void loadNode(const Nepeta::Node &node)=0;
 		virtual void postProcess()=0;

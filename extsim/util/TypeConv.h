@@ -8,7 +8,7 @@
 
 #include "../simulation/Vector.h"
 
-namespace ExtS {
+namespace exts {
 	template<class T>
 	T badCastStrategy(const std::string &str, T def) { return def; }
 	

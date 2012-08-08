@@ -1,7 +1,7 @@
 #include "Position.h"
 #include "ValRange.h"
 
-namespace ExtS {
+namespace exts {
 	// Parameter
 	//
 	//

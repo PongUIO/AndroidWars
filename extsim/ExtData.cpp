@@ -5,7 +5,7 @@
 
 #define foreach BOOST_FOREACH
 
-namespace ExtS {
+namespace exts {
 #define _EXTS_X(type, name) \
 	template<> type &ExtData::getComponent() \
 	{ return get##name##Db(); }

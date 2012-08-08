@@ -3,7 +3,7 @@
 
 #include "ExtDataListener.h"
 
-namespace ExtS {
+namespace exts {
 	class ExtDataComponent : public DataListener {
 		public:
 			virtual void startup()=0;

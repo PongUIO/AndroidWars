@@ -8,7 +8,7 @@
 #include "../../simulation/Save.h"
 #include "../../simulation/Common.h"
 
-namespace ExtS {
+namespace exts {
 	class ExtSim;
 	
 	template<class Type>
@@ -99,8 +99,10 @@ namespace ExtS {
 		public:
 			typedef std::vector<RuleParameter*> RuleParamVec;
 			
-			ParamList() {}
+			ParamList(Sim::IdType refTypeRule=Sim::NoId)
+				: mRefTypeRule(refTypeRule) {}
 			~ParamList() { clearRuleParam(); }
+			ParamList(const ParamList &other);
 			
 			ParamList &operator=(const ParamList &src);
 			
@@ -112,16 +114,19 @@ namespace ExtS {
 			RuleParameter *getParam(size_t i) { return mRuleParam[i]; }
 			const RuleParameter *getParam(size_t i) const
 			{ return mRuleParam[i]; }
-			
+			Sim::IdType getTypeRuleId() const { return mRefTypeRule; }
 			size_t size() const { return mRuleParam.size(); }
+			
+			bool isConstrained(ExtSim &ref) const;
 			
 			void save(Sim::Save::BasePtr &fp) const;
 			void load(Sim::Save::BasePtr &fp);
 			
-		protected:
+		private:
 			void clearRuleParam();
 			
 			RuleParamVec mRuleParam;
+			Sim::IdType mRefTypeRule;
 	};
 }
 

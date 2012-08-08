@@ -3,7 +3,7 @@
 
 #include "../ExtDataComponent.h"
 
-namespace ExtS {
+namespace exts {
 	class ExtSim;
 	
 	class ExtDamageData : public ExtDataComponent {

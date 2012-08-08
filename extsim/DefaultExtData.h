@@ -8,7 +8,7 @@
 #include "ExtDataComponent.h"
 #include "CommonLoad.h"
 
-namespace ExtS {
+namespace exts {
 	class ExtSim;
 	
 	/**

@@ -12,7 +12,7 @@
 namespace Sim
 { class BotD; class ArmorDatabase; }
 
-namespace ExtS {
+namespace exts {
 	class ExtBotData;
 	
 	class ExtBot : public ExtDataObjBase {

@@ -3,7 +3,7 @@
 #include "../../simulation/Simulation.h"
 #include "../ExtSim.h"
 
-namespace ExtS {
+namespace exts {
 	ExtDamageData::ExtDamageData(ExtSim & esim) :
 		ExtDataComponent(), mExtSim(esim)
 	{}

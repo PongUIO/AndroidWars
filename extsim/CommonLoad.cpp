@@ -1,6 +1,6 @@
 #include "CommonLoad.h"
 
-namespace ExtS { namespace Load {
+namespace exts { namespace Load {
 	const char *Name = "Name";
 	const char *Description = "Description";
 } }

@@ -4,7 +4,7 @@
 #include "../CommonLoad.h"
 #include "../ExtSim.h"
 
-namespace ExtS {
+namespace exts {
 	// ExtGameData
 	//
 	//

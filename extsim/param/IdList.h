@@ -7,7 +7,7 @@
 #include "../object/ParamList.h"
 #include "../../simulation/Common.h"
 
-namespace ExtS {
+namespace exts {
 	/**
 	 * Allows an identifier of an arbitrary type, constrained to a
 	 * list of identifiers.

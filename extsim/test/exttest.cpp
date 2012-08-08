@@ -13,18 +13,18 @@
 
 #include "../object/TypeRule.h"
 
-ExtS::ExtSim extSim = ExtS::ExtSim();
+exts::ExtSim extSim = exts::ExtSim();
 Sim::Simulation &sim = extSim.getSim();
 
 namespace fs = boost::filesystem;
 
 template<class T>
-struct IdListListener : public ExtS::Listener<ExtS::IdList<T> > {
-	void process(ExtS::IdList<T> *p) {
+struct IdListListener : public exts::Listener<exts::IdList<T> > {
+	void process(exts::IdList<T> *p) {
 		std::cout << p->getId() << " | ";
 		
-		const typename ExtS::IdList<T>::IdSet &idSet = p->getIdSet();
-		for(typename ExtS::IdList<T>::IdSet::const_iterator i=idSet.begin();
+		const typename exts::IdList<T>::IdSet &idSet = p->getIdSet();
+		for(typename exts::IdList<T>::IdSet::const_iterator i=idSet.begin();
 			i!=idSet.end(); ++i) {
 			std::cout << *i << " ";
 		}
@@ -33,20 +33,20 @@ struct IdListListener : public ExtS::Listener<ExtS::IdList<T> > {
 };
 
 template<class T>
-struct ValRangeListener : public ExtS::Listener<ExtS::ValRange<T> > {
-	void process(ExtS::ValRange<T> *p) {
+struct ValRangeListener : public exts::Listener<exts::ValRange<T> > {
+	void process(exts::ValRange<T> *p) {
 		std::cout << p->getVal();
 	}
 };
 
-struct PositionListener : public ExtS::Listener<ExtS::PositionParam> {
-	void process(ExtS::PositionParam *p) {
+struct PositionListener : public exts::Listener<exts::PositionParam> {
+	void process(exts::PositionParam *p) {
 		p->setVal(Sim::Vector(25,25));
 		
 		std::cout << p->getVal().x << "," << p->getVal().y << "\n";
 		
-		const ExtS::PositionParam::ValPairVec &consts = p->getValPairs();
-		for(ExtS::PositionParam::ValPairVec::const_iterator i = consts.begin();
+		const exts::PositionParam::ValPairVec &consts = p->getValPairs();
+		for(exts::PositionParam::ValPairVec::const_iterator i = consts.begin();
 			i!=consts.end(); ++i) {
 			std::cout << "\t" << i->first.x << "," << i->first.y <<
 				" -> " << i->second.x << "," << i->second.y << "\n";
@@ -136,7 +136,7 @@ void printHealth(const Sim::Health &health)
 	}
 }
 
-void printExtBot(const ExtS::ExtBot *bot)
+void printExtBot(const exts::ExtBot *bot)
 {
 	printf("\tName: %s\n", bot->getName().c_str());
 	printf("\tDescription: %s\n", bot->getDescription().c_str());
@@ -150,12 +150,12 @@ void printSimBot(const Sim::BotD *bot)
 void listBot()
 {
 	Sim::BotDatabase &simBotDb = sim.getData().getBotDb();
-	ExtS::ExtBotData &extBotDb = extSim.getData().getBotDb();
+	exts::ExtBotData &extBotDb = extSim.getData().getBotDb();
 	
 	printf("Bot type list:\n");
 	for(unsigned int i=0; i<simBotDb.size(); i++) {
 		const Sim::BotD *simBot = static_cast<const Sim::BotD*>(simBotDb.getType(i));
-		const ExtS::ExtBot *extBot = extBotDb.getType(i);
+		const exts::ExtBot *extBot = extBotDb.getType(i);
 		
 		printExtBot(extBot);
 		printSimBot(simBot);
@@ -166,19 +166,19 @@ void listBot()
 
 void testParam()
 {
-	ExtS::IdList<Sim::ArmorD>::setListener( IdListListener<Sim::ArmorD>() );
-	ExtS::ValRange<uint32_t>::setListener( ValRangeListener<uint32_t>() );
-	ExtS::PositionParam::ListenerSlot<ExtS::PositionParam>::setListener( PositionListener() );
+	exts::IdList<Sim::ArmorD>::setListener( IdListListener<Sim::ArmorD>() );
+	exts::ValRange<uint32_t>::setListener( ValRangeListener<uint32_t>() );
+	exts::PositionParam::ListenerSlot<exts::PositionParam>::setListener( PositionListener() );
 	
 	printf("\nParameter testing:\n");
 	
-	ExtS::ExtProgramData &progDb = extSim.getData().getProgramDb();
+	exts::ExtProgramData &progDb = extSim.getData().getProgramDb();
 	for(Sim::IdType i=0; i<progDb.size(); ++i) {
-		const ExtS::ExtProgram *prog = progDb.getType(i);
+		const exts::ExtProgram *prog = progDb.getType(i);
 		std::cout << prog->getName() << "\n\tDescription: " <<
 			prog->getDescription() << "\n";
 		
-		const ExtS::TypeRule *rule;
+		const exts::TypeRule *rule;
 		/*if(prog && (rule=prog->getRule())!=0) {
 			ExtS::ParamList *param = rule->makeParam();
 			const ExtS::TypeRule::RuleParamVec &paramVec =
@@ -216,13 +216,13 @@ void testSim()
 	std::cout << "Giving bot input through ExtSim\n";
 	
 	// Create input object
-	ExtS::InputData inputData = extSim.getInput().getProgram().buildInput(
+	exts::InputData inputData = extSim.getInput().getProgram().buildInput(
 		extSim.getData().getProgramDb().getIdOf("MoveTowards")
 	);
 	
 	// Modify input object
-	ExtS::InputData::ParamPtr paramPtr = inputData.getParamList();
-	const ExtS::TypeRule::RuleParamVec paramVec = paramPtr->getRuleParamVec();
+	exts::InputData::ParamPtr paramPtr = inputData.getParamList();
+	const exts::TypeRule::RuleParamVec paramVec = paramPtr->getRuleParamVec();
 	for(uint32_t i=0; i<paramVec.size(); ++i) {
 		paramVec[i]->callback();
 	}
@@ -231,7 +231,7 @@ void testSim()
 	extSim.getInput().getProgram().registerInput(inputData);
 	
 	// Dispatching input
-	extSim.getInput().getProgram().dispatchInput(ExtS::IcmNone);
+	extSim.getInput().getProgram().dispatchInput(exts::IcmNone);
 	
 	// (Temporary to bypass a lack of cpu input in extsim)
 	sim.getInput().getCpuInput().registerInput(0,0,0);
@@ -250,6 +250,62 @@ void testSim()
 	
 	std::cout << "\n";
 }
+
+/*
+ExtSim interaction pseudocode:
+
+[bootstrap]
+ExtSim::startup();
+
+[data loading]
+for all data files as F:
+	ExtSim::loadDataScript(F);
+ExtSim::postProcessData();
+
+[preparing the simulation]
+create players
+create bots
+ExtSim::prepareSim();
+
+[main loop]
+while game running
+	do any of the following
+		- give input to extsim directly
+		- build input using the InputBuilder
+		- feed input from external packets
+		- recover input from the ReplayManager or alternate timelines
+		- select the active phase on the timeline, as well as the active timeline
+		- revert to the "present" simulation state on the timeline
+		- seek on the timeline or replay part of the timeline
+	
+	- ExtSim::finishPhase()
+		stores the active input buffer in the ReplayManager
+			all timeline data after the solidified phase is invalidated and discarded
+		(optional) stores the active InputBuilder data in the ReplayManager
+
+[shutting down the simulation]
+(optional) save the ReplayManager data
+ExtSim::shutdown();
+
+Subprocesses:
+[give input to ExtSim]
+choose a target to create input for
+	- for example program input for a specific bot
+	- or the creation of a bot
+ExtSim builds a ParamList for this object or operation
+the ParamList object is modified by the caller as desired
+the caller passes the ParamList back to ExtSim, either storing it in
+	->InputBuilder, or passing it directly to the barrier
+
+[feed input from external packets]
+the caller receives external input packets as Save objects or similar
+these objects are sent directly to either InputBuilder or to the barrier
+
+[recover input from the ReplayManager or alternate timelines]
+the caller contacts the ReplayManager and switches the active branch and node
+
+
+ */
 
 int main(void)
 {

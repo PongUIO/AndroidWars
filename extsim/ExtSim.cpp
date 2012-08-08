@@ -1,6 +1,6 @@
 #include "ExtSim.h"
 
-namespace ExtS {
+namespace exts {
 #define _EXTS_X(type, name) \
 	template<> type &ExtSim::getComponent() \
 	{ return get##name(); }
@@ -10,8 +10,9 @@ namespace ExtS {
 	ExtSim::ExtSim() :
 		mSim(),
 		
-		mData(*this)
-		//mInput(*this)
+		mData(*this),
+		mInput(*this),
+		mTypeRuleMgr(*this)
 	{}
 
 	ExtSim::~ExtSim()

@@ -1,7 +1,7 @@
 #include "ExtDataObj.h"
 #include "../CommonLoad.h"
 
-namespace ExtS {
+namespace exts {
 	// ExtDataObjBase
 	// 
 	// 

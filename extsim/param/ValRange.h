@@ -4,7 +4,7 @@
 #include "../object/ParamList.h"
 #include "../util/TypeConv.h"
 
-namespace ExtS {
+namespace exts {
 	/**
 	 * Allows an arbitrary value of a generic type, constrained
 	 * to one or more value ranges.

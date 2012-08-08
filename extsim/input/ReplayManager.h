@@ -3,7 +3,7 @@
 
 #include "ReplayTree.h"
 
-namespace ExtS {
+namespace exts {
 	class ExtSim;
 	
 	/**

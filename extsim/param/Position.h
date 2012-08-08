@@ -8,7 +8,7 @@
 
 #include "ValRange.h"
 
-namespace ExtS {
+namespace exts {
 	/**
 	 * Used to denote a world position.
 	 */

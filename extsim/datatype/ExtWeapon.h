@@ -4,7 +4,7 @@
 #include "../DefaultExtData.h"
 #include "../object/ExtDataObj.h"
 
-namespace ExtS {
+namespace exts {
 	class ExtWeapon : public ExtDataObjBase {
 		public:
 			ExtWeapon(ExtSim &esim, Sim::IdType id);

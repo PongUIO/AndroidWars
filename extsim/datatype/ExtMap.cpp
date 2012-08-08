@@ -6,7 +6,7 @@
 #include "../util/TypeConv.h"
 #include "../ExtSim.h"
 
-namespace ExtS {
+namespace exts {
 	// ExtMapData
 	//
 	//

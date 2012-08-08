@@ -5,7 +5,7 @@
 #include "../../simulation/Simulation.h"
 #include "../../simulation/data/WeaponD.h"
 
-namespace ExtS {
+namespace exts {
 	// ExtWeaponData
 	//
 	//
