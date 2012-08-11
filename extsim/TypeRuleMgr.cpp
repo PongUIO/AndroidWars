@@ -19,7 +19,7 @@ namespace exts {
 	
 	Sim::IdType TypeRuleMgr::registerRule(TypeRule* rule)
 	{	Sim::IdType id = add(rule);
-		rule->mId = id;
+		rule->setId(id);
 		return id;
 	}
 

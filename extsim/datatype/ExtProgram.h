@@ -2,6 +2,7 @@
 #define EXTSIM_EXTPROGRAM_H
 
 #include "../DefaultExtData.h"
+#include "../TypeRuleLoader.h"
 #include "../object/ExtDataObj.h"
 
 namespace exts {
@@ -14,6 +15,11 @@ namespace exts {
 			
 			void loadNode(const Nepeta::Node& node);
 			void postProcess();
+			
+			const TypeRule *getRule() const { return mRule; }
+			
+		private:
+			TypeRule *mRule;
 	};
 	
 	class ExtProgramData : public DefaultExtData<ExtProgram> {
@@ -23,6 +29,11 @@ namespace exts {
 			
 			void startup() {}
 			void shutdown() {}
+			
+		private:
+			
+			TypeRuleLoader mRuleLoader;
+			friend class ExtProgram;
 	};
 }
 

@@ -3,6 +3,7 @@ add_library(AWExtSim
 	ExtData.cpp
 	InputBarrier.cpp
 	TypeRuleMgr.cpp
+	TypeRuleLoader.cpp
 	CommonTemplate.cpp
 	CommonLoad.cpp
 	
@@ -15,6 +16,7 @@ add_library(AWExtSim
 	
 	object/ExtDataObj.cpp
 	object/TypeRule.cpp
+	object/TypeRuleObj.cpp
 	object/ParamList.cpp
 	
 	typerule/program/MoveTowards.cpp
@@ -32,7 +34,7 @@ add_library(AWExtSim
 target_link_libraries(AWExtSim AWSim)
 
 if(COMP_EXTSIM_TEST)
-	set(ES_LIBS "AWSim AWExtSim nepeta ${Boost_FILESYSTEM_LIBRARY}")
+	set(ES_LIBS AWExtSim nepeta ${Boost_SYSTEM_LIBRARY} ${Boost_FILESYSTEM_LIBRARY})
 	
 	if(Boost_FILESYSTEM_FOUND)
 		add_executable(../ExtSimTest test/exttest.cpp)

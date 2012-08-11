@@ -4,7 +4,7 @@ project(AndroidWars)
 # Set output directory
 #set(EXECUTABLE_OUTPUT_PATH ${CMAKE_DIR})
 
-find_package(Boost 1.34 COMPONENTS filesystem)
+find_package(Boost 1.34 COMPONENTS filesystem system)
 find_package(Qt4 COMPONENTS QtCore QtOpenGL QtGui REQUIRED)
 
 find_package(Doxygen)

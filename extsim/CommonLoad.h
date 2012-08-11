@@ -8,6 +8,11 @@ namespace exts {
 	namespace Load {
 		extern const char *Name;
 		extern const char *Description;
+		
+		extern const char *Base;
+		
+		extern const char *Param;
+		extern const char *Constraint;
 	}
 }
 

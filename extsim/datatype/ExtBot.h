@@ -66,6 +66,10 @@ namespace exts {
 			void startup() {}
 			void shutdown() {}
 			
+		private:
+			
+			
+			friend class ExtBot;
 	};
 }
 

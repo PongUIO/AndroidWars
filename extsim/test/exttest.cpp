@@ -213,7 +213,7 @@ void testSim()
 {
 	std::cout << "\nTesting ExtSim-Simulation communication\n";
 	
-	std::cout << "Giving bot input through ExtSim\n";
+	/* std::cout << "Giving bot input through ExtSim\n";
 	
 	// Create input object
 	exts::InputData inputData = extSim.getInput().getProgram().buildInput(
@@ -246,7 +246,7 @@ void testSim()
 	sim.endPhase(true);
 	
 	pos = sim.getState().getBotFactory().getBot(0)->getBody().mPos;
-	std::cout << "Bot position post: ("<<pos.x<<", "<<pos.y<<")\n";
+	std::cout << "Bot position post: ("<<pos.x<<", "<<pos.y<<")\n"; */
 	
 	std::cout << "\n";
 }

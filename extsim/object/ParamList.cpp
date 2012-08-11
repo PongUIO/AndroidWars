@@ -14,7 +14,7 @@ namespace exts {
 		if(this != &src) {
 			clearRuleParam();
 			
-			mRefTypeRule = src.mRefTypeRule;
+			mRefTypeRuleId = src.mRefTypeRuleId;
 			for(RuleParamVec::const_iterator i=src.mRuleParam.begin();
 			i!=src.mRuleParam.end(); ++i) {
 				mRuleParam.push_back( (*i)->clone() );
@@ -35,17 +35,19 @@ namespace exts {
 	
 	void ParamList::save(Sim::Save::BasePtr& fp) const
 	{
-		fp << mRuleParam;
+		throw std::runtime_error("Undefined");
+		//fp << mRuleParam;
 	}
 
 	void ParamList::load(Sim::Save::BasePtr& fp)
 	{
-		fp >> mRuleParam;
+		throw std::runtime_error("Undefined");
+		//fp >> mRuleParam;
 	}
 	
 	bool ParamList::isConstrained(ExtSim &ref) const
 	{
-		const TypeRule *R = ref.getTypeRuleMgr().getRule(mRefTypeRule);
+		const TypeRule *R = ref.getTypeRuleMgr().getRule(mRefTypeRuleId);
 		if(!R)
 			return false;
 		

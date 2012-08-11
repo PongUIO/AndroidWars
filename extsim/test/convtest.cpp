@@ -20,11 +20,11 @@ void bitfield()
 	
 	cout << "Without default (0x0):\n";
 	cout << bits << " - " << hex << uppercase <<
-		ExtS::convBitfield<uint64_t>(bits,0) << "\n\n";
+		exts::convBitfield<uint64_t>(bits,0) << "\n\n";
 	
 	cout << "With default (0xF):\n";
 	cout << bits << " - " << hex << uppercase <<
-		ExtS::convBitfield<uint64_t>(bits,0xF) << "\n\n";
+		exts::convBitfield<uint64_t>(bits,0xF) << "\n\n";
 }
 
 int main(void)

@@ -70,7 +70,10 @@ namespace exts {
 			virtual RuleParameter *clone()=0;
 			virtual void callback()=0;
 			
-			virtual void readNode(Nepeta::Node &node)=0;
+			virtual void readNode(
+				const Nepeta::Node &param,
+				const Nepeta::Node &constraint
+			)=0;
 			virtual void postProcess(ExtSim &) {}
 			
 			virtual void save(Sim::Save::BasePtr &fp) const=0;
@@ -82,8 +85,8 @@ namespace exts {
 			bool isConstraintDefined() const { return mIsConstraintDefined; }
 			
 		protected:
-			Nepeta::Node &getNodeData(Nepeta::Node &node) const
-			{ return node.getNodeSimple(getDataName()); }
+			const Nepeta::Node &getNodeData(const Nepeta::Node &node) const
+			{ return node.getNode(getDataName()); }
 			
 			void setConstraintDefined() { mIsConstraintDefined=true; }
 			
@@ -100,7 +103,7 @@ namespace exts {
 			typedef std::vector<RuleParameter*> RuleParamVec;
 			
 			ParamList(Sim::IdType refTypeRule=Sim::NoId)
-				: mRefTypeRule(refTypeRule) {}
+				: mRefTypeRuleId(refTypeRule) {}
 			~ParamList() { clearRuleParam(); }
 			ParamList(const ParamList &other);
 			
@@ -114,7 +117,7 @@ namespace exts {
 			RuleParameter *getParam(size_t i) { return mRuleParam[i]; }
 			const RuleParameter *getParam(size_t i) const
 			{ return mRuleParam[i]; }
-			Sim::IdType getTypeRuleId() const { return mRefTypeRule; }
+			Sim::IdType getTypeRuleId() const { return mRefTypeRuleId; }
 			size_t size() const { return mRuleParam.size(); }
 			
 			bool isConstrained(ExtSim &ref) const;
@@ -125,8 +128,16 @@ namespace exts {
 		private:
 			void clearRuleParam();
 			
+			void addParam(RuleParameter *param)
+			{ mRuleParam.push_back(param); }
+			
+			void setRefTypeRuleId(Sim::IdType id)
+			{ mRefTypeRuleId = id; }
+			
 			RuleParamVec mRuleParam;
-			Sim::IdType mRefTypeRule;
+			Sim::IdType mRefTypeRuleId;
+			
+			friend class TypeRule;
 	};
 }
 

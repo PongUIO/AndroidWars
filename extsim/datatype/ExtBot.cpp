@@ -29,6 +29,13 @@ namespace exts {
 	
 	void ExtBot::loadNode(const Nepeta::Node& node)
 	{
+		// Create simulation type
+		Sim::IdType simId = mExtSim.getSim().getData().getBotDb().
+		registerImpl<Sim::Bot>(getName());
+		
+		assert(simId == getId() &&
+		"The simulation ID and the ExtSim ID must be equivalent");
+		
 		// Load standard data
 		ExtDataObjBase::loadNode(node);
 		loadSimBot(node,

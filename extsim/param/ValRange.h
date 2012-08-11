@@ -21,19 +21,19 @@ namespace exts {
 			
 			virtual RuleParameter *clone() { return new ValRange<T>(*this); }
 			
-			virtual void readNode(Nepeta::Node &node) {
-				Nepeta::Node &paramNode = node.getNode("PARAM");
-				Nepeta::Node &constraintNode = node.getNode("CONSTRAINT");
-				
+			virtual void readNode(
+				const Nepeta::Node &paramNode,
+				const Nepeta::Node &constraintNode
+ 			) {
 				// Read default value
 				if(paramNode.isValid()) {
-					Nepeta::Node &paramData = getNodeData(paramNode);
+					const Nepeta::Node &paramData = getNodeData(paramNode);
 					
 					mVal = convValue<T>(paramData.getArg(0), T());
 				}
 				
 				// Read constraint
-				Nepeta::Node &constrData = getNodeData(constraintNode);
+				const Nepeta::Node &constrData = getNodeData(constraintNode);
 				if(constrData.isValid()) {
 					setConstraintDefined();
 					
