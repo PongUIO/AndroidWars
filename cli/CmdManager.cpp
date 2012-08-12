@@ -6,7 +6,7 @@
 
 CmdManager::CmdManager()
 {
-	#define CMD(str, cls) registerCmd(str, new cls());
+	#define CMD(str, cls) registerCmd(str, cls);
 	#include "cmd.def"
 	#undef CMD
 }
@@ -88,5 +88,3 @@ void CmdManager::interact()
 		else execute(cmd);
 	}
 }
-
-

@@ -2,7 +2,7 @@
 #define ECHO_H
 #include <nepeta.h>
 #include <iostream>
-#include "Command.h"
+#include "../Command.h"
 
 class Echo : public Command {
 	public:

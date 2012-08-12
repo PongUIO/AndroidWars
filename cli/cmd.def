@@ -1,0 +1,2 @@
+CMD("echo", new Echo)
+CMD("include", new include(*this))
