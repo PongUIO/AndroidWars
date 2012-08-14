@@ -40,7 +40,7 @@ namespace exts {
 					typedef std::vector<std::string> StringVec;
 					StringVec rangeVec;
 					
-					for(size_t i=0, nc=constrData.getNodeCount(); i<nc; ++i) {
+					for(size_t i=0; i<constrData.getArgCount(); ++i) {
 						StringVec rangeParam;
 						boost::split(rangeParam, constrData.getArg(i),
 							boost::is_any_of(">"),

@@ -41,7 +41,7 @@ struct ValRangeListener : public exts::Listener<exts::ValRange<T> > {
 
 struct PositionListener : public exts::Listener<exts::PositionParam> {
 	void process(exts::PositionParam *p) {
-		p->setVal(Sim::Vector(25,25));
+		p->setVal(Sim::Vector(5,25));
 		
 		std::cout << p->getVal().x << "," << p->getVal().y << "\n";
 		
@@ -179,20 +179,20 @@ void testParam()
 			prog->getDescription() << "\n";
 		
 		const exts::TypeRule *rule;
-		/*if(prog && (rule=prog->getRule())!=0) {
-			ExtS::ParamList *param = rule->makeParam();
-			const ExtS::TypeRule::RuleParamVec &paramVec =
-				param->getRuleParamVec();
+		if(prog && (rule=prog->getRule())!=0) {
+			exts::ParamList *param = rule->makeParam();
+			exts::ParamList::RuleParamVec &paramVec =
+				param->getParamVec();
 			
-			for(ExtS::TypeRule::RuleParamVec::const_iterator i=paramVec.begin();
-				i!=paramVec.end(); ++i) {
+			for(exts::ParamList::RuleParamVec::iterator i=paramVec.begin();
+			i!=paramVec.end(); ++i) {
 				std::cout << "\t\"" << (*i)->getDataName() << "\"\t ";
 				(*i)->callback();
 				std::cout << "\n";
 			}
 			
 			delete param;
-		}*/
+		}
 	}
 }
 
@@ -213,25 +213,21 @@ void testSim()
 {
 	std::cout << "\nTesting ExtSim-Simulation communication\n";
 	
-	/* std::cout << "Giving bot input through ExtSim\n";
+	std::cout << "Giving bot input through ExtSim\n";
 	
 	// Create input object
-	exts::InputData inputData = extSim.getInput().getProgram().buildInput(
-		extSim.getData().getProgramDb().getIdOf("MoveTowards")
-	);
+	exts::ParamList *inputParam = extSim.getData().getProgramDb().getType(
+		"MoveTowards"
+	)->getRule()->makeParam();
 	
 	// Modify input object
-	exts::InputData::ParamPtr paramPtr = inputData.getParamList();
-	const exts::TypeRule::RuleParamVec paramVec = paramPtr->getRuleParamVec();
-	for(uint32_t i=0; i<paramVec.size(); ++i) {
-		paramVec[i]->callback();
-	}
+	inputParam->traverseCallback();
 	
 	// Register input
-	extSim.getInput().getProgram().registerInput(inputData);
+	extSim.getInput().registerInput(inputParam);
 	
 	// Dispatching input
-	extSim.getInput().getProgram().dispatchInput(exts::IcmNone);
+	extSim.getInput().dispatchInput();
 	
 	// (Temporary to bypass a lack of cpu input in extsim)
 	sim.getInput().getCpuInput().registerInput(0,0,0);
@@ -246,7 +242,7 @@ void testSim()
 	sim.endPhase(true);
 	
 	pos = sim.getState().getBotFactory().getBot(0)->getBody().mPos;
-	std::cout << "Bot position post: ("<<pos.x<<", "<<pos.y<<")\n"; */
+	std::cout << "Bot position post: ("<<pos.x<<", "<<pos.y<<")\n";
 	
 	std::cout << "\n";
 }

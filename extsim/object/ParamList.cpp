@@ -53,4 +53,12 @@ namespace exts {
 		
 		return R->checkConstrained(this);
 	}
+	
+	void ParamList::traverseCallback()
+	{
+		for(RuleParamVec::iterator i=mRuleParam.begin();
+		i!=mRuleParam.end(); ++i) {
+			(*i)->callback();
+		}
+	}
 }

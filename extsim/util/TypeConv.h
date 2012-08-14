@@ -57,6 +57,7 @@ namespace exts {
 		return val;
 	}
 	
+#include <stdio.h>
 	template<>
 	inline Sim::Vector convValue<Sim::Vector>(const std::string &str,
 	Sim::Vector def) {
@@ -66,8 +67,10 @@ namespace exts {
 		
 		Sim::Vector val = def;
 		if(sep.size() == 2) {
+			printf("convValue<Sim::Vector>('%s', '%s')\n", sep[0].c_str(), sep[1].c_str());
 			val.x = convValue<double>(sep[0],def.x);
 			val.y = convValue<double>(sep[1],def.y);
+			printf("convValue<Sim::Vector>('%g', '%g')\n", val.x, val.y);
 		}
 		
 		return val;
@@ -80,6 +83,16 @@ namespace exts {
 			return false;
 		else if(str=="true")
 			return true;
+		else return def;
+	}
+	
+	template<>
+	inline double badCastStrategy<double>(const std::string &str, double def)
+	{
+		if(str=="inf")
+			return std::numeric_limits<double>::infinity();
+		else if(str=="-inf")
+			return -std::numeric_limits<double>::infinity();
 		else return def;
 	}
 }

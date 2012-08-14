@@ -20,8 +20,12 @@ namespace exts { namespace prog {
 	
 	void MoveTowards::makeInput(const ParamList* param) const
 	{
-		Sim::Prog::MoveTowards::Config cfg;
-		cfg.mTargetPos = param->getParamT<PositionParam>(0)->getVal();
+		const PositionParam *pos = param->getParamT<PositionParam>(0);
+		
+		
+		Sim::Prog::MoveTowards::Config cfg = Sim::Prog::MoveTowards::Config(
+			Sim::Prog::MoveTowards::DtPosition,pos->getVal()
+		);
 		
 		mExtSim.getSim().getInput().getProgramInput().
 		buildInputImpl<Sim::Prog::MoveTowards>(cfg, mObjectId);

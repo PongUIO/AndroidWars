@@ -38,8 +38,14 @@ namespace exts {
 		ExtDataObjBase::loadNode(node);
 		
 		mRule = mExtSim.getData().getProgramDb().mRuleLoader.loadRuleNode(node);
-		if(mRule)
+		if(mRule) {
 			mRule->setObjectId(getId());
+			mRule->load(node);
+			Sim::IdType simId = mRule->registerSimData(getName());
+			
+			assert(simId == getId() &&
+			"Simulation ID must be the same as the ExtSim ID");
+		}
 	}
 	
 	void ExtProgram::postProcess()

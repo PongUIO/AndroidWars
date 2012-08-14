@@ -117,10 +117,15 @@ namespace exts {
 			RuleParameter *getParam(size_t i) { return mRuleParam[i]; }
 			const RuleParameter *getParam(size_t i) const
 			{ return mRuleParam[i]; }
+			
+			const RuleParamVec &getParamVec() const { return mRuleParam; }
+			RuleParamVec &getParamVec() { return mRuleParam; }
+			
 			Sim::IdType getTypeRuleId() const { return mRefTypeRuleId; }
 			size_t size() const { return mRuleParam.size(); }
 			
 			bool isConstrained(ExtSim &ref) const;
+			void traverseCallback();
 			
 			void save(Sim::Save::BasePtr &fp) const;
 			void load(Sim::Save::BasePtr &fp);

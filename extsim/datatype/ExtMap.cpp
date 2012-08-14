@@ -36,8 +36,8 @@ namespace exts {
 			Sim::TileDatabase &tileDb = mExtSim.getSim().getData().getTileDb();
 			
 			const Nepeta::Node &ttNode = node.getNode("TILE");
-			for(Nepeta::Iterator i=node.begin("TILE"); node.hasNext(i);
-			node.next(i,"TILE")) {
+			for(Nepeta::Iterator i=ttNode.begin("Type"); ttNode.hasNext(i);
+			ttNode.next(i,"Type")) {
 				const Nepeta::Node &ttData = ttNode.getIterNode(i);
 				Sim::TileD td;
 				td.colMask = (Sim::TileD::ColMask)

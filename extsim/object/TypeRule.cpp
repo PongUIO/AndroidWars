@@ -31,6 +31,9 @@ namespace exts {
 		// Compare each parameter to test against the reference parameters
 		// if any parameter is not constrained, return false 
 		for(size_t i=0; i<mParam.size(); ++i) {
+			if(!mParam.getParam(i)->isConstraintDefined())
+				continue;
+			
 			if(!mParam.getParam(i)->isConstrained(
 			param->getParam(i), mExtSim)) {
 				return false;
