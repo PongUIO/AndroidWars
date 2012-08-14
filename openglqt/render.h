@@ -169,7 +169,6 @@ protected:
 	QGLShader* loadShader(QString path, QGLShader::ShaderType type) {
 		QGLShader *ret = new QGLShader(type, this);
 		if (ret->compileSourceFile(path)) {
-			qDebug() << ret->sourceCode();
 			ret->setProperty("tex", red);
 			return ret;
 		} else {

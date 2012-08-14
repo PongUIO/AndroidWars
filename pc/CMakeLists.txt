@@ -2,7 +2,7 @@ find_package(Qt4 COMPONENTS QtCore QtOpenGL QtGui)
 
 set(COMP_GUI true CACHE BOOL "Compile GUI")
 
-if(Qt4_FOUND AND COMP_GUI)
+if(QT4_FOUND AND COMP_GUI)
 	set(qtgui_SOURCES main.cpp botselector.cpp gamebutton.cpp
 		gamecontroller.cpp gameslider.cpp menubutton.cpp)
 	set(qtgui_HEADERS main.h ../openglqt/render.h ../util/camera.h
