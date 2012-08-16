@@ -40,6 +40,7 @@ add_subdirectory(simulation/)
 add_subdirectory(timeline/)
 add_subdirectory(extsim/)
 add_subdirectory(sound/)
+add_subdirectory(cli/)
 
 if(COMP_GUI)
 	add_subdirectory(pc/)
