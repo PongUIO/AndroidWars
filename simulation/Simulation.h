@@ -8,7 +8,6 @@
 #include "Data.h"
 #include "State.h"
 #include "Input.h"
-#include "Replay.h"
 #include "program/ProgramInclude.h"
 #include "ability/AbilityInclude.h"
 
@@ -42,7 +41,6 @@ namespace Sim {
 	_SIM_X(State) \
 	_SIM_X(Input) \
 	_SIM_X(Data) \
-	_SIM_X(ReplayManager) \
 	_SIM_X(Configuration)
 	
 	class Simulation {
@@ -65,8 +63,6 @@ namespace Sim {
 				void startPhase();
 				void step();
 				void endPhase(bool finalize);
-				
-				void gotoPresent() { mReplayManager.gotoPresent(); }
 				
 				bool hasPhaseStep()
 				{ return getState().getStateType() == State::StInPhase; }

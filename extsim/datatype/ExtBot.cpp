@@ -1,12 +1,12 @@
 #include "ExtBot.h"
+
 #include "../ExtData.h"
+#include "../util/TypeConv.h"
 
 #include "../../simulation/Simulation.h"
 #include "../ExtSim.h"
 
-#include "../typerule/bot/DefaultBot.h"
-
-namespace ExtS {
+namespace exts {
 	// ExtBotData
 	//
 	//
@@ -15,7 +15,7 @@ namespace ExtS {
 		// A blank string identifies the default type,
 		// or the type selected if no "Base" parameter is defined
 		// in a script block
-		registerTypeRule("", new Bot::DefaultBot());
+		//registerTypeRule("", new Bot::DefaultBot());
 	}
 	
 	ExtBotData::~ExtBotData()
@@ -24,31 +24,37 @@ namespace ExtS {
 	// ExtBot
 	//
 	//
-	ExtBot::ExtBot(ExtSim *esim) : ExtBaseDataObj(esim) {}
+	ExtBot::ExtBot(ExtSim &esim, Sim::IdType id) : ExtDataObjBase(esim,id) {}
 	ExtBot::~ExtBot() {}
 	
-	void ExtBot::loadNode(Nepeta::Node& node,
-		Sim::IdType simTypeId, TypeRule* rule)
+	void ExtBot::loadNode(const Nepeta::Node& node)
 	{
+		// Create simulation type
+		Sim::IdType simId = mExtSim.getSim().getData().getBotDb().
+		registerImpl<Sim::Bot>(getName());
+		
+		assert(simId == getId() &&
+		"The simulation ID and the ExtSim ID must be equivalent");
+		
 		// Load standard data
-		ExtBaseDataObj::loadNode(node, simTypeId, rule);
+		ExtDataObjBase::loadNode(node);
 		loadSimBot(node,
-			mExtSim->getSim().getData().getBotDb().getType(getId()));
+			mExtSim.getSim().getData().getBotDb().getType(getId())
+		);
 		
 		// Load extended data
 		{
-			mBaseCost = ExtData::readValue<uint32_t>(
-				node.getNodeFirst("BaseCost"), 0);
+			mBaseCost = convValue<uint32_t>(node.getNodeFirst("BaseCost"), 0);
 			
 			// Load weapon slots
-			Nepeta::Node &slotNode = node.getNode("WEAPONS");
+			const Nepeta::Node &slotNode = node.getNode("WEAPONS");
 			
-			for(size_t i=slotNode.indexOf("Slot"); i!=Nepeta::NoPos;
-			i=slotNode.nextIndexOf("Slot",i)) {
-				Nepeta::Node &data = slotNode.getNode(i);
+			for(Nepeta::Iterator i=slotNode.begin("Slot"); slotNode.hasNext(i);
+			slotNode.next(i,"Slot")) {
+				const Nepeta::Node &data = slotNode.getIterNode(i);
 				
 				const std::string &slotType = data.getArg(0);
-				int slotCount = ExtData::readValue<int>(data.getArg(1), 1);
+				int slotCount = convValue<int>(data.getArg(1), 1);
 				
 				for(int sc=0; sc<slotCount; sc++)
 					mWeaponSlot.push_back( WeaponSlot(slotType) );
@@ -58,12 +64,13 @@ namespace ExtS {
 		// Load temporary data
 		{
 			// Load attachments
-			mCoreHealth.loadData(node.getNodeSimple("Health"));
+			mCoreHealth.loadData(node.getNode("Health"));
 			
-			Nepeta::Node &atmNode = node.getNode("ATTACHMENTS");
+			const Nepeta::Node &atmNode = node.getNode("ATTACHMENTS");
 			if(atmNode.isValid()) {
-				for(size_t hi=0, sz=atmNode.getNodeCount(); hi<sz; ++hi) {
-					Nepeta::Node &healthNode = atmNode.getNode(hi);
+				for(Nepeta::Iterator i=atmNode.begin(); atmNode.hasNext(i);
+				atmNode.next(i)) {
+					const Nepeta::Node &healthNode = atmNode.getIterNode(i);
 					mAttachmentHealth.push_back(HealthHull());
 					mAttachmentHealth.back().loadData(healthNode);
 				}
@@ -71,14 +78,14 @@ namespace ExtS {
 		}
 	}
 	
-	void ExtBot::postProcess(ExtSim& extsim)
+	void ExtBot::postProcess()
 	{
-		ExtBaseDataObj::postProcess(extsim);
+		ExtDataObjBase::postProcess();
 		
-		Sim::ArmorDatabase &armorDb = extsim.getSim().getData().getArmorDb();
+		Sim::ArmorDatabase &armorDb = mExtSim.getSim().getData().getArmorDb();
 		mCoreHealth.postProcess(armorDb);
 		
-		Sim::BotD *simData = extsim.getSim().getData().getBotDb().
+		Sim::BotD *simData = mExtSim.getSim().getData().getBotDb().
 			getType(getId());
 		
 		simData->coreHealth.getCore() = mCoreHealth;
@@ -91,10 +98,9 @@ namespace ExtS {
 		}
 	}
 	
-	void ExtBot::loadSimBot(Nepeta::Node& node, Sim::BotD *simBot)
+	void ExtBot::loadSimBot(const Nepeta::Node& node, Sim::BotD *simBot)
 	{
-		simBot->baseSpeed = ExtData::readValue<double>(
-			node.getNodeFirst("Speed"), 0);
+		simBot->baseSpeed = convValue<double>(node.getNodeFirst("Speed"), 0);
 		
 		// Load debug data
 		Sim::Collision::ColPoints pts;
@@ -109,14 +115,14 @@ namespace ExtS {
 	// ExtBot::HealthHull
 	//
 	//
-	void ExtBot::HealthHull::loadData(Nepeta::Node& data)
+	void ExtBot::HealthHull::loadData(const Nepeta::Node& data)
 	{
 		mType = data.getArg(0);
 		
 		int health, maxHealth;
-		health = maxHealth = ExtData::readValue<int>(data.getArg(1), 1);
+		health = maxHealth = convValue<int>(data.getArg(1), 1);
 		if(data.getNodeCount()==3)
-			health = ExtData::readValue<int>(data.getArg(2), maxHealth);
+			health = convValue<int>(data.getArg(2), maxHealth);
 		
 		addMaxHealth(maxHealth, false);
 		addHealth(health);

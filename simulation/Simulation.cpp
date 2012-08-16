@@ -11,8 +11,7 @@ namespace Sim {
 	Simulation::Simulation() :
 		mState(this),
 		mInput(this),
-		mData(this),
-		mReplayManager(this)
+		mData(this)
 		{}
 	
 	Simulation::~Simulation()
@@ -23,12 +22,10 @@ namespace Sim {
 		mData.startup();
 		mInput.startup();
 		clear();
-		mReplayManager.startup();
 	}
 	
 	void Simulation::shutdown()
 	{
-		mReplayManager.shutdown();
 		mState.shutdown();
 		mInput.shutdown();
 		mData.shutdown();
@@ -50,7 +47,6 @@ namespace Sim {
 	{
 		mInput.finalizeInput();
 		mInput.dispatchInput();
-		mReplayManager.prepareSim();
 	}
 	
 	/**
@@ -59,7 +55,6 @@ namespace Sim {
 	void Simulation::startPhase()
 	{
 		mInput.finalizeInput();
-		mReplayManager.startPhase();
 		mInput.dispatchInput();
 		
 		mState.startPhase();
@@ -79,8 +74,6 @@ namespace Sim {
 	void Simulation::endPhase(bool finalize)
 	{
 		mState.endPhase();
-		
-		mReplayManager.endPhase(finalize);
 	}
 	
 	uint32_t Simulation::checksumData()

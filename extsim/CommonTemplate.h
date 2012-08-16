@@ -1,7 +1,7 @@
 #ifndef EXTSIM_COMMONTEMPLATE_H
 #define EXTSIM_COMMONTEMPLATE_H
 
-namespace ExtS {
+namespace exts {
 	class ExtSim;
 	
 	/// Allows generic retrieval of \c ExtSim subsystems

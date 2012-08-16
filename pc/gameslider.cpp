@@ -28,7 +28,7 @@ void GameSlider::hideEvent(QHideEvent *event) {
 	qle->hide();
 }
 void GameSlider::updatePhase() {
-	sim->gotoPresent();
+	/*sim->gotoPresent();
 	if (value() != 0) {
 		if (replay) {
 			int tmp = value() + sim->getCurPhase()*sim->getConfiguration().phaseLength;
@@ -36,7 +36,7 @@ void GameSlider::updatePhase() {
 		} else {
 			sim->getReplayManager().rewind(((double)value()*sim->getConfiguration().stepTime+sim->getCurTime()));
 		}
-	}
+	}*/
 }
 void GameSlider::qleChange(const QString text) {
 	setValue(text.toInt());

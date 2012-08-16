@@ -1,34 +1,33 @@
-#include "../../ExtSim.h"
 #include "MoveTowards.h"
+
+#include "../../ExtSim.h"
 
 #include "../../param/Position.h"
 
-namespace ExtS { namespace Prog {
-	MoveTowardsRule::MoveTowardsRule()
+namespace exts { namespace prog {
+	MoveTowards::MoveTowards(ExtSim& esim): TypeRule(esim)
 	{
-		registerRuleParam(new PositionParam("Position"));
+		registerParam(new PositionParam("Position"));
 	}
 	
-	Sim::IdType MoveTowardsRule::registerSimData(ExtSim& esim,
-		const std::string &name)
-	{
-		return esim.getSim().getData().getProgramDb().
-			registerImpl<Sim::Prog::MoveTowards>(name);
-	}
-
+	MoveTowards::~MoveTowards() {}
 	
-	void MoveTowardsRule::makeInput(ExtSim& extsim,
-		Sim::IdType simTypeId, const ParamList* param) const
+	Sim::IdType MoveTowards::registerSimData(const std::string& name) const
 	{
-		Sim::Vector pos = param->getParam<PositionParam>(0)->getVal();
+		return mExtSim.getSim().getData().getProgramDb().
+		registerImpl<Sim::Prog::MoveTowards>(name);
+	}
+	
+	void MoveTowards::makeInput(const ParamList* param) const
+	{
+		const PositionParam *pos = param->getParamT<PositionParam>(0);
 		
-		extsim.getSim().getInput().getProgramInput().
-		buildInputImpl<Sim::Prog::MoveTowards>(
-			Sim::Prog::MoveTowards::Config(
-				Sim::Prog::MoveTowards::DtPosition,
-				pos
-			),
-			simTypeId
+		
+		Sim::Prog::MoveTowards::Config cfg = Sim::Prog::MoveTowards::Config(
+			Sim::Prog::MoveTowards::DtPosition,pos->getVal()
 		);
+		
+		mExtSim.getSim().getInput().getProgramInput().
+		buildInputImpl<Sim::Prog::MoveTowards>(cfg, mObjectId);
 	}
 } }

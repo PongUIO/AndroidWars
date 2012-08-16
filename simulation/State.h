@@ -12,8 +12,6 @@
 #include "Player.h"
 #include "Program.h"
 #include "Ability.h"
-//#include "Input.h"
-#include "Replay.h"
 
 #include "utility/CallGroup.h"
 #include "StateObj.h"

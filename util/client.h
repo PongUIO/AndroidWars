@@ -92,8 +92,8 @@ public:
 		} else if (button == 0) {
 			for (bot = bots.begin(); bot != bots.end(); bot++) {
 				if (isSelected((*bot)->getId())) {
-					sim->gotoPresent();
-					sim->getReplayManager().loadCurPhaseInput();
+					//sim->gotoPresent();
+					//sim->getReplayManager().loadCurPhaseInput();
 					Sim::Input &inMgr = sim->getInput();
 					Sim::ProgramFactory &progFact = sim->getState().getProgramFactory();
 
