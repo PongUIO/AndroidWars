@@ -5,7 +5,7 @@
 
 #include "../simulation/Save.h"
 
-namespace ExtS {
+namespace exts {
 	class ReplayBranch;
 	class ReplayTree;
 	

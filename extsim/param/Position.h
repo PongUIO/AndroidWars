@@ -3,12 +3,12 @@
 
 #include "../../simulation/Vector.h"
 
-#include "../TypeRule.h"
+#include "../object/ParamList.h"
 #include "../ExtData.h"
 
 #include "ValRange.h"
 
-namespace ExtS {
+namespace exts {
 	/**
 	 * Used to denote a world position.
 	 */

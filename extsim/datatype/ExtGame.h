@@ -3,10 +3,12 @@
 
 #include <string>
 
-#include "../ExtBaseData.h"
+#include "../ExtDataComponent.h"
 
-namespace ExtS {
-	class ExtGameData : public ExtBaseData {
+namespace exts {
+	class ExtSim;
+	
+	class ExtGameData : public ExtDataComponent {
 		public:
 			ExtGameData(ExtSim& sim);
 			virtual ~ExtGameData();
@@ -14,8 +16,7 @@ namespace ExtS {
 			void startup();
 			void shutdown();
 			
-			void loadNode(Nepeta::Node& node);
-			
+			void loadNode(const Nepeta::Node& node);
 			void postProcess();
 			
 			const std::string &getName() const
@@ -24,6 +25,8 @@ namespace ExtS {
 			{ return mDescription; }
 			
 		private:
+			ExtSim &mExtSim;
+			
 			std::string mName;
 			std::string mDescription;
 			

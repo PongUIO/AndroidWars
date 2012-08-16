@@ -1,13 +1,14 @@
 #include "ExtGame.h"
 
-#include "../ExtData.h"
+#include "../util/TypeConv.h"
+#include "../CommonLoad.h"
 #include "../ExtSim.h"
 
-namespace ExtS {
+namespace exts {
 	// ExtGameData
 	//
 	//
-	ExtGameData::ExtGameData(ExtSim& sim): ExtBaseData(sim)
+	ExtGameData::ExtGameData(ExtSim& esim) : ExtDataComponent(), mExtSim(esim)
 	{}
 	
 	ExtGameData::~ExtGameData()
@@ -19,17 +20,16 @@ namespace ExtS {
 	void ExtGameData::shutdown()
 	{}
 	
-	void ExtGameData::loadNode(Nepeta::Node& node)
+	void ExtGameData::loadNode(const Nepeta::Node& node)
 	{
 		node.readChain().
-			nodearg("Name", mName).
-			nodearg("Description", mDescription);
-		mStepTime = ExtData::readValue(node.getNodeFirst("StepTime"), 1.0);
+			nodearg(Load::Name, mName).
+			nodearg(Load::Description, mDescription);
+		mStepTime = convValue(node.getNodeFirst("StepTime"), 1.0);
 	}
 
 	void ExtGameData::postProcess()
 	{
-		mExtSim->getSim().getConfiguration().stepTime = mStepTime;
+		mExtSim.getSim().getConfiguration().stepTime = mStepTime;
 	}
-
 }

@@ -5,7 +5,7 @@
 #include "../../simulation/Simulation.h"
 #include "../../simulation/data/WeaponD.h"
 
-namespace ExtS {
+namespace exts {
 	// ExtWeaponData
 	//
 	//
@@ -23,27 +23,26 @@ namespace ExtS {
 	// ExtProgram
 	//
 	//
-	ExtWeapon::ExtWeapon(ExtSim *esim) : ExtBaseDataObj(esim)
+	ExtWeapon::ExtWeapon(ExtSim &esim, Sim::IdType id) : ExtDataObjBase(esim,id)
 	{}
 
 	ExtWeapon::~ExtWeapon()
 	{}
 	
-	void ExtWeapon::loadNode(Nepeta::Node& node,
-		Sim::IdType simTypeId, TypeRule* rule)
+	void ExtWeapon::loadNode(const Nepeta::Node& node)
 	{
-		ExtBaseDataObj::loadNode(node, simTypeId, rule);
+		ExtDataObjBase::loadNode(node);
 		
 		node.readChain().
 			node("Size").arg(mSizeType).endnode().
 			node("BaseDamage").arg(mBaseDamageStr).endnode();
 	}
 	
-	void ExtWeapon::postProcess(ExtSim& extsim)
+	void ExtWeapon::postProcess()
 	{
-		ExtBaseDataObj::postProcess(extsim);
+		ExtDataObjBase::postProcess();
 		
-		mBaseDamageType = extsim.getSim().getData().
+		mBaseDamageType = mExtSim.getSim().getData().
 			getDamageDb().getIdOf(mBaseDamageStr);
 	}
 	

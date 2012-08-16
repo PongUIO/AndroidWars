@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-namespace ExtS {
+namespace exts {
 	class ExtPlayer {
 		public:
 			ExtPlayer();

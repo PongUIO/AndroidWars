@@ -48,7 +48,7 @@ public:
 	int subMenu;
 	ClientStates *states;
 	GameController *gc;
-	ExtS::ExtSim eSim;
+	exts::ExtSim eSim;
 	Sim::Simulation &sim;
 	QSize size;
 	std::vector< std::vector<QWidget*> > menus;
@@ -78,7 +78,6 @@ public:
 		resetTimer();
 	}
 	void loadFiles(QString path) {
-		eSim.switchDataContext(ExtS::ExtData::ListenerContext(ExtS::ExtData::LcContentLoading |ExtS::ExtData::LcDataLoading));
 		QDir dir(path);
 		QStringList filters;
 		filters << "*.da";

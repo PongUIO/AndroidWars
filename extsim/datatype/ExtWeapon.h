@@ -1,17 +1,17 @@
 #ifndef EXTSIM_WEAPON_H
 #define EXTSIM_WEAPON_H
 
-#include "../ExtBaseData.h"
+#include "../DefaultExtData.h"
+#include "../object/ExtDataObj.h"
 
-namespace ExtS {
-	class ExtWeapon : public ExtBaseDataObj {
+namespace exts {
+	class ExtWeapon : public ExtDataObjBase {
 		public:
-			ExtWeapon(ExtSim *esim);
+			ExtWeapon(ExtSim &esim, Sim::IdType id);
 			~ExtWeapon();
 			
-			void loadNode(Nepeta::Node &node,
-				Sim::IdType simTypeId, TypeRule *rule);
-			void postProcess(ExtSim &extsim);
+			void loadNode(const Nepeta::Node &node);
+			void postProcess();
 			
 		private:
 			std::string mSizeType;

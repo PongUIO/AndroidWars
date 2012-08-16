@@ -3,7 +3,7 @@
 
 #include "ReplayTree.h"
 
-namespace ExtS {
+namespace exts {
 	class ExtSim;
 	
 	/**
@@ -13,6 +13,10 @@ namespace ExtS {
 		public:
 			ReplayManager(ExtSim &esim);
 			~ReplayManager();
+			
+			void selectBranch();
+			
+			const ReplayTree &getReplayTree() const { return mTree; }
 			
 		private:
 			/// @name Configuration

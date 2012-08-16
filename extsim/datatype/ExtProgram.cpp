@@ -2,17 +2,20 @@
 
 #include "../ExtSim.h"
 
-#include "../typerule/program/MoveTowards.h"
+#include "../typerule/program/program.h"
 
-namespace ExtS {
+namespace exts {
 	// ExtProgramData
 	//
 	//
 	ExtProgramData::ExtProgramData(ExtSim &esim) :
-		DefaultExtData<ExtProgram>(esim)
+		DefaultExtData<ExtProgram>(esim), mRuleLoader(esim)
 	{
-		registerTypeRule("Base/MoveTowards",
-			new Prog::MoveTowardsRule());
+		/*registerTypeRule("Base/MoveTowards",
+			new Prog::MoveTowardsRule());*/
+#define _EXTS_X(name, cls) mRuleLoader.registerRule(name, new prog::cls(mExtSim));
+		#include "../typerule/program/program.def"
+#undef _EXTS_X
 	}
 	
 	ExtProgramData::~ExtProgramData()
@@ -23,20 +26,30 @@ namespace ExtS {
 	// ExtProgram
 	//
 	//
-	ExtProgram::ExtProgram(ExtSim *esim) : ExtBaseDataObj(esim)
+	ExtProgram::ExtProgram(ExtSim &esim, Sim::IdType id) :
+		ExtDataObjBase(esim,id)
 	{}
 	
 	ExtProgram::~ExtProgram()
 	{}
 
-	void ExtProgram::loadNode(Nepeta::Node& node,
-		Sim::IdType simTypeId, TypeRule* rule)
+	void ExtProgram::loadNode(const Nepeta::Node& node)
 	{
-		ExtBaseDataObj::loadNode(node, simTypeId, rule);
+		ExtDataObjBase::loadNode(node);
+		
+		mRule = mExtSim.getData().getProgramDb().mRuleLoader.loadRuleNode(node);
+		if(mRule) {
+			mRule->setObjectId(getId());
+			mRule->load(node);
+			Sim::IdType simId = mRule->registerSimData(getName());
+			
+			assert(simId == getId() &&
+			"Simulation ID must be the same as the ExtSim ID");
+		}
 	}
 	
-	void ExtProgram::postProcess(ExtSim& extsim)
+	void ExtProgram::postProcess()
 	{
-		ExtBaseDataObj::postProcess(extsim);
+		ExtDataObjBase::postProcess();
 	}
 }

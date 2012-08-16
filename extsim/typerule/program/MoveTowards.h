@@ -1,22 +1,21 @@
-#ifndef EXTSIM_PROGRAM_MOVETOWARDS_H
-#define EXTSIM_PROGRAM_MOVETOWARDS_H
+#ifndef EXTSIM_MOVETOWARDS_H
+#define EXTSIM_MOVETOWARDS_H
 
-#include "../../TypeRule.h"
+#include "../../object/TypeRule.h"
 
-namespace ExtS { namespace Prog {
-	class MoveTowardsRule : public TypeRule {
+namespace exts { namespace prog {
+	class MoveTowards : public TypeRule {
 		public:
-			MoveTowardsRule();
-			virtual ~MoveTowardsRule() {}
+			MoveTowards(ExtSim& esim);
+			~MoveTowards();
 			
-			virtual TypeRule* clone()
-			{ return new MoveTowardsRule(*this); }
+			TypeRule* clone() { return new MoveTowards(*this); }
 			
-			virtual Sim::IdType registerSimData(ExtSim& esim,
-				const std::string& name);
+			void makeInput(const ParamList* param) const;
+			void buildTimelineData(const ParamList* param) const {}
+			Sim::IdType registerSimData(const std::string& name) const;
 			
-			virtual void makeInput(ExtSim &extsim,
-				Sim::IdType simTypeId, const ParamList* param) const;
+		private:
 	};
 } }
 

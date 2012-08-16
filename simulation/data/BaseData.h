@@ -129,28 +129,12 @@ namespace Sim {
 	};
 	
 	/**
-	 * Default implementation for databases tailored to the simulation.
-	 * 
-	 * In essence, this class defines an extended version of \c DataCtr.
-	 * 
-	 * A \c NameIdMgr is also included, providing the ability for data to
-	 * associate a name with each identifier.
-	 * 
-	 * @param T Database object type.
+	 * @brief Extended implementation of DataCtr
 	 */
 	template<class T>
-	class DefaultDatabase : public BaseDatabase, protected DataCtr<T> {
+	class DataCtrAdv : public DataCtr<T> {
 		public:
 			typedef T Type;
-			
-			DefaultDatabase() : mSim(0) {}
-			virtual ~DefaultDatabase() {}
-			
-			virtual void startup(Simulation* sim)
-			{ mSim = sim; }
-			
-			virtual void shutdown()
-			{ DataCtr<T>::clear(); }
 			
 			/// Retrieves a database object by id
 			T *getType(IdType id) { return DataCtr<T>::get(id); }
@@ -209,8 +193,33 @@ namespace Sim {
 			}
 			
 		protected:
-			Simulation *mSim;
 			NameIdMgr mNameIdMgr;
+	};
+	
+	/**
+	 * Default implementation for databases tailored to the simulation.
+	 * 
+	 * In essence, this class defines an extended version of \c DataCtr.
+	 * 
+	 * A \c NameIdMgr is also included, providing the ability for data to
+	 * associate a name with each identifier.
+	 * 
+	 * @param T Database object type.
+	 */
+	template<class T>
+	class DefaultDatabase : public BaseDatabase, public DataCtrAdv<T> {
+		public:
+			DefaultDatabase() : mSim(0) {}
+			virtual ~DefaultDatabase() {}
+			
+			virtual void startup(Simulation* sim)
+			{ mSim = sim; }
+			
+			virtual void shutdown()
+			{ DataCtr<T>::clear(); }
+			
+		protected:
+			Simulation *mSim;
 	};
 	
 	/// Empty struct for types without any shared metadata

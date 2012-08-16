@@ -1,20 +1,25 @@
 #ifndef EXTSIM_EXTPROGRAM_H
 #define EXTSIM_EXTPROGRAM_H
 
-#include "../ExtBaseData.h"
-#include "../TypeRule.h"
+#include "../DefaultExtData.h"
+#include "../TypeRuleLoader.h"
+#include "../object/ExtDataObj.h"
 
-namespace ExtS {
+namespace exts {
 	class ExtSim;
 	
-	class ExtProgram : public ExtBaseDataObj {
+	class ExtProgram : public ExtDataObjBase {
 		public:
-			ExtProgram(ExtSim *esim);
+			ExtProgram(ExtSim &esim, Sim::IdType id);
 			~ExtProgram();
 			
-			void loadNode(Nepeta::Node& node,
-				Sim::IdType simTypeId, TypeRule* rule);
-			void postProcess(ExtSim &extsim);
+			void loadNode(const Nepeta::Node& node);
+			void postProcess();
+			
+			const TypeRule *getRule() const { return mRule; }
+			
+		private:
+			TypeRule *mRule;
 	};
 	
 	class ExtProgramData : public DefaultExtData<ExtProgram> {
@@ -24,6 +29,11 @@ namespace ExtS {
 			
 			void startup() {}
 			void shutdown() {}
+			
+		private:
+			
+			TypeRuleLoader mRuleLoader;
+			friend class ExtProgram;
 	};
 }
 

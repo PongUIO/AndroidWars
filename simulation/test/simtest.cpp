@@ -306,56 +306,13 @@ int main(void)
 	}
 	
 	printf("\n\n");
-	
-	// Re-run the simulation to assure it is deterministic
-	printf("Simulation replay:\n");
-	sim.getReplayManager().rewind(0,0);
-	bool doLoadInput = false;
-	for(int i=0; i<PHASE_COUNT; i++) {
-		if(doLoadInput)
-			sim.getReplayManager().loadCurPhaseInput();
-		else
-			doLoadInput=true;
 		
-		sim.startPhase();
-		
-		while( sim.hasPhaseStep() ) {
-			Sim::Bot *bot = sim.getState().getBotFactory().getBot(0);
-			Sim::Vector pos;
-			if(bot)
-				pos = bot->getBody().mPos;
-			
-			printf("%02d %03d (%g, %g)\n",
-				sim.getCurPhase(), sim.getCurPhaseStep(),
-				pos.x, pos.y);
-			
-			sim.step();
-		}
-		
-		sim.endPhase(false);
-		printf("Phase %02d checksum: %X\n", sim.getCurPhase(), sim.checksumSim());
-	}
-	
-	printf("\n\nPresent checksum vs. rewind checksum\n");
-	sim.gotoPresent();
-	uint32_t presentChecksum = sim.checksumSim();
-	sim.getReplayManager().rewind(sim.getCurPhase(),sim.getCurPhaseStep());
-	uint32_t rewindChecksum = sim.checksumSim();
-	
-	printf("%X == %X\n", presentChecksum, rewindChecksum);
-	
 	printf("Testing simulation saving:\n");
-	for(int i=0; i<2; i++) {
-		if(i==0)
-			sim.gotoPresent();
-		else
-			sim.getReplayManager().rewind(sim.getCurPhase(),sim.getCurPhaseStep());
-		
-		printf("Savefile size: %g KiB\n", double(sim.save().size())/1024.0);
-		FILE *fp = fopen((i==0) ? "presentSave" : "rewindSave", "w");
-		fwrite(sim.save().getData(), sim.save().size(), 1, fp);
-		fclose(fp);
-	}
+	FILE *fp = fopen("save", "w");
+	Sim::Save save = sim.save();
+	fwrite(save.getData(), sim.save().size(), 1, fp);
+	fclose(fp);
+	printf("Savefile size: %g KiB\n", double(save.size())/1024.0);
 	
 	// Shutdown the simulation
 	sim.shutdown();

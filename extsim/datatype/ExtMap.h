@@ -3,10 +3,12 @@
 
 #include <stdint.h>
 
-#include "../ExtBaseData.h"
+#include "../ExtDataComponent.h"
 
-namespace ExtS {
-	class ExtMapData : public ExtBaseData {
+namespace exts {
+	class ExtSim;
+	
+	class ExtMapData : public ExtDataComponent {
 		public:
 			ExtMapData(ExtSim& sim);
 			virtual ~ExtMapData();
@@ -14,11 +16,11 @@ namespace ExtS {
 			void startup();
 			void shutdown();
 			
-			void loadNode(Nepeta::Node& node);
-			
+			void loadNode(const Nepeta::Node& node);
 			void postProcess();
 			
 		private:
+			ExtSim &mExtSim;
 	};
 }
 
