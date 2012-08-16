@@ -13,6 +13,7 @@ boost (just get libboost-dev)
 libopenal-dev
 libalut-dev
 libvorbis-dev
+libassimp2-d-dev
 
 To compile and run:
 mkdir build

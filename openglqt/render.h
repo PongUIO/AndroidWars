@@ -138,7 +138,6 @@ protected:
 		loadAndBind("../testmod/graphics/debug/checker.png", &checkImage, &check, 256, 256);
 		loadAndBind("../testmod/graphics/debug/red.png", &redImage, &red, 100, 100);
 		gm->registerPiece(new GLObj("../testmod/obj/box.obj", QVector3D(1., 1., 1.)));
-		gm->registerPiece(new GLObj("../testmod/obj/boxtrans.obj", QVector3D(1., 1., 1.)));
 		gm->setWorld(wld);
 		gm->setOffmap(1);
 		robots.push_back(new GLObj("../testmod/obj/Android01.obj", QVector3D(1., 1., 1.)));
@@ -169,7 +168,6 @@ protected:
 	QGLShader* loadShader(QString path, QGLShader::ShaderType type) {
 		QGLShader *ret = new QGLShader(type, this);
 		if (ret->compileSourceFile(path)) {
-			qDebug() << ret->sourceCode();
 			ret->setProperty("tex", red);
 			return ret;
 		} else {

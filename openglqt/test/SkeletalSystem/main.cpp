@@ -4,9 +4,14 @@ int main(int argc, char *argv[])
 {
 	SkeletalSystem s;
 	int skel = s.addSkeleton();
-	int b = s.addBoneToSkeleton(skel, QQuaternion(1,0,-1,1), -1);
+	QQuaternion q1 = QQuaternion();
+	q1.setVector(1,0,0);
+	QQuaternion q2 = QQuaternion();
+	q2.setVector(0,0,1);
+
+	int b = s.addBoneToSkeleton(skel, q1, -1);
 	qDebug() << b;
-	int b2 = s.addBoneToSkeleton(skel, QQuaternion(1,0,0,1), b);
+	int b2 = s.addBoneToSkeleton(skel, q2, b);
 
 	qDebug() << s.getMatrixForSkeleton(0, 0);
 	qDebug() << s.skeletons.at(0)->bones.at(0)->rotOrigin;

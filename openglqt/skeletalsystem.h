@@ -22,7 +22,6 @@ class Bone {
 				rotOrigin = tmp->rot * rotOrigin;
 				qDebug() << rotOrigin;
 				qDebug() << "debug";
-				qDebug() << tmp->rot * rotOrigin;
 			}
 		}
 
