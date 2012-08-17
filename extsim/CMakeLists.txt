@@ -34,7 +34,7 @@ add_library(AWExtSim
 target_link_libraries(AWExtSim AWSim)
 
 if(COMP_EXTSIM_TEST)
-	set(ES_LIBS AWExtSim nepeta ${Boost_SYSTEM_LIBRARY} ${Boost_FILESYSTEM_LIBRARY})
+	set(ES_LIBS AWExtSim nepeta ${Boost_SYSTEM_LIBRARY} ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
 	
 	if(Boost_FILESYSTEM_FOUND)
 		add_executable(../ExtSimTest test/exttest.cpp)

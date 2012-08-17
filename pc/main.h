@@ -80,7 +80,7 @@ public:
 	void loadFiles(QString path) {
 		QDir dir(path);
 		QStringList filters;
-		filters << "*.da";
+		filters << "*.nep";
 		QStringList files = dir.entryList(filters);
 		for (QStringList::Iterator iter = files.begin(); iter != files.end(); ++iter) {
 			QFile f(path + *iter);
