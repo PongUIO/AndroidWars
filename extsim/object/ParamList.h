@@ -69,6 +69,7 @@ namespace exts {
 			
 			virtual RuleParameter *clone()=0;
 			virtual void callback()=0;
+			virtual void clearListener()=0;
 			
 			virtual void readNode(
 				const Nepeta::Node &param,
@@ -126,6 +127,7 @@ namespace exts {
 			
 			bool isConstrained(ExtSim &ref) const;
 			void traverseCallback();
+			void clearListeners() const;
 			
 			void save(Sim::Save::BasePtr &fp) const;
 			void load(Sim::Save::BasePtr &fp);

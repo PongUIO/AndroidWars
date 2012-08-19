@@ -106,16 +106,16 @@ namespace exts {
 			
 			void callback()
 			{ ListenerSlot<IdList<T> >::raiseListener(this); }
+			void clearListener()
+			{ ListenerSlot<IdList<T> >::clearListener(); }
 			
 			void save(Sim::Save::BasePtr& fp) const {
 				fp << mId;
 				fp.writeUnorderedSet(mIdSet);
-				//fp << mIsAlwaysValid;
 			}
 			void load(Sim::Save::BasePtr& fp) {
 				fp >> mId;
 				fp.readUnorderedSet(mIdSet);
-				//fp >> mIsAlwaysValid;
 			}
 			
 			Sim::IdType getId() const { return mId; }

@@ -305,10 +305,6 @@ the caller contacts the ReplayManager and switches the active branch and node
 
 int main(void)
 {
-	Sim::Configuration config;
-	config.phaseLength = 5;
-	config.stepTime = 0.01;
-	
 	// [bootstrap]
 	extSim.startup();
 	

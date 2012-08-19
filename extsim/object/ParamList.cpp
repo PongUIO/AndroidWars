@@ -61,4 +61,12 @@ namespace exts {
 			(*i)->callback();
 		}
 	}
+	
+	void ParamList::clearListeners() const
+	{
+		for(RuleParamVec::const_iterator i=mRuleParam.begin();
+		i!=mRuleParam.end(); ++i) {
+			(*i)->clearListener();
+		}
+	}
 }

@@ -64,6 +64,8 @@ namespace exts {
 			
 			virtual void callback()
 			{ ListenerSlot< ValRange<T> >::raiseListener(this); }
+			virtual void clearListener()
+			{ ListenerSlot< ValRange<T> >::clearListener(); }
 			
 			virtual bool isConstrained(const RuleParameter* param, ExtSim& extsim) const {
 				const ValRange<T> *valSrc = static_cast<const ValRange<T>*>(param);
