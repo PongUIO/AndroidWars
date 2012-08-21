@@ -2,6 +2,7 @@
 #define EXTSIM_TYPERULEMGR_H
 
 #include "../simulation/data/BaseData.h"
+#include "../simulation/Save.h"
 
 namespace exts {
 	class ExtSim;
@@ -39,6 +40,10 @@ namespace exts {
 			//@{
 				const TypeRule *getRule(Sim::IdType id) const;
 				Sim::IdType registerRule(TypeRule *rule);
+				
+				ParamList *loadParamList(Sim::Save::BasePtr &fp) const;
+				void saveParamList(Sim::Save::BasePtr &fp,
+					const ParamList *ref) const;
 			//@}
 			
 		private:

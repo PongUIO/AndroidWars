@@ -29,6 +29,9 @@ namespace exts {
 		return isConstrained;
 	}
 	
+	/**
+	 * @brief Sends the current input buffer to the simulation
+	 */
 	void InputBarrier::dispatchInput()
 	{
 		for(ParamListVec::iterator i=mInput.begin(); i!=mInput.end(); ++i) {
@@ -43,6 +46,9 @@ namespace exts {
 		mInput.clear();
 	}
 	
+	/**
+	 * @brief Discards the active input buffer
+	 */
 	void InputBarrier::discardInput()
 	{
 		for(ParamListVec::iterator i=mInput.begin(); i!=mInput.end(); ++i)
