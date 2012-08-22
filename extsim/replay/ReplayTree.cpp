@@ -4,72 +4,87 @@ namespace exts {
 	// ReplayNode
 	// 
 	// 
+	ReplayNode::ReplayNode(ReplayTree& mgr, Sim::IdType id, ReplayNode* parent) :
+		mTree(mgr), mId(id),
+		mParent(parent), mChildren(), mDepth(parent->getDepth())
+	{}
 	
-	// ReplayBranch
-	//
-	//
-	ReplayBranch::~ReplayBranch()
+	ReplayNode::~ReplayNode()
+	{}
+	
+	ReplayNode* ReplayNode::createBranch()
 	{
-		for(NodeVec::iterator i=mNodes.begin(); i!=mNodes.end(); ++i)
-			delete *i;
+		ReplayNode *tmp = mTree.makeNode(this);
+		mChildren.push_back(tmp);
+		return tmp;
 	}
 	
 	/**
-	 * @brief Gets the node corresponding to the given phase.
+	 * @brief Prepares this node to be modified.
 	 * 
-	 * The node is retrieved using the following rules:
-	 * - If the \c phase exceeds the number of stored nodes, 0 is returned
-	 * - If the \c phase is within the current branch, then the corresponding
-	 * 	node from this branch is retrieved.
-	 * - If the \c phase is less than the offset, then the corresponding
-	 * 	node from the parent branch is retrieved.
-	 * 
-	 * @return A valid \c ReplayNode, or 0 if no node exists for the given
-	 * phase.
+	 * This means all children nodes will be destroyed, as any modifications
+	 * to this node invalidates all children. In addition, any savedata
+	 * is cleared.
 	 */
-	const ReplayNode *ReplayBranch::getNode(size_t phase) const {
-		if(phase >= mOffset)
-			return (phase-mOffset)<getNodeCount() ? mNodes[phase-mOffset] : 0;
-		else if(mParent)
-			return mParent->getNode(phase);
-		else
-			return 0;
-	}
-	
-	ReplayNode* ReplayBranch::getNode(size_t phase)
-	{	return const_cast<ReplayNode*>(getNode(phase) ); }
-
-	
-	void ReplayBranch::clearRefBranches()
+	void ReplayNode::modifyNode()
 	{
-		for(BranchVec::iterator i=mRefBranches.begin();
-		i!=mRefBranches.end(); ++i) {
-			(*i)->mParent = mParent;
+		// Remove all children
+		for(ReplayNodeVec::iterator i=mChildren.begin(); i!=mChildren.end();
+		++i) {
+			mTree.freeNode(*i);
 		}
-	}
-	
-	void ReplayBranch::removeRef(const ReplayBranch* ref)
-	{
-		for(BranchVec::iterator i=mRefBranches.begin();
-		i!=mRefBranches.end(); ++i) {
-			if(*i == ref) {
-				mRefBranches.erase(i);
-				break;
-			}
-		}
+		mChildren.clear();
+		
+		// Destroy any savedata
+		for(size_t i=0; i<NtMax; ++i)
+			mSave[i].clear();
 	}
 
 	
 	// ReplayTree
 	// 
 	// 
-	ReplayTree::ReplayTree() : mRoot(new ReplayNode(0,0))
+	ReplayTree::ReplayTree() : mRoot(makeNode())
 	{
 	}
 
 	ReplayTree::~ReplayTree()
 	{
-		if(mRoot)
-			delete mRoot;
+		freeNode(mRoot);
 	}
+	
+	ReplayNode* ReplayTree::makeNode(ReplayNode *parent)
+	{
+		// Allocate node ID
+		size_t id;
+		if(mFreeNodes.size() > 0) {
+			id = mFreeNodes.top();
+			mFreeNodes.pop();
+		} else {
+			id = mNodes.size();
+			mNodes.push_back(0);
+		}
+		
+		ReplayNode *tmp = new ReplayNode(*this, id, parent);
+		
+		mNodes[id] = tmp;
+		return tmp;
+	}
+	
+	/**
+	 * @brief Removes a node and all its descendants
+	 */
+	void ReplayTree::freeNode(ReplayNode* node)
+	{
+		ReplayNodeVec &children = node->getChildren();
+		for(ReplayNodeVec::iterator i=children.begin(); i!=children.end();
+		++i) {
+			freeNode(*i);
+		}
+		
+		mFreeNodes.push(node->getId());
+		mNodes[node->getId()] = 0;
+		delete node;
+	}
+	
 }

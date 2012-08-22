@@ -2,11 +2,16 @@
 #define EXTSIM_REPLAYTREE_H
 
 #include <vector>
+#include <stack>
 
 #include "../simulation/Save.h"
+#include "../simulation/Common.h"
 
 namespace exts {
 	class ReplayTree;
+	class ReplayNode;
+	
+	typedef std::vector<ReplayNode*> ReplayNodeVec;
 	
 	/**
 	 * @brief Replay tree node that contains all relevant data for a phase.
@@ -29,9 +34,6 @@ namespace exts {
 				NtMax
 			};
 			
-			ReplayNode(ReplayNode *parent=0, size_t depth=0);
-			~ReplayNode();
-			
 			const Sim::Save &getData(NodeType type) const
 			{ return mSave[type]; }
 			Sim::Save &getData(NodeType type) { return mSave[type]; }
@@ -46,66 +48,29 @@ namespace exts {
 			ReplayNode *getParent() { return mParent; }
 			const ReplayNode *getParent() const { return mParent; }
 			
+			ReplayNodeVec &getChildren() { return mChildren; }
+			const ReplayNodeVec &getChildren() const { return mChildren; }
+			
 			size_t getChildrenCount() const { return mChildren.size(); }
-			size_t getParentCount() const;
+			size_t getDepth() const { return mDepth; }
+			
+			Sim::IdType getId() const { return mId; }
+			
+			ReplayNode *createBranch();
+			void modifyNode();
 			
 		private:
-			typedef std::vector<ReplayNode*> NodeVec;
-			NodeVec mChildren;
+			ReplayNode(ReplayTree &mgr, Sim::IdType id, ReplayNode *parent=0);
+			~ReplayNode();
+			
+			ReplayTree &mTree;
+			Sim::IdType mId;
 			
 			ReplayNode *mParent;
+			ReplayNodeVec mChildren;
 			size_t mDepth;
 			
 			Sim::Save mSave[NtMax];
-			
-			friend class ReplayTree;
-	};
-	
-	/**
-	 * @brief Handles a single timeline branch.
-	 * 
-	 * A branch is, from an external view, a linear timeline with all
-	 * relevant data for \c ExtSim to recreate a \c Simulation state
-	 * perfectly.
-	 */
-	class ReplayBranch {
-		public:
-			typedef std::vector<ReplayBranch*> BranchVec;
-			
-			const ReplayBranch *getParent() const { return mParent; }
-			ReplayBranch *getParent() { return mParent; }
-			
-			const BranchVec &getDescendants() const { return mRefBranches; }
-			const ReplayNode *getNode(size_t phase) const;
-			ReplayNode *getNode(size_t phase);
-			
-			size_t getNodeCount() const { return mNodes.size(); }
-			size_t getDescendantCount() const { return mRefBranches.size(); }
-			
-		private:
-			ReplayBranch(ReplayBranch *parent=0) :
-				mOffset(0), mPresent(0), mParent(parent) {}
-			~ReplayBranch();
-			
-			void clearRefBranches();
-			
-			void updateRef(ReplayBranch *ref) { mRefBranches.push_back(ref); }
-			void removeRef(const ReplayBranch *ref);
-			
-			typedef std::vector<ReplayNode*> NodeVec;
-			
-			NodeVec mNodes;
-			BranchVec mRefBranches;
-			
-			/// Phase offset for this branch, or the phase where nodes are
-			/// local rather than inherited from parents.
-			size_t mOffset;
-			
-			/// Marks the "present" phase, all nodes before this is
-			/// defined constant/unmodifiable.
-			size_t mPresent;
-			
-			ReplayBranch *mParent;
 			
 			friend class ReplayTree;
 	};
@@ -127,10 +92,22 @@ namespace exts {
 			ReplayTree();
 			~ReplayTree();
 			
-			ReplayNode *getRoot();
+			ReplayNode *getRoot() { return mRoot; }
+			
+			ReplayNode *getNode(Sim::IdType id)
+			{ return id>=mNodes.size() ? 0 : mNodes[id]; }
 			
 		private:
+			ReplayNode *makeNode(ReplayNode *parent=0);
+			void freeNode(ReplayNode *node);
+			
 			ReplayNode *mRoot;
+			
+			typedef std::stack<Sim::IdType> FreeStack;
+			ReplayNodeVec mNodes;
+			FreeStack mFreeNodes;
+			
+			friend class ReplayNode;
 	};
 }
 
