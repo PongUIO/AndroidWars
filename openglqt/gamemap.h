@@ -1,7 +1,7 @@
 #ifndef GAMEMAP_H
 #define GAMEMAP_H
 #include <QtGui>
-#include "globj.h"
+#include "../Qt-based-common-libs/globj.h"
 #include "Simulation.h"
 #include "../util/client.h"
 

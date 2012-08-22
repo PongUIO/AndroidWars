@@ -86,6 +86,7 @@ public:
 			QFile f(path + *iter);
 			f.open(QFile::QIODevice::ReadOnly);
 			eSim.loadDataScript(std::string(f.readAll()));
+			f.close();
 		}
 		eSim.postProcessData();
 

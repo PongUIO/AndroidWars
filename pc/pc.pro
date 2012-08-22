@@ -13,7 +13,7 @@ HEADERS += main.h ../openglqt/render.h ../util/camera.h \
     ../util/cursordefines.h \
     ../util/client.h \
     main.h \
-    ../openglqt/globj.h \
+    ../Qt-based-common-libs/globj.h \
     ../openglqt/gamemap.h \
     botselector.h \
     gamebutton.h \

@@ -8,6 +8,10 @@ int main(int argc, char *argv[])
 	q1.setVector(1,0,0);
 	QQuaternion q2 = QQuaternion();
 	q2.setVector(0,0,1);
+	qDebug() << q1.normalized();
+	qDebug() << q2.normalized();
+	q1.normalize();
+	q2.normalize();
 
 	int b = s.addBoneToSkeleton(skel, q1, -1);
 	qDebug() << b;

@@ -8,7 +8,7 @@
 #include "../util/client.h"
 #include "../util/cursordefines.h"
 #include "skeletalsystem.h"
-#include "globj.h"
+#include "../Qt-based-common-libs/globj.h"
 #include "gamemap.h"
 
 class GameDrawer : public QGLWidget {
@@ -252,7 +252,6 @@ protected:
 		gm->draw();
 		for (bot = bots.begin(); bot != bots.end(); bot++) {
 			Sim::Vector pos = (*bot)->getBody().mPos;
-			Sim::Vector col = (*bot)->getTypePtr()->getCollision()->getBboxHigh();
 			if (states->isSelected((*bot)->getId())) {
 
 				glColor4f(0.2f, 1.0f, 0.2f, selAlpha);

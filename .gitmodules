@@ -1,0 +1,3 @@
+[submodule "Qt-based-common-libs"]
+	path = Qt-based-common-libs
+	url = git://github.com/TZer0/Qt-based-common-libs.git
