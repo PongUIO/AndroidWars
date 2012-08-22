@@ -12,7 +12,8 @@ public:
 		r = NULL;
 	}
 	Piece(QString file, QVector3D scale) {
-		r = new GLObj(file, scale);
+		r = new GLObj();
+		r->loadFile(file, scale);
 	}
 
 	Piece(GLObj *go, QVector3D scale) {
