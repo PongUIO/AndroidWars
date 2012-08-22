@@ -6,7 +6,6 @@
 #include "../simulation/Save.h"
 
 namespace exts {
-	class ReplayBranch;
 	class ReplayTree;
 	
 	/**
@@ -30,8 +29,8 @@ namespace exts {
 				NtMax
 			};
 			
-			ReplayNode() {}
-			~ReplayNode() {}
+			ReplayNode(ReplayNode *parent=0, size_t depth=0);
+			~ReplayNode();
 			
 			const Sim::Save &getData(NodeType type) const
 			{ return mSave[type]; }
@@ -40,8 +39,26 @@ namespace exts {
 			bool isTypeSet(NodeType type) const
 			{ return mSave[type].size()>0; }
 			
+			bool isRoot() const { return !mParent; }
+			bool isBranch() const { return mChildren.size()>0; }
+			bool isLeaf() const { return mChildren.size()==0; }
+			
+			ReplayNode *getParent() { return mParent; }
+			const ReplayNode *getParent() const { return mParent; }
+			
+			size_t getChildrenCount() const { return mChildren.size(); }
+			size_t getParentCount() const;
+			
 		private:
+			typedef std::vector<ReplayNode*> NodeVec;
+			NodeVec mChildren;
+			
+			ReplayNode *mParent;
+			size_t mDepth;
+			
 			Sim::Save mSave[NtMax];
+			
+			friend class ReplayTree;
 	};
 	
 	/**
@@ -110,17 +127,10 @@ namespace exts {
 			ReplayTree();
 			~ReplayTree();
 			
-			const ReplayBranch *getBranch(size_t index) const;
-			ReplayBranch *getBranch(size_t index);
-			
-			size_t createBranch(size_t index=0);
-			bool deleteBranch(size_t index);
-			
-			size_t getBranchCount() const { return mBranches.size(); }
+			ReplayNode *getRoot();
 			
 		private:
-			typedef std::vector<ReplayBranch*> BranchVec;
-			BranchVec mBranches;
+			ReplayNode *mRoot;
 	};
 }
 

@@ -9,7 +9,8 @@ add_library(AWExtSim
 	
 	#ExtProgramInput.cpp
 	
-	input/ReplayTree.cpp
+	replay/ReplayTree.cpp
+	replay/ReplayManager.cpp
 	
 	param/Position.cpp
 	param/IdList.cpp
