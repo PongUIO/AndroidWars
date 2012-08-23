@@ -8,31 +8,38 @@ namespace exts {
 	
 	/**
 	 * @brief Keeps track of the simulation's history
+	 * 
 	 */
 	class ReplayManager {
 		public:
 			ReplayManager(ExtSim &esim);
 			~ReplayManager();
 			
-			void selectBranch();
+			void selectBranch(Sim::IdType id);
+			
+			void commit();
+			void commitNewBranch();
 			
 			const ReplayTree &getReplayTree() const { return mTree; }
+			ReplayNode *getActiveNode();
 			
 		private:
+			/// @name Data
+			//@{
+				ExtSim &mExtSim;
+				
+				/// Stores the branching tree of timelines
+				ReplayTree mTree;
+				
+				/// Currently active branch node
+				Sim::IdType mActiveNode;
+			//@}
+			
 			/// @name Configuration
 			//@{
 				/// How many phases between each full \c Simulation copy.
 				uint32_t mPhaseSaveInterval;
-				
-				/// If true, the replay manager will make a full
-				/// \c Simulation copy for a branch
-				bool mDoBranchSave;
-				
-				/// Stores the branching tree of timelines
-				ReplayTree mTree;
 			//@}
-			
-			ExtSim *mExtSim;
 	};
 }
 
