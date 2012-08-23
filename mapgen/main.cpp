@@ -8,7 +8,7 @@ int main(int argc, char *argv[])
 	int y;
 	switch(1)
 	{
-		case 1: x = 100; y = 20; break;
+		case 1: x = 200; y = 20; break;
 		case 2: x = 75; y = 15; break;
 		case 3: x = 50; y = 10; break;
 		default: x = 25; y = 5;
@@ -16,5 +16,6 @@ int main(int argc, char *argv[])
 	MapGenerator mg(x,y);
 	mg.Generate();
 	//mg.SetTile(16,8,1);
+	mg.CreateSpawnProtection();
 	mg.PrintBoard();
 }

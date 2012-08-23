@@ -7,3 +7,4 @@ build/*
 simulation/test/simtest
 simulation/doc/**
 *.kdev4*
+*.user
