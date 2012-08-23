@@ -21,7 +21,7 @@ MapGenerator::MapGenerator(int wX, int wY)
 
 void MapGenerator::Generate()
 {
-	for (int x=0; x<WorldX ; x++)
+	for (int x=0; x<WorldX/2 ; x++)
 	{
 		for (int y=0; y<WorldY; y++)
 		{
@@ -50,6 +50,7 @@ void MapGenerator::Generate()
 			}
 		}
 	}
+
 	for (int x=0; x<WorldX ; x++)
 	{
 		for (int y=0; y<WorldY; y++)
@@ -63,11 +64,40 @@ void MapGenerator::Generate()
 			}
 		}
 	}
+	for (int x=0; x<WorldX/2 ; x++)
+	{
+		for (int y=0; y<WorldY; y++)
+		{
+			if(Map[x][y]==1)
+			{
+				Map[WorldX-x-1][y]=1;
+			}
+		}
+	}
 }
 
 void MapGenerator::SetTile(int x, int y, int val)
 {
 	Map[x-1][y-1]=val;
+}
+
+void MapGenerator::CreateSpawnProtection()
+{
+	for (int x=0; x<3; x++)
+	{
+		for (int y=0; y<3; y++)
+		{
+			Map[x][y]=0;
+		}
+	}
+
+	for (int x=WorldX-1; x>WorldX-4; x--)
+	{
+		for (int y=0; y<3; y++)
+		{
+			Map[x][y]=0;
+		}
+	}
 }
 
 void MapGenerator::PrintBoard()
@@ -77,7 +107,7 @@ void MapGenerator::PrintBoard()
 		QString tmp = "";
 		for (int j=0; j<WorldX; j++)
 		{
-			tmp+=QString::number(Map[j][WorldY-i-1]);
+			tmp+=QString::number(Map[j][WorldY-i-1])+" ";
 		}
 		qDebug() << tmp.simplified();
 	}
