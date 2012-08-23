@@ -8,6 +8,7 @@ class MapGenerator
 public:
 	MapGenerator(int, int);
 	void Generate();
+	void SetTile(int , int, int);
 	void PrintBoard();
 	int **Map;
 	int WorldX, WorldY;

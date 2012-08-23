@@ -15,5 +15,6 @@ int main(int argc, char *argv[])
 	}
 	MapGenerator mg(x,y);
 	mg.Generate();
+	//mg.SetTile(16,8,1);
 	mg.PrintBoard();
 }
