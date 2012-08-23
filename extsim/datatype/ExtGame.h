@@ -1,6 +1,7 @@
 #ifndef EXTSIM_EXTGAME_H
 #define EXTSIM_EXTGAME_H
 
+#include <stdio.h>
 #include <string>
 
 #include "../ExtDataComponent.h"
