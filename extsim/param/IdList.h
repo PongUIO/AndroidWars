@@ -19,23 +19,22 @@ namespace exts {
 			typedef std::vector<std::string> StringVec;
 			typedef boost::unordered_set<Sim::IdType> IdSet;
 			
-			IdList(const std::string& dataName) : RuleParameter(dataName) {}
+			IdList(const std::string& dataName, bool whiteList=true) :
+				RuleParameter(dataName), mWhitelist(whiteList) {}
 			virtual ~IdList() {}
 			
 			RuleParameter *clone() { return new IdList<T>(*this); }
 			
-			void readNode(Nepeta::Node &node) {
-				Nepeta::Node &paramNode = node.getNode("PARAM");
-				Nepeta::Node &constraintNode = node.getNode("CONSTRAINT");
-				
+			void readNode(const Nepeta::Node &paramNode,
+			const Nepeta::Node &constraintNode) {
 				// Read default value
 				if(paramNode.isValid()) {
-					Nepeta::Node &paramData = getNodeData(paramNode);
+					const Nepeta::Node &paramData = getNodeData(paramNode);
 					mIdName = paramData.getArg(0);
 				}
 				
 				// Read constraints
-				Nepeta::Node &constraintData = getNodeData(constraintNode);
+				const Nepeta::Node &constraintData = getNodeData(constraintNode);
 				if(constraintData.isValid()) {
 					setConstraintDefined();
 					
@@ -45,24 +44,23 @@ namespace exts {
 			}
 			
 			void postProcess(ExtSim& extsim) {
-				bool whiteList = true;
-				IdSet deny;
-				typename T::DatabaseType &db =
-					Sim::getDataComponent<typename T::DatabaseType>(
+				typename T::TypeDatabase &db =
+					Sim::getDataComponent<typename T::TypeDatabase>(
 					extsim.getSim());
 				
 				// Translate default value
 				mId = db.getIdOf(mIdName);
 				
 				// Translate constraints
+				bool doAdd = true; // True to add to the set, false to remove
 				for(StringVec::iterator i=mIdNameVec.begin();
 				    i!=mIdNameVec.end(); ++i) {
 					size_t len = i->length();
 					
 					if (i->at(0) == '+') {
-						whiteList = true;
+						doAdd = true;
 					} else if (i->at(0) == '-') {
-						whiteList = false;
+						doAdd = false;
 					} else if (i->at(len-1) == '*') {
 						std::string candidate;
 						
@@ -71,7 +69,7 @@ namespace exts {
 						// and accept every completion
 						for (Sim::IdType j = 0; j < db.size(); j++) {
 							candidate = db.getNameOf(j);
-							size_t cand_len = candidate.length();
+							size_t cand_len = candidate.size();
 							
 							// candidate shorter than
 							// possible completion or
@@ -79,29 +77,31 @@ namespace exts {
 							if (cand_len < len || candidate.substr(0, len-1) != *i)
 								continue;
 							
-							whiteList ?
-								mIdSet.insert(j) :
-								deny.insert(j);
+							if(doAdd)
+								mIdSet.insert(j);
+							else
+								mIdSet.erase(j);
 						}
 					} else {
 						Sim::IdType id = db.getIdOf(*i);
 						
-						whiteList ?
-							mIdSet.insert(id) :
-							deny.insert(id);
+						if(doAdd)
+							mIdSet.insert(id);
+						else
+							mIdSet.erase(id);
 					}
 				}
 				mIdNameVec.clear();
-				
-				// filter through denied IdTypes
-				for (IdSet::iterator i = deny.begin(); i != deny.end(); i++)
-					mIdSet.erase(*i);
 			}
 		
-			bool isConstrained(const RuleParameter* param, ExtSim& extsim) const {
+			bool isConstrained(const RuleParameter* param,
+			ExtSim& extsim) const {
 				const IdList<T> *srcList = static_cast<const IdList<T>*>(param);
 				
-				return mIdSet.find(srcList->getId())!=mIdSet.end();
+				// If this is a blacklist, the parameter must not be in the set.
+				// If this is a whitelist, the parameter must be in the set
+				return (mIdSet.find(srcList->getId()) != mIdSet.end())
+					== mWhitelist;
 			}
 			
 			void callback()
@@ -111,15 +111,23 @@ namespace exts {
 			
 			void save(Sim::Save::BasePtr& fp) const {
 				fp << mId;
+				fp << mWhitelist;
 				fp.writeUnorderedSet(mIdSet);
 			}
 			void load(Sim::Save::BasePtr& fp) {
 				fp >> mId;
+				fp >> mWhitelist;
 				fp.readUnorderedSet(mIdSet);
 			}
 			
+			void setId(Sim::IdType id) { mId=id; }
 			Sim::IdType getId() const { return mId; }
+			
 			const IdSet &getIdSet() const { return mIdSet; }
+			IdSet &getIdSet() { return mIdSet; }
+			
+			bool isWhitelist() const { return mWhitelist; }
+			void setWhitelist(bool isWhite) { mWhitelist=isWhite; }
 			
 		private:
 			// Value
@@ -127,6 +135,7 @@ namespace exts {
 			Sim::IdType mId;
 			
 			// Constraint
+			bool mWhitelist;
 			StringVec mIdNameVec;
 			IdSet mIdSet;
 	};

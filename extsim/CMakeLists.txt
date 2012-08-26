@@ -7,7 +7,7 @@ add_library(AWExtSim
 	CommonTemplate.cpp
 	CommonLoad.cpp
 	
-	#ExtProgramInput.cpp
+	simcontrol/ExtCpuInput.cpp
 	
 	replay/ReplayTree.cpp
 	replay/ReplayManager.cpp
@@ -21,6 +21,7 @@ add_library(AWExtSim
 	object/ParamList.cpp
 	
 	typerule/program/MoveTowards.cpp
+	typerule/misc/CpuInput.cpp
 	
 	#typerule/bot/DefaultBot.cpp
 	

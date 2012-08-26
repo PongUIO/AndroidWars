@@ -62,7 +62,7 @@ namespace Sim {
 				
 				void startPhase();
 				void step();
-				void endPhase(bool finalize);
+				void endPhase();
 				
 				bool hasPhaseStep()
 				{ return getState().getStateType() == State::StInPhase; }

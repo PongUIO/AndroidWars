@@ -16,14 +16,21 @@ namespace exts {
 			~ReplayManager();
 			
 			void selectBranch(Sim::IdType id);
+			void replay(uint32_t phase, uint32_t step);
+			void replay(double timeUnit);
+			void step(uint32_t numStep=1);
 			
 			void commit();
 			void commitNewBranch();
 			
 			const ReplayTree &getReplayTree() const { return mTree; }
-			ReplayNode *getActiveNode();
 			
+			const ReplayNode *getActiveNode() const
+			{ return mTree.getNode(mActiveNode); }
 		private:
+			ReplayNode *getActiveNode()
+			{ return mTree.getNode(mActiveNode); }
+			
 			/// @name Data
 			//@{
 				ExtSim &mExtSim;

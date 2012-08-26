@@ -12,7 +12,9 @@ namespace exts {
 		
 		mData(*this),
 		mInput(*this),
-		mTypeRuleMgr(*this)
+		mTypeRuleMgr(*this),
+		mReplay(*this),
+		mCpuInput(*this)
 	{}
 
 	ExtSim::~ExtSim()
@@ -21,16 +23,23 @@ namespace exts {
 	void ExtSim::startup()
 	{
 		mSim.startup();
+		
+		mCpuInput.startup();
 	}
 	
 	void ExtSim::shutdown()
 	{
+		mCpuInput.shutdown();
+		
 		mSim.shutdown();
 	}
 	
 	void ExtSim::prepareSim()
 	{
 		mSim.prepareSim();
+		
+		// Initial commit
+		getReplay().commit();
 	}
 	
 	/**

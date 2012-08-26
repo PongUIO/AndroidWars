@@ -71,7 +71,7 @@ namespace Sim {
 	 * 
 	 * @param finalize See \c ReplayManager::endPhase().
 	 */
-	void Simulation::endPhase(bool finalize)
+	void Simulation::endPhase()
 	{
 		mState.endPhase();
 	}

@@ -6,13 +6,17 @@
 #include "ExtData.h"
 #include "InputBarrier.h"
 #include "TypeRuleMgr.h"
+#include "replay/ReplayManager.h"
+#include "simcontrol/ExtCpuInput.h"
 
 namespace exts {
 #define _EXTS_X_EXTSIM_COMPONENTS \
 	_EXTS_X(Sim::Simulation, Sim) \
 	_EXTS_X(ExtData, Data) \
 	_EXTS_X(InputBarrier, Input) \
-	_EXTS_X(TypeRuleMgr, TypeRuleMgr)
+	_EXTS_X(TypeRuleMgr, TypeRuleMgr) \
+	_EXTS_X(ReplayManager, Replay) \
+	_EXTS_X(ExtCpuInput, CpuInput)
 	
 	/**
 	 * @brief Manages simulation data not directly related to simulation.

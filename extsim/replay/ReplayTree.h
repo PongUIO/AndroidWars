@@ -96,6 +96,8 @@ namespace exts {
 			
 			ReplayNode *getNode(Sim::IdType id)
 			{ return id>=mNodes.size() ? 0 : mNodes[id]; }
+			const ReplayNode *getNode(Sim::IdType id) const
+			{ return const_cast<const ReplayNode*>(getNode(id)); }
 			
 		private:
 			ReplayNode *makeNode(ReplayNode *parent=0);

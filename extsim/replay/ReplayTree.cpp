@@ -6,7 +6,7 @@ namespace exts {
 	// 
 	ReplayNode::ReplayNode(ReplayTree& mgr, Sim::IdType id, ReplayNode* parent) :
 		mTree(mgr), mId(id),
-		mParent(parent), mChildren(), mDepth(parent->getDepth())
+		mParent(parent), mChildren(), mDepth(parent ? parent->getDepth() : 0)
 	{}
 	
 	ReplayNode::~ReplayNode()
@@ -44,8 +44,9 @@ namespace exts {
 	// ReplayTree
 	// 
 	// 
-	ReplayTree::ReplayTree() : mRoot(makeNode())
+	ReplayTree::ReplayTree() : mRoot(0)
 	{
+		mRoot = makeNode(0);
 	}
 
 	ReplayTree::~ReplayTree()

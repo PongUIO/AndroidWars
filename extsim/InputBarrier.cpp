@@ -1,3 +1,5 @@
+#include <stdint.h>
+
 #include "InputBarrier.h"
 
 #include "ExtSim.h"
@@ -53,6 +55,34 @@ namespace exts {
 	{
 		for(ParamListVec::iterator i=mInput.begin(); i!=mInput.end(); ++i)
 			delete *i;
+		mInput.clear();
 	}
-
+	
+	void InputBarrier::save(Sim::Save::BasePtr& fp)
+	{
+		fp << uint32_t(mInput.size());
+		for(ParamListVec::iterator i=mInput.begin(); i!=mInput.end(); ++i)
+			mExtSim.getTypeRuleMgr().saveParamList(fp, *i);
+	}
+	
+	void InputBarrier::load(Sim::Save::BasePtr& fp)
+	{
+		uint32_t count;
+		fp >> count;
+		
+		for(uint32_t i=0; i<count; ++i) {
+			ParamList *param = mExtSim.getTypeRuleMgr().loadParamList(fp);
+			
+			if(param)
+				registerInput(param);
+			else
+				break;
+		}
+	}
+	
+	void InputBarrier::load(Sim::Save& save)
+	{
+		Sim::Save::FilePtr fp(save);
+		load(fp);
+	}
 }

@@ -3,6 +3,8 @@
 
 #include <vector>
 
+#include "../simulation/Save.h"
+
 namespace exts {
 	class ExtSim;
 	class ParamList;
@@ -40,6 +42,11 @@ namespace exts {
 				
 				void dispatchInput();
 				void discardInput();
+				
+				void save(Sim::Save::BasePtr &fp);
+				void load(Sim::Save::BasePtr &fp);
+				
+				void load(Sim::Save &save);
 			//@}
 			
 		private:

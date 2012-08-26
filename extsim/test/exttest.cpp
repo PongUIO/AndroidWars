@@ -225,12 +225,10 @@ void testSim()
 	
 	// Register input
 	extSim.getInput().registerInput(inputParam);
+	extSim.getCpuInput().registerCpuInput(0,0,0);
 	
 	// Dispatching input
 	extSim.getInput().dispatchInput();
-	
-	// (Temporary to bypass a lack of cpu input in extsim)
-	sim.getInput().getCpuInput().registerInput(0,0,0);
 	
 	// Running a single phase to assure things work
 	Sim::Vector pos = sim.getState().getBotFactory().getBot(0)->getBody().mPos;
@@ -239,7 +237,7 @@ void testSim()
 	sim.startPhase();
 	while(sim.hasPhaseStep())
 		sim.step();
-	sim.endPhase(true);
+	sim.endPhase();
 	
 	pos = sim.getState().getBotFactory().getBot(0)->getBody().mPos;
 	std::cout << "Bot position post: ("<<pos.x<<", "<<pos.y<<")\n";
