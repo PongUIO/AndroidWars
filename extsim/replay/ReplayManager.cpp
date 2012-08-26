@@ -1,5 +1,6 @@
 #include <list>
 #include <assert.h>
+#include <stdio.h>
 
 #include "ReplayManager.h"
 
@@ -51,11 +52,10 @@ namespace exts {
 		typedef std::list<ReplayNode*> ReplayList;
 		ReplayList nodePath;
 		ReplayNode *mostRecentSim = baseNode;
-		nodePath.push_front(mostRecentSim);
 		while(mostRecentSim
 			&& !mostRecentSim->isTypeSet(ReplayNode::NtSimulation)) {
-			mostRecentSim = mostRecentSim->getParent();
 			nodePath.push_front(mostRecentSim);
+			mostRecentSim = mostRecentSim->getParent();
 		}
 		
 		// Assure the node exists, if it doesn't there is no parent node
@@ -70,19 +70,16 @@ namespace exts {
 		uint32_t totalStep = simCfg.phaseLength*phase + step;
 		ReplayList::iterator i = nodePath.begin();
 		while( sim.getCurTotalStep() < totalStep ) {
-			
-			
 			// Load input
 			if( simState.getStateType() == Sim::State::StIdle ) {
 				ReplayNode *curNode = (i==nodePath.end()) ? 0 : *i;
-				
 				
 				// Dispatch input
 				if(curNode) {
 					mExtSim.getInput().load(
 						curNode->getData(ReplayNode::NtInput)
 					);
-					mExtSim.getInput().dispatchInput();
+					mExtSim.getInput().dispatchInput(false);
 					
 					++i;
 				}
@@ -124,6 +121,19 @@ namespace exts {
 	}
 	
 	/**
+	 * @brief Loads the simulation state at the active node
+	 */
+	void ReplayManager::gotoActive()
+	{
+		ReplayNode *node = getActiveNode();
+		
+		if(node) {
+			replay(node->getDepth(),0);
+		}
+	}
+
+	
+	/**
 	 * @brief Appends a new node to the active node and commits to it.
 	 */
 	void ReplayManager::commitNewBranch()
@@ -163,7 +173,7 @@ namespace exts {
 			Sim::Save &saveObj = node->getData(ReplayNode::NtInput);
 			saveObj.clear();
 			Sim::Save::FilePtr fp(saveObj);
-			mExtSim.getSim().getInput().save(fp);
+			mExtSim.getInput().save(fp);
 		}
 	}
 }

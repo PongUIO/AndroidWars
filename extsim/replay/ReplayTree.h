@@ -93,6 +93,7 @@ namespace exts {
 			~ReplayTree();
 			
 			ReplayNode *getRoot() { return mRoot; }
+			const ReplayNode *getRoot() const { return mRoot; }
 			
 			ReplayNode *getNode(Sim::IdType id)
 			{ return id>=mNodes.size() ? 0 : mNodes[id]; }

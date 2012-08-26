@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <stdio.h>
 
 #include "InputBarrier.h"
 
@@ -34,18 +35,30 @@ namespace exts {
 	/**
 	 * @brief Sends the current input buffer to the simulation
 	 */
-	void InputBarrier::dispatchInput()
+	void InputBarrier::dispatchInput(bool saveReplay)
 	{
+		// Feed input
 		for(ParamListVec::iterator i=mInput.begin(); i!=mInput.end(); ++i) {
 			const TypeRule *rule = mExtSim.getTypeRuleMgr()
 			.getRule((*i)->getTypeRuleId());
 			
 			if(rule)
 				rule->makeInput(*i);
-			
-			delete *i;
 		}
-		mInput.clear();
+		
+		// Fast-forward the simulation
+		if(saveReplay) {
+			mExtSim.getSim().startPhase();
+			while(mExtSim.getSim().hasPhaseStep())
+				mExtSim.getSim().step();
+			mExtSim.getSim().endPhase();
+			
+			// Commit the replay
+			mExtSim.getReplay().commitNewBranch();
+		}
+		
+		// Throw away the spent input
+		discardInput();
 	}
 	
 	/**

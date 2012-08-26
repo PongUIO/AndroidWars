@@ -20,6 +20,8 @@ namespace exts {
 			void replay(double timeUnit);
 			void step(uint32_t numStep=1);
 			
+			void gotoActive();
+			
 			void commit();
 			void commitNewBranch();
 			
@@ -27,10 +29,9 @@ namespace exts {
 			
 			const ReplayNode *getActiveNode() const
 			{ return mTree.getNode(mActiveNode); }
-		private:
 			ReplayNode *getActiveNode()
 			{ return mTree.getNode(mActiveNode); }
-			
+		private:
 			/// @name Data
 			//@{
 				ExtSim &mExtSim;

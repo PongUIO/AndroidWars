@@ -40,7 +40,7 @@ namespace exts {
 			//@{
 				bool registerInput(ParamList *param);
 				
-				void dispatchInput();
+				void dispatchInput(bool saveReplay=true);
 				void discardInput();
 				
 				void save(Sim::Save::BasePtr &fp);

@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 #include "CpuInput.h"
 
 #include "../../param/IdList.h"
@@ -20,11 +22,11 @@ namespace exts { namespace misc {
 	
 	void CpuInput::makeInput(const ParamList* param) const
 	{
-		const IdList<Sim::Bot> *bot = getRefParam()->
+		const IdList<Sim::Bot> *bot = param->
 			getParamT<BotId>(0);
-		const IdList<Sim::Program> *prog = getRefParam()->
+		const IdList<Sim::Program> *prog = param->
 			getParamT<ProgramId>(1);
-		const ValRange<uint32_t> *delay = getRefParam()->
+		const ValRange<uint32_t> *delay = param->
 			getParamT<Uint32Val>(2);
 		
 		mExtSim.getSim().getInput().getCpuInput().registerInput(
