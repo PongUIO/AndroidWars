@@ -19,7 +19,12 @@ namespace exts {
 
 	void InputBarrier::shutdown()
 	{	discardInput(); }
-
+	
+	/**
+	 * @brief Registers a \c ParamList to the \c InputBarrier
+	 * 
+	 * @note The \c InputBarrier takes ownership of \p param.
+	 */
 	bool InputBarrier::registerInput(ParamList* param)
 	{
 		if(!param)
@@ -33,11 +38,31 @@ namespace exts {
 	}
 	
 	/**
-	 * @brief Sends the current input buffer to the simulation
+	 * @brief Dispatches input to the simulation and optionally saves a replay.
+	 * 
+	 * This is a meta-function for the \c feedInput(), \c commitReplay(), and
+	 * \c discardInput() to simplify individual calls.
 	 */
 	void InputBarrier::dispatchInput(bool saveReplay)
 	{
 		// Feed input
+		feedInput();
+		
+		if(saveReplay)
+			commitReplay();
+		
+		// Throw away the spent input
+		discardInput();
+	}
+	
+	/**
+	 * @brief Feeds the stored input to the simulation
+	 * 
+	 * Sends the entire current input buffer to the simulation, the internal
+	 * buffer is stored until \c discardInput is called.
+	 */
+	void InputBarrier::feedInput()
+	{
 		for(ParamListVec::iterator i=mInput.begin(); i!=mInput.end(); ++i) {
 			const TypeRule *rule = mExtSim.getTypeRuleMgr()
 			.getRule((*i)->getTypeRuleId());
@@ -45,24 +70,35 @@ namespace exts {
 			if(rule)
 				rule->makeInput(*i);
 		}
-		
-		// Fast-forward the simulation
-		if(saveReplay) {
+	}
+	
+	/**
+	 * @brief Commits the current stored input to the \c ReplayManager
+	 * 
+	 * This assumes that the input buffer comes from this phase
+	 * (essentially, this is called "right after" \c feedInput()), and
+	 * that the simulation has loaded the input, or has processed through
+	 * the input.
+	 */
+	void InputBarrier::commitReplay()
+	{
+		// Fast-forward the simulation if not already performed
+		if(mExtSim.getReplay().getActiveNode()->getDepth()
+		== mExtSim.getSim().getCurPhase()) {
 			mExtSim.getSim().startPhase();
 			while(mExtSim.getSim().hasPhaseStep())
 				mExtSim.getSim().step();
 			mExtSim.getSim().endPhase();
-			
-			// Commit the replay
-			mExtSim.getReplay().commitNewBranch();
 		}
 		
-		// Throw away the spent input
-		discardInput();
+		// Commit the replay
+		mExtSim.getReplay().commitNewBranch();
 	}
 	
 	/**
 	 * @brief Discards the active input buffer
+	 * 
+	 * Every object in the buffer is deleted.
 	 */
 	void InputBarrier::discardInput()
 	{

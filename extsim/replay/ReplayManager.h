@@ -1,6 +1,8 @@
 #ifndef EXTSIM_REPLAYMANAGER_H
 #define EXTSIM_REPLAYMANAGER_H
 
+#include <list>
+
 #include "ReplayTree.h"
 
 namespace exts {
@@ -12,26 +14,32 @@ namespace exts {
 	 */
 	class ReplayManager {
 		public:
+			typedef std::list<ReplayNode*> ReplayList;
+			
 			ReplayManager(ExtSim &esim);
 			~ReplayManager();
 			
 			void selectBranch(Sim::IdType id);
 			void replay(uint32_t phase, uint32_t step);
 			void replay(double timeUnit);
-			void step(uint32_t numStep=1);
+			void loadPhaseInput(ReplayList &src);
+			void stepReplay(ReplayList &path, uint32_t numStep=1);
 			
 			void gotoActive();
 			
 			void commit();
 			void commitNewBranch();
 			
+			const ReplayNode *buildPathToSimSave(ReplayList& path, Sim::IdType nodeId);
+			
 			const ReplayTree &getReplayTree() const { return mTree; }
 			
 			const ReplayNode *getActiveNode() const
 			{ return mTree.getNode(mActiveNode); }
-			ReplayNode *getActiveNode()
-			{ return mTree.getNode(mActiveNode); }
 		private:
+			ReplayNode *getActiveNodeI()
+			{ return mTree.getNode(mActiveNode); }
+			
 			/// @name Data
 			//@{
 				ExtSim &mExtSim;

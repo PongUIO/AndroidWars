@@ -39,7 +39,7 @@ namespace exts {
 		Sim::State &simState = sim.getState();
 		
 		// Find the correct phase node, this is the base node for replay
-		ReplayNode *baseNode = getActiveNode();
+		ReplayNode *baseNode = getActiveNodeI();
 		while(baseNode && baseNode->getDepth() > phase)
 			baseNode = baseNode->getParent();
 		
@@ -49,14 +49,12 @@ namespace exts {
 		
 		// Find the most recent complete simulation save, and store the path
 		// to it
-		typedef std::list<ReplayNode*> ReplayList;
 		ReplayList nodePath;
-		ReplayNode *mostRecentSim = baseNode;
-		while(mostRecentSim
-			&& !mostRecentSim->isTypeSet(ReplayNode::NtSimulation)) {
-			nodePath.push_front(mostRecentSim);
-			mostRecentSim = mostRecentSim->getParent();
-		}
+		const ReplayNode *mostRecentSimC =
+		buildPathToSimSave(nodePath, baseNode->getId());
+		
+		// Minor hack to get around const-correctness issues caused by me.
+		ReplayNode *mostRecentSim = mTree.getNode(mostRecentSimC->getId());
 		
 		// Assure the node exists, if it doesn't there is no parent node
 		// with a simulation save
@@ -68,35 +66,62 @@ namespace exts {
 		
 		// Start replaying to the correct phase and step
 		uint32_t totalStep = simCfg.phaseLength*phase + step;
-		ReplayList::iterator i = nodePath.begin();
-		while( sim.getCurTotalStep() < totalStep ) {
-			// Load input
-			if( simState.getStateType() == Sim::State::StIdle ) {
-				ReplayNode *curNode = (i==nodePath.end()) ? 0 : *i;
-				
-				// Dispatch input
-				if(curNode) {
-					mExtSim.getInput().load(
-						curNode->getData(ReplayNode::NtInput)
-					);
-					mExtSim.getInput().dispatchInput(false);
-					
-					++i;
-				}
-				
-				sim.startPhase();
-			}
-			
-			// Step 
-			if( simState.getStateType() == Sim::State::StInPhase )
-				sim.step();
-			
-			// End phase
-			if( simState.getStateType() == Sim::State::StEndPhase )
-				sim.endPhase();
-		}
+		stepReplay(nodePath, totalStep - sim.getCurTotalStep() );
 	}
-
+	
+	/**
+	 * @brief Builds a path from the given node to the nearest parent with
+	 * a complete simulation save.
+	 * 
+	 * @return The node with the complete simulation save
+	 */
+	const ReplayNode *ReplayManager::buildPathToSimSave(ReplayList& path, Sim::IdType nodeId)
+	{
+		ReplayNode *node = mTree.getNode(nodeId);
+		if(!node)
+			return 0;
+		
+		while(node && !node->isTypeSet(ReplayNode::NtSimulation)) {
+			path.push_front(node);
+			node = node->getParent();
+		}
+		
+		return node;
+	}
+	
+	/**
+	 * @brief Loads the next input from a replay path
+	 * 
+	 * The input is loaded to the \c InputBarrier, but is not dispatched.
+	 * 
+	 * @param src The source path to take from, the front element is discarded
+	 * when used.
+	 */
+	void ReplayManager::loadPhaseInput(ReplayList& src)
+	{
+		if(src.size() == 0)
+			return;
+		
+		ReplayNode *curNode = src.front();
+		
+		// Assure the input can be loaded
+		// - Node must exist
+		// - The node must have a depth one above the current phase
+		// - The simulation state must be outside phase processing (idle)
+		Sim::State &simState = mExtSim.getSim().getState();
+		if(!curNode ||
+		simState.getCurPhase()+1 != curNode->getDepth() ||
+		simState.getStateType() != Sim::State::StIdle) {
+			return;
+		}
+		
+		// Load the input
+		mExtSim.getInput().load(curNode->getData(ReplayNode::NtInput));
+		
+		// Discard the node
+		src.pop_front();
+	}
+	
 	void ReplayManager::replay(double timeUnit)
 	{
 		const Sim::Configuration &cfg = mExtSim.getSim().getConfiguration();
@@ -114,10 +139,31 @@ namespace exts {
 	 * Everything related to stepping is taken care of by this function, such
 	 * as loading input to the \c InputBarrier, and calling \c startPhase and
 	 * \c endPhase.
+	 * 
+	 * @param path A precomputed path storing the successive nodes to retrieve
+	 * input from.
 	 */
-	void ReplayManager::step(uint32_t numStep)
+	void ReplayManager::stepReplay(ReplayList &path, uint32_t numStep)
 	{
+		Sim::Simulation &sim = mExtSim.getSim();
+		Sim::State &state = sim.getState();
 		
+		while( (numStep--) > 0) {
+			// Load input
+			if( state.getStateType() == Sim::State::StIdle ) {
+				loadPhaseInput(path);
+				mExtSim.getInput().dispatchInput(false);
+				
+				sim.startPhase();
+			}
+			
+			// Step
+			if( state.getStateType() == Sim::State::StInPhase )
+				sim.step();
+			
+			if( state.getStateType() == Sim::State::StEndPhase )
+				sim.endPhase();
+		}
 	}
 	
 	/**
@@ -125,7 +171,7 @@ namespace exts {
 	 */
 	void ReplayManager::gotoActive()
 	{
-		ReplayNode *node = getActiveNode();
+		ReplayNode *node = getActiveNodeI();
 		
 		if(node) {
 			replay(node->getDepth(),0);
@@ -138,7 +184,7 @@ namespace exts {
 	 */
 	void ReplayManager::commitNewBranch()
 	{
-		ReplayNode *node = getActiveNode();
+		ReplayNode *node = getActiveNodeI();
 		if(node) {
 			ReplayNode *branch = node->createBranch();
 			selectBranch(branch->getId());
@@ -154,7 +200,7 @@ namespace exts {
 	 */
 	void ReplayManager::commit()
 	{
-		ReplayNode *node = getActiveNode();
+		ReplayNode *node = getActiveNodeI();
 		
 		if(node) {
 			// A commit may only be performed when the simulation phase

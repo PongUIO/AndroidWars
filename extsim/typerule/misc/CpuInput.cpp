@@ -1,5 +1,3 @@
-#include <stdio.h>
-
 #include "CpuInput.h"
 
 #include "../../param/IdList.h"

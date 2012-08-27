@@ -95,10 +95,12 @@ namespace exts {
 			ReplayNode *getRoot() { return mRoot; }
 			const ReplayNode *getRoot() const { return mRoot; }
 			
-			ReplayNode *getNode(Sim::IdType id)
-			{ return id>=mNodes.size() ? 0 : mNodes[id]; }
 			const ReplayNode *getNode(Sim::IdType id) const
-			{ return const_cast<const ReplayNode*>(getNode(id)); }
+			{ return id>=mNodes.size() ? 0 : mNodes[id]; }
+			
+			ReplayNode *getNode(Sim::IdType id)
+			{ return const_cast<ReplayNode*>(
+			static_cast<const ReplayTree&>(*this).getNode(id)); }
 			
 		private:
 			ReplayNode *makeNode(ReplayNode *parent=0);

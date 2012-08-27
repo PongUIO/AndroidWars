@@ -41,6 +41,9 @@ namespace exts {
 				bool registerInput(ParamList *param);
 				
 				void dispatchInput(bool saveReplay=true);
+				
+				void feedInput();
+				void commitReplay();
 				void discardInput();
 				
 				void save(Sim::Save::BasePtr &fp);
