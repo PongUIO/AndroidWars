@@ -148,22 +148,6 @@ namespace Sim {
 					getIdOf(name));
 			}
 			
-			/**
-			 * Similar to \c buildInputImpl, but creating an object of the
-			 * default generic type.
-			 */
-			/*template<class Arg>
-			typename T::Type *buildInput(const Arg &cfg) {
-				T &fact = getStateComponent<T>(*mSim);
-				
-				IdType id = allocateId();
-				typename T::Type *obj = fact.template create<Arg>(cfg, id);
-				if(obj)
-					mTmpBuffer.addInput(obj);
-				
-				return obj;
-			}*/
-			
 			IdType allocateId() {
 				T &fact = getStateComponent<T>(*mSim);
 				return fact.getCurrentUniqueId() + mIdCounter++;

@@ -107,10 +107,10 @@ namespace exts {
 		mInput.clear();
 	}
 	
-	void InputBarrier::save(Sim::Save::BasePtr& fp)
+	void InputBarrier::save(Sim::Save::BasePtr& fp) const
 	{
 		fp << uint32_t(mInput.size());
-		for(ParamListVec::iterator i=mInput.begin(); i!=mInput.end(); ++i)
+		for(ParamListVec::const_iterator i=mInput.begin(); i!=mInput.end(); ++i)
 			mExtSim.getTypeRuleMgr().saveParamList(fp, *i);
 	}
 	

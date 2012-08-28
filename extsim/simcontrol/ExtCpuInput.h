@@ -3,6 +3,8 @@
 
 #include "../../simulation/Common.h"
 
+#include "../ExtModule.h"
+
 namespace exts {
 	class ExtSim;
 	namespace misc {
@@ -12,7 +14,7 @@ namespace exts {
 	/**
 	 * @brief Minor class to manage CPU input to simulation bots
 	 */
-	class ExtCpuInput {
+	class ExtCpuInput : public ExtModule {
 		public:
 			ExtCpuInput(ExtSim &esim);
 			~ExtCpuInput();

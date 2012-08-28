@@ -15,8 +15,15 @@ namespace exts {
 		mTypeRuleMgr(*this),
 		mReplay(*this),
 		mCpuInput(*this)
-	{}
-
+	{
+		registerCallObj(&mData);
+		registerCallObj(&mInput);
+		registerCallObj(&mTypeRuleMgr);
+		registerCallObj(&mReplay);
+		registerCallObj(&mAgent);
+		registerCallObj(&mCpuInput);
+	}
+	
 	ExtSim::~ExtSim()
 	{}
 	
@@ -24,12 +31,12 @@ namespace exts {
 	{
 		mSim.startup();
 		
-		mCpuInput.startup();
+		call( boost::bind(&ExtModule::startup, _1) );
 	}
 	
 	void ExtSim::shutdown()
 	{
-		mCpuInput.shutdown();
+		rcall( boost::bind(&ExtModule::shutdown, _1) );
 		
 		mSim.shutdown();
 	}

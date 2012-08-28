@@ -9,6 +9,9 @@ add_library(AWExtSim
 	
 	simcontrol/ExtCpuInput.cpp
 	
+	agent/AgentMgr.cpp
+	agent/Agent.cpp
+	
 	replay/ReplayTree.cpp
 	replay/ReplayManager.cpp
 	

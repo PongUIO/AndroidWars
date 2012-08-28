@@ -2,11 +2,14 @@
 #define EXTSIM_EXTSIM_H
 
 #include "../simulation/Simulation.h"
+#include "../simulation/utility/CallGroup.h"
 
+#include "ExtModule.h"
 #include "ExtData.h"
 #include "InputBarrier.h"
 #include "TypeRuleMgr.h"
 #include "replay/ReplayManager.h"
+#include "agent/AgentMgr.h"
 #include "simcontrol/ExtCpuInput.h"
 
 namespace exts {
@@ -16,6 +19,7 @@ namespace exts {
 	_EXTS_X(InputBarrier, Input) \
 	_EXTS_X(TypeRuleMgr, TypeRuleMgr) \
 	_EXTS_X(ReplayManager, Replay) \
+	_EXTS_X(AgentMgr, Agent) \
 	_EXTS_X(ExtCpuInput, CpuInput)
 	
 	/**
@@ -30,7 +34,7 @@ namespace exts {
 	 * and any access to it should generally be limited to reading. Other
 	 * interaction should be done through this class.
 	 */
-	class ExtSim {
+	class ExtSim : private Sim::CallGroup<ExtModule> {
 		public:
 			/// @name Initialization
 			//@{

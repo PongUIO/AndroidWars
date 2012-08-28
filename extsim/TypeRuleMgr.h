@@ -4,6 +4,8 @@
 #include "../simulation/data/BaseData.h"
 #include "../simulation/Save.h"
 
+#include "ExtModule.h"
+
 namespace exts {
 	class ExtSim;
 	class TypeRule;
@@ -25,7 +27,7 @@ namespace exts {
 	 * 
 	 * Destruction of \c TypeRule objects are done by this manager.
 	 */
-	class TypeRuleMgr : private Sim::DataCtr<TypeRule> {
+	class TypeRuleMgr : public ExtModule, private Sim::DataCtr<TypeRule> {
 		public:
 			/// @name Initialization
 			//@{

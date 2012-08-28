@@ -3,6 +3,7 @@
 
 #include <list>
 
+#include "../ExtModule.h"
 #include "ReplayTree.h"
 
 namespace exts {
@@ -12,12 +13,15 @@ namespace exts {
 	 * @brief Keeps track of the simulation's history
 	 * 
 	 */
-	class ReplayManager {
+	class ReplayManager : public ExtModule {
 		public:
 			typedef std::list<const ReplayNode*> ReplayList;
 			
 			ReplayManager(ExtSim &esim);
 			~ReplayManager();
+			
+			void startup() {}
+			void shutdown() {}
 			
 			void selectBranch(Sim::IdType id);
 			void replay(uint32_t phase, uint32_t step);
