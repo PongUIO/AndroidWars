@@ -102,7 +102,7 @@ namespace exts {
 		if(src.size() == 0)
 			return;
 		
-		ReplayNode *curNode = src.front();
+		const ReplayNode *curNode = src.front();
 		
 		// Assure the input can be loaded
 		// - Node must exist

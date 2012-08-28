@@ -147,5 +147,8 @@ int main(void)
 	// Analyze replay
 	displayReplayTree();
 	
+	// Shutdown the simulation
+	extSim.shutdown();
+	
 	return 0;
 }

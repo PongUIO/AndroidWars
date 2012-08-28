@@ -96,7 +96,7 @@ namespace Sim {
 				uint32_t checksumSim();
 				
 				Save save();
-				void load(Save &saveData);
+				void load(const Save &saveData);
 				
 				void save(Save::BasePtr &fp);
 			//@}

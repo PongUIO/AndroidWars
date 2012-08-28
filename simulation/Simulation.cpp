@@ -117,7 +117,7 @@ namespace Sim {
 	 * 
 	 * \param saveData The savestate to load from.
 	 */
-	void Simulation::load(Save& saveData)
+	void Simulation::load(const Save& saveData)
 	{
 		Save::FilePtr fp = Save::FilePtr(saveData);
 		

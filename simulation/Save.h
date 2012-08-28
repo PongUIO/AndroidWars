@@ -340,27 +340,34 @@ namespace Sim {
 					 * Utility function used for reading the position of
 					 * the read pointer.
 					 */
-					virtual uint32_t getReadPos() { return 0; }
+					virtual uint32_t getReadPos() const { return 0; }
 					/**
 					 * Utility function used for reading the position of
 					 * the write pointer.
 					 */
-					virtual uint32_t getWritePos() { return 0; }
+					virtual uint32_t getWritePos() const { return 0; }
 			};
 			
 			/**
 			 * @brief Implements \c BasePtr functionality for reading and/or
 			 * writing to a \c Save reference.
 			 * 
-			 * @note Both reading and writing is allowed at the same. Writing
-			 * is always performed at the end of the \c Save reference, while
-			 * reading is performed using an internal numerical pointer to
-			 * a position in the \c Save reference.
+			 * The distinction between a read-only and read-write \c FilePtr
+			 * is dependent on the \c Save object passed to the constructor
+			 * If const, this is marked as read-only, else read-write.
 			 */
 			class FilePtr : public BasePtr {
+				public:
+					enum Mode {
+						Read = 0x01,
+						Write = 0x02,
+						ReadWrite = Read|Write
+					};
+				
 				private:
-					Save &mSaveRef;
+					const Save &mSaveRef;
 					uint32_t mReadPtr;
+					Mode mMode;
 					
 					/**
 					 * Writes \c bytes to the \c Save reference from the
@@ -373,18 +380,20 @@ namespace Sim {
 					 * it in \c ptr.
 					 * 
 					 * @exception std::out_of_range If the \c bytes argument
-					 * is such that mReadPtr+bytes > file.size(), this
-					 * exception is thrown.
+					 * is such that mReadPtr+bytes > file.size()
 					 */
 					virtual void nanoRead(void *ptr, uint32_t bytes);
 					
 				public:
-					FilePtr(Save &saveObj) :
-						mSaveRef(saveObj), mReadPtr(0)
+					explicit FilePtr(Save &saveObj) :
+						mSaveRef(saveObj), mReadPtr(0), mMode(ReadWrite)
+					{}
+					explicit FilePtr(const Save &saveObj) :
+						mSaveRef(saveObj), mReadPtr(0), mMode(Read)
 					{}
 					
-					uint32_t getReadPos() { return mReadPtr; }
-					uint32_t getWritePos() { return mSaveRef.size(); }
+					uint32_t getReadPos() const { return mReadPtr; }
+					uint32_t getWritePos() const { return mSaveRef.size(); }
 					
 					bool eof() const
 					{ return mReadPtr >= mSaveRef.size(); }
@@ -417,10 +426,10 @@ namespace Sim {
 					SyncPtr() : mSize(0)
 						{}
 					
-					uint32_t checksum()
+					uint32_t checksum() const
 					{ return mCksum.checksum(); }
 					
-					uint32_t size()
+					uint32_t size() const
 					{ return mSize; }
 			};
 			

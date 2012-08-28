@@ -14,7 +14,7 @@ namespace exts {
 	 */
 	class ReplayManager {
 		public:
-			typedef std::list<ReplayNode*> ReplayList;
+			typedef std::list<const ReplayNode*> ReplayList;
 			
 			ReplayManager(ExtSim &esim);
 			~ReplayManager();

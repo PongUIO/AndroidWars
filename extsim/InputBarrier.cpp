@@ -129,7 +129,7 @@ namespace exts {
 		}
 	}
 	
-	void InputBarrier::load(Sim::Save& save)
+	void InputBarrier::load(const Sim::Save& save)
 	{
 		Sim::Save::FilePtr fp(save);
 		load(fp);

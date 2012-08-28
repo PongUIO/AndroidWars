@@ -49,7 +49,7 @@ namespace exts {
 				void save(Sim::Save::BasePtr &fp);
 				void load(Sim::Save::BasePtr &fp);
 				
-				void load(Sim::Save &save);
+				void load(const Sim::Save &save);
 			//@}
 			
 		private:
