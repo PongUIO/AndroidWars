@@ -21,12 +21,13 @@ namespace exts {
 			virtual TypeRule *clone()=0;
 			void load(const Nepeta::Node &node);
 			
+			virtual void registerInput(ParamList *param) const {}
 			virtual void makeInput(const ParamList *param) const=0;
 			virtual void buildTimelineData(const ParamList *param) const=0;
 			virtual Sim::IdType registerSimData(const std::string &name) const=0;
 			
 			bool checkConstrained(const ParamList *param) const;
-			ParamList *makeParam() const;
+			ParamList *makeParam(Sim::IdType agentId=Sim::NoId) const;
 			
 			const ParamList *getRefParam() const { return &mParam; }
 			const Sim::IdType getId() const { return mId; }
@@ -35,6 +36,7 @@ namespace exts {
 			
 		protected:
 			void registerParam(RuleParameter *param);
+			void allocateId(ParamList *param, Sim::IdType id) const;
 			void setId(Sim::IdType id);
 			
 			ExtSim &mExtSim;

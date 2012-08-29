@@ -19,11 +19,17 @@ namespace exts {
 			void startup() {}
 			void shutdown() { clearAgents(); }
 			
+			void save(Sim::Save::BasePtr& fp) const;
+			void load(Sim::Save::BasePtr& fp);
+			
 			/// @name Interface
 			//@{
 				void setupAgents(Sim::IdType count);
 				
 				Agent *getAgent(Sim::IdType id);
+				
+				void updateAllocAll();
+				void discardAllocAll();
 			//@}
 			
 		private:

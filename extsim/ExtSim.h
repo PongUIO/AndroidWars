@@ -36,13 +36,16 @@ namespace exts {
 	 */
 	class ExtSim : private Sim::CallGroup<ExtModule> {
 		public:
-			/// @name Initialization
+			/// @name Interface
 			//@{
 				ExtSim();
 				~ExtSim();
 				
 				void startup();
 				void shutdown();
+				
+				void save(Sim::Save &dst);
+				void load(const Sim::Save &saveData);
 				
 				void loadDataScript(const std::string &script)
 				{ mData.loadScript(script); }

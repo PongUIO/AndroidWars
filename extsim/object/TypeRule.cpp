@@ -17,11 +17,19 @@ namespace exts {
 	void TypeRule::registerParam(RuleParameter* param)
 	{ mParam.addParam(param); }
 	
+	void TypeRule::allocateId(ParamList* param, Sim::IdType id) const
+	{	param->allocateId(id);	}
+
+	
 	void TypeRule::setId(Sim::IdType id)
 	{ mId = id; mParam.setRefTypeRuleId(id); }
 	
-	ParamList* TypeRule::makeParam() const
-	{ return new ParamList(mParam); }
+	ParamList* TypeRule::makeParam(Sim::IdType agentId) const
+	{
+		ParamList *tmp = new ParamList(mParam);
+		tmp->setAgent(agentId);
+		return tmp;
+	}
 	
 	bool TypeRule::checkConstrained(const ParamList* param) const
 	{

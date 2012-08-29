@@ -46,12 +46,13 @@ namespace exts {
 				
 				void feedInput();
 				void commitReplay();
+				void postProcessInput();
 				void discardInput();
 				
-				void save(Sim::Save::BasePtr &fp) const;
-				void load(Sim::Save::BasePtr &fp);
+				void saveInput(Sim::Save::BasePtr &fp) const;
+				void loadInput(Sim::Save::BasePtr &fp);
 				
-				void load(const Sim::Save &save);
+				void loadInput(const Sim::Save &save);
 			//@}
 			
 		private:

@@ -31,8 +31,13 @@ namespace exts {
 			return false;
 		
 		bool isConstrained = param->isConstrained(mExtSim);
-		if(isConstrained)
+		if(isConstrained) {
+			const TypeRule *rule = mExtSim.getTypeRuleMgr()
+			.getRule(param->getTypeRuleId());
+			
+			rule->registerInput(param);
 			mInput.push_back(param);
+		}
 		
 		return isConstrained;
 	}
@@ -40,16 +45,21 @@ namespace exts {
 	/**
 	 * @brief Dispatches input to the simulation and optionally saves a replay.
 	 * 
-	 * This is a meta-function for the \c feedInput(), \c commitReplay(), and
-	 * \c discardInput() to simplify individual calls.
+	 * This is a meta-function for the \c feedInput(), \c commitReplay(),
+	 * \c postProcessInput(), and \c discardInput() to simplify individual
+	 * calls.
 	 */
 	void InputBarrier::dispatchInput(bool saveReplay)
 	{
 		// Feed input
 		feedInput();
 		
+		// Save the replay
 		if(saveReplay)
 			commitReplay();
+		
+		// Perform post-processing (updating input agents)
+		postProcessInput();
 		
 		// Throw away the spent input
 		discardInput();
@@ -73,12 +83,27 @@ namespace exts {
 	}
 	
 	/**
+	 * @brief Performs tasks for after input
+	 * 
+	 * This is needed because the replay must be committed before the input
+	 * agents are updated.
+	 */
+	void InputBarrier::postProcessInput()
+	{
+		// Update agent ID allocation
+		mExtSim.getAgent().updateAllocAll();
+	}
+	
+	/**
 	 * @brief Commits the current stored input to the \c ReplayManager
 	 * 
 	 * This assumes that the input buffer comes from this phase
 	 * (essentially, this is called "right after" \c feedInput()), and
 	 * that the simulation has loaded the input, or has processed through
 	 * the input.
+	 * 
+	 * @warning Always call this between a call to \c feedInput() and
+	 * \c postProcessInput(), otherwise weird things might happen.
 	 */
 	void InputBarrier::commitReplay()
 	{
@@ -105,16 +130,18 @@ namespace exts {
 		for(ParamListVec::iterator i=mInput.begin(); i!=mInput.end(); ++i)
 			delete *i;
 		mInput.clear();
+		
+		mExtSim.getAgent().discardAllocAll();
 	}
 	
-	void InputBarrier::save(Sim::Save::BasePtr& fp) const
+	void InputBarrier::saveInput(Sim::Save::BasePtr& fp) const
 	{
 		fp << uint32_t(mInput.size());
 		for(ParamListVec::const_iterator i=mInput.begin(); i!=mInput.end(); ++i)
 			mExtSim.getTypeRuleMgr().saveParamList(fp, *i);
 	}
 	
-	void InputBarrier::load(Sim::Save::BasePtr& fp)
+	void InputBarrier::loadInput(Sim::Save::BasePtr& fp)
 	{
 		uint32_t count;
 		fp >> count;
@@ -129,9 +156,9 @@ namespace exts {
 		}
 	}
 	
-	void InputBarrier::load(const Sim::Save& save)
+	void InputBarrier::loadInput(const Sim::Save& save)
 	{
 		Sim::Save::FilePtr fp(save);
-		load(fp);
+		loadInput(fp);
 	}
 }

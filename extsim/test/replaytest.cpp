@@ -39,6 +39,8 @@ void loadFiles()
 
 void setupWorld()
 {
+	extSim.getAgent().setupAgents(2);
+	
 	Sim::Player testSide;
 	testSide.mAllyGroup = 0;
 	sim.getState().getPlayerData().addPlayer(testSide);
@@ -70,16 +72,16 @@ void buildBotInput(uint32_t depth)
 			extSim.getReplay().gotoActive();
 			
 			exts::ParamList *paramList = extSim.getData().getProgramDb()
-				.getType("MoveTowards")->getRule()->makeParam();
+				.getType("MoveTowards")->getRule()->makeParam(0);
 			
 			double modVal = (i==0 ? 1.0 : -1.0);
 			Sim::Vector offPos = Sim::Vector(activeId,1+activeNode->getDepth()*modVal);
 			
-			paramList->getParamT<exts::PositionParam>(0)
-			->setVal(offPos);
+			paramList->getParamT<exts::PositionParam>(0)->setVal(offPos);
+			
 			extSim.getInput().registerInput(paramList);
 			extSim.getCpuInput().registerCpuInput(0,
-				sim.getState().getProgramFactory().getCurrentUniqueId(), 0);
+				paramList->getAllocId(0), 0);
 			
 			extSim.getInput().dispatchInput();
 			

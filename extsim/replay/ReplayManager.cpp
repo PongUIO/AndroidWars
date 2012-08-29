@@ -62,7 +62,7 @@ namespace exts {
 			return;
 		
 		// Load this simulation copy
-		sim.load(mostRecentSim->getData(ReplayNode::NtSimulation));
+		mExtSim.load(mostRecentSim->getData(ReplayNode::NtSimulation));
 		
 		// Start replaying to the correct phase and step
 		uint32_t totalStep = simCfg.phaseLength*phase + step;
@@ -116,7 +116,7 @@ namespace exts {
 		}
 		
 		// Load the input
-		mExtSim.getInput().load(curNode->getData(ReplayNode::NtInput));
+		mExtSim.getInput().loadInput(curNode->getData(ReplayNode::NtInput));
 		
 		// Discard the node
 		src.pop_front();
@@ -211,15 +211,16 @@ namespace exts {
 			
 			// Save the simulation
 			if(node->getDepth()%mPhaseSaveInterval == 0) {
-				node->getData(ReplayNode::NtSimulation) = 
-				mExtSim.getSim().save();
+				Sim::Save tmp;
+				mExtSim.save(tmp);
+				node->getData(ReplayNode::NtSimulation) = tmp;
 			}
 			
 			// Save the InputBarrier
 			Sim::Save &saveObj = node->getData(ReplayNode::NtInput);
 			saveObj.clear();
 			Sim::Save::FilePtr fp(saveObj);
-			mExtSim.getInput().save(fp);
+			mExtSim.getInput().saveInput(fp);
 		}
 	}
 }

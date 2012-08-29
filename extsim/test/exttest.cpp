@@ -198,6 +198,8 @@ void testParam()
 
 void setupWorld()
 {
+	extSim.getAgent().setupAgents(2);
+	
 	Sim::Player testSide;
 	testSide.mAllyGroup = 0;
 	sim.getState().getPlayerData().addPlayer(testSide);
@@ -218,14 +220,14 @@ void testSim()
 	// Create input object
 	exts::ParamList *inputParam = extSim.getData().getProgramDb().getType(
 		"MoveTowards"
-	)->getRule()->makeParam();
+	)->getRule()->makeParam(0);
 	
 	// Modify input object
 	inputParam->traverseCallback();
 	
 	// Register input
 	extSim.getInput().registerInput(inputParam);
-	extSim.getCpuInput().registerCpuInput(0,0,0);
+	extSim.getCpuInput().registerCpuInput(0,inputParam->getAllocId(0),0);
 	
 	// Dispatching input
 	extSim.getInput().dispatchInput();

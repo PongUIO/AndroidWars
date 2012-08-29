@@ -120,7 +120,12 @@ namespace Sim {
 	void Simulation::load(const Save& saveData)
 	{
 		Save::FilePtr fp = Save::FilePtr(saveData);
-		
+		load(fp);
+	}
+	
+	void Simulation::load(Save::BasePtr& fp)
+	{
 		mState.load(fp);
 	}
+
 }

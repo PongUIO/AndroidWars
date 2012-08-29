@@ -1,5 +1,3 @@
-#include <stdio.h>
-
 #include "MoveTowards.h"
 
 #include "../../ExtSim.h"
@@ -20,6 +18,16 @@ namespace exts { namespace prog {
 	{
 		return mExtSim.getSim().getData().getProgramDb().
 		registerImpl<Sim::Prog::MoveTowards>(name);
+	}
+	
+	void MoveTowards::registerInput(ParamList* param) const
+	{
+		Agent *agent = mExtSim.getAgent().getAgent(param->getAgent());
+		if(!agent)
+			return;
+		
+		Sim::IdType id = agent->allocateId();
+		allocateId(param, id);
 	}
 	
 	void MoveTowards::makeInput(const ParamList* param) const

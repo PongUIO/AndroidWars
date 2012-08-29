@@ -99,6 +99,7 @@ namespace Sim {
 				void load(const Save &saveData);
 				
 				void save(Save::BasePtr &fp);
+				void load(Save::BasePtr &fp);
 			//@}
 			
 		private:

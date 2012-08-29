@@ -2,9 +2,10 @@
 #define EXTSIM_AGENT_H
 
 #include "../../simulation/Common.h"
+#include "../../simulation/Save.h"
 
 namespace exts {
-	class Agent {
+	class Agent : private Sim::Save::OperatorImpl<Agent> {
 		public:
 			Agent(Sim::IdType id,
 			Sim::IdType startId=0, Sim::IdType endId=Sim::NoId) :
@@ -30,8 +31,13 @@ namespace exts {
 				
 				void updateAlloc()
 				{	mBaseId=mPeekId; }
-				void resetAlloc()
+				void discardAlloc()
 				{	mPeekId=mBaseId; }
+				
+				void save(Sim::Save::BasePtr &fp) const
+				{	fp << mBaseId << mPeekId << mMaxId; }
+				void load(Sim::Save::BasePtr &fp)
+				{	fp >> mBaseId >> mPeekId >> mMaxId; }
 			//@}
 			
 		private:

@@ -249,10 +249,9 @@ namespace Sim {
 						uint32_t count;
 						*this >> count;
 						
-						data.resize(count);
-						for(typename C::iterator i=data.begin();
-							i!=data.end(); i++) {
-							*this >> *i;
+						for(uint32_t i=0; i<count; ++i) {
+							data.resize(data.size()+1);
+							*this >> data.back();
 						}
 					}
 					

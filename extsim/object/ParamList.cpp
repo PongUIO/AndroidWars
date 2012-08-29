@@ -41,6 +41,8 @@ namespace exts {
 	 */
 	void ParamList::save(Sim::Save::BasePtr& fp) const
 	{
+		fp << mRefAgent;
+		
 		for(RuleParamVec::const_iterator i=mRuleParam.begin();
 		i!=mRuleParam.end(); ++i) {
 			fp << *(*i);
@@ -56,6 +58,8 @@ namespace exts {
 	 */
 	void ParamList::load(Sim::Save::BasePtr& fp)
 	{
+		fp >> mRefAgent;
+		
 		for(RuleParamVec::iterator i=mRuleParam.begin();
 		i!=mRuleParam.end(); ++i) {
 			fp >> *(*i);

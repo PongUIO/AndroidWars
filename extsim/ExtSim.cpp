@@ -41,6 +41,23 @@ namespace exts {
 		mSim.shutdown();
 	}
 	
+	void ExtSim::save(Sim::Save& dst)
+	{
+		Sim::Save::FilePtr fp(dst);
+		
+		getSim().save(fp);
+		call( boost::bind(&ExtModule::save, _1, boost::ref(fp)) );
+	}
+
+	void ExtSim::load(const Sim::Save& saveData)
+	{
+		Sim::Save::FilePtr fp(saveData);
+		
+		getSim().load(fp);
+		call( boost::bind(&ExtModule::load, _1, boost::ref(fp)) );
+	}
+
+	
 	void ExtSim::prepareSim()
 	{
 		mSim.prepareSim();
