@@ -2,6 +2,9 @@
 #define EXTSIM_TYPERULEMGR_H
 
 #include "../simulation/data/BaseData.h"
+#include "../simulation/Save.h"
+
+#include "ExtModule.h"
 
 namespace exts {
 	class ExtSim;
@@ -24,7 +27,7 @@ namespace exts {
 	 * 
 	 * Destruction of \c TypeRule objects are done by this manager.
 	 */
-	class TypeRuleMgr : private Sim::DataCtr<TypeRule> {
+	class TypeRuleMgr : public ExtModule, private Sim::DataCtr<TypeRule> {
 		public:
 			/// @name Initialization
 			//@{
@@ -39,6 +42,10 @@ namespace exts {
 			//@{
 				const TypeRule *getRule(Sim::IdType id) const;
 				Sim::IdType registerRule(TypeRule *rule);
+				
+				ParamList *loadParamList(Sim::Save::BasePtr &fp) const;
+				void saveParamList(Sim::Save::BasePtr &fp,
+					const ParamList *ref) const;
 			//@}
 			
 		private:

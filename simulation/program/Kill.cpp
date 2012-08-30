@@ -6,7 +6,7 @@
 
 namespace Sim {
 	namespace Prog {
-		Kill::Kill(Simulation* sim, uint32_t id, uint32_t typeId,
+		Kill::Kill(Simulation* sim, IdType id, IdType typeId,
 			const Config &cfg) :
 			Program(sim, id, typeId),
 			mTargetId(cfg.mTargetId)

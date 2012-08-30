@@ -3,6 +3,10 @@
 
 #include <vector>
 
+#include "../simulation/Save.h"
+
+#include "ExtModule.h"
+
 namespace exts {
 	class ExtSim;
 	class ParamList;
@@ -23,7 +27,7 @@ namespace exts {
 	 * \c ReplayManager, then each \c ParamList object calls its corresponding
 	 * \c TypeRule object to construct input in the \c Simulation.
 	 */
-	class InputBarrier {
+	class InputBarrier : public ExtModule {
 		public:
 			/// @name Initialization
 			//@{
@@ -38,8 +42,17 @@ namespace exts {
 			//@{
 				bool registerInput(ParamList *param);
 				
-				void dispatchInput();
+				void dispatchInput(bool saveReplay=true);
+				
+				void feedInput();
+				void commitReplay();
+				void postProcessInput();
 				void discardInput();
+				
+				void saveInput(Sim::Save::BasePtr &fp) const;
+				void loadInput(Sim::Save::BasePtr &fp);
+				
+				void loadInput(const Sim::Save &save);
 			//@}
 			
 		private:

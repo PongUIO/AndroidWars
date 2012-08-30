@@ -1,1 +1,2 @@
 _EXTS_X("Base/MoveTowards", MoveTowards)
+_EXTS_X("Base/Kill", Kill)

@@ -1,15 +1,15 @@
-#ifndef EXTSIM_MOVETOWARDS_H
-#define EXTSIM_MOVETOWARDS_H
+#ifndef EXTSIM_KILL_H
+#define EXTSIM_KILL_H
 
 #include "../../object/TypeRule.h"
 
 namespace exts { namespace prog {
-	class MoveTowards : public TypeRule {
+	class Kill : public TypeRule {
 		public:
-			MoveTowards(ExtSim& esim);
-			~MoveTowards();
+			Kill(ExtSim& esim);
+			~Kill();
 			
-			TypeRule* clone() { return new MoveTowards(*this); }
+			TypeRule* clone() { return new Kill(*this); }
 			
 			void registerInput(ParamList* param) const;
 			void makeInput(const ParamList* param) const;

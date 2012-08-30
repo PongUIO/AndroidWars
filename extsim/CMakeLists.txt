@@ -7,9 +7,13 @@ add_library(AWExtSim
 	CommonTemplate.cpp
 	CommonLoad.cpp
 	
-	#ExtProgramInput.cpp
+	simcontrol/ExtCpuInput.cpp
 	
-	input/ReplayTree.cpp
+	agent/AgentMgr.cpp
+	agent/Agent.cpp
+	
+	replay/ReplayTree.cpp
+	replay/ReplayManager.cpp
 	
 	param/Position.cpp
 	param/IdList.cpp
@@ -20,6 +24,8 @@ add_library(AWExtSim
 	object/ParamList.cpp
 	
 	typerule/program/MoveTowards.cpp
+	typerule/program/Kill.cpp
+	typerule/misc/CpuInput.cpp
 	
 	#typerule/bot/DefaultBot.cpp
 	
@@ -38,7 +44,10 @@ if(COMP_EXTSIM_TEST)
 	
 	if(Boost_FILESYSTEM_FOUND)
 		add_executable(../ExtSimTest test/exttest.cpp)
+		add_executable(../ExtReplayTest test/replaytest.cpp)
+		
 		target_link_libraries(../ExtSimTest ${ES_LIBS})
+		target_link_libraries(../ExtReplayTest ${ES_LIBS})
 	endif()
 	
 	add_executable(../ConvTest test/convtest.cpp)

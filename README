@@ -1,9 +1,5 @@
 license.txt envelops all code contributed by PongUIO (group).
 
-Everything within nepeta/* is taken from the nepeta project
-(see https://github.com/Thekian/nepeta for further details), and is
-licensed under LGPL.
-
 To compile you will need the following (on Debian-based distros: setupenvironment.sh):
 qmake
 make
@@ -13,11 +9,10 @@ boost (just get libboost-dev)
 libopenal-dev
 libalut-dev
 libvorbis-dev
-libassimp2-d-dev
 
 To compile and run:
 mkdir build
 cd build
 cmake ..
-make -j 2
+make -j 4
 ./qtgui

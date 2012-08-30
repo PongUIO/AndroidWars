@@ -122,7 +122,7 @@ protected:
 
 	// overridden
 	void initializeGL() {
-		Sim::World *wld = &(states->getSim()->getState().getWorld());
+		Sim::World *wld = &(states->getSim()->getSim().getState().getWorld());
 		glClearColor( 0.1, 0.1, 0.1, 0.0 );
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_DOUBLE);
@@ -234,17 +234,17 @@ protected:
 	// overridden
 	void paintGL() {
 		testShader->bind();
-		Sim::Simulation *sim = states->getSim();
+		exts::ExtSim *sim = states->getSim();
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClear(GL_DEPTH_BUFFER_BIT);
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
-		glFrustum(-1, 1, -1*cam->ratio, 1*cam->ratio, 1, 5.1+cam->zoom);
-		glTranslatef(cam->pos.x,cam->pos.y,-1-cam->zoom);
+		glFrustum(-1, 1, -1*cam->mRatio, 1*cam->mRatio, 1, 5.1+cam->mZoom);
+		glTranslatef(cam->mPos.x,cam->mPos.y,-1-cam->mZoom);
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
 
-		std::list<Sim::Bot*> bots = sim->getState().getBotFactory().getBotList();
+		std::list<Sim::Bot*> bots = sim->getSim().getState().getBotFactory().getBotList();
 		std::list<Sim::Bot*>::iterator bot;
 
 		glEnable(GL_BLEND);

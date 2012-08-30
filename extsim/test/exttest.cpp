@@ -198,6 +198,8 @@ void testParam()
 
 void setupWorld()
 {
+	extSim.getAgent().setupAgents(2);
+	
 	Sim::Player testSide;
 	testSide.mAllyGroup = 0;
 	sim.getState().getPlayerData().addPlayer(testSide);
@@ -206,7 +208,7 @@ void setupWorld()
 	botCfg.mSide = 0;
 	botCfg.mBody.mPos = Sim::Vector(0,0);
 	
-	sim.getInput().getBotInput().buildInputImpl<Sim::Bot>( botCfg, 0 );
+	sim.getState().getBotFactory().createImpl<Sim::Bot>(botCfg, 0,0);
 }
 
 void testSim()
@@ -218,19 +220,17 @@ void testSim()
 	// Create input object
 	exts::ParamList *inputParam = extSim.getData().getProgramDb().getType(
 		"MoveTowards"
-	)->getRule()->makeParam();
+	)->getRule()->makeParam(0);
 	
 	// Modify input object
 	inputParam->traverseCallback();
 	
 	// Register input
 	extSim.getInput().registerInput(inputParam);
+	extSim.getCpuInput().registerCpuInput(0,inputParam->getAllocId(0),0);
 	
 	// Dispatching input
 	extSim.getInput().dispatchInput();
-	
-	// (Temporary to bypass a lack of cpu input in extsim)
-	sim.getInput().getCpuInput().registerInput(0,0,0);
 	
 	// Running a single phase to assure things work
 	Sim::Vector pos = sim.getState().getBotFactory().getBot(0)->getBody().mPos;
@@ -239,7 +239,7 @@ void testSim()
 	sim.startPhase();
 	while(sim.hasPhaseStep())
 		sim.step();
-	sim.endPhase(true);
+	sim.endPhase();
 	
 	pos = sim.getState().getBotFactory().getBot(0)->getBody().mPos;
 	std::cout << "Bot position post: ("<<pos.x<<", "<<pos.y<<")\n";
@@ -305,10 +305,6 @@ the caller contacts the ReplayManager and switches the active branch and node
 
 int main(void)
 {
-	Sim::Configuration config;
-	config.phaseLength = 5;
-	config.stepTime = 0.01;
-	
 	// [bootstrap]
 	extSim.startup();
 	

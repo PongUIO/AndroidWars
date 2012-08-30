@@ -12,25 +12,58 @@ namespace exts {
 		
 		mData(*this),
 		mInput(*this),
-		mTypeRuleMgr(*this)
-	{}
-
+		mTypeRuleMgr(*this),
+		mReplay(*this),
+		mCpuInput(*this)
+	{
+		registerCallObj(&mData);
+		registerCallObj(&mInput);
+		registerCallObj(&mTypeRuleMgr);
+		registerCallObj(&mReplay);
+		registerCallObj(&mAgent);
+		registerCallObj(&mCpuInput);
+	}
+	
 	ExtSim::~ExtSim()
 	{}
 	
 	void ExtSim::startup()
 	{
 		mSim.startup();
+		
+		call( boost::bind(&ExtModule::startup, _1) );
 	}
 	
 	void ExtSim::shutdown()
 	{
+		rcall( boost::bind(&ExtModule::shutdown, _1) );
+		
 		mSim.shutdown();
 	}
+	
+	void ExtSim::save(Sim::Save& dst)
+	{
+		Sim::Save::FilePtr fp(dst);
+		
+		getSim().save(fp);
+		call( boost::bind(&ExtModule::save, _1, boost::ref(fp)) );
+	}
+
+	void ExtSim::load(const Sim::Save& saveData)
+	{
+		Sim::Save::FilePtr fp(saveData);
+		
+		getSim().load(fp);
+		call( boost::bind(&ExtModule::load, _1, boost::ref(fp)) );
+	}
+
 	
 	void ExtSim::prepareSim()
 	{
 		mSim.prepareSim();
+		
+		// Initial commit
+		getReplay().commit();
 	}
 	
 	/**

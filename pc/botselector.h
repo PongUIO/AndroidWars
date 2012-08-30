@@ -5,9 +5,9 @@
 class BotSelector : public QLabel {
 	Q_OBJECT
 public:
-	uint botId;
-	ClientStates *states;
-	BotSelector(uint botId, ClientStates *states, QWidget *parent = 0);
+	uint mBotId;
+	ClientStates *mStates;
+	BotSelector(uint mBotId, ClientStates *mStates, QWidget *parent = 0);
 private:
 	// overridden
 	void mousePressEvent(QMouseEvent *ev);

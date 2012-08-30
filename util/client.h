@@ -4,107 +4,106 @@
 #include<boost/unordered_set.hpp>
 #include "cursordefines.h"
 #include "Simulation.h"
+#include "../extsim/ExtSim.h"
+#include "../extsim/typerule/program/MoveTowards.h"
+#include "../extsim/param/Position.h"
 
 class ClientStates {
 private:
-	boost::unordered_set<uint> selBots;
-	Sim::Simulation *sim;
-	bool shift, ctrl, menu, gameStepping;
-	int offset;
+	boost::unordered_set<uint> mSelBots;
+	exts::ExtSim *mSim;
+	bool mShift, mCtrl, mMenu, mGameStepping;
+	int mOffset;
 public:
 	ClientStates() {
-		offset = 0;
-		shift = ctrl = gameStepping = false;
-		menu = true;
-		sim = NULL;
+		mOffset = 0;
+		mShift = mCtrl = mGameStepping = false;
+		mMenu = true;
+		mSim = NULL;
 	}
 
-	Sim::Simulation* getSim() {
-		return sim;
+	exts::ExtSim* getSim() {
+		return mSim;
 	}
 
 	void setOffset(int i) {
-		offset = i;
+		mOffset = i;
 	}
 
-	void setSim(Sim::Simulation *in) {
-		shift = ctrl = menu = false;
-		sim = in;
-		selBots.clear();
+	void setExtSim(exts::ExtSim *in) {
+		mShift = mCtrl = mMenu = false;
+		mSim = in;
+		mSelBots.clear();
 	}
 	void releaseMods() {
-		shift = false;
-		ctrl = false;
+		mShift = false;
+		mCtrl = false;
 	}
 	void setShift(bool state) {
-		shift = state;
+		mShift = state;
 	}
 
 	void setCtrl(bool state) {
-		ctrl = state;
+		mCtrl = state;
 	}
 	void setMenu(bool state) {
-		menu = state;
+		mMenu = state;
 	}
 	void setRunning(bool state) {
-		gameStepping = state;
+		mGameStepping = state;
 	}
 	bool getRunning() {
-		return gameStepping;
+		return mGameStepping;
 	}
 	bool menuOpen() {
-		return menu;
+		return mMenu;
 	}
 
 	bool isSelected(uint b) {
-		return selBots.find(b) != selBots.end();
+		return mSelBots.find(b) != mSelBots.end();
 	}
 
 	int getSelSize() {
-		return selBots.size();
+		return mSelBots.size();
 	}
 
 	void select(uint i) {
-		if (!shift) {
-			selBots.clear();
+		if (!mShift) {
+			mSelBots.clear();
 		}
-		selBots.insert(i);
+		mSelBots.insert(i);
 	}
 
 	int registerClick(double x, double y, int button) {
-		if (sim == NULL || gameStepping) {
+		if (mSim == NULL || mGameStepping) {
 			return 1;
 		}
-		std::list<Sim::Bot*> bots = sim->getState().getBotFactory().getBotList();
+		std::list<Sim::Bot*> bots = mSim->getSim().getState().getBotFactory().getBotList();
 		std::list<Sim::Bot*>::iterator bot;
 		if (button) {
-			if (!shift) {
-				selBots.clear();
+			if (!mShift) {
+				mSelBots.clear();
 			}
 			for (bot = bots.begin(); bot != bots.end(); bot++) {
 				Sim::Vector pos = (*bot)->getBody().mPos;
 				Sim::Vector col = (*bot)->getTypePtr()->getCollision()->getBboxHigh();
 				if ( pos.x < x && x < pos.x + col.x && pos.y < y && y < pos.y + col.y) {
-					selBots.insert((*bot)->getId());
+					mSelBots.insert((*bot)->getId());
 					return 1;
 				}
 			}
 		} else if (button == 0) {
 			for (bot = bots.begin(); bot != bots.end(); bot++) {
 				if (isSelected((*bot)->getId())) {
-					//sim->gotoPresent();
-					//sim->getReplayManager().loadCurPhaseInput();
-					Sim::Input &inMgr = sim->getInput();
-					Sim::ProgramFactory &progFact = sim->getState().getProgramFactory();
+					mSim->getReplay().gotoActive();
+					exts::ParamList *paramList = mSim->getData().getProgramDb()
+						.getType("MoveTowards")->getRule()->makeParam(0);
+					paramList->getParamT<exts::PositionParam>(0)->setVal(Sim::Vector(x, y));
 
-					using namespace Sim::Prog;
-					MoveTowards *move = inMgr.getProgramInput().buildInputImplStr<MoveTowards>(
-						    MoveTowards::Config(MoveTowards::DtPosition, Sim::Vector(x, y)), "MoveTowards"
-						    );
-					//Kill *kill = inMgr.getProgramInput().buildInputImpl<Kill>(
-					//Kill::Config(move->getId()));
-					inMgr.getCpuInput().registerInput((*bot)->getId(), move->getId(), offset);
-					//inMgr.getCpuInput().registerInput((*bot)->getId(), kill->getId(), 20);
+
+					mSim->getInput().registerInput(paramList);
+					mSim->getCpuInput().registerCpuInput((*bot)->getId(), paramList->getAllocId(0), 0);
+
 				}
 			}
 			return 1;

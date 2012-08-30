@@ -9,11 +9,11 @@
 class GameButton : public QLabel {
 	Q_OBJECT        // must include this if you use Qt signals/slots
 public:
-	int func;
-	Sim::Simulation *sim;
-	GameSlider *gs;
-	ClientStates *cs;
-	GameButton(Sim::Simulation *sim, ClientStates *states, int func, GameSlider *gs, QWidget *parent = 0);
+	int mFunc;
+	exts::ExtSim *mExtSim;
+	GameSlider *mGs;
+	ClientStates *mCs;
+	GameButton(exts::ExtSim *mExtSim, ClientStates *states, int mFunc, GameSlider *mGs, QWidget *parent = 0);
 private:
 	// overridden
 	void mousePressEvent(QMouseEvent *ev);

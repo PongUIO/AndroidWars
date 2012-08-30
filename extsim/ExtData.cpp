@@ -35,7 +35,10 @@ namespace exts {
 	}
 	
 	ExtData::~ExtData()
-	{}
+	{
+		if(mActiveListener)
+			delete mActiveListener;
+	}
 	
 	/**
 	 * @brief Loads a script string.

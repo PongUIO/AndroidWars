@@ -10,7 +10,6 @@ namespace Sim {
 	
 	Simulation::Simulation() :
 		mState(this),
-		mInput(this),
 		mData(this)
 		{}
 	
@@ -20,14 +19,12 @@ namespace Sim {
 	void Simulation::startup()
 	{
 		mData.startup();
-		mInput.startup();
 		clear();
 	}
 	
 	void Simulation::shutdown()
 	{
 		mState.shutdown();
-		mInput.shutdown();
 		mData.shutdown();
 	}
 	
@@ -45,8 +42,6 @@ namespace Sim {
 	
 	void Simulation::prepareSim()
 	{
-		mInput.finalizeInput();
-		mInput.dispatchInput();
 	}
 	
 	/**
@@ -54,9 +49,6 @@ namespace Sim {
 	 */
 	void Simulation::startPhase()
 	{
-		mInput.finalizeInput();
-		mInput.dispatchInput();
-		
 		mState.startPhase();
 	}
 	
@@ -71,7 +63,7 @@ namespace Sim {
 	 * 
 	 * @param finalize See \c ReplayManager::endPhase().
 	 */
-	void Simulation::endPhase(bool finalize)
+	void Simulation::endPhase()
 	{
 		mState.endPhase();
 	}
@@ -117,10 +109,15 @@ namespace Sim {
 	 * 
 	 * \param saveData The savestate to load from.
 	 */
-	void Simulation::load(Save& saveData)
+	void Simulation::load(const Save& saveData)
 	{
 		Save::FilePtr fp = Save::FilePtr(saveData);
-		
+		load(fp);
+	}
+	
+	void Simulation::load(Save::BasePtr& fp)
+	{
 		mState.load(fp);
 	}
+
 }

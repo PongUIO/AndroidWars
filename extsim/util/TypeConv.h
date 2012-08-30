@@ -5,12 +5,21 @@
 #include <boost/algorithm/string.hpp>
 #include <string>
 #include <vector>
+#include <stdio.h>
 
 #include "../../simulation/Vector.h"
 
 namespace exts {
-	template<class T>
-	T badCastStrategy(const std::string &str, T def) { return def; }
+	namespace BadCastType {
+		struct BctInteger {};
+		struct BctFloat {};
+		struct BctOther {};
+	}
+	
+	template<class T, class V>
+	struct BadCast {
+		static T strategy(const std::string &str, T def) { return def; }
+	};
 	
 	/**
 	 * @brief Converts a string into a value of a specific type
@@ -24,7 +33,15 @@ namespace exts {
 		
 		try { val = boost::lexical_cast<T>(str); }
 		catch(boost::bad_lexical_cast &)
-		{ val=badCastStrategy<T>(str,def); }
+		{
+			if(boost::is_integral<T>::value == boost::true_type::value &&
+			boost::is_same<T,bool>::value == boost::false_type::value)
+				val=BadCast<T,BadCastType::BctInteger>::strategy(str,def);
+			else if(boost::is_float<T>::value == boost::true_type::value)
+				val=BadCast<T,BadCastType::BctFloat>::strategy(str,def);
+			else
+				val=BadCast<T,BadCastType::BctOther>::strategy(str,def);
+		}
 		
 		return val;
 	}
@@ -57,7 +74,6 @@ namespace exts {
 		return val;
 	}
 	
-#include <stdio.h>
 	template<>
 	inline Sim::Vector convValue<Sim::Vector>(const std::string &str,
 	Sim::Vector def) {
@@ -67,34 +83,48 @@ namespace exts {
 		
 		Sim::Vector val = def;
 		if(sep.size() == 2) {
-			printf("convValue<Sim::Vector>('%s', '%s')\n", sep[0].c_str(), sep[1].c_str());
 			val.x = convValue<double>(sep[0],def.x);
 			val.y = convValue<double>(sep[1],def.y);
-			printf("convValue<Sim::Vector>('%g', '%g')\n", val.x, val.y);
 		}
 		
 		return val;
 	}
 	
 	template<>
-	inline bool badCastStrategy<bool>(const std::string &str, bool def)
-	{
-		if(str=="false")
-			return false;
-		else if(str=="true")
-			return true;
-		else return def;
-	}
+	struct BadCast<bool,BadCastType::BctOther> {
+		static bool strategy(const std::string &str, bool def)
+		{
+			if(str=="false")
+				return false;
+			else if(str=="true")
+				return true;
+			else return def;
+		}
+	};
 	
-	template<>
-	inline double badCastStrategy<double>(const std::string &str, double def)
-	{
-		if(str=="inf")
-			return std::numeric_limits<double>::infinity();
-		else if(str=="-inf")
-			return -std::numeric_limits<double>::infinity();
-		else return def;
-	}
+	template<class T>
+	struct BadCast<T,BadCastType::BctFloat> {
+		static T strategy(const std::string &str, T def)
+		{
+			if(str=="inf")
+				return std::numeric_limits<T>::infinity();
+			else if(str=="-inf")
+				return -std::numeric_limits<T>::infinity();
+			else return def;
+		}
+	};
+	
+	template<class T>
+	struct BadCast<T,BadCastType::BctInteger> {
+		static T strategy(const std::string &str, T def)
+		{
+			if(str=="max")
+				return std::numeric_limits<T>::max();
+			else if(str=="min")
+				return std::numeric_limits<T>::min();
+			else return def;
+		}
+	};
 }
 
 #endif

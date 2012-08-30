@@ -13,20 +13,19 @@
 
 class GameController {
 public:
-	QWidget *parent;
-	GameDrawer *drawer;
-	QTimer *camTimer, *timer;
-	QHBoxLayout *lower, *upper;
-	QVBoxLayout *iconHolder;
-	QSpacerItem *space;
-	QPixmap profiles[1];
-	QPixmap m;
-	ClientStates *states;
+	QWidget *mParent;
+	GameDrawer *mDrawer;
+	QTimer *mCamTimer, *mTimer;
+	QHBoxLayout *mLower, *mUpper;
+	QVBoxLayout *mIconHolder;
+	QSpacerItem *mSpace;
+	QPixmap mProfiles[1];
+	ClientStates *mStates;
 
 	//buttons
-	GameButton *label, *label2;
-	GameSlider *slider;
-	GameController(ClientStates *states, QWidget *parent = 0);
+	GameButton *mLabel1, *mLabel2;
+	GameSlider *mSlider;
+	GameController(ClientStates *mStates, QWidget *mParent = 0);
 	void showAll();
 	void hideAll();
 	void updateGUI();

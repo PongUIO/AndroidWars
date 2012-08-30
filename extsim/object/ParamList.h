@@ -69,6 +69,7 @@ namespace exts {
 			
 			virtual RuleParameter *clone()=0;
 			virtual void callback()=0;
+			virtual void clearListener()=0;
 			
 			virtual void readNode(
 				const Nepeta::Node &param,
@@ -101,9 +102,10 @@ namespace exts {
 	class ParamList : public Sim::Save::OperatorImpl<ParamList> {
 		public:
 			typedef std::vector<RuleParameter*> RuleParamVec;
+			typedef std::vector<Sim::IdType> IdVec;
 			
 			ParamList(Sim::IdType refTypeRule=Sim::NoId)
-				: mRefTypeRuleId(refTypeRule) {}
+				: mRefTypeRuleId(refTypeRule), mRefAgent(Sim::NoId) {}
 			~ParamList() { clearRuleParam(); }
 			ParamList(const ParamList &other);
 			
@@ -124,8 +126,15 @@ namespace exts {
 			Sim::IdType getTypeRuleId() const { return mRefTypeRuleId; }
 			size_t size() const { return mRuleParam.size(); }
 			
+			Sim::IdType getAgent() const { return mRefAgent; }
+			void setAgent(Sim::IdType id) { mRefAgent = id; }
+			
+			Sim::IdType getAllocId(size_t i) const
+			{	return i<mAllocId.size() ? mAllocId[i] : Sim::NoId; }
+			
 			bool isConstrained(ExtSim &ref) const;
 			void traverseCallback();
+			void clearListeners() const;
 			
 			void save(Sim::Save::BasePtr &fp) const;
 			void load(Sim::Save::BasePtr &fp);
@@ -136,11 +145,16 @@ namespace exts {
 			void addParam(RuleParameter *param)
 			{ mRuleParam.push_back(param); }
 			
+			void allocateId(Sim::IdType id)
+			{ mAllocId.push_back(id);}
+			
 			void setRefTypeRuleId(Sim::IdType id)
 			{ mRefTypeRuleId = id; }
 			
 			RuleParamVec mRuleParam;
+			IdVec mAllocId;
 			Sim::IdType mRefTypeRuleId;
+			Sim::IdType mRefAgent;
 			
 			friend class TypeRule;
 	};

@@ -132,6 +132,14 @@
 	Description {
 		Allows a bot to move towards a target position.
 	}
+	
+	#PARAM
+		Duration 10
+	#
+	
+	#CONSTRAINT
+		Duration min>max
+	#
 #
 
 #PROGRAM

@@ -33,16 +33,37 @@ namespace exts {
 		mRuleParam.clear();
 	}
 	
+	/**
+	 * @brief Saves a parameter list
+	 * 
+	 * @warning The \c ParamList is associated with a specific \c TypeRule
+	 * object, therefore the list is stored without metadata.
+	 */
 	void ParamList::save(Sim::Save::BasePtr& fp) const
 	{
-		throw std::runtime_error("Undefined");
-		//fp << mRuleParam;
+		fp << mRefAgent;
+		
+		for(RuleParamVec::const_iterator i=mRuleParam.begin();
+		i!=mRuleParam.end(); ++i) {
+			fp << *(*i);
+		}
 	}
-
+	
+	/**
+	 * @brief Loads a parameter list
+	 * 
+	 * @warning The \c ParamList is associated to a specific \c TypeRule object.
+	 * The \c ParamList assumes it is already pre-associated and all its
+	 * variables are constructed.
+	 */
 	void ParamList::load(Sim::Save::BasePtr& fp)
 	{
-		throw std::runtime_error("Undefined");
-		//fp >> mRuleParam;
+		fp >> mRefAgent;
+		
+		for(RuleParamVec::iterator i=mRuleParam.begin();
+		i!=mRuleParam.end(); ++i) {
+			fp >> *(*i);
+		}
 	}
 	
 	bool ParamList::isConstrained(ExtSim &ref) const
@@ -59,6 +80,14 @@ namespace exts {
 		for(RuleParamVec::iterator i=mRuleParam.begin();
 		i!=mRuleParam.end(); ++i) {
 			(*i)->callback();
+		}
+	}
+	
+	void ParamList::clearListeners() const
+	{
+		for(RuleParamVec::const_iterator i=mRuleParam.begin();
+		i!=mRuleParam.end(); ++i) {
+			(*i)->clearListener();
 		}
 	}
 }

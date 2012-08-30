@@ -1,42 +1,43 @@
 #include "gameslider.h"
 
-GameSlider::GameSlider(Sim::Simulation *sim, ClientStates *cs, QWidget *parent) : QSlider(Qt::Horizontal,parent), cs(cs), sim(sim) {
-	replay = true;
-	qle = new QLineEdit(parent);
+GameSlider::GameSlider(exts::ExtSim *sim, ClientStates *cs, QWidget *parent) : QSlider(Qt::Horizontal,parent), mCs(cs), mExtSim(sim) {
+	mReplay = true;
+	mQle = new QLineEdit(parent);
 	setRange(0, 100);
 	resize(250, height());
-	qle->move(width(),0);
-	qle->hide();
+	mQle->move(width(),0);
+	mQle->hide();
 	setAutoFillBackground(true);
-	connect(qle, SIGNAL(textEdited(QString)), this, SLOT(qleChange(QString)));
+	connect(mQle, SIGNAL(textEdited(QString)), this, SLOT(qleChange(QString)));
 
 }
 void GameSlider::sliderChange(SliderChange sc) {
 
 	if (sc == QAbstractSlider::SliderValueChange) {
 		QString str = "%1";
-		qle->setText(str.arg(value()));
-		cs->setOffset(value());
+		mQle->setText(str.arg(value()));
+		mCs->setOffset(value());
 		update();
 		updatePhase();
 	}
 }
 void GameSlider::showEvent(QShowEvent *event) {
-	qle->show();
+	mQle->show();
 }
 void GameSlider::hideEvent(QHideEvent *event) {
-	qle->hide();
+	mQle->hide();
 }
 void GameSlider::updatePhase() {
-	/*sim->gotoPresent();
+	mExtSim->getReplay().gotoActive();
 	if (value() != 0) {
-		if (replay) {
-			int tmp = value() + sim->getCurPhase()*sim->getConfiguration().phaseLength;
-			sim->getReplayManager().rewind(tmp/sim->getConfiguration().phaseLength, tmp%sim->getConfiguration().phaseLength);
+		Sim::Simulation &sim = mExtSim->getSim();
+		if (mReplay) {
+			int tmp = value() + sim.getCurPhase()*sim.getConfiguration().phaseLength;
+			mExtSim->getReplay().replay(tmp/sim.getConfiguration().phaseLength, tmp%sim.getConfiguration().phaseLength);
 		} else {
-			sim->getReplayManager().rewind(((double)value()*sim->getConfiguration().stepTime+sim->getCurTime()));
+			mExtSim->getReplay().replay(((double)value()*sim.getConfiguration().stepTime+sim.getCurTime()));
 		}
-	}*/
+	}
 }
 void GameSlider::qleChange(const QString text) {
 	setValue(text.toInt());
