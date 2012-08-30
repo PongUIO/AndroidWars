@@ -17,6 +17,8 @@
 #include "datatype/ExtGame.h"
 #include "datatype/ExtMap.h"
 
+#include "ExtModule.h"
+
 namespace exts {
 #define _EXTS_X_EXTDATA_COMPONENTS \
 	_EXTS_X(ExtArmorData, Armor) \
@@ -35,19 +37,22 @@ namespace exts {
 	 * 
 	 * Scripts are assumed to be in the Nepeta language.
 	 */
-	class ExtData {
+	class ExtData : public ExtModule {
 		public:
 			/// @name Initialization
 			//@{
 				ExtData(ExtSim &esim);
 				~ExtData();
 				
-				void startup();
-				void shutdown();
+				void startup() {}
+				void shutdown() {}
 			//@}
 			
 			/// @name Interface
 			//@{
+				void save(Sim::Save::BasePtr& fp) const {}
+				void load(Sim::Save::BasePtr& fp) {}
+				
 				void loadScript(const std::string &data);
 				
 				void postProcess();

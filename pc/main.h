@@ -19,10 +19,10 @@ public slots:
 		switch(type) {
 		case GAME:
 			setState(GAME);
-			subMenu = RESUME;
+			mSubMenu = RESUME;
 			break;
 		case MENU:
-			changeToSubMenu(value);
+			changeToSubmenu(value);
 			break;
 		case EXIT:
 			QApplication::quit();
@@ -32,67 +32,69 @@ public slots:
 		}
 	}
 	void gameStep() {
-		if (!states->getRunning()) {
+		if (!mStates->getRunning()) {
 			return;
-		} else if ( sim.hasPhaseStep() ) {
-			sim.step();
+		} else if ( mExtSim.getSim().hasPhaseStep() ) {
+			mExtSim.getSim().step();
 		} else {
-			sim.endPhase(false);
-			states->setRunning(false);
+			mExtSim.getSim().endPhase();
+			mExtSim.getInput().commitReplay();
+			mExtSim.getInput().postProcessInput();
+			mExtSim.getInput().discardInput();
+			mStates->setRunning(false);
 		}
 	}
 public:
-	QPalette *p;
-	bool fullScreen, gameRunning;
-	State dispState;
-	int subMenu;
-	ClientStates *states;
-	GameController *gc;
-	exts::ExtSim eSim;
-	Sim::Simulation &sim;
-	QSize size;
-	std::vector< std::vector<QWidget*> > menus;
-	QTimer *gameTimer;
-	double lastUpdate;
-	QSettings *settings;
-	MainWidget (QWidget *parent = 0) : QWidget(parent), sim(eSim.getSim()) {
-		settings = new QSettings("PongUIO", "AndroidWars");
-		dispState = MENU;
-		subMenu = MAIN;
-		//grabKeyboard();
-		states = new ClientStates();
+	QPalette *mPal;
+	bool mFullScreen, mGameRunning;
+	State mDispState;
+	int mSubMenu;
+	ClientStates *mStates;
+	GameController *mGamecont;
+	exts::ExtSim mExtSim;
+	QSize mCurrentSize;
+	std::vector< std::vector<QWidget*> > mMenus;
+	QTimer *mGameTimer;
+	double mLastUpdate;
+	QSettings *mSettings;
+	MainWidget (QWidget *parent = 0) : QWidget(parent) {
+		mSettings = new QSettings("PongUIO", "AndroidWars");
+		mDispState = MENU;
+		mSubMenu = MAIN;
+		mStates = new ClientStates();
 		loadFiles("../testmod/data/");
 		initSim();
-		fullScreen = false;
-		p = new QPalette( this->palette() );
-		p->setColor( QPalette::Background, Qt::black );
-		setPalette( *p );
-		gameRunning = false;
-		gc = new GameController(states, this);
-		gc->hideAll();
-		registerForResize(gc->drawer);
+		mFullScreen = false;
+		mPal = new QPalette( this->palette() );
+		mPal->setColor( QPalette::Background, Qt::black );
+		setPalette( *mPal );
+		mGameRunning = false;
+		mGamecont = new GameController(mStates, this);
+		mGamecont->hideAll();
+		registerForResize(mGamecont->mDrawer);
 		resize(700,700);
 		initMenus();
-		gameTimer = new QTimer(this);
-		connect(gameTimer, SIGNAL(timeout()), this, SLOT(gameStep()));
+		mGameTimer = new QTimer(this);
+		connect(mGameTimer, SIGNAL(timeout()), this, SLOT(gameStep()));
 		resetTimer();
 	}
 	void loadFiles(QString path) {
 		QDir dir(path);
 		QStringList filters;
-		filters << "*.da";
+		filters << "*.nep";
 		QStringList files = dir.entryList(filters);
 		for (QStringList::Iterator iter = files.begin(); iter != files.end(); ++iter) {
 			QFile f(path + *iter);
 			f.open(QFile::QIODevice::ReadOnly);
-			eSim.loadDataScript(std::string(f.readAll()));
+			mExtSim.loadDataScript(std::string(f.readAll()));
+			f.close();
 		}
-		eSim.postProcessData();
+		mExtSim.postProcessData();
 
 	}
 	void resetTimer() {
-		gameTimer->stop();
-		gameTimer->start(sim.getConfiguration().stepTime*1000);
+		mGameTimer->stop();
+		mGameTimer->start(mExtSim.getSim().getConfiguration().stepTime*1000);
 	}
 	void registerForResize(QWidget *target) {
 		res.push_back(target);
@@ -105,16 +107,16 @@ public:
 		}
 	}
 	void setStates(ClientStates *nS) {
-		states = nS;
-		states->releaseMods();
+		mStates = nS;
+		mStates->releaseMods();
 
 	}
-	void changeToSubMenu(int value) {
-		subMenu = value;
+	void changeToSubmenu(int value) {
+		mSubMenu = value;
 		showMenus();
 	}
 	void toggleMenu() {
-		switch (dispState) {
+		switch (mDispState) {
 		case GAME:
 			setState(MENU);
 			break;
@@ -124,41 +126,41 @@ public:
 		}
 	}
 	void setState(State s) {
-		dispState = s;
+		mDispState = s;
 		switch (s) {
 		case MENU:
-			gc->hideAll();
+			mGamecont->hideAll();
 			showMenus();
 			break;
 		case GAME:
-			gc->showAll();
+			mGamecont->showAll();
 			hideMenus();
 			break;
 		}
 	}
 	void hideMenus() {
-		states->setMenu(false);
-		for (int i = 0; i < menus.size(); i++) {
-			for (int j = 0; j < menus[i].size(); j++) {
-				menus[i][j]->hide();
+		mStates->setMenu(false);
+		for (int i = 0; i < mMenus.size(); i++) {
+			for (int j = 0; j < mMenus[i].size(); j++) {
+				mMenus[i][j]->hide();
 			}
 		}
 	}
 	void showMenus() {
 		hideMenus();
-		states->setMenu(true);
-		if (subMenu < 0 || menus.size() < subMenu) {
+		mStates->setMenu(true);
+		if (mSubMenu < 0 || mMenus.size() < mSubMenu) {
 			qDebug() << "Submenu-index out of range!!!";
 		} else {
-			for (int j = 0; j < menus[subMenu].size(); j++) {
-				menus[subMenu][j]->show();
+			for (int j = 0; j < mMenus[mSubMenu].size(); j++) {
+				mMenus[mSubMenu][j]->show();
 			}
 		}
 	}
 	void addMenusToWidget() {
-		for (int i = 0; i < menus.size(); i++) {
-			for (int j = 0; j < menus[i].size(); j++) {
-				layout()->addWidget(menus[i][j]);
+		for (int i = 0; i < mMenus.size(); i++) {
+			for (int j = 0; j < mMenus[i].size(); j++) {
+				layout()->addWidget(mMenus[i][j]);
 			}
 		}
 	}
@@ -184,11 +186,11 @@ public:
 	}
 
 	void addMenuPage() {
-		menus.push_back(std::vector<QWidget*>());
+		mMenus.push_back(std::vector<QWidget*>());
 	}
 
 	void addMenuButton(QWidget *in) {
-		menus[menus.size()-1].push_back(in);
+		mMenus[mMenus.size()-1].push_back(in);
 	}
 
 	MenuButton *createButton(State type, int signal, QString text) {
@@ -203,60 +205,46 @@ public:
 	void fixRes() {
 		for (int i = 0; i < res.size(); i++) {
 #ifdef _WIN32
-			res[i]->resize(size.width(), size.height()-1);
+			// This hack is needed because of glitchy supprt in Windows. It causes the OpenGL-window to disappear if it covers the entire viewable surface.
+			res[i]->resize(CurrentSize.width(), CurrentSize.height()-1);
 #else
-			res[i]->resize(size);
+			res[i]->resize(mCurrentSize);
 #endif
 		}
 	}
 	void initSim() {
-		Sim::Configuration &config = sim.getConfiguration();
+		Sim::Configuration &config = mExtSim.getSim().getConfiguration();
 
 		config.phaseLength = 10;
 		config.stepTime = 0.01;
-		sim.startup();
+		mExtSim.startup();
 
-		//sim.getData().getProgramDb().registerAllDefault();
-
+		//ExSim.getSim().getData().getProgramDb().registerAllDefault();
+		mExtSim.getAgent().setupAgents(3);
 		Sim::Player testSide;
-		sim.getState().getPlayerData().addPlayer(testSide);
+		mExtSim.getSim().getState().getPlayerData().addPlayer(testSide);
 
-		//sim.getData().getBotDb().addBot(myBot, cpts);
+		//ExSim.getSim().getData().getBotDb().addBot(myBot, cpts);
 		// Create a test bot
 		Sim::Bot::Config botCfg;
 		botCfg.mSide = 0;
 		//botCfg.mType = 0;
 		botCfg.mBody.mPos = Sim::Vector(0,0);
-		int botId = sim.getInput().getBotInput().buildInputImpl<Sim::Bot>(botCfg, 0)->getId();
+		mExtSim.getSim().getState().getBotFactory().createImpl<Sim::Bot>(botCfg, 0, 0);
 		Sim::Bot::Config botCfg2;
 		botCfg2.mSide = 0;
 		//botCfg2.mType = 0;
 		botCfg2.mBody.mPos = Sim::Vector(0,1);
-		sim.getInput().getBotInput().buildInputImpl<Sim::Bot>(botCfg2, 0);
+		mExtSim.getSim().getState().getBotFactory().createImpl<Sim::Bot>(botCfg2, 0, 1);
 		Sim::Bot::Config botCfg3;
 		botCfg3.mSide = 0;
 		//botCfg3.mType = 0;
 		botCfg3.mBody.mPos = Sim::Vector(0,2);
-		sim.getInput().getBotInput().buildInputImpl<Sim::Bot>(botCfg3, 0);
+		mExtSim.getSim().getState().getBotFactory().createImpl<Sim::Bot>(botCfg3, 0, 2);
 
 
-		// Send some input to this bot
-		{
-			Sim::Input &inMgr = sim.getInput();
-			Sim::ProgramFactory &progFact = sim.getState().getProgramFactory();
 
-			using namespace Sim::Prog;
-			Sim::IdType moveId = inMgr.getProgramInput().buildInputImplStr<MoveTowards>(
-						MoveTowards::Config(MoveTowards::DtPosition, Sim::Vector(10,0)), "MoveTowards")->
-					getId();
-
-			//Kill *kill = inMgr.getProgramInput().buildInputImpl<Kill>(
-			//			Kill::Config(moveId));
-			inMgr.getCpuInput().registerInput(botId, moveId, 0);
-			//inMgr.getCpuInput().registerInput(botId, kill->getId(), 20);
-		}
-
-		Sim::TileDatabase &db = sim.getData().getTileDb();
+		Sim::TileDatabase &db = mExtSim.getSim().getData().getTileDb();
 		Sim::TileD myTile;
 		myTile.colMask = 0;
 		myTile.blastResist = 0.0;
@@ -268,45 +256,44 @@ public:
 		myTile.colMask = Sim::TileD::ColAll;
 		db.addTile(myTile);
 
-		//sim.getState().getWorld().getTile(3,0).setType(1);
+		//ExSim.getSim().getState().getWorld().getTile(3,0).setType(1);
 
-		sim.prepareSim();
+		mExtSim.prepareSim();
 
-		states->setSim(&sim);
+		mStates->setExtSim(&mExtSim);
 	}
 
 protected:
 	std::vector<QWidget*> res;
 	// overridden
 	void resizeEvent(QResizeEvent *event) {
-		size = event->size();
-		//resize(size);
+		mCurrentSize = event->size();
 		fixRes();
 	}
 	void keyPressEvent(QKeyEvent *event) {
 		int k = event->key();
 		if (k == Qt::Key_F11) {
-			fullScreen = !fullScreen;
-			setFullScreen(fullScreen);
+			mFullScreen = !mFullScreen;
+			setFullScreen(mFullScreen);
 		} else if (k == Qt::Key_Escape) {
 			toggleMenu();
 		} else {
-			if (states != NULL) {
+			if (mStates != NULL) {
 				modKey(k, true);
 			}
 		}
 	}
 
 	void keyReleaseEvent(QKeyEvent *event) {
-		if (states != NULL) {
+		if (mStates != NULL) {
 			modKey(event->key(), false);
 		}
 	}
 	void modKey(int k, bool state) {
 		if ( k == Qt::Key_Shift ) {
-			states->setShift(state);
+			mStates->setShift(state);
 		} else if ( k == Qt::Key_Control ) {
-			states->setCtrl(state);
+			mStates->setCtrl(state);
 			if (state) {
 
 			}

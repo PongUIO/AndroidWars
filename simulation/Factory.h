@@ -199,6 +199,22 @@ namespace Sim {
 			/// @name Object creation
 			//@{
 				/**
+				 * @brief Constructs an object implementation from parameters.
+				 */
+				template<class Impl>
+				Impl *createImpl(const typename Impl::Config &cfg,
+				IdType typeId, IdType id)
+				{
+					if(id == NoId || typeId == NoId)
+						return 0;
+					
+					Impl *obj = new Impl(mSim,id,typeId,cfg);
+					UidFactory<T>::insertObject(obj,id);
+					return obj;
+				}
+				
+				
+				/**
 				 * Loads and creates an object from a serialized stream \c fp.
 				 * 
 				 * @param fp Source stream to read the object from.

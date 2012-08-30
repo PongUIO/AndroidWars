@@ -9,11 +9,11 @@
 class GameSlider : public QSlider {
 	Q_OBJECT
 public:
-	Sim::Simulation *sim;
-	QLineEdit *qle;
-	bool replay;
-	ClientStates *cs;
-	GameSlider(Sim::Simulation *sim, ClientStates *cs, QWidget *parent = 0);
+	exts::ExtSim *mExtSim;
+	QLineEdit *mQle;
+	bool mReplay;
+	ClientStates *mCs;
+	GameSlider(exts::ExtSim *sim, ClientStates *cs, QWidget *parent = 0);
 	void sliderChange(SliderChange sc);
 	void showEvent(QShowEvent *event);
 	void hideEvent(QHideEvent *event);

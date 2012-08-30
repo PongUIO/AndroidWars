@@ -17,8 +17,8 @@ endif()
 
 
 # Add core libraries
-find_package(Boost 1.34 COMPONENTS filesystem)
-add_subdirectory(nepeta/)
+find_package(Boost 1.34 COMPONENTS filesystem system)
+add_subdirectory(nepeta/src/)
 
 include_directories(${Boost_INCLUDE_DIR})
 include_directories(${NEPETA_INCLUDE_DIR})

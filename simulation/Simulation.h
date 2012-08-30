@@ -7,7 +7,6 @@
 
 #include "Data.h"
 #include "State.h"
-#include "Input.h"
 #include "program/ProgramInclude.h"
 #include "ability/AbilityInclude.h"
 
@@ -39,7 +38,6 @@ namespace Sim {
 	
 #define _SIM_X_SIMULATION_COMPONENTS \
 	_SIM_X(State) \
-	_SIM_X(Input) \
 	_SIM_X(Data) \
 	_SIM_X(Configuration)
 	
@@ -62,7 +60,7 @@ namespace Sim {
 				
 				void startPhase();
 				void step();
-				void endPhase(bool finalize);
+				void endPhase();
 				
 				bool hasPhaseStep()
 				{ return getState().getStateType() == State::StInPhase; }
@@ -96,9 +94,10 @@ namespace Sim {
 				uint32_t checksumSim();
 				
 				Save save();
-				void load(Save &saveData);
+				void load(const Save &saveData);
 				
 				void save(Save::BasePtr &fp);
+				void load(Save::BasePtr &fp);
 			//@}
 			
 		private:

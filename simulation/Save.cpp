@@ -1,4 +1,5 @@
 #include <string.h>
+#include <assert.h>
 
 #include "Save.h"
 
@@ -20,6 +21,10 @@ namespace Sim {
 	
 	void Save::FilePtr::nanoRead(void* vptr, uint32_t bytes)
 	{
+		assert((mMode & Read) &&
+			"Attempt to read using a non-reading mode"
+		);
+		
 		uint8_t *ptr = static_cast<uint8_t*>(vptr);
 		
 		if(mReadPtr > mSaveRef.size())
@@ -32,11 +37,17 @@ namespace Sim {
 	
 	void Save::FilePtr::nanoWrite(const void* vptr, uint32_t bytes)
 	{
+		assert((mMode & Write) &&
+			"Attempt to write using a non-writing mode"
+		);
+		
 		const uint8_t *ptr = static_cast<const uint8_t*>(vptr);
 		
-		uint32_t oldSize = mSaveRef.size();
-		mSaveRef.mData.resize(oldSize+bytes);
-		memcpy(mSaveRef.getData()+oldSize, ptr, bytes);
+		Save &save = const_cast<Save&>(mSaveRef);
+		
+		uint32_t oldSize = save.size();
+		save.mData.resize(oldSize+bytes);
+		memcpy(save.getData()+oldSize, ptr, bytes);
 	}
 	
 	// Save::BasePtr stream operators

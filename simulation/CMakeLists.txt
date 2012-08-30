@@ -3,7 +3,6 @@ set(COMP_SIM_TEST false CACHE BOOL "Compile simulation tests")
 add_library(AWSim
 	Body.cpp
 	Bot.cpp
-	Input.cpp
 	Program.cpp
 	Ability.cpp
 	Health.cpp

@@ -7,94 +7,94 @@
 
 class Camera {
 public:
-	double zoom, dzoom, panFriction, zoomFriction, ratio, scrollSpeed;
-	int lastX, lastY, xres, yres;
-	Sim::Vector pos, delta, zoomDir;
+	double mZoom, mDeltaZoom, panFriction, mZoomFriction, mRatio, mScrollSpeed;
+	int mLastX, mLastY, mXres, mYres;
+	Sim::Vector mPos, mDelta, mZoomDir;
 
 	Camera(double x, double y, int xres, int yres) {
-		pos = Sim::Vector(x,y);
-		delta = Sim::Vector(0,0);
-		zoomDir = Sim::Vector(0,0);
-		dzoom = 0.0;
-		zoom = 1;
+		mPos = Sim::Vector(x,y);
+		mDelta = Sim::Vector(0,0);
+		mZoomDir = Sim::Vector(0,0);
+		mDeltaZoom = 0.0;
+		mZoom = 1;
 		calcRatio(xres, yres);
-		zoomFriction = 0.9;
+		mZoomFriction = 0.9;
 		panFriction = 0.9;
-		scrollSpeed = 0.002;
+		mScrollSpeed = 0.002;
         }
         virtual ~Camera() {}
 
 	void calcRatio(double xres, double yres) {
-		ratio = yres/((double)xres);
-		this->xres = xres;
-		this->yres = yres;
+		mRatio = yres/((double)xres);
+		this->mXres = xres;
+		this->mYres = yres;
         }
-        void setLastPos(int lastX, int lastY) {
-                this->lastX = lastX;
-                this->lastY = lastY;
+	void setLastPos(int mLastX, int mLastY) {
+		this->mLastX = mLastX;
+		this->mLastY = mLastY;
         }
 	void modZoom(double mod) {
-		zoomDir =  Sim::Vector(xPixToDouble(lastX), yPixToDouble(lastY));
-		dzoom -= mod/10000;
+		mZoomDir =  Sim::Vector(xPixToDouble(mLastX), yPixToDouble(mLastY));
+		mDeltaZoom -= mod/10000;
         }
 
         void iter() {
-		if ( 0 < lastX && lastX < xres && 0 < lastY && lastY < yres) {
-			delta += Sim::Vector((lastX > xres -EDGE ) * (-(lastX - xres + EDGE)*scrollSpeed) +
-				    (lastX < EDGE) * (-(lastX-EDGE)*scrollSpeed),
-				    (lastY < EDGE) * ((lastY - EDGE)*scrollSpeed) +
-				    ((lastY > yres - EDGE)) * ((lastY - yres + EDGE)* scrollSpeed))/2;
+		if ( 0 < mLastX && mLastX < mXres && 0 < mLastY && mLastY < mYres) {
+			mDelta += Sim::Vector((mLastX > mXres -EDGE ) * (-(mLastX - mXres + EDGE)*mScrollSpeed) +
+				    (mLastX < EDGE) * (-(mLastX-EDGE)*mScrollSpeed),
+				    (mLastY < EDGE) * ((mLastY - EDGE)*mScrollSpeed) +
+				    ((mLastY > mYres - EDGE)) * ((mLastY - mYres + EDGE)* mScrollSpeed))/2;
 		}
-		pos += delta*zoom;
-		delta *= panFriction;
-		dzoom *= zoomFriction;
-		zoom *= dzoom + 1;
+		mPos += mDelta*mZoom;
+		mDelta *= panFriction;
+		mDeltaZoom *= mZoomFriction;
+		mZoom *= mDeltaZoom + 1;
 
-                if (zoom < 1) {
-			zoom = 1;
-		} else if (zoom > 32) {
-                        zoom = 32;
+		if (mZoom < 1) {
+			mZoom = 1;
+		} else if (mZoom > 32) {
+			mZoom = 32;
                 }
 
-                if (dzoom > 0) {
+		if (mDeltaZoom > 0) {
                         return;
                 }
 		//qDebug("%4.4f %4.4f\n", temp.x, temp.y);
-		pos += zoomDir*(dzoom*5)*(zoom+1);
+		mPos += mZoomDir*(mDeltaZoom*5)*(mZoom+1);
         }
 
 	double xToSimX(int x) {
-		return ((xPixToDouble(x))*(zoom+1)-pos.x);
+		return ((xPixToDouble(x))*(mZoom+1)-mPos.x);
 	}
 
 	double yToSimY(int y) {
-		return ((yPixToDouble(y))*(zoom+1)*ratio-pos.y);
+		return ((yPixToDouble(y))*(mZoom+1)*mRatio-mPos.y);
 	}
 	double xToSimXBack(int x) {
-		return ((xPixToDouble(x))*(zoom+2)-pos.x);
+		return ((xPixToDouble(x))*(mZoom+2)-mPos.x);
 	}
 
 	double yToSimYBack(int y) {
-		return ((yPixToDouble(y))*(zoom+2)*ratio-pos.y);
+		return ((yPixToDouble(y))*(mZoom+2)*mRatio-mPos.y);
 	}
 
         double xPixToDouble(int x) {
-		return ((x*2)/((double)xres)-1);
+		return ((x*2)/((double)mXres)-1);
 	}
         double yPixToDouble(int y) {
-		return (1-(y*2)/((double)yres));
+		return (1-(y*2)/((double)mYres));
         }
         int xDoubleToPix(double x) {
-		return (-x+1)/xres-pos.x;
+		return (-x+1)/mXres-mPos.x;
         }
 	int yDoubleToPix(double y) {
-		return (y+1)/yres-pos.y;
+		return (y+1)/mYres-mPos.y;
         }
 	int ySimLim(int i) {
-                return yToSimY(i*yres*1.5);
+		return yToSimY(i*mYres*1.5);
 	}
 	int xSimLim(int i) {
-		return xToSimX(i*xres*1.4);
+		return xToSimX(i*mXres*1.4);
 	}
 };
 #endif

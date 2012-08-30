@@ -1,76 +1,76 @@
 #include "gamecontroller.h"
 
-GameController::GameController(ClientStates *states, QWidget *parent) : states(states), parent(parent) {
+GameController::GameController(ClientStates *states, QWidget *parent) : mStates(states), mParent(parent) {
 
-	drawer = new GameDrawer(states, parent);
-	drawer->setMouseTracking(true);
-	iconHolder  = new QVBoxLayout(parent);
-	lower = new QHBoxLayout();
-	upper = new QHBoxLayout();
-	iconHolder->insertLayout(0, lower);
-	iconHolder->insertSpacing(1, -1);
-	iconHolder->insertLayout(0, upper);
+	mDrawer = new GameDrawer(states, parent);
+	mDrawer->setMouseTracking(true);
+	mIconHolder  = new QVBoxLayout(parent);
+	mLower = new QHBoxLayout();
+	mUpper = new QHBoxLayout();
+	mIconHolder->insertLayout(0, mLower);
+	mIconHolder->insertSpacing(1, -1);
+	mIconHolder->insertLayout(0, mUpper);
 
-	slider = new GameSlider(states->getSim(), states, parent);
+	mSlider = new GameSlider(states->getSim(), states, parent);
 
-	label = new GameButton(states->getSim(), states, 0, slider, parent);
-	label2 = new GameButton(states->getSim(), states, 0, slider, parent);
+	mLabel1 = new GameButton(states->getSim(), states, 0, mSlider, parent);
+	mLabel2 = new GameButton(states->getSim(), states, 0, mSlider, parent);
 
 
-	label->setPixmap(QPixmap("../testmod/graphics/temp/temp.png"));
-	label->resize(60,60);
-	label2->setPixmap(QPixmap("../testmod/graphics/temp/temp2.png"));
-	label2->resize(60,60);
-	profiles[0] = QPixmap("../testmod/graphics/profiles/test.png");
-	space = new QSpacerItem(parent->width(), 0, QSizePolicy::Expanding);
-	lower->insertWidget(0, label);
-	lower->insertWidget(1, label2);
-	lower->insertSpacerItem(2, space);
-	lower->setAlignment(Qt::AlignBottom);
-	upper->setAlignment(Qt::AlignTop);
+	mLabel1->setPixmap(QPixmap("../testmod/graphics/temp/temp.png"));
+	mLabel1->resize(60,60);
+	mLabel2->setPixmap(QPixmap("../testmod/graphics/temp/temp2.png"));
+	mLabel2->resize(60,60);
+	mProfiles[0] = QPixmap("../testmod/graphics/profiles/test.png");
+	mSpace = new QSpacerItem(parent->width(), 0, QSizePolicy::Expanding);
+	mLower->insertWidget(0, mLabel1);
+	mLower->insertWidget(1, mLabel2);
+	mLower->insertSpacerItem(2, mSpace);
+	mLower->setAlignment(Qt::AlignBottom);
+	mUpper->setAlignment(Qt::AlignTop);
 	updateGUI();
 }
 void GameController::showAll() {
-	label->show();
-	label2->show();
-	drawer->show();
-	drawer->startTimers();
-	slider->show();
+	mLabel1->show();
+	mLabel2->show();
+	mDrawer->show();
+	mDrawer->startTimers();
+	mSlider->show();
 	updateGUI();
 }
 void GameController::hideAll() {
-	label->hide();
-	label2->hide();
-	drawer->hide();
-	drawer->stopTimers();
-	slider->hide();
+	mLabel1->hide();
+	mLabel2->hide();
+	mDrawer->hide();
+	mDrawer->stopTimers();
+	mSlider->hide();
 	emptyGUI();
 }
 
 void GameController::updateGUI() {
 	emptyGUI();
 	//upper->insertWidget(1, slider);
-	upper->insertSpacerItem(0, space);
+	mUpper->insertSpacerItem(0, mSpace);
 	int i = 1;
-	int selected = states->getSelSize();
-	std::list<Sim::Bot*> bots = states->getSim()->getState().getBotFactory().getBotList();
+	int selected = mStates->getSelSize();
+	std::list<Sim::Bot*> bots = mStates->getSim()->getSim().getState().getBotFactory().getBotList();
 	std::list<Sim::Bot*>::iterator it;
 	BotSelector *clabel;
 	for (it = bots.begin(); it != bots.end(); it++) {
-		clabel = new BotSelector((*it)->getId(), states, parent);
-		clabel->setPixmap(profiles[0]);
+		clabel = new BotSelector((*it)->getId(), mStates, mParent);
+		clabel->setPixmap(mProfiles[0]);
 		clabel->resize(60,60);
-		upper->insertWidget(i, clabel);
+		mUpper->insertWidget(i, clabel);
 		clabel->show();
 		i++;
-		if (selected == 1 && states->isSelected((*it)->getId())) {
+		if (selected == 1 && mStates->isSelected((*it)->getId())) {
 		}
 	}
 }
 
 void GameController::emptyGUI() {
 	QLayoutItem *temp;
-	while ((temp = upper->takeAt(0))) {
+	while ((temp = mUpper->takeAt(0))) {
 		delete temp->widget();
 	}
 }

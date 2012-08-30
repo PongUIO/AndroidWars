@@ -16,7 +16,8 @@ namespace exts {
 			typedef std::pair<T,T> ValPair;
 			typedef std::vector<ValPair> ValPairVec;
 			
-			ValRange(const std::string& dataName) : RuleParameter(dataName) {}
+			ValRange(const std::string& dataName, bool whitelist=true) :
+				RuleParameter(dataName), mWhitelist(whitelist) {}
 			virtual ~ValRange() {}
 			
 			virtual RuleParameter *clone() { return new ValRange<T>(*this); }
@@ -64,6 +65,8 @@ namespace exts {
 			
 			virtual void callback()
 			{ ListenerSlot< ValRange<T> >::raiseListener(this); }
+			virtual void clearListener()
+			{ ListenerSlot< ValRange<T> >::clearListener(); }
 			
 			virtual bool isConstrained(const RuleParameter* param, ExtSim& extsim) const {
 				const ValRange<T> *valSrc = static_cast<const ValRange<T>*>(param);
@@ -72,13 +75,14 @@ namespace exts {
 				for(typename ValPairVec::const_iterator i=mValPairs.begin();
 					i!=mValPairs.end(); ++i) {
 					if(val >= (*i).first && val <= (*i).second)
-						return true;
+						return mWhitelist;
 				}
-				return false;
+				return !mWhitelist;
 			}
 			
 			virtual void save(Sim::Save::BasePtr& fp) const {
 				fp << mVal;
+				fp << mWhitelist;
 				
 				fp << uint32_t(mValPairs.size());
 				for(typename ValPairVec::const_iterator i=mValPairs.begin();
@@ -89,6 +93,7 @@ namespace exts {
 			}
 			virtual void load(Sim::Save::BasePtr& fp) {
 				fp >> mVal;
+				fp >> mWhitelist;
 				
 				mValPairs.clear();
 				uint32_t count;
@@ -105,13 +110,16 @@ namespace exts {
 			
 			T getVal() const { return mVal; }
 			void setVal(const T &val) { mVal=val; }
+			
 			const ValPairVec &getValPairs() const { return mValPairs; }
+			ValPairVec &getValPairs() { return mValPairs; }
 			
 		private:
 			// Value
 			T mVal;
 			
 			// Constraint
+			bool mWhitelist;
 			ValPairVec mValPairs;
 	};
 }

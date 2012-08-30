@@ -21,11 +21,4 @@ namespace Sim {
 	{ return getSimulationComponent<Data>(sim).getDatabase<type>(); }
 	_SIM_X_DATA_COMPONENTS
 #undef _SIM_X
-
-#define _SIM_X(type, name) \
-	template<> type & \
-	getInputComponent<type>(Simulation &sim) \
-	{ return getSimulationComponent<Input>(sim).getComponent<type>(); }
-	_SIM_X_INPUT_COMPONENTS
-#undef _SIM_X
 }

@@ -24,6 +24,8 @@ namespace exts {
 			
 			virtual void callback()
 			{ ListenerSlot<PositionParam>::raiseListener(this); }
+			virtual void clearListener()
+			{ ListenerSlot<PositionParam>::clearListener(); }
 			
 		private:
 	};

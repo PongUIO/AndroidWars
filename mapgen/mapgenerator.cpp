@@ -1,38 +1,101 @@
 #include "mapgenerator.h"
 
+
 MapGenerator::MapGenerator(int wX, int wY)
 {
 	WorldX = wX;
 	WorldY = wY;
 	Map = new int*[WorldX];
-	for (int i = 0; i < WorldX; i++) {
-		Map[i] = new int[WorldY];
+	for (int x = 0; x < WorldX; x++) {
+		Map[x] = new int[WorldY];
+	}
+	//Create a blank board.
+	for (int x=0; x<WorldX ; x++)
+	{
+		for (int y=0; y<WorldY; y++)
+		{
+			Map[x][y]=0;
+		}
 	}
 }
 
 void MapGenerator::Generate()
 {
-	for (int i=0; i<WorldX; i++)
+	for (int x=0; x<WorldX/2 ; x++)
 	{
-		for (int j=0; j<WorldY; j++)
+		for (int y=0; y<WorldY; y++)
 		{
-			Map[i][j] = 0;
-			if(j==0)
+			Map[x][y]=qrand()%2;
+			if (Map[x][y]==1)
 			{
-				Map[i][j]=1;
+				Map[x][y]=qrand()%2;
+				if (Map[x][y]==1)
+				{
+					Map[x][y]=qrand()%2;
+				}
 			}
 		}
 	}
 
-	for (int i=0; i<WorldX/2; i++)
+	for (int x=0; x<WorldX ; x++)
 	{
-		for (int j=0; j<WorldY; j++)
+		for (int y=0; y<WorldY; y++)
 		{
-			if(Map[i][j-1] == 1)
+			if (x > 0 && x < WorldX-1)
 			{
-				Map[i][j]=qrand()%2;		// Generates half the map
-				Map[WorldX-i-1][j]=Map[i][j];	// Mirrors the generated map
+				if (Map[x-1][y]==1 && Map[x+1][y]==1)
+				{
+					Map[x][y]=1;
+				}
 			}
+		}
+	}
+
+	for (int x=0; x<WorldX ; x++)
+	{
+		for (int y=0; y<WorldY; y++)
+		{
+			if (y > 0 && y < WorldY-1)
+			{
+				if (Map[x][y-1]==1 && Map[x][y+1]==1)
+				{
+					Map[x][y]=1;
+				}
+			}
+		}
+	}
+	for (int x=0; x<WorldX/2 ; x++)
+	{
+		for (int y=0; y<WorldY; y++)
+		{
+			if(Map[x][y]==1)
+			{
+				Map[WorldX-x-1][y]=1;
+			}
+		}
+	}
+}
+
+void MapGenerator::SetTile(int x, int y, int val)
+{
+	Map[x-1][y-1]=val;
+}
+
+void MapGenerator::CreateSpawnProtection()
+{
+	for (int x=0; x<3; x++)
+	{
+		for (int y=0; y<3; y++)
+		{
+			Map[x][y]=0;
+		}
+	}
+
+	for (int x=WorldX-1; x>WorldX-4; x--)
+	{
+		for (int y=0; y<3; y++)
+		{
+			Map[x][y]=0;
 		}
 	}
 }
@@ -44,13 +107,8 @@ void MapGenerator::PrintBoard()
 		QString tmp = "";
 		for (int j=0; j<WorldX; j++)
 		{
-			tmp+=QString::number(Map[j][WorldY-i-1]);
+			tmp+=QString::number(Map[j][WorldY-i-1])+" ";
 		}
 		qDebug() << tmp.simplified();
 	}
 }
-//
-//if (i == 0|| i == (WorldX-1) || j == 0 || j == (WorldY-1))
-//{
-//	continue;
-//}

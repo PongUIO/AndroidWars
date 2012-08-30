@@ -1,11 +1,11 @@
 #include "botselector.h"
 BotSelector::BotSelector(uint botId, ClientStates *states, QWidget *parent)
 	: QLabel(parent) {
-	this->botId = botId;
-	this->states = states;
+	this->mBotId = botId;
+	this->mStates = states;
 }
 
 // overridden
 void BotSelector::mousePressEvent(QMouseEvent * event) {
-	states->select(botId);
+	mStates->select(mBotId);
 }

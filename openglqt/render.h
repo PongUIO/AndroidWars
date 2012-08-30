@@ -8,7 +8,7 @@
 #include "../util/client.h"
 #include "../util/cursordefines.h"
 #include "skeletalsystem.h"
-#include "globj.h"
+#include "../Qt-based-common-libs/globj.h"
 #include "gamemap.h"
 
 class GameDrawer : public QGLWidget {
@@ -122,7 +122,7 @@ protected:
 
 	// overridden
 	void initializeGL() {
-		Sim::World *wld = &(states->getSim()->getState().getWorld());
+		Sim::World *wld = &(states->getSim()->getSim().getState().getWorld());
 		glClearColor( 0.1, 0.1, 0.1, 0.0 );
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_DOUBLE);
@@ -137,10 +137,14 @@ protected:
 		loadAndBind("../testmod/graphics/weapons/bullet.png", &bullet[0], &bullettextures[0],16,16);
 		loadAndBind("../testmod/graphics/debug/checker.png", &checkImage, &check, 256, 256);
 		loadAndBind("../testmod/graphics/debug/red.png", &redImage, &red, 100, 100);
-		gm->registerPiece(new GLObj("../testmod/obj/box.obj", QVector3D(1., 1., 1.)));
+		GLObj *tmp = new GLObj();
+		tmp->loadFile("../testmod/obj/box.obj", QVector3D(1., 1., 1.));
+		gm->registerPiece(tmp);
 		gm->setWorld(wld);
 		gm->setOffmap(1);
-		robots.push_back(new GLObj("../testmod/obj/Android01.obj", QVector3D(1., 1., 1.)));
+		tmp = new GLObj();
+		tmp->loadFile("../testmod/obj/Android01.obj", QVector3D(1., 1., 1.));
+		robots.push_back(tmp);
 		this->setAttribute(Qt::WA_NoSystemBackground);
 		QPixmap m;
 		m.convertFromImage(mouse[MOUSE_NORMAL]);
@@ -230,17 +234,17 @@ protected:
 	// overridden
 	void paintGL() {
 		testShader->bind();
-		Sim::Simulation *sim = states->getSim();
+		exts::ExtSim *sim = states->getSim();
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClear(GL_DEPTH_BUFFER_BIT);
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
-		glFrustum(-1, 1, -1*cam->ratio, 1*cam->ratio, 1, 5.1+cam->zoom);
-		glTranslatef(cam->pos.x,cam->pos.y,-1-cam->zoom);
+		glFrustum(-1, 1, -1*cam->mRatio, 1*cam->mRatio, 1, 5.1+cam->mZoom);
+		glTranslatef(cam->mPos.x,cam->mPos.y,-1-cam->mZoom);
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
 
-		std::list<Sim::Bot*> bots = sim->getState().getBotFactory().getBotList();
+		std::list<Sim::Bot*> bots = sim->getSim().getState().getBotFactory().getBotList();
 		std::list<Sim::Bot*>::iterator bot;
 
 		glEnable(GL_BLEND);
@@ -252,7 +256,6 @@ protected:
 		gm->draw();
 		for (bot = bots.begin(); bot != bots.end(); bot++) {
 			Sim::Vector pos = (*bot)->getBody().mPos;
-			Sim::Vector col = (*bot)->getTypePtr()->getCollision()->getBboxHigh();
 			if (states->isSelected((*bot)->getId())) {
 
 				glColor4f(0.2f, 1.0f, 0.2f, selAlpha);

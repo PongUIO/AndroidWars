@@ -10,4 +10,4 @@ simulation/doc/**
 *~
 *.build
 *.out
-
+*.user
