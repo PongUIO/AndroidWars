@@ -18,12 +18,21 @@ namespace exts { namespace prog {
 		registerImpl<Sim::Prog::Kill>(name);
 	}
 	
+	void Kill::registerInput(ParamList *param) const
+	{
+		Agent *agent = mExtSim.getAgent().getAgent(param->getAgent());
+		if(!agent)
+			return;
+		
+		allocateId(param, agent->allocateId());
+	}
+	
 	void Kill::makeInput(const ParamList* param) const
 	{
 		const IdList<Sim::Program> *prog = param->getParamT<IdList<Sim::Program> >(0);
 		
 		Sim::Prog::Kill::Config cfg = Sim::Prog::Kill::Config(prog->getId());
-		mExtSim.getSim().getInput().getProgramInput()
-		.buildInputImpl<Sim::Prog::Kill>(cfg, mObjectId);
+		mExtSim.getSim().getState().getProgramFactory().
+		createImpl<Sim::Prog::Kill>(cfg, mObjectId, param->getAllocId(0));
 	}
 } }

@@ -208,7 +208,7 @@ void setupWorld()
 	botCfg.mSide = 0;
 	botCfg.mBody.mPos = Sim::Vector(0,0);
 	
-	sim.getInput().getBotInput().buildInputImpl<Sim::Bot>( botCfg, 0 );
+	sim.getState().getBotFactory().createImpl<Sim::Bot>(botCfg, 0,0);
 }
 
 void testSim()

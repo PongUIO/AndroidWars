@@ -11,6 +11,7 @@ namespace exts { namespace prog {
 			
 			TypeRule* clone() { return new Kill(*this); }
 			
+			void registerInput(ParamList* param) const;
 			void makeInput(const ParamList* param) const;
 			void buildTimelineData(const ParamList* param) const {}
 			Sim::IdType registerSimData(const std::string& name) const;

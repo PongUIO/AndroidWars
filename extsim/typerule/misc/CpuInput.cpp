@@ -27,8 +27,10 @@ namespace exts { namespace misc {
 		const ValRange<uint32_t> *delay = param->
 			getParamT<Uint32Val>(2);
 		
-		mExtSim.getSim().getInput().getCpuInput().registerInput(
-		bot->getId(), prog->getId(), delay->getVal());
+		Sim::Bot *botObj = mExtSim.getSim().getState().getBotFactory().getBot(bot->getId());
+		if(botObj) {
+			botObj->getState().mCpu.scheduleProgram(prog->getId(),delay->getVal());
+		}
 	}
 	
 	ParamList* CpuInput::setupParam(Sim::IdType bot, Sim::IdType prog,

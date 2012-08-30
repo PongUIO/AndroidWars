@@ -49,8 +49,8 @@ void setupWorld()
 	botA.mSide = 0;
 	botA.mBody.mPos = Sim::Vector(0,0);
 	
-	sim.getInput().getBotInput().buildInputImpl<Sim::Bot>( botA, 0 );
-	sim.getInput().getBotInput().buildInputImpl<Sim::Bot>( botA, 0 );
+	sim.getState().getBotFactory().createImpl<Sim::Bot>( botA, 0, 0 );
+	sim.getState().getBotFactory().createImpl<Sim::Bot>( botA, 0, 1 );
 }
 
 void buildBotInput(uint32_t depth)

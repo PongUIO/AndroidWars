@@ -7,7 +7,6 @@
 
 #include "Data.h"
 #include "State.h"
-#include "Input.h"
 #include "program/ProgramInclude.h"
 #include "ability/AbilityInclude.h"
 
@@ -39,7 +38,6 @@ namespace Sim {
 	
 #define _SIM_X_SIMULATION_COMPONENTS \
 	_SIM_X(State) \
-	_SIM_X(Input) \
 	_SIM_X(Data) \
 	_SIM_X(Configuration)
 	

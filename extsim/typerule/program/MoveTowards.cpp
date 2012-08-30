@@ -39,8 +39,8 @@ namespace exts { namespace prog {
 			Sim::Prog::MoveTowards::DtPosition,pos->getVal()
 		);
 		
-		Sim::Prog::MoveTowards *mt = mExtSim.getSim().getInput().getProgramInput().
-		buildInputImpl<Sim::Prog::MoveTowards>(cfg, mObjectId);
+		Sim::Prog::MoveTowards *mt = mExtSim.getSim().getState().getProgramFactory()
+		.createImpl<Sim::Prog::MoveTowards>(cfg, mObjectId, param->getAllocId(0));
 		
 		mt->setRunningTime(duration->getVal());
 	}
