@@ -1,6 +1,5 @@
 #ifndef ECHO_H
 #define ECHO_H
-#include <nepeta.h>
 #include <iostream>
 #include "../Command.h"
 

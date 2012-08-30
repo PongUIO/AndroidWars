@@ -3,17 +3,20 @@
 
 #include "../extsim/ExtSim.h"
 
+class CmdManager;
+
 class SimMgr
 {
 	public:
-		SimMgr();
+		SimMgr(CmdManager &tmgr);
 		~SimMgr();
 		
-		ExtSim getExtSim();
+		exts::ExtSim &getExtSim(){ return mExtSim; }
 
 	private:
-		ExtSim &mExtSim;
+		exts::ExtSim mExtSim;
+		CmdManager &mgr;
 
-	
+
 };
 #endif

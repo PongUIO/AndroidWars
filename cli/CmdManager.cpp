@@ -4,8 +4,9 @@
 
 #include <stdio.h>
 
-CmdManager::CmdManager()
+CmdManager::CmdManager() : msim(*this)
 {
+	mgl = new_GetLine(1024, 1024);
 	#define CMD(str, cls) registerCmd(str, cls);
 	#include "cmd.def"
 	#undef CMD
@@ -13,7 +14,7 @@ CmdManager::CmdManager()
 
 CmdManager::~CmdManager()
 {
-
+	del_GetLine(mgl);
 }
 
 static std::string getargv(int i, int argc, char** argv)
@@ -73,15 +74,12 @@ void CmdManager::execfile(const std::string& str)
 	
 }
 
-#include <readline/readline.h>
 void CmdManager::interact()
 {
 	bool isend = false;
 	while (!isend)
 	{
-		char* str = readline("> ");
-		std::string cmd = str;
-		free(str);
+		std::string cmd = gl_get_line(mgl, "> ", 0, 0);
 		
 		if(cmd == "exit")
 			isend = true;

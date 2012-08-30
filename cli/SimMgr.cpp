@@ -1,6 +1,6 @@
 #include "SimMgr.h"
 
-SimMgr::SimMgr()
+SimMgr::SimMgr(CmdManager &tmgr) : mgr(tmgr)
 {
 
 }
@@ -10,7 +10,3 @@ SimMgr::~SimMgr()
 
 }
 
-ExtSim SimMgr::getExtSim()
-{
-
-}
