@@ -6,6 +6,13 @@
 namespace exts { namespace prog {
 	class MoveTowards : public TypeRule {
 		public:
+			enum ParamIndex {
+				PiPosition = 0,
+				PiDuration,
+				
+				PiMax
+			};
+			
 			MoveTowards(ExtSim& esim);
 			~MoveTowards();
 			

@@ -7,7 +7,7 @@ namespace exts {
 	{}
 	
 	AgentMgr::~AgentMgr()
-	{}
+	{ clearAgents(); }
 	
 	void AgentMgr::setupAgents(Sim::IdType count)
 	{

@@ -329,5 +329,7 @@ int main(void)
 	// Testing extsim-simulation communication
 	testSim();
 	
+	extSim.shutdown();
+	
 	return 0;
 }

@@ -51,9 +51,9 @@ namespace Sim {
 		killAll();
 	}
 	
-	Program* ProgramFactory::createFromSerialized(Save::BasePtr& fp)
+	Program* ProgramFactory::createFromSerialized(Save::BasePtr& fp, Sim::IdType id)
 	{
-		InsertData insData = insertObject();
+		InsertData insData = insertObject(0,id);
 		
 		Program *prog = loadObj(insData.first, fp);
 		*insData.second = prog;

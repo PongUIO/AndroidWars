@@ -125,7 +125,7 @@ namespace Sim {
 				void step(double stepTime);
 			//@}
 			
-			Program *createFromSerialized(Save::BasePtr &fp);
+			Program *createFromSerialized(Save::BasePtr &fp, Sim::IdType id);
 			
 			void destroyProgram(IdType id) { removeObj(id); }
 			Program *getProgram(IdType id) { return getObject(id); }

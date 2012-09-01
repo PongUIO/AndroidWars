@@ -2,6 +2,7 @@
 #include "ParamList.h"
 
 #include "../CommonLoad.h"
+#include "../ExtSim.h"
 
 namespace exts {
 	void TypeRule::load(const Nepeta::Node& node)
@@ -14,12 +15,35 @@ namespace exts {
 		}
 	}
 	
+	/**
+	 * @brief Allocates a set number of new \c RuleParameter objects for the
+	 * reference parameters.
+	 */
+	void TypeRule::allocateParam(size_t count)
+	{
+		mParam.getParamVec().resize(mParam.getParamVec().size()+count);
+	}
+	
+	void TypeRule::setParam(size_t index, RuleParameter* param)
+	{
+		if(index < mParam.size())
+			mParam.getParamVec()[index] = param;
+	}
+
+	
 	void TypeRule::registerParam(RuleParameter* param)
 	{ mParam.addParam(param); }
 	
-	void TypeRule::allocateId(ParamList* param, Sim::IdType id) const
-	{	param->allocateId(id);	}
-
+	void TypeRule::allocateId(ParamList* param, size_t count) const
+	{
+		Agent *agent = mExtSim.getAgent().getAgent(param->getAgent());
+		if(!agent)
+			return; /// @todo Throw exception for illegal agent
+		
+		while( (count--) > 0) {
+			param->allocateId(agent->allocateId());
+		}
+	}
 	
 	void TypeRule::setId(Sim::IdType id)
 	{ mId = id; mParam.setRefTypeRuleId(id); }

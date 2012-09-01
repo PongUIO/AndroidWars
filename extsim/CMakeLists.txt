@@ -23,11 +23,10 @@ add_library(AWExtSim
 	object/TypeRuleObj.cpp
 	object/ParamList.cpp
 	
+	typerule/bot/BaseBot.cpp
 	typerule/program/MoveTowards.cpp
 	typerule/program/Kill.cpp
 	typerule/misc/CpuInput.cpp
-	
-	#typerule/bot/DefaultBot.cpp
 	
 	datatype/ExtGame.cpp
 	datatype/ExtMap.cpp
