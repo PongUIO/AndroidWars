@@ -37,6 +37,18 @@ void loadFiles()
 	}
 }
 
+void printErrors()
+{
+	const exts::ExtErrorMgr::MessageVec &msgVec = extSim.getError().getMessages();
+	if(msgVec.size() > 0)
+		printf("ExtSim error list:\n");
+	
+	for(size_t i=0; i<msgVec.size(); ++i) {
+		exts::ExtErrorMgr::Message msg = msgVec.at(i);
+		printf("\t%s : %s\n", msg.where.c_str(), msg.what.c_str());
+	}
+}
+
 void setupWorld()
 {
 	extSim.getAgent().setupAgents(2);
@@ -148,6 +160,9 @@ int main(void)
 	
 	// Analyze replay
 	displayReplayTree();
+	
+	// Display any errors
+	printErrors();
 	
 	// Shutdown the simulation
 	extSim.shutdown();

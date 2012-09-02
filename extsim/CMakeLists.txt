@@ -1,6 +1,7 @@
 add_library(AWExtSim
 	ExtSim.cpp
 	ExtData.cpp
+	ExtErrorMgr.cpp
 	InputBarrier.cpp
 	TypeRuleMgr.cpp
 	TypeRuleLoader.cpp

@@ -22,6 +22,9 @@ namespace exts {
 	 */
 	void ReplayManager::selectBranch(Sim::IdType id)
 	{
+		if(!mTree.getNode(id))
+			return mExtSim.getError().msgId(EXTS_FUNC, id);
+		
 		mActiveNode = id;
 	}
 	
@@ -200,27 +203,55 @@ namespace exts {
 	 */
 	void ReplayManager::commit()
 	{
+		uint32_t activePhase = mExtSim.getSim().getCurPhase();
+		
+		// Assure the simulation is in a proper state
+		if(mExtSim.getSim().getState().getStateType() != Sim::State::StIdle) {
+			return mExtSim.getError().message(exts::ExtErrorMgr::Warning,
+				EXTS_FUNC, "The simulation state is not in the idle state"
+			);
+		}
+		
+		// Find a suitable node to commit to
+		ReplayNode *node = findNodeForPhase(activePhase);
+		if(!node) {
+			return mExtSim.getError().message(
+				exts::ExtErrorMgr::Warning, EXTS_FUNC,
+				"Could not find a suitable node for the current branch "
+				"and phase"
+			);
+		}
+		
+		// Destroy the node's subtree
+		node->modifyNode();
+		if(getActiveNodeI() == 0)
+			selectBranch(node->getId());
+		
+		// Save the simulation
+		if(node->getDepth()%mPhaseSaveInterval == 0) {
+			mExtSim.save(node->getData(ReplayNode::NtSimulation));
+		}
+		
+		// Save the InputBarrier
+		Sim::Save::FilePtr fp(node->getData(ReplayNode::NtInput));
+		mExtSim.getInput().saveInput(fp);
+	}
+	
+	/**
+	 * @brief Seeks in the current branch for a node at the phase.
+	 */
+	ReplayNode* ReplayManager::findNodeForPhase(uint32_t phase)
+	{
+		// Look backwards from the last node
 		ReplayNode *node = getActiveNodeI();
 		
-		if(node) {
-			// A commit may only be performed when the simulation phase
-			// is the same as the node's depth
-			assert(mExtSim.getSim().getCurPhase() == node->getDepth() &&
-				"The node committed must be in the same phase as the simulation"
-			);
+		while(node) {
+			if(node->getDepth() == phase)
+				return node;
 			
-			// Save the simulation
-			if(node->getDepth()%mPhaseSaveInterval == 0) {
-				Sim::Save tmp;
-				mExtSim.save(tmp);
-				node->getData(ReplayNode::NtSimulation) = tmp;
-			}
-			
-			// Save the InputBarrier
-			Sim::Save &saveObj = node->getData(ReplayNode::NtInput);
-			saveObj.clear();
-			Sim::Save::FilePtr fp(saveObj);
-			mExtSim.getInput().saveInput(fp);
+			node = node->getParent();
 		}
+		
+		return node;
 	}
 }
