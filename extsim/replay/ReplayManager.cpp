@@ -39,7 +39,6 @@ namespace exts {
 	{
 		Sim::Simulation &sim = mExtSim.getSim();
 		Sim::Configuration &simCfg = sim.getConfiguration();
-		Sim::State &simState = sim.getState();
 		
 		// Find the correct phase node, this is the base node for replay
 		ReplayNode *baseNode = getActiveNodeI();

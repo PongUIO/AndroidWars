@@ -6,7 +6,7 @@
 
 #include "../param/IdList.h"
 #include "../param/Position.h"
-#include "../param/ValRange.h"
+#include "../param/ValueParam.h"
 
 #include "../object/TypeRule.h"
 
@@ -75,8 +75,6 @@ void buildBotInput(uint32_t depth)
 		
 		extSim.getReplay().selectBranch(activeId);
 		extSim.getReplay().gotoActive();
-		Sim::Vector pos = sim.getState().getBotFactory()
-		.getBot(0)->getState().mBody.mPos;
 		
 		// Create the branches
 		for(size_t i=0; i<2; ++i) {

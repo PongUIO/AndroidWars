@@ -3,14 +3,14 @@
 #include "../../ExtSim.h"
 
 #include "../../param/Position.h"
-#include "../../param/ValRange.h"
+#include "../../param/ValueParam.h"
 
 namespace exts { namespace prog {
 	MoveTowards::MoveTowards(ExtSim& esim): TypeRule(esim)
 	{
 		allocateParam(PiMax);
 		setParam(PiPosition, new PositionParam("Position"));
-		setParam(PiDuration, new ValRange<uint32_t>("Duration"));
+		setParam(PiDuration, new ValueParam<uint32_t>("Duration"));
 	}
 	
 	MoveTowards::~MoveTowards() {}
@@ -27,7 +27,7 @@ namespace exts { namespace prog {
 	void MoveTowards::makeInput(const ParamList* param) const
 	{
 		_EXTS_PARAM(PositionParam, pos, PiPosition)
-		_EXTS_PARAM(ValRange<uint32_t>, duration, PiDuration)
+		_EXTS_PARAM(ValueParam<uint32_t>, duration, PiDuration)
 		
 		Sim::Prog::MoveTowards::Config cfg = Sim::Prog::MoveTowards::Config(
 			Sim::Prog::MoveTowards::DtPosition,pos->getVal()

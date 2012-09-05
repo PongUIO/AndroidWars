@@ -9,7 +9,7 @@
 
 #include "../param/IdList.h"
 #include "../param/Position.h"
-#include "../param/ValRange.h"
+#include "../param/ValueParam.h"
 
 #include "../object/TypeRule.h"
 
@@ -33,8 +33,8 @@ struct IdListListener : public exts::Listener<exts::IdList<T> > {
 };
 
 template<class T>
-struct ValRangeListener : public exts::Listener<exts::ValRange<T> > {
-	void process(exts::ValRange<T> *p) {
+struct ValRangeListener : public exts::Listener<exts::ValueParam<T> > {
+	void process(exts::ValueParam<T> *p) {
 		std::cout << p->getVal();
 	}
 };
@@ -167,7 +167,7 @@ void listBot()
 void testParam()
 {
 	exts::IdList<Sim::ArmorD>::setListener( IdListListener<Sim::ArmorD>() );
-	exts::ValRange<uint32_t>::setListener( ValRangeListener<uint32_t>() );
+	exts::ValueParam<uint32_t>::setListener( ValRangeListener<uint32_t>() );
 	exts::PositionParam::ListenerSlot<exts::PositionParam>::setListener( PositionListener() );
 	
 	printf("\nParameter testing:\n");

@@ -146,6 +146,18 @@ namespace Sim {
 						
 						return res;
 					}
+					
+					template<class T>
+					struct WriteObjInternal {
+						void operator()(BasePtr &fp, const T &obj)
+						{	fp << obj; }
+					};
+					
+					template<class T>
+					struct ReadObjInternal {
+						void operator()(BasePtr &fp, T &obj)
+						{	fp >> obj; }
+					};
 				
 				public:
 					template<class T>
@@ -218,6 +230,15 @@ namespace Sim {
 						return tmp;
 					}
 					
+					template<class C, class F>
+					void writeCtrF(const C &data, F func)
+					{
+						*this << uint32_t(data.size());
+						for(typename C::const_iterator i=data.begin();
+							i!=data.end(); i++)
+							func(*this,*i);
+					}
+					
 					/**
 					 * Writes a sequence-type container
 					 * (vector, deque, or list).
@@ -227,12 +248,7 @@ namespace Sim {
 					 */
 					template<class C>
 					void writeCtr(const C &data)
-					{
-						*this << uint32_t(data.size());
-						for(typename C::const_iterator i=data.begin();
-							i!=data.end(); i++)
-							*this << *i;
-					}
+					{	return writeCtrF(data,WriteObjInternal<typename C::value_type>()); }
 					
 					/**
 					 * Reads a sequence-type container
@@ -243,6 +259,10 @@ namespace Sim {
 					 */
 					template<class C>
 					void readCtr(C &data)
+					{	return readCtrF(data, ReadObjInternal<typename C::value_type>()); }
+					
+					template<class C, class F>
+					void readCtrF(C &data, F func)
 					{
 						data.clear();
 						
@@ -251,7 +271,7 @@ namespace Sim {
 						
 						for(uint32_t i=0; i<count; ++i) {
 							data.resize(data.size()+1);
-							*this >> data.back();
+							func(*this, data.back());
 						}
 					}
 					
@@ -329,7 +349,7 @@ namespace Sim {
 					
 					/// Writes a value of type T
 					template<class T>
-					Save::BasePtr &operator<<(T val);
+					Save::BasePtr &operator<<(const T &val);
 					
 					/// Reads a value of type T
 					template<class T>
@@ -444,7 +464,7 @@ namespace Sim {
 			 */
 			template<class T>
 			struct OperatorImpl {
-				friend Save::BasePtr &operator<<(Save::BasePtr &fp, T const& ref)
+				friend Save::BasePtr &operator<<(Save::BasePtr &fp, const T &ref)
 				{ ref.save(fp); return fp; }
 				
 				friend Save::BasePtr &operator>>(Save::BasePtr &fp, T &ref)

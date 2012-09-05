@@ -56,7 +56,7 @@ namespace Sim {
 	
 	// Base macros
 #define WRITE_FUNC(Type, contents) \
-	template<> Save::BasePtr& Save::BasePtr::operator<<(Type val) \
+	template<> Save::BasePtr& Save::BasePtr::operator<<(const Type &val) \
 	{ contents; return *this; }
 #define READ_FUNC(Type, contents) \
 	template<> Save::BasePtr& Save::BasePtr::operator>>(Type &val) \
