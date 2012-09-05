@@ -7,14 +7,15 @@
 #include "../object/ParamList.h"
 #include "../../simulation/Common.h"
 
+#include "../object/ParamVisitor.h"
+
 namespace exts {
 	/**
 	 * Allows an identifier of an arbitrary type, constrained to a
 	 * list of identifiers.
 	 */
 	template<class T>
-	class IdList : public RuleParameter,
-	public ListenerSlot<IdList<T> > {
+	class IdList : public RuleParameter {
 		public:
 			typedef std::vector<std::string> StringVec;
 			typedef boost::unordered_set<Sim::IdType> IdSet;
@@ -104,10 +105,8 @@ namespace exts {
 					== mWhitelist;
 			}
 			
-			void callback()
-			{ ListenerSlot<IdList<T> >::raiseListener(this); }
-			void clearListener()
-			{ ListenerSlot<IdList<T> >::clearListener(); }
+			virtual void accept(ParamVisitor& visitor)
+			{	visitor.visit(*this); }
 			
 			void save(Sim::Save::BasePtr& fp) const {
 				fp << mId;

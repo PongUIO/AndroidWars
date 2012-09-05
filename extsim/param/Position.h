@@ -12,8 +12,7 @@ namespace exts {
 	/**
 	 * Used to denote a world position.
 	 */
-	class PositionParam : public ValueParam<Sim::Vector>,
-	public ListenerSlot<PositionParam> {
+	class PositionParam : public ValueParam<Sim::Vector> {
 		public:
 			PositionParam(const std::string& dataName) :
 				ValueParam<Sim::Vector>(dataName) {}
@@ -21,11 +20,8 @@ namespace exts {
 			
 			virtual RuleParameter* clone()
 			{ return new PositionParam(*this); }
-			
-			virtual void callback()
-			{ ListenerSlot<PositionParam>::raiseListener(this); }
-			virtual void clearListener()
-			{ ListenerSlot<PositionParam>::clearListener(); }
+			virtual void accept(ParamVisitor& visitor)
+			{	visitor.visit(*this); }
 			
 		private:
 	};

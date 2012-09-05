@@ -1,56 +1,13 @@
 #ifndef EXTSIM_PARAMLIST_H
 #define EXTSIM_PARAMLIST_H
 
-#include <boost/unordered_map.hpp>
-#include <boost/shared_ptr.hpp>
-
 #include "nepeta.h"
 #include "../../simulation/Save.h"
 #include "../../simulation/Common.h"
 
 namespace exts {
 	class ExtSim;
-	
-	template<class Type>
-	struct Listener {
-		virtual void process(Type *src)=0;
-	};
-	
-	/**
-	 * @brief Manages the global listener for a parameter and constraint.
-	 * 
-	 * Used to implement callbacks for \c Param or \c Constraint
-	 * specializations.
-	 */
-	template<class Type>
-	class ListenerSlot {
-		private:
-			typedef boost::shared_ptr<Listener<Type> > SharedPtr;
-		
-		public:
-			template<class LT>
-			static void setListener(const LT &L) {
-				sListener = SharedPtr(new LT(L));
-			}
-			
-			static void clearListener() {
-				sListener.reset();
-			}
-			
-			static void raiseListener(Type *src) {
-				if(sListener.get())
-					sListener->process(src);
-			}
-		
-		private:
-			static SharedPtr sListener;
-	};
-	
-	template<class Type>
-	typename ListenerSlot<Type>::SharedPtr ListenerSlot<Type>::sListener =
-	typename ListenerSlot<Type>::SharedPtr();
-	
-	
+	class ParamVisitor;
 	
 	/**
 	 * @brief Interface for a generic constrained parameter of any data type.
@@ -68,8 +25,7 @@ namespace exts {
 			virtual ~RuleParameter() {}
 			
 			virtual RuleParameter *clone()=0;
-			virtual void callback()=0;
-			virtual void clearListener()=0;
+			virtual void accept(ParamVisitor &visitor)=0;
 			
 			virtual void readNode(
 				const Nepeta::Node &param,
@@ -133,8 +89,7 @@ namespace exts {
 			{	return i<mAllocId.size() ? mAllocId[i] : Sim::NoId; }
 			
 			bool isConstrained(ExtSim &ref) const;
-			void traverseCallback();
-			void clearListeners() const;
+			void traverseVisitor(ParamVisitor &visitor);
 			
 			void save(Sim::Save::BasePtr &fp) const;
 			void load(Sim::Save::BasePtr &fp);

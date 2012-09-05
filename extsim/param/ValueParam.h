@@ -5,6 +5,7 @@
 #include <boost/lambda/bind.hpp>
 
 #include "../object/ParamList.h"
+#include "../object/ParamVisitor.h"
 #include "../util/TypeConv.h"
 
 namespace exts {
@@ -13,8 +14,7 @@ namespace exts {
 	 * to one or more value ranges.
 	 */
 	template<class T>
-	class ValueParam : public RuleParameter,
-	public ListenerSlot< ValueParam<T> > {
+	class ValueParam : public RuleParameter {
 		public:
 			typedef std::pair<T,T> ValPair;
 			typedef std::vector<ValPair> ValPairVec;
@@ -114,10 +114,8 @@ namespace exts {
 				}
 			}
 			
-			virtual void callback()
-			{ ListenerSlot< ValueParam<T> >::raiseListener(this); }
-			virtual void clearListener()
-			{ ListenerSlot< ValueParam<T> >::clearListener(); }
+			virtual void accept(ParamVisitor& visitor)
+			{	visitor.visit(*this); }
 			
 			virtual bool isConstrained(const RuleParameter* param, ExtSim& esim) const {
 				const ValueParam<T> *valSrc = static_cast<const ValueParam<T>*>(param);

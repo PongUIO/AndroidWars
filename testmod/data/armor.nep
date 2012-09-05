@@ -14,3 +14,13 @@
 	Rule "Explosive" 2.0
 	Rule "Rocket" 2.0
 #
+
+#ARMOR
+	Name "Waterproof"
+	
+	Default 5 false
+	
+	// Waterproof armor takes only 5% damage from water,
+	// and reduces the effects of water to 5% of ordinary
+	Rule "Water" 0.05
+#

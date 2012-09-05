@@ -18,6 +18,7 @@ add_library(AWExtSim
 	
 	param/Position.cpp
 	param/IdList.cpp
+	param/ValueParam.cpp
 	
 	object/ExtDataObj.cpp
 	object/TypeRule.cpp
