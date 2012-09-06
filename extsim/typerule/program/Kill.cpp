@@ -7,7 +7,7 @@
 namespace exts { namespace prog {
 	Kill::Kill(ExtSim& esim): TypeRule(esim)
 	{
-		registerParam(new IdList<Sim::Program>("Program"));
+		registerParam(new IdParam<Sim::Program>("Program"));
 	}
 	
 	Kill::~Kill() {}
@@ -23,7 +23,7 @@ namespace exts { namespace prog {
 	
 	void Kill::makeInput(const ParamList* param) const
 	{
-		_EXTS_PARAM(IdList<Sim::Program>, prog, 0)
+		_EXTS_PARAM(IdParam<Sim::Program>, prog, 0)
 		
 		Sim::Prog::Kill::Config cfg = Sim::Prog::Kill::Config(prog->getId());
 		mExtSim.getSim().getState().getProgramFactory().

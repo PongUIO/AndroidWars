@@ -20,7 +20,7 @@ namespace exts {
 	 * related to \c Simulation replays, including metadata such as the
 	 * timeline used to generate the input, or full simulation state saves.
 	 */
-	class ReplayNode {
+	class ReplayNode : private Sim::Save::OperatorImpl<ReplayNode> {
 		public:
 			/// Identifies the types of data stored in this node
 			enum NodeType {
@@ -58,6 +58,9 @@ namespace exts {
 			
 			ReplayNode *createBranch();
 			void modifyNode();
+			
+			void save(Sim::Save::BasePtr &fp) const;
+			void load(Sim::Save::BasePtr &fp);
 			
 		private:
 			ReplayNode(ReplayTree &mgr, Sim::IdType id, ReplayNode *parent=0);
@@ -102,7 +105,13 @@ namespace exts {
 			{ return const_cast<ReplayNode*>(
 			static_cast<const ReplayTree&>(*this).getNode(id)); }
 			
+			void save(Sim::Save::BasePtr &fp) const;
+			void load(Sim::Save::BasePtr &fp);
+			
 		private:
+			void saveNode(Sim::Save::BasePtr &fp, const ReplayNode *node) const;
+			void loadNode(Sim::Save::BasePtr &fp, ReplayNode *&node);
+			
 			ReplayNode *makeNode(ReplayNode *parent=0);
 			void freeNode(ReplayNode *node);
 			

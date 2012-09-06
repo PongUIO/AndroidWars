@@ -1,3 +1,5 @@
+#include <boost/bind.hpp>
+
 #include "ReplayTree.h"
 
 namespace exts {
@@ -39,7 +41,18 @@ namespace exts {
 		for(size_t i=0; i<NtMax; ++i)
 			mSave[i].clear();
 	}
-
+	
+	void ReplayNode::save(Sim::Save::BasePtr& fp) const
+	{
+		for(uint32_t i=0; i<NtMax; ++i)
+			fp.writeSave(mSave[i]);
+	}
+	
+	void ReplayNode::load(Sim::Save::BasePtr& fp)
+	{
+		for(uint32_t i=0; i<NtMax; ++i)
+			mSave[i] = fp.readSave();
+	}
 	
 	// ReplayTree
 	// 
@@ -88,4 +101,41 @@ namespace exts {
 		delete node;
 	}
 	
+	void ReplayTree::saveNode(Sim::Save::BasePtr& fp, const ReplayNode *node) const
+	{
+		if(node) {
+			fp << true;
+			fp << *node;
+		} else {
+			fp << false;
+		}
+	}
+	
+	void ReplayTree::loadNode(Sim::Save::BasePtr& fp, ReplayNode*& node)
+	{
+		bool hasNode;
+		fp >> hasNode;
+		
+		Sim::IdType nextId = mNodes.size()-1;
+		
+		if(hasNode) {
+			node = new ReplayNode(*this, nextId, 0);
+			fp >> *node;
+		} else {
+			mFreeNodes.push(nextId);
+		}
+	}
+	
+	void ReplayTree::save(Sim::Save::BasePtr& fp) const
+	{
+		fp << mRoot->getId();
+		fp.writeCtrF(mNodes, boost::bind(&ReplayTree::saveNode, *this, _1, _2));
+	}
+	
+	void ReplayTree::load(Sim::Save::BasePtr& fp)
+	{
+		Sim::IdType rootId;
+		fp >> rootId;
+		fp.readCtrF(mNodes, boost::bind(&ReplayTree::loadNode, this, _1, _2));
+	}
 }
