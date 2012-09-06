@@ -17,7 +17,7 @@ add_library(AWExtSim
 	replay/ReplayManager.cpp
 	
 	param/Position.cpp
-	param/IdList.cpp
+	param/IdParam.cpp
 	param/ValueParam.cpp
 	
 	object/ExtDataObj.cpp

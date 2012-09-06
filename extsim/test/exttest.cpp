@@ -7,7 +7,7 @@
 
 #include "../ExtSim.h"
 
-#include "../param/IdList.h"
+#include "../param/IdParam.h"
 #include "../param/Position.h"
 #include "../param/ValueParam.h"
 

@@ -11,7 +11,7 @@ namespace Sim {
 namespace exts {
 	// Forward declare classes
 	template<class T>
-	class IdList;
+	class IdParam;
 	
 	template<class T>
 	class ValueParam;
@@ -29,7 +29,7 @@ namespace exts {
 			#undef _EXTS_X
 			
 			// IdList visitors for all types in dataid.def
-			#define _EXTS_X(type) virtual void visit(IdList<type> &) {}
+			#define _EXTS_X(type) virtual void visit(IdParam<type> &) {}
 			#include "../param/dataid.def"
 			#undef _EXTS_X
 			

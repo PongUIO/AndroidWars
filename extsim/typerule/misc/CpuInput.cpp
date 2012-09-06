@@ -1,11 +1,11 @@
 #include "CpuInput.h"
 
-#include "../../param/IdList.h"
+#include "../../param/IdParam.h"
 #include "../../param/ValueParam.h"
 
 namespace exts { namespace misc {
-	typedef IdList<Sim::Bot> BotId;
-	typedef IdList<Sim::Program> ProgramId;
+	typedef IdParam<Sim::Bot> BotId;
+	typedef IdParam<Sim::Program> ProgramId;
 	typedef ValueParam<uint32_t> Uint32Val;
 	
 	CpuInput::CpuInput(ExtSim& esim): TypeRule(esim)
@@ -20,9 +20,9 @@ namespace exts { namespace misc {
 	
 	void CpuInput::makeInput(const ParamList* param) const
 	{
-		const IdList<Sim::Bot> *bot = param->
+		const IdParam<Sim::Bot> *bot = param->
 			getParamT<BotId>(0);
-		const IdList<Sim::Program> *prog = param->
+		const IdParam<Sim::Program> *prog = param->
 			getParamT<ProgramId>(1);
 		const ValueParam<uint32_t> *delay = param->
 			getParamT<Uint32Val>(2);

@@ -2,7 +2,7 @@
 
 #include "../../ExtSim.h"
 
-#include "../../param/IdList.h"
+#include "../../param/IdParam.h"
 
 namespace exts { namespace prog {
 	Kill::Kill(ExtSim& esim): TypeRule(esim)
