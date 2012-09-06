@@ -7,10 +7,13 @@
 #include "../extsim/ExtSim.h"
 #include "../extsim/typerule/program/MoveTowards.h"
 #include "../extsim/param/Position.h"
+#include<QtGui>
+
 
 class ClientStates {
 private:
-	boost::unordered_set<uint> mSelBots;
+	typedef boost::unordered_set<Sim::IdType> idSet;
+	idSet mSelBots;
 	exts::ExtSim *mSim;
 	bool mShift, mCtrl, mMenu, mGameStepping;
 	int mOffset;
@@ -59,7 +62,7 @@ public:
 		return mMenu;
 	}
 
-	bool isSelected(uint b) {
+	bool isSelected(Sim::IdType b) {
 		return mSelBots.find(b) != mSelBots.end();
 	}
 
@@ -67,7 +70,7 @@ public:
 		return mSelBots.size();
 	}
 
-	void select(uint i) {
+	void select(Sim::IdType i) {
 		if (!mShift) {
 			mSelBots.clear();
 		}
@@ -78,33 +81,32 @@ public:
 		if (mSim == NULL || mGameStepping) {
 			return 1;
 		}
-		std::list<Sim::Bot*> bots = mSim->getSim().getState().getBotFactory().getBotList();
-		std::list<Sim::Bot*>::iterator bot;
 		if (button) {
+			const std::list<Sim::Bot*> &bots = mSim->getSim().getState().getBotFactory().getBotList();
+			std::list<Sim::Bot*>::const_iterator bot = bots.begin();
 			if (!mShift) {
 				mSelBots.clear();
 			}
-			for (bot = bots.begin(); bot != bots.end(); bot++) {
+			for (; bot != bots.end(); bot++) {
 				Sim::Vector pos = (*bot)->getBody().mPos;
 				Sim::Vector col = (*bot)->getTypePtr()->getCollision()->getBboxHigh();
 				if ( pos.x < x && x < pos.x + col.x && pos.y < y && y < pos.y + col.y) {
+					qDebug() << (*bot)->getId();
 					mSelBots.insert((*bot)->getId());
 					return 1;
 				}
 			}
 		} else if (button == 0) {
-			for (bot = bots.begin(); bot != bots.end(); bot++) {
-				if (isSelected((*bot)->getId())) {
-					mSim->getReplay().gotoActive();
-					exts::ParamList *paramList = mSim->getData().getProgramDb()
-						.getType("MoveTowards")->getRule()->makeParam(0);
-					paramList->getParamT<exts::PositionParam>(0)->setVal(Sim::Vector(x, y));
+			mSim->getReplay().gotoActive();
+			for (idSet::iterator bot = mSelBots.begin(); bot != mSelBots.end(); bot++) {
+				exts::ParamList *paramList = mSim->getData().getProgramDb()
+					.getType("MoveTowards")->getRule()->makeParam(0);
+				paramList->getParamT<exts::PositionParam>(0)->setVal(Sim::Vector(x, y));
 
 
-					mSim->getInput().registerInput(paramList);
-					mSim->getCpuInput().registerCpuInput((*bot)->getId(), paramList->getAllocId(0), 0);
+				mSim->getInput().registerInput(paramList);
+				mSim->getCpuInput().registerCpuInput(*bot, paramList->getAllocId(0), 0);
 
-				}
 			}
 			return 1;
 		}
