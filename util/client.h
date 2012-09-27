@@ -38,10 +38,12 @@ public:
 		mSim = in;
 		mSelBots.clear();
 	}
+
 	void releaseMods() {
 		mShift = false;
 		mCtrl = false;
 	}
+
 	void setShift(bool state) {
 		mShift = state;
 	}
@@ -49,15 +51,19 @@ public:
 	void setCtrl(bool state) {
 		mCtrl = state;
 	}
+
 	void setMenu(bool state) {
 		mMenu = state;
 	}
+
 	void setRunning(bool state) {
 		mGameStepping = state;
 	}
+
 	bool getRunning() {
 		return mGameStepping;
 	}
+
 	bool menuOpen() {
 		return mMenu;
 	}

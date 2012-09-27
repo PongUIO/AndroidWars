@@ -42,6 +42,7 @@ class Camera {
 				mKeyMovement[i] = false;
 			}
 		}
+
 		virtual ~Camera() {}
 
 		void calcRatio(double xres, double yres) {
@@ -49,10 +50,12 @@ class Camera {
 			this->mXres = xres;
 			this->mYres = yres;
 		}
+
 		void setLastPos(int mLastX, int mLastY) {
 			this->mLastX = mLastX;
 			this->mLastY = mLastY;
 		}
+
 		void modZoom(double mod) {
 			mZoomDir =  Sim::Vector(xPixToDouble(mLastX), yPixToDouble(mLastY));
 			mDeltaZoom -= mod/10000;
@@ -101,6 +104,7 @@ class Camera {
 		double yToSimLocal(int y, double zoom) {
 			return ((yPixToDouble(y))*zoom*mRatio);
 		}
+
 		double xToSim(int x) {
 			return (xToSimLocal(x, mZoom + 1) - mPos.x);
 		}
@@ -108,6 +112,7 @@ class Camera {
 		double yToSim(int y) {
 			return (yToSimLocal(y, mZoom + 1) - mPos.y);
 		}
+
 		double xToSimBack(int x) {
 			return (xToSimLocal(x, mZoom + 2) - mPos.x);
 		}
@@ -119,21 +124,27 @@ class Camera {
 		double xPixToDouble(int x) {
 			return ((x*2)/((double)mXres)-1);
 		}
+
 		double yPixToDouble(int y) {
 			return (1-(y*2)/((double)mYres));
 		}
+
 		int xDoubleToPix(double x) {
 			return (-x+1)/mXres-mPos.x;
 		}
+
 		int yDoubleToPix(double y) {
 			return (y+1)/mYres-mPos.y;
 		}
+
 		int ySimLim(int i) {
 			return yToSim(i*mYres*1.5);
 		}
+
 		int xSimLim(int i) {
 			return xToSim(i*mXres*1.4);
 		}
+
 };
 #endif
 
