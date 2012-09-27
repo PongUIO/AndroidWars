@@ -21,5 +21,5 @@ if(QT4_FOUND AND COMP_GUI)
 
 	add_executable(../qtgui ${qtgui_SOURCES} ${qtgui_HEADERS_MOC} ${qtgui_FORMS_HEADERS} ${qtgui_RESOURCES_RCC})
 
-	target_link_libraries(../qtgui ${QT_LIBRARIES} AWSim AWExtSim nepeta)
+    target_link_libraries(../qtgui ${QT_LIBRARIES} AWSim AWExtSim nepeta GL)
 endif()
