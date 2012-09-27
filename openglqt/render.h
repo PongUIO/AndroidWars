@@ -65,7 +65,7 @@ public:
 
 	Camera *mCam;
 	ClientStates *mStates;
-	QTimer *glTimer, *mCamTimer;
+	QTimer *mGlTimer, *mCamTimer;
 	GameMap *mGameMap;
 	double mHitX, mHitY;
 	QVector3D mScaleTest;
@@ -81,8 +81,8 @@ public:
 		mSelAlpha = 0.8;
 		mDirAlpha = false;
 		mFullScreen = false;
-		glTimer = new QTimer(parent);
-		connect(glTimer, SIGNAL(timeout()), this, SLOT(redraw()));
+		mGlTimer = new QTimer(parent);
+		connect(mGlTimer, SIGNAL(timeout()), this, SLOT(redraw()));
 		mCamTimer = new QTimer(parent);
 		connect(mCamTimer, SIGNAL(timeout()), this, SLOT(tick()));
 		mHitX = mHitY = 0;
@@ -90,12 +90,31 @@ public:
 	}
 
 	void stopTimers() {
-		glTimer->stop();
+		mGlTimer->stop();
 		mCamTimer->stop();
 	}
 	void startTimers() {
-		glTimer->start(0);
+		mGlTimer->start(0);
 		mCamTimer->start(40);
+	}
+
+	void modKeyState(int key, bool state) {
+		switch (key) {
+		case Qt::Key_W:
+			mCam->setKeyMoveState(KEY_UP, state);
+			break;
+		case Qt::Key_S:
+			mCam->setKeyMoveState(KEY_DOWN, state);
+			break;
+		case Qt::Key_A:
+			mCam->setKeyMoveState(KEY_LEFT, state);
+			break;
+		case Qt::Key_D:
+			mCam->setKeyMoveState(KEY_RIGHT, state);
+			break;
+		default:
+			break;
+		}
 	}
 protected:
 	// overriden
@@ -111,10 +130,10 @@ protected:
 		}
 		int w = width();
 		int h = height();
-		mHitX = mCam->xToSimX(event->x());
-		mHitY = mCam->yToSimY(event->y());
-		if (!mStates->registerClick(mCam->xToSimX(event->x()), mCam->yToSimY(event->y()), event->button())) {
-			mStates->registerClick(mCam->xToSimXBack(event->x()), mCam->yToSimYBack(event->y()), event->button());
+		mHitX = mCam->xToSim(event->x());
+		mHitY = mCam->yToSim(event->y());
+		if (!mStates->registerClick(mCam->xToSim(event->x()), mCam->yToSim(event->y()), event->button())) {
+			mStates->registerClick(mCam->xToSimBack(event->x()), mCam->yToSimBack(event->y()), event->button());
 
 		}
 	}

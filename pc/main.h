@@ -289,14 +289,23 @@ protected:
 			modKey(event->key(), false);
 		}
 	}
-	void modKey(int k, bool state) {
-		if ( k == Qt::Key_Shift ) {
-			mStates->setShift(state);
-		} else if ( k == Qt::Key_Control ) {
-			mStates->setCtrl(state);
-			if (state) {
 
-			}
+	void modKey(int k, bool state) {
+		switch (k) {
+		case Qt::Key_Shift:
+			mStates->setShift(state);
+			break;
+		case Qt::Key_Control:
+			mStates->setCtrl(state);
+			break;
+		case Qt::Key_W:
+		case Qt::Key_A:
+		case Qt::Key_S:
+		case Qt::Key_D:
+			mGameController->mDrawer->modKeyState(k, state);
+			break;
+		default:
+			break;
 		}
 	}
 
