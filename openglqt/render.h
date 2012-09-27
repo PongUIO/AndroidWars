@@ -20,101 +20,101 @@ public slots:
 	}
 
 	void tick() {
-		if (states->menuOpen()) {
+		if (mStates->menuOpen()) {
 			return;
 		}
-		cam->setLastPos(lastX, lastY);
-		cam->iter();
-		if (dirAlpha) {
-			selAlpha += 0.01;
+		mCam->setLastPos(mLastX, mLastY);
+		mCam->iter();
+		if (mDirAlpha) {
+			mSelAlpha += 0.01;
 		} else {
-			selAlpha -= 0.01;
+			mSelAlpha -= 0.01;
 		}
-		if (selAlpha > 1) {
-			dirAlpha = false;
-		} else if (selAlpha < 0.6) {
-			dirAlpha = true;
+		if (mSelAlpha > 1) {
+			mDirAlpha = false;
+		} else if (mSelAlpha < 0.6) {
+			mDirAlpha = true;
 		}
 	}
 
 public:
-	QWidget *parent;
-	int lastX, lastY, cMouse;
-	double mouseSize;
-	bool fullScreen;
-	float selAlpha;
-	bool dirAlpha;
-	QGLShaderProgram *testShader;
+	QWidget *mParent;
+	int mLastX, mLastY, mCurrMouse;
+	double mMouseSize;
+	bool mFullScreen;
+	float mSelAlpha;
+	bool mDirAlpha;
+	QGLShaderProgram *mTestShader;
 
-	QVector<GLObj*> robots;
-	QVector<GLObj*> terrain;
-	QImage data[3];
-	QImage weapons[1];
-	GLuint weaponstextures[1];
-	QImage bg[1];
-	GLuint bgtextures[1];
-	QImage mouse[2];
-	GLuint mousetextures[2];
-	QPixmap mouseMaps[2];
-	QImage bullet[1];
-	GLuint bullettextures[1];
-	QImage checkImage;
-	GLuint check;
-	QImage redImage;
-	GLuint red;
+	QVector<GLObj*> mRobots;
+	QVector<GLObj*> mTerrain;
+	QImage mData[3];
+	QImage mWeapons[1];
+	GLuint mWeaponstextures[1];
+	QImage mBackground[1];
+	GLuint mBGTextures[1];
+	QImage mMouse[2];
+	GLuint mMousetextures[2];
+	QPixmap mMouseMaps[2];
+	QImage mBullet[1];
+	GLuint mBullettextures[1];
+	QImage mCheckImage;
+	GLuint mCheck;
+	QImage mRedImage;
+	GLuint mRed;
 
-	Camera *cam;
-	ClientStates *states;
-	QTimer *glTimer, *camTimer;
-	GameMap *gm;
-	double hitX, hitY;
-	QVector3D scaleTest;
+	Camera *mCam;
+	ClientStates *mStates;
+	QTimer *glTimer, *mCamTimer;
+	GameMap *mGameMap;
+	double mHitX, mHitY;
+	QVector3D mScaleTest;
 	GameDrawer(ClientStates *states, QWidget *parent = 0)
-		: QGLWidget(QGLFormat(QGL::SampleBuffers), parent), states(states) {
-		scaleTest = QVector3D(1,1,1);
-		this->parent = parent;
-		cMouse = 0;
-		this->cam = new Camera(0, 0, parent->width(), parent->height());
-		lastX = width()/2;
-		lastY = height()/2;
-		mouseSize = 0.07;
-		selAlpha = 0.8;
-		dirAlpha = false;
-		fullScreen = false;
+		: QGLWidget(QGLFormat(QGL::SampleBuffers), parent), mStates(states) {
+		mScaleTest = QVector3D(1,1,1);
+		this->mParent = parent;
+		mCurrMouse = 0;
+		this->mCam = new Camera(0, 0, parent->width(), parent->height());
+		mLastX = width()/2;
+		mLastY = height()/2;
+		mMouseSize = 0.07;
+		mSelAlpha = 0.8;
+		mDirAlpha = false;
+		mFullScreen = false;
 		glTimer = new QTimer(parent);
 		connect(glTimer, SIGNAL(timeout()), this, SLOT(redraw()));
-		camTimer = new QTimer(parent);
-		connect(camTimer, SIGNAL(timeout()), this, SLOT(tick()));
-		hitX = hitY = 0;
-		gm = new GameMap(cam);
+		mCamTimer = new QTimer(parent);
+		connect(mCamTimer, SIGNAL(timeout()), this, SLOT(tick()));
+		mHitX = mHitY = 0;
+		mGameMap = new GameMap(mCam);
 	}
 
 	void stopTimers() {
 		glTimer->stop();
-		camTimer->stop();
+		mCamTimer->stop();
 	}
 	void startTimers() {
 		glTimer->start(0);
-		camTimer->start(40);
+		mCamTimer->start(40);
 	}
 protected:
 	// overriden
 	void mouseMoveEvent(QMouseEvent * event) {
-		lastX = event->pos().x();
-		lastY = event->pos().y();
+		mLastX = event->pos().x();
+		mLastY = event->pos().y();
 	}
 
 	// overridden
 	void mousePressEvent(QMouseEvent * event) {
-		if (states->menuOpen()) {
+		if (mStates->menuOpen()) {
 			return;
 		}
 		int w = width();
 		int h = height();
-		hitX = cam->xToSimX(event->x());
-		hitY = cam->yToSimY(event->y());
-		if (!states->registerClick(cam->xToSimX(event->x()), cam->yToSimY(event->y()), event->button() == Qt::LeftButton)) {
-			states->registerClick(cam->xToSimXBack(event->x()), cam->yToSimYBack(event->y()), event->button() == Qt::LeftButton);
+		mHitX = mCam->xToSimX(event->x());
+		mHitY = mCam->yToSimY(event->y());
+		if (!mStates->registerClick(mCam->xToSimX(event->x()), mCam->yToSimY(event->y()), event->button())) {
+			mStates->registerClick(mCam->xToSimXBack(event->x()), mCam->yToSimYBack(event->y()), event->button());
 
 		}
 	}
@@ -122,7 +122,7 @@ protected:
 
 	// overridden
 	void initializeGL() {
-		Sim::World *wld = &(states->getSim()->getSim().getState().getWorld());
+		Sim::World *wld = &(mStates->getSim()->getSim().getState().getWorld());
 		glClearColor( 0.1, 0.1, 0.1, 0.0 );
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_DOUBLE);
@@ -131,30 +131,30 @@ protected:
 		glPushClientAttrib( GL_CLIENT_VERTEX_ARRAY_BIT );
 
 		// Loading textures and obj-files.
-		loadAndBind("../testmod/graphics/weapons/testweapon.png", &weapons[0], &weaponstextures[0], 32, 64);
-		loadAndBind("../testmod/graphics/mouse/default.png", &mouse[0], &mousetextures[0],64,64);
-		loadAndBind("../testmod/graphics/mouse/attack.png", &mouse[1], &mousetextures[1],64,64);
-		loadAndBind("../testmod/graphics/weapons/bullet.png", &bullet[0], &bullettextures[0],16,16);
-		loadAndBind("../testmod/graphics/debug/checker.png", &checkImage, &check, 256, 256);
-		loadAndBind("../testmod/graphics/debug/red.png", &redImage, &red, 100, 100);
+		loadAndBind("../testmod/graphics/weapons/testweapon.png", &mWeapons[0], &mWeaponstextures[0], 32, 64);
+		loadAndBind("../testmod/graphics/mouse/default.png", &mMouse[0], &mMousetextures[0],64,64);
+		loadAndBind("../testmod/graphics/mouse/attack.png", &mMouse[1], &mMousetextures[1],64,64);
+		loadAndBind("../testmod/graphics/weapons/bullet.png", &mBullet[0], &mBullettextures[0],16,16);
+		loadAndBind("../testmod/graphics/debug/checker.png", &mCheckImage, &mCheck, 256, 256);
+		loadAndBind("../testmod/graphics/debug/red.png", &mRedImage, &mRed, 100, 100);
 		GLObj *tmp = new GLObj();
 		tmp->loadFile("../testmod/obj/box.obj", QVector3D(1., 1., 1.));
-		gm->registerPiece(tmp);
-		gm->setWorld(wld);
-		gm->setOffmap(1);
+		mGameMap->registerPiece(tmp);
+		mGameMap->setWorld(wld);
+		mGameMap->setOffmap(1);
 		tmp = new GLObj();
 		tmp->loadFile("../testmod/obj/Android01.obj", QVector3D(1., 1., 1.));
-		robots.push_back(tmp);
+		mRobots.push_back(tmp);
 		this->setAttribute(Qt::WA_NoSystemBackground);
 		QPixmap m;
-		m.convertFromImage(mouse[MOUSE_NORMAL]);
+		m.convertFromImage(mMouse[MOUSE_NORMAL]);
 		this->setCursor(QCursor(m, -1, -1));
-		testShader = new QGLShaderProgram(context()->currentContext(), this);
-		testShader->addShader(loadShader("../shaders/animation.vert", QGLShader::Vertex));
-		testShader->addShader(loadShader("../shaders/animation.frag", QGLShader::Fragment));
+		mTestShader = new QGLShaderProgram(context()->currentContext(), this);
+		mTestShader->addShader(loadShader("../shaders/animation.vert", QGLShader::Vertex));
+		mTestShader->addShader(loadShader("../shaders/animation.frag", QGLShader::Fragment));
 
-		if (testShader) {
-			testShader->link();
+		if (mTestShader) {
+			mTestShader->link();
 		}
 		glDisable(GL_TEXTURE_2D);
 
@@ -172,7 +172,7 @@ protected:
 	QGLShader* loadShader(QString path, QGLShader::ShaderType type) {
 		QGLShader *ret = new QGLShader(type, this);
 		if (ret->compileSourceFile(path)) {
-			ret->setProperty("tex", red);
+			ret->setProperty("tex", mRed);
 			return ret;
 		} else {
 			qDebug() << "Shader compile error" << ret->log();
@@ -183,7 +183,7 @@ protected:
 	// overridden
 	void resizeGL( int w, int h) {
 		glViewport( 0, 0, (GLint)w, (GLint)h);
-		cam->calcRatio(w, h);
+		mCam->calcRatio(w, h);
 	}
 
 	void resizeEvent(QResizeEvent *event) {
@@ -193,7 +193,7 @@ protected:
 	}
 
 	void wheelEvent(QWheelEvent *event) {
-		cam->modZoom(event->delta());
+		mCam->modZoom(event->delta());
 	}
 
 	void drawTexObj2d(double xf, double yf, double xt, double yt) {
@@ -233,14 +233,14 @@ protected:
 
 	// overridden
 	void paintGL() {
-		testShader->bind();
-		exts::ExtSim *sim = states->getSim();
+		mTestShader->bind();
+		exts::ExtSim *sim = mStates->getSim();
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClear(GL_DEPTH_BUFFER_BIT);
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
-		glFrustum(-1, 1, -1*cam->mRatio, 1*cam->mRatio, 1, 5.1+cam->mZoom);
-		glTranslatef(cam->mPos.x,cam->mPos.y,-1-cam->mZoom);
+		glFrustum(-1, 1, -1*mCam->mRatio, 1*mCam->mRatio, 1, 5.1+mCam->mZoom);
+		glTranslatef(mCam->mPos.x,mCam->mPos.y,-1-mCam->mZoom);
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
 
@@ -250,22 +250,22 @@ protected:
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glEnable(GL_TEXTURE_2D);
-		glBindTexture(GL_TEXTURE_2D, check);
-		testShader->bind();
-		testShader->setAttributeValue("testtween", 0.5);
-		gm->draw();
+		glBindTexture(GL_TEXTURE_2D, mCheck);
+		mTestShader->bind();
+		mTestShader->setAttributeValue("testtween", 0.5);
+		mGameMap->draw();
 		for (bot = bots.begin(); bot != bots.end(); bot++) {
 			Sim::Vector pos = (*bot)->getBody().mPos;
-			if (states->isSelected((*bot)->getId())) {
+			if (mStates->isSelected((*bot)->getId())) {
 
-				glColor4f(0.2f, 1.0f, 0.2f, selAlpha);
+				glColor4f(0.2f, 1.0f, 0.2f, mSelAlpha);
 			} else {
 				glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 			}
-			robots[(*bot)->getTypeId()]->draw(pos.x, pos.y, 0);
+			mRobots[(*bot)->getTypeId()]->draw(pos.x, pos.y, 0);
 
 		}
-		testShader->release();
+		mTestShader->release();
 		glDisable(GL_TEXTURE_2D);
 		glDisable(GL_BLEND);
 		glFlush();

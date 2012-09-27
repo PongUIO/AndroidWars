@@ -81,7 +81,7 @@ public:
 		if (mSim == NULL || mGameStepping) {
 			return 1;
 		}
-		if (button) {
+		if (button == Qt::LeftButton) {
 			const std::list<Sim::Bot*> &bots = mSim->getSim().getState().getBotFactory().getBotList();
 			std::list<Sim::Bot*>::const_iterator bot = bots.begin();
 			if (!mShift) {
@@ -96,7 +96,7 @@ public:
 					return 1;
 				}
 			}
-		} else if (button == 0) {
+		} else if (button == Qt::RightButton) {
 			mSim->getReplay().gotoActive();
 			for (idSet::iterator bot = mSelBots.begin(); bot != mSelBots.end(); bot++) {
 				exts::ParamList *paramList = mSim->getData().getProgramDb()

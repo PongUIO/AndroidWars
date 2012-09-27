@@ -2,9 +2,13 @@ moc*
 *.o
 ui_*
 pc/pc
-pc/Makefile
 build/*
 simulation/test/simtest
 simulation/doc/**
 *.kdev4*
-*.user
+*.user*
+*Makefile
+*.cmake
+*~
+*build-debug/*
+openglqt/test/SkeletalSystem/SkeletalSystem

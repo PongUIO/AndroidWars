@@ -9,9 +9,10 @@ GameButton::GameButton(exts::ExtSim *sim, ClientStates *states, int func, GameSl
 void GameButton::mousePressEvent(QMouseEvent * event) {
 	if (mFunc == 0) {
 		if (!mCs->getRunning()) {
+			mGs->setValue(0);
+			mExtSim->getReplay().gotoActive();
 			mExtSim->getInput().feedInput();
 			mExtSim->getSim().startPhase();
-			mGs->setValue(0);
 			mCs->setRunning(true);
 		}
 	}

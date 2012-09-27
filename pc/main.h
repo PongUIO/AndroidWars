@@ -50,7 +50,7 @@ public:
 	State mDispState;
 	int mSubMenu;
 	ClientStates *mStates;
-	GameController *mGamecont;
+	GameController *mGameController;
 	exts::ExtSim mExtSim;
 	QSize mCurrentSize;
 	std::vector< std::vector<QWidget*> > mMenus;
@@ -69,9 +69,9 @@ public:
 		mPal->setColor( QPalette::Background, Qt::black );
 		setPalette( *mPal );
 		mGameRunning = false;
-		mGamecont = new GameController(mStates, this);
-		mGamecont->hideAll();
-		registerForResize(mGamecont->mDrawer);
+		mGameController = new GameController(mStates, this);
+		mGameController->hideAll();
+		registerForResize(mGameController->mDrawer);
 		resize(700,700);
 		initMenus();
 		mGameTimer = new QTimer(this);
@@ -129,11 +129,11 @@ public:
 		mDispState = s;
 		switch (s) {
 		case MENU:
-			mGamecont->hideAll();
+			mGameController->hideAll();
 			showMenus();
 			break;
 		case GAME:
-			mGamecont->showAll();
+			mGameController->showAll();
 			hideMenus();
 			break;
 		}

@@ -7,16 +7,16 @@
 
 class Bone {
 	public:
-		Bone *previous;
-		QQuaternion origin, rotOrigin, rot;
+		Bone *mPrevious;
+		QQuaternion mOrigin, rotOrigin, rot;
 		Bone(Bone *p, QQuaternion o) {
-			previous = p;
-			origin = rotOrigin = QQuaternion();
+			mPrevious = p;
+			mOrigin = rotOrigin = QQuaternion();
 			rot = o;
 		}
 		void calcMatrix() {
-			rotOrigin = origin;
-			Bone *tmp = previous;
+			rotOrigin = mOrigin;
+			Bone *tmp = mPrevious;
 			if (tmp != NULL) {
 				rot *= tmp->rot;
 				rotOrigin = tmp->rot * rotOrigin;
