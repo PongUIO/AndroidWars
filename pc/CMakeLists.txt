@@ -8,7 +8,8 @@ if(QT4_FOUND AND COMP_GUI)
 	set(qtgui_HEADERS main.h ../openglqt/render.h ../util/camera.h
 		menubutton.h gamecontroller.h gamebutton.h
 		../util/cursordefines.h ../util/client.h
-		botselector.h main.h gameslider.h ../openglqt/skeletalsystem.h)
+		botselector.h main.h gameslider.h ../openglqt/skeletalsystem.h
+		../Qt-based-common-libs/globj.h)
 
 	set(QT_USE_QTOPENGL TRUE)
 
