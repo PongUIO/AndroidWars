@@ -12,6 +12,32 @@ namespace exts {
 	class ParamList;
 	
 	/**
+	 * @brief Stores a list of \c ParamList objects.
+	 */
+	class InputList : public Sim::Save::OperatorImpl<InputList> {
+		public:
+			typedef std::vector<ParamList*> ParamListVec;
+			
+			InputList(ExtSim &esim);
+			~InputList();
+			
+			bool registerInput(ParamList *param);
+			void inheritList(InputList &source);
+			
+			void discardInput();
+			
+			const ParamListVec &getParamList() const
+			{ return mInput; }
+			
+			void save(Sim::Save::BasePtr &fp) const;
+			void load(Sim::Save::BasePtr &fp);
+			
+		private:
+			ExtSim &mExtSim;
+			ParamListVec mInput;
+	};
+	
+	/**
 	 * @brief Filters input from external sources and sends it to the
 	 * simulation.
 	 * 
@@ -40,15 +66,20 @@ namespace exts {
 			
 			/// @name Interface
 			//@{
-				bool registerInput(ParamList *param);
-				
+				// Utility functions
+				void copyInput(const InputList &il);
+				void applyInput(InputList &il);
 				void dispatchInput(bool saveReplay=true);
+				
+				// Basic input interface
+				bool registerInput(ParamList *param);
 				
 				void feedInput();
 				void commitReplay();
 				void postProcessInput();
 				void discardInput();
 				
+				// Save/load
 				void saveInput(Sim::Save::BasePtr &fp) const;
 				void loadInput(Sim::Save::BasePtr &fp);
 				
@@ -57,9 +88,7 @@ namespace exts {
 			
 		private:
 			ExtSim &mExtSim;
-			
-			typedef std::vector<ParamList*> ParamListVec;
-			ParamListVec mInput;
+			InputList mInput;
 	};
 }
 

@@ -8,24 +8,23 @@
 #include "object/ParamList.h"
 
 namespace exts {
-	InputBarrier::InputBarrier(ExtSim& esim) : mExtSim(esim)
+	// InputList
+	// 
+	// 
+	InputList::InputList(ExtSim &esim) : mExtSim(esim)
 	{}
-
-	InputBarrier::~InputBarrier()
-	{	discardInput(); }
 	
-	void InputBarrier::startup()
-	{}
-
-	void InputBarrier::shutdown()
-	{	discardInput(); }
+	InputList::~InputList()
+	{
+		discardInput();
+	}
 	
 	/**
-	 * @brief Registers a \c ParamList to the \c InputBarrier
+	 * @brief Registers a \c ParamList to the \c InputList
 	 * 
-	 * @note The \c InputBarrier takes ownership of \p param.
+	 * @note The \c InputList takes ownership of \p param.
 	 */
-	bool InputBarrier::registerInput(ParamList* param)
+	bool InputList::registerInput(ParamList* param)
 	{
 		if(!param)
 			return false;
@@ -40,6 +39,94 @@ namespace exts {
 		}
 		
 		return isConstrained;
+	}
+	
+	/**
+	 * @brief Discards and deletes all input stored in this \c InputList.
+	 */
+	void InputList::discardInput()
+	{
+		for(size_t i=0; i<mInput.size(); ++i)
+			delete mInput[i];
+		
+		mInput.clear();
+	}
+	
+	/**
+	 * @brief Inherits all input from the source \c InputList.
+	 */
+	void InputList::inheritList(InputList& source)
+	{
+		mInput.insert(mInput.end(),
+		source.mInput.begin(), source.mInput.end());
+		source.mInput = ParamListVec();
+	}
+	
+	void InputList::save(Sim::Save::BasePtr& fp) const
+	{
+		fp << uint32_t(mInput. size());
+		for(ParamListVec::const_iterator i=mInput.begin(); i!=mInput.end(); ++i)
+			mExtSim.getTypeRuleMgr().saveParamList(fp, *i);
+	}
+
+	void InputList::load(Sim::Save::BasePtr& fp)
+	{
+		uint32_t count;
+		fp >> count;
+		
+		for(uint32_t i=0; i<count; ++i) {
+			ParamList *param = mExtSim.getTypeRuleMgr().loadParamList(fp);
+			
+			if(param)
+				registerInput(param);
+			else
+				break;
+		}
+	}
+
+	
+	// InputBarrier
+	// 
+	// 
+	InputBarrier::InputBarrier(ExtSim& esim) : mExtSim(esim), mInput(esim)
+	{}
+
+	InputBarrier::~InputBarrier()
+	{	discardInput(); }
+	
+	void InputBarrier::startup()
+	{}
+
+	void InputBarrier::shutdown()
+	{	discardInput(); }
+	
+	/**
+	 * @brief Copies any input from the \c InputList, preserving its
+	 * original contents.
+	 */
+	void InputBarrier::copyInput(const InputList& il)
+	{
+		for(InputList::ParamListVec::const_iterator i = mInput
+		.getParamList().begin(); i!=mInput.getParamList().end(); ++i) {
+			registerInput(new ParamList(**i));
+		}
+	}
+	
+	/**
+	 * @brief Makes the \c InputBarrier take ownership of all the input
+	 * in the \c InputList provided.
+	 */
+	void InputBarrier::applyInput(InputList& il)
+	{
+		mInput.inheritList(il);
+	}
+	
+	/**
+	 * @see InputList::registerInput
+	 */
+	bool InputBarrier::registerInput(ParamList* param)
+	{
+		return mInput.registerInput(param);
 	}
 	
 	/**
@@ -73,7 +160,9 @@ namespace exts {
 	 */
 	void InputBarrier::feedInput()
 	{
-		for(ParamListVec::iterator i=mInput.begin(); i!=mInput.end(); ++i) {
+		for(InputList::ParamListVec::const_iterator i=
+		mInput.getParamList().begin();
+		i!=mInput.getParamList().end(); ++i) {
 			const TypeRule *rule = mExtSim.getTypeRuleMgr()
 			.getRule((*i)->getTypeRuleId());
 			
@@ -127,33 +216,19 @@ namespace exts {
 	 */
 	void InputBarrier::discardInput()
 	{
-		for(ParamListVec::iterator i=mInput.begin(); i!=mInput.end(); ++i)
-			delete *i;
-		mInput.clear();
+		mInput.discardInput();
 		
 		mExtSim.getAgent().discardAllocAll();
 	}
 	
 	void InputBarrier::saveInput(Sim::Save::BasePtr& fp) const
 	{
-		fp << uint32_t(mInput.size());
-		for(ParamListVec::const_iterator i=mInput.begin(); i!=mInput.end(); ++i)
-			mExtSim.getTypeRuleMgr().saveParamList(fp, *i);
+		fp << mInput;
 	}
 	
 	void InputBarrier::loadInput(Sim::Save::BasePtr& fp)
 	{
-		uint32_t count;
-		fp >> count;
-		
-		for(uint32_t i=0; i<count; ++i) {
-			ParamList *param = mExtSim.getTypeRuleMgr().loadParamList(fp);
-			
-			if(param)
-				registerInput(param);
-			else
-				break;
-		}
+		fp >> mInput;
 	}
 	
 	void InputBarrier::loadInput(const Sim::Save& save)
