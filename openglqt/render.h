@@ -128,16 +128,23 @@ protected:
 		if (mStates->menuOpen()) {
 			return;
 		}
+		if (event->button() == Qt::MiddleButton) {
+			mCam->stopZoom();
+			return;
+		}
 		int w = width();
 		int h = height();
 		mHitX = mCam->xToSim(event->x());
 		mHitY = mCam->yToSim(event->y());
-		if (!mStates->registerClick(mCam->xToSim(event->x()), mCam->yToSim(event->y()), event->button())) {
-			mStates->registerClick(mCam->xToSimBack(event->x()), mCam->yToSimBack(event->y()), event->button());
-
+		if (!(mStates->registerClick(mCam->xToSim(event->x()), mCam->yToSim(event->y()), event->button()) ||
+				mStates->registerClick(mCam->xToSimBack(event->x()), mCam->yToSimBack(event->y()), event->button()))) {
+			mCam->setDragMove(true);
 		}
 	}
 
+	void mouseReleaseEvent(QMouseEvent *event) {
+		mCam->setDragMove(false);
+	}
 
 	// overridden
 	void initializeGL() {
