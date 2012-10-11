@@ -1,0 +1,6 @@
+CMD("echo", new Echo)
+CMD("include", new include(*this))
+CMD("runphase", new runphase(getSimMgr()))
+CMD("runstep", new runstep(getSimMgr()))
+CMD("startup", new startup(getSimMgr()))
+CMD("shutdown", new shutdown(getSimMgr()))

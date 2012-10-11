@@ -12,3 +12,9 @@ simulation/doc/**
 *~
 *build-debug/*
 openglqt/test/SkeletalSystem/SkeletalSystem
+pc/Makefile
+**/build/*
+simulation/test/simtest
+*.build
+*.out
+*.user
