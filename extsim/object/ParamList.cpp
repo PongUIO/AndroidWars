@@ -75,19 +75,11 @@ namespace exts {
 		return R->checkConstrained(this);
 	}
 	
-	void ParamList::traverseCallback()
+	void ParamList::traverseVisitor(ParamVisitor& visitor)
 	{
 		for(RuleParamVec::iterator i=mRuleParam.begin();
 		i!=mRuleParam.end(); ++i) {
-			(*i)->callback();
-		}
-	}
-	
-	void ParamList::clearListeners() const
-	{
-		for(RuleParamVec::const_iterator i=mRuleParam.begin();
-		i!=mRuleParam.end(); ++i) {
-			(*i)->clearListener();
+			(*i)->accept(visitor);
 		}
 	}
 }

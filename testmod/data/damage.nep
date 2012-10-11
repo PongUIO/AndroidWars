@@ -9,3 +9,15 @@
 #DAMAGE
 	Name "Rocket"
 #
+
+#DAMAGE
+	Name "Water"
+	
+	/*
+		Water based damage could reduce the max health of a bot
+		(corrosion), as well as causing disruptions to the bot's CPU.
+		
+		Some bots could have a special armor type that absorbs the effects
+		of water damage only taking mild damage.
+	*/
+#

@@ -24,8 +24,8 @@ namespace Sim {
 	class Simulation;
 	
 	/**
-	 * This template provides a variant of factories that provide
-	 * unique ids for an entity.
+	 * @brief Provides a factory that stores objects in an ordered list with
+	 * unique identifiers per entity.
 	 * 
 	 * This uses an implementation which mix a linked list (providing strict
 	 * ordering) and a hash table (providing fast random access and fast
@@ -45,6 +45,9 @@ namespace Sim {
 	 */
 	template<class T>
 	class UidFactory {
+		private:
+			static void nullfunc() {}
+		
 		public:
 			typedef T Type;
 			typedef std::list<T*> DataList;
@@ -52,8 +55,10 @@ namespace Sim {
 				IdResolveMap;
 			typedef std::pair<IdType,typename DataList::iterator>
 				InsertData;
+			typedef std::pair<typename IdResolveMap::iterator,bool>
+				InsertResult;
 			
-			UidFactory() : mCurrentUniqueId(0)
+			UidFactory()
 				{}
 			~UidFactory() {}
 			
@@ -86,13 +91,11 @@ namespace Sim {
 			
 			void cleanDead()
 			{
-				factoryCall(boost::bind(&T::isDead, _1));
+				factoryCall(boost::bind(&nullfunc));
 			}
 			
 			virtual void save(Save::BasePtr &fp)
 			{
-				fp << mCurrentUniqueId;
-				
 				fp << IdType(mData.size());
 				for(typename DataList::iterator i=mData.begin();
 					i!=mData.end(); i++) {
@@ -106,8 +109,6 @@ namespace Sim {
 			{
 				killAll();
 				
-				fp >> mCurrentUniqueId;
-				
 				IdType objCount;
 				fp >> objCount;
 				for(IdType i=0; i<objCount; i++) {
@@ -120,7 +121,6 @@ namespace Sim {
 			}
 			
 			const DataList &getData() const { return mData; }
-			IdType getCurrentUniqueId() const { return mCurrentUniqueId;}
 			
 		protected:
 			T *getObject(IdType id) {
@@ -135,36 +135,38 @@ namespace Sim {
 				}
 				mData.clear();
 				mIdResolve.clear();
-				
-				mCurrentUniqueId = 0;
 			}
 			
 			InsertData insertObject(
-				T *obj=0, IdType uid=NoId) {
-				
+			T *obj, IdType uid) {
+				// Handle the special illegal identifier
 				if(uid == NoId)
-					uid = mCurrentUniqueId++;
+					throw IllegalId();
 				
 				mData.push_back(obj);
 				typename DataList::iterator listElm = --mData.end();
 				InsertData insertPair = std::make_pair(uid, listElm);
-				mIdResolve.insert( insertPair );
+				
+				// Insert the data, and check if an element already exists
+				// with the same ID
+				if(!mIdResolve.insert( insertPair ).second)
+					throw IllegalId();
 				
 				return insertPair;
 			}
 			
-			void deleteObject(IdType id) {
+			bool deleteObject(IdType id) {
 				typename IdResolveMap::iterator i= mIdResolve.find(id);
 				if(i != mIdResolve.end()) {
 					deleteInstance(*i->second);
 					mData.erase(i->second);
 					mIdResolve.erase(i);
+					return true;
 				}
+				return false;
 			}
 			
 		private:
-			IdType mCurrentUniqueId;
-			
 			DataList mData;
 			IdResolveMap mIdResolve;
 	};
@@ -205,9 +207,6 @@ namespace Sim {
 				Impl *createImpl(const typename Impl::Config &cfg,
 				IdType typeId, IdType id)
 				{
-					if(id == NoId || typeId == NoId)
-						return 0;
-					
 					Impl *obj = new Impl(mSim,id,typeId,cfg);
 					UidFactory<T>::insertObject(obj,id);
 					return obj;

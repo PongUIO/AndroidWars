@@ -7,51 +7,43 @@
 
 #include "../ExtSim.h"
 
-#include "../param/IdList.h"
+#include "../param/IdParam.h"
 #include "../param/Position.h"
-#include "../param/ValRange.h"
+#include "../param/ValueParam.h"
 
 #include "../object/TypeRule.h"
+#include "../object/ParamVisitor.h"
 
 exts::ExtSim extSim = exts::ExtSim();
 Sim::Simulation &sim = extSim.getSim();
 
 namespace fs = boost::filesystem;
 
-template<class T>
-struct IdListListener : public exts::Listener<exts::IdList<T> > {
-	void process(exts::IdList<T> *p) {
-		std::cout << p->getId() << " | ";
-		
-		const typename exts::IdList<T>::IdSet &idSet = p->getIdSet();
-		for(typename exts::IdList<T>::IdSet::const_iterator i=idSet.begin();
-			i!=idSet.end(); ++i) {
-			std::cout << *i << " ";
+class VisitorTest : public exts::ParamVisitor {
+	public:
+		template<class T>
+		void visitValueParam(exts::ValueParam<T> &p) {
+			std::cout << p.getVal();
 		}
-		std::cout << (p->isConstraintDefined()?"":"(identity)");
-	}
-};
-
-template<class T>
-struct ValRangeListener : public exts::Listener<exts::ValRange<T> > {
-	void process(exts::ValRange<T> *p) {
-		std::cout << p->getVal();
-	}
-};
-
-struct PositionListener : public exts::Listener<exts::PositionParam> {
-	void process(exts::PositionParam *p) {
-		p->setVal(Sim::Vector(5,25));
 		
-		std::cout << p->getVal().x << "," << p->getVal().y << "\n";
+		// Wraps around each visitor to provide a template-based implementation
+#define _EXTS_X(type) void visit(exts::ValueParam<type> &t) \
+		{ visitValueParam<type>(t); }
+#include "../param/valtype.def"
+#undef _EXTS_X
 		
-		const exts::PositionParam::ValPairVec &consts = p->getValPairs();
-		for(exts::PositionParam::ValPairVec::const_iterator i = consts.begin();
-			i!=consts.end(); ++i) {
-			std::cout << "\t" << i->first.x << "," << i->first.y <<
-				" -> " << i->second.x << "," << i->second.y << "\n";
+		void visit(exts::PositionParam &p) {
+			p.setVal(Sim::Vector(5,25));
+			
+			std::cout << p.getVal() << "\n";
+			
+			const exts::PositionParam::ValPairVec &consts = p.getValPairs();
+			for(exts::PositionParam::ValPairVec::const_iterator i = consts.begin();
+				i!=consts.end(); ++i) {
+				std::cout << "\t" << i->first.x << "," << i->first.y <<
+					" -> " << i->second.x << "," << i->second.y << "\n";
+			}
 		}
-	}
 };
 
 void loadFiles()
@@ -166,9 +158,7 @@ void listBot()
 
 void testParam()
 {
-	exts::IdList<Sim::ArmorD>::setListener( IdListListener<Sim::ArmorD>() );
-	exts::ValRange<uint32_t>::setListener( ValRangeListener<uint32_t>() );
-	exts::PositionParam::ListenerSlot<exts::PositionParam>::setListener( PositionListener() );
+	VisitorTest vtest;
 	
 	printf("\nParameter testing:\n");
 	
@@ -187,7 +177,7 @@ void testParam()
 			for(exts::ParamList::RuleParamVec::iterator i=paramVec.begin();
 			i!=paramVec.end(); ++i) {
 				std::cout << "\t\"" << (*i)->getDataName() << "\"\t ";
-				(*i)->callback();
+				(*i)->accept(vtest);
 				std::cout << "\n";
 			}
 			
@@ -223,7 +213,8 @@ void testSim()
 	)->getRule()->makeParam(0);
 	
 	// Modify input object
-	inputParam->traverseCallback();
+	VisitorTest vtest;
+	inputParam->traverseVisitor(vtest);
 	
 	// Register input
 	extSim.getInput().registerInput(inputParam);
@@ -328,6 +319,8 @@ int main(void)
 	
 	// Testing extsim-simulation communication
 	testSim();
+	
+	extSim.shutdown();
 	
 	return 0;
 }

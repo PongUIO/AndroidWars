@@ -2,6 +2,7 @@
 #define SIM_COMMON_H
 
 #include <stdint.h>
+#include <exception>
 
 namespace Sim {
 	/// Common type for numerical identifiers
@@ -12,6 +13,21 @@ namespace Sim {
 	
 	/// Common type for size
 	typedef uint32_t SizeType;
+	
+	/// @name Exceptions for the simulation
+	//@{
+		/**
+		 * @brief Thrown when an illegal identifier is found.
+		 * 
+		 * When an illegal identifier is passed as a parameter, or detected
+		 * by internal processes, this is thrown.
+		 */
+		class IllegalId : public std::exception {
+			public:
+				const char* what() const throw()
+				{	return "Illegal identifier detected"; }
+		};
+	//@}
 };
 
 #endif

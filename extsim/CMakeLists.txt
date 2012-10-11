@@ -1,6 +1,7 @@
 add_library(AWExtSim
 	ExtSim.cpp
 	ExtData.cpp
+	ExtErrorMgr.cpp
 	InputBarrier.cpp
 	TypeRuleMgr.cpp
 	TypeRuleLoader.cpp
@@ -16,18 +17,18 @@ add_library(AWExtSim
 	replay/ReplayManager.cpp
 	
 	param/Position.cpp
-	param/IdList.cpp
+	param/IdParam.cpp
+	param/ValueParam.cpp
 	
 	object/ExtDataObj.cpp
 	object/TypeRule.cpp
 	object/TypeRuleObj.cpp
 	object/ParamList.cpp
 	
+	typerule/bot/BaseBot.cpp
 	typerule/program/MoveTowards.cpp
 	typerule/program/Kill.cpp
 	typerule/misc/CpuInput.cpp
-	
-	#typerule/bot/DefaultBot.cpp
 	
 	datatype/ExtGame.cpp
 	datatype/ExtMap.cpp

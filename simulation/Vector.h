@@ -2,6 +2,7 @@
 #define SIM_VECTOR_H
 
 #include <limits>
+#include <ostream>
 
 #include <math.h>
 #include <boost/operators.hpp>
@@ -65,6 +66,11 @@ namespace Sim {
 			static Vector infinity() {
 				double infVal = std::numeric_limits<double>::infinity();
 				return Vector(infVal,infVal);
+			}
+			
+			friend std::ostream& operator<<(
+			std::ostream &stream, const Vector &v) {
+				return (stream << "(" << v.x << "," << v.y << ")");
 			}
 	};
 }

@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "../DefaultExtData.h"
+#include "../TypeRuleLoader.h"
 #include "../object/ExtDataObj.h"
 
 #include "../../simulation/Health.h"
@@ -30,9 +31,12 @@ namespace exts {
 			void postProcess();
 			
 			uint32_t getBaseCost() const { return mBaseCost; }
+			const TypeRule *getRule() const { return mRule; }
 			
 		private:
 			void loadSimBot(const Nepeta::Node &node, Sim::BotD *simBot);
+			
+			TypeRule *mRule;
 			
 			/// @name Extended data
 			//@{
@@ -68,7 +72,7 @@ namespace exts {
 			
 		private:
 			
-			
+			TypeRuleLoader mRuleLoader;
 			friend class ExtBot;
 	};
 }

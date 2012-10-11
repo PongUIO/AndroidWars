@@ -6,16 +6,21 @@
 #include "../../simulation/Simulation.h"
 #include "../ExtSim.h"
 
+#include "../object/TypeRule.h"
+
+#include "../typerule/bot/bot.h"
+
 namespace exts {
 	// ExtBotData
 	//
 	//
-	ExtBotData::ExtBotData(ExtSim &esim): DefaultExtData<ExtBot>(esim)
+	ExtBotData::ExtBotData(ExtSim &esim) :
+		DefaultExtData<ExtBot>(esim),
+		mRuleLoader(esim)
 	{
-		// A blank string identifies the default type,
-		// or the type selected if no "Base" parameter is defined
-		// in a script block
-		//registerTypeRule("", new Bot::DefaultBot());
+#define _EXTS_X(name, cls) mRuleLoader.registerRule(name, new bot::cls(mExtSim));
+		#include "../typerule/bot/bot.def"
+#undef _EXTS_X
 	}
 	
 	ExtBotData::~ExtBotData()
@@ -30,11 +35,15 @@ namespace exts {
 	void ExtBot::loadNode(const Nepeta::Node& node)
 	{
 		// Create simulation type
-		Sim::IdType simId = mExtSim.getSim().getData().getBotDb().
-		registerImpl<Sim::Bot>(getName());
-		
-		assert(simId == getId() &&
-		"The simulation ID and the ExtSim ID must be equivalent");
+		mRule = mExtSim.getData().getBotDb().mRuleLoader.loadRuleNode(node);
+		if(mRule) {
+			mRule->setObjectId(getId());
+			mRule->load(node);
+			Sim::IdType simId = mRule->registerSimData(getName());
+			
+			assert(simId == getId() &&
+			"Simulation ID must be the same as the ExtSim ID");
+		}
 		
 		// Load standard data
 		ExtDataObjBase::loadNode(node);

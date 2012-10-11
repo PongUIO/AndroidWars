@@ -44,6 +44,8 @@ namespace exts {
 			ReplayNode *getActiveNodeI()
 			{ return mTree.getNode(mActiveNode); }
 			
+			ReplayNode *findNodeForPhase(uint32_t phase);
+			
 			/// @name Data
 			//@{
 				ExtSim &mExtSim;

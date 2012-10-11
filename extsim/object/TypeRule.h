@@ -35,8 +35,11 @@ namespace exts {
 			void setObjectId(Sim::IdType id) { mObjectId = id; }
 			
 		protected:
+			void allocateParam(size_t count);
+			void setParam(size_t index, RuleParameter *param);
+			
 			void registerParam(RuleParameter *param);
-			void allocateId(ParamList *param, Sim::IdType id) const;
+			void allocateId(ParamList *param, size_t count) const;
 			void setId(Sim::IdType id);
 			
 			ExtSim &mExtSim;
@@ -47,6 +50,10 @@ namespace exts {
 			
 			friend class TypeRuleMgr;
 	};
+	
+/// Simple shortcut to define local variables for parameters for \c TypeRule objects
+#define _EXTS_PARAM(type, name, index) \
+	const type *name = param->getParamT< type >(index);
 }
 
 #endif

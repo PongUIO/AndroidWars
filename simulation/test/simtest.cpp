@@ -4,6 +4,16 @@
 // Main simulation object
 Sim::Simulation sim;
 
+// Basic ID allocator
+Sim::IdType newId()
+{
+	static Sim::IdType curId = 0;
+	
+	return curId++;
+}
+
+Sim::IdType BotIdA = Sim::NoId;
+
 /**
  * Simple test implementation of a weapon
  */
@@ -172,52 +182,60 @@ void setupWorld()
 	{
 		using namespace Sim::Abil;
 		
-		Sim::IdType abilId = sim.getInput().getAbilityInput().
-			buildInputImplStr<CpuBoost>(
-			CpuBoost::Config(0,10),"CpuBoost")->getId();
+		Sim::IdType abilId = sim.getState().getAbilityFactory().
+			createImpl<CpuBoost>(
+				CpuBoost::Config(0,10),
+				sim.getData().getAbilityDb().getIdOf("CpuBoost"),
+				newId()
+			)->getId();
 		botCfg.mAbility.addAbility(abilId);
 	}
 	
 	{
-		Sim::IdType weapId = sim.getInput().getWeaponInput().
-			buildInputImplStr<DemoWeapon>(weapCfg,"DemoWeapon")->getId();
+		Sim::IdType weapId = sim.getState().getWeaponFactory().
+			createImpl<DemoWeapon>(
+				weapCfg,
+				sim.getData().getWeaponDb().getIdOf("DemoWeapon"),
+				newId()
+  			)->getId();
 		botCfg.mWeapon.addWeapon( weapId );
 	}
 	
-	Sim::IdType botId = sim.getInput().getBotInput().buildInputImpl<Sim::Bot>(
-		botCfg, 0)->getId();
+	BotIdA = sim.getState().getBotFactory().createImpl<Sim::Bot>(
+		botCfg, 0, newId())->getId();
 	
 	// Create a second dummy bot
 	botCfg = Sim::Bot::Config();
 	botCfg.mSide = 0;
 	botCfg.mBody.mPos = Sim::Vector(50,50);
 	
-	sim.getInput().getBotInput().buildInputImpl<Sim::Bot>(botCfg, 0);
+	sim.getState().getBotFactory().createImpl<Sim::Bot>(botCfg, 0, newId());
 	
 	// Give the bot some input
 	{
 		using namespace Sim::Prog;
 		
-		Sim::FactoryInput<Sim::ProgramFactory> &progInput =
-			sim.getInput().getProgramInput();
-		Sim::BotCpuInput &cpuInput =
-			sim.getInput().getCpuInput();
+		Sim::ProgramFactory &progFact =
+			sim.getState().getProgramFactory();
+		Sim::BotFactory &botFact =
+			sim.getState().getBotFactory();
 		
-		
-		Sim::IdType moveId = progInput.buildInputImplStr<MoveTowards>(
+		Sim::IdType moveId = progFact.createImpl<MoveTowards>(
 			MoveTowards::Config(MoveTowards::DtPosition, Sim::Vector(10,0)),
-			"MoveTowards")->getId();
+			sim.getData().getProgramDb().getIdOf("MoveTowards"), newId())->getId();
 		
-		Sim::IdType killId = progInput.buildInputImplStr<Kill>(
-			Kill::Config(moveId), "Kill")->getId();
+		Sim::IdType killId = progFact.createImpl<Kill>(
+			Kill::Config(moveId),
+			sim.getData().getProgramDb().getIdOf("Kill"), newId())->getId();
 		
-		Shoot *shoot = progInput.buildInputImplStr<Shoot>(
-			Shoot::Config(0, Sim::Save()), "Shoot");
+		Shoot *shoot = progFact.createImpl<Shoot>(
+			Shoot::Config(0, Sim::Save()), 
+			sim.getData().getProgramDb().getIdOf("Shoot"), newId());
 		shoot->setRunningTime(2);
 		
-		cpuInput.registerInput(botId, moveId, 0);
-		cpuInput.registerInput(botId, killId, 3);
-		cpuInput.registerInput(botId, shoot->getId(), 5);
+		botFact.getBot(BotIdA)->getState().mCpu.scheduleProgram(moveId, 0);
+		botFact.getBot(BotIdA)->getState().mCpu.scheduleProgram(killId, 3);
+		botFact.getBot(BotIdA)->getState().mCpu.scheduleProgram(shoot->getId(), 5);
 	}
 	
 	sim.getState().getWorld().setDimensions(32,32);
@@ -227,14 +245,16 @@ void setupWorld()
 	{
 		using namespace Sim::Abil;
 		
-		Sim::FactoryInput<Sim::AbilityFactory> &abilIn =
-			sim.getInput().getAbilityInput();
+		Sim::AbilityFactory &abilFact =
+			sim.getState().getAbilityFactory();
 		
-		CpuBoost *sharedBoost = abilIn.buildInputImplStr<CpuBoost>(
-			CpuBoost::Config(0, 5), "CpuBoost");
+		CpuBoost *sharedBoost = abilFact.createImpl<CpuBoost>(
+			CpuBoost::Config(0, 5),
+			sim.getData().getAbilityDb().getIdOf("CpuBoost"), newId());
 		ArmorAttachment *armorAtm =
-			abilIn.buildInputImplStr<ArmorAttachment>(
-			ArmorAttachment::Config(2, 10), "ArmorAttachment");
+			abilFact.createImpl<ArmorAttachment>(
+			ArmorAttachment::Config(2, 10),
+			sim.getData().getAbilityDb().getIdOf("ArmorAttachment"), newId());
 		
 		Sim::Player &player = sim.getState().getPlayerData().getPlayer(0);
 		player.mGlobalAbilities.push_back(sharedBoost->getId());
@@ -271,37 +291,38 @@ int main(void)
 			sim.step();
 		}
 		
-		sim.endPhase(true);
+		sim.endPhase();
 		printf("Phase %02d checksum: %X\n", sim.getCurPhase(), sim.checksumSim());
 		
+		using namespace Sim::Prog;
+		Sim::ProgramFactory &progFact =
+			sim.getState().getProgramFactory();
+		Sim::BotFactory &botFact =
+			sim.getState().getBotFactory();
 		if(i==1) {
 			// Example of giving input after a phase
-			using namespace Sim::Prog;
-			Sim::FactoryInput<Sim::ProgramFactory> &progIn =
-				sim.getInput().getProgramInput();
-			Sim::BotCpuInput &cpuIn =
-				sim.getInput().getCpuInput();
 			
-			MoveTowards *move = progIn.buildInputImplStr<MoveTowards>(
+			MoveTowards *move = progFact.createImpl<MoveTowards>(
 				MoveTowards::Config(MoveTowards::DtPosition, Sim::Vector(-50,0)),
-				"MoveTowards"
+				sim.getData().getProgramDb().getIdOf("MoveTowards"),
+				newId()
 			);
 			
-			Kill *kill = progIn.buildInputImplStr<Kill>(
-				Kill::Config(move->getId()), "Kill");
+			Kill *kill = progFact.createImpl<Kill>(
+				Kill::Config(move->getId()),
+				sim.getData().getProgramDb().getIdOf("Kill"),
+				newId()
+			);
 			
-			cpuIn.registerInput(0, move->getId(), 2);
-			cpuIn.registerInput(0, kill->getId(), 8);
+			botFact.getBot(BotIdA)->getState().mCpu.scheduleProgram(move->getId(), 2);
+			botFact.getBot(BotIdA)->getState().mCpu.scheduleProgram(kill->getId(), 8);
 		} else if(i==3) {
 			// Example of creating a new bot in the middle of a phase
-			Sim::FactoryInput<Sim::BotFactory> &botIn =
-				sim.getInput().getBotInput();
-			
 			Sim::Bot::Config botCfg;
 			botCfg.mSide = 0;
 			botCfg.mBody.mPos = Sim::Vector(5,25);
 				
-			botIn.buildInputImpl<Sim::Bot>( botCfg, 0 );
+			botFact.createImpl<Sim::Bot>( botCfg, 0, newId());
 		}
 	}
 	

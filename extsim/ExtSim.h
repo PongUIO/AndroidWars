@@ -6,6 +6,7 @@
 
 #include "ExtModule.h"
 #include "ExtData.h"
+#include "ExtErrorMgr.h"
 #include "InputBarrier.h"
 #include "TypeRuleMgr.h"
 #include "replay/ReplayManager.h"
@@ -20,7 +21,8 @@ namespace exts {
 	_EXTS_X(TypeRuleMgr, TypeRuleMgr) \
 	_EXTS_X(ReplayManager, Replay) \
 	_EXTS_X(AgentMgr, Agent) \
-	_EXTS_X(ExtCpuInput, CpuInput)
+	_EXTS_X(ExtCpuInput, CpuInput) \
+	_EXTS_X(ExtErrorMgr, Error)
 	
 	/**
 	 * @brief Manages simulation data not directly related to simulation.

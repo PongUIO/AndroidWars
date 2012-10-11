@@ -6,26 +6,22 @@
 #include "../object/ParamList.h"
 #include "../ExtData.h"
 
-#include "ValRange.h"
+#include "ValueParam.h"
 
 namespace exts {
 	/**
 	 * Used to denote a world position.
 	 */
-	class PositionParam : public ValRange<Sim::Vector>,
-	public ListenerSlot<PositionParam> {
+	class PositionParam : public ValueParam<Sim::Vector> {
 		public:
 			PositionParam(const std::string& dataName) :
-				ValRange<Sim::Vector>(dataName) {}
+				ValueParam<Sim::Vector>(dataName) {}
 			virtual ~PositionParam() {}
 			
 			virtual RuleParameter* clone()
 			{ return new PositionParam(*this); }
-			
-			virtual void callback()
-			{ ListenerSlot<PositionParam>::raiseListener(this); }
-			virtual void clearListener()
-			{ ListenerSlot<PositionParam>::clearListener(); }
+			virtual void accept(ParamVisitor& visitor)
+			{	visitor.visit(*this); }
 			
 		private:
 	};

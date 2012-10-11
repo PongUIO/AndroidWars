@@ -3,13 +3,14 @@
 #include "../../ExtSim.h"
 
 #include "../../param/Position.h"
-#include "../../param/ValRange.h"
+#include "../../param/ValueParam.h"
 
 namespace exts { namespace prog {
 	MoveTowards::MoveTowards(ExtSim& esim): TypeRule(esim)
 	{
-		registerParam(new PositionParam("Position"));
-		registerParam(new ValRange<uint32_t>("Duration"));
+		allocateParam(PiMax);
+		setParam(PiPosition, new PositionParam("Position"));
+		setParam(PiDuration, new ValueParam<uint32_t>("Duration"));
 	}
 	
 	MoveTowards::~MoveTowards() {}
@@ -21,19 +22,12 @@ namespace exts { namespace prog {
 	}
 	
 	void MoveTowards::registerInput(ParamList* param) const
-	{
-		Agent *agent = mExtSim.getAgent().getAgent(param->getAgent());
-		if(!agent)
-			return;
-		
-		Sim::IdType id = agent->allocateId();
-		allocateId(param, id);
-	}
+	{	allocateId(param, 1); }
 	
 	void MoveTowards::makeInput(const ParamList* param) const
 	{
-		const PositionParam *pos = param->getParamT<PositionParam>(0);
-		const ValRange<uint32_t> *duration = param->getParamT<ValRange<uint32_t> >(1);
+		_EXTS_PARAM(PositionParam, pos, PiPosition)
+		_EXTS_PARAM(ValueParam<uint32_t>, duration, PiDuration)
 		
 		Sim::Prog::MoveTowards::Config cfg = Sim::Prog::MoveTowards::Config(
 			Sim::Prog::MoveTowards::DtPosition,pos->getVal()

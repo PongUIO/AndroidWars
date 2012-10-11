@@ -20,6 +20,8 @@
 #include "ExtModule.h"
 
 namespace exts {
+	class ExtSim;
+	
 #define _EXTS_X_EXTDATA_COMPONENTS \
 	_EXTS_X(ExtArmorData, Armor) \
 	_EXTS_X(ExtDamageData, Damage) \

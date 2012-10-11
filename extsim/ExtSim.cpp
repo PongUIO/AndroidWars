@@ -14,8 +14,10 @@ namespace exts {
 		mInput(*this),
 		mTypeRuleMgr(*this),
 		mReplay(*this),
-		mCpuInput(*this)
+		mCpuInput(*this),
+		mError(*this)
 	{
+		registerCallObj(&mError);
 		registerCallObj(&mData);
 		registerCallObj(&mInput);
 		registerCallObj(&mTypeRuleMgr);

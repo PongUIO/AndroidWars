@@ -1,0 +1,12 @@
+_EXTS_X(int8_t)
+_EXTS_X(int16_t)
+_EXTS_X(int32_t)
+_EXTS_X(int64_t)
+
+_EXTS_X(uint8_t)
+_EXTS_X(uint16_t)
+_EXTS_X(uint32_t)
+_EXTS_X(uint64_t)
+
+_EXTS_X(float)
+_EXTS_X(double)

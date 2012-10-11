@@ -4,9 +4,9 @@
 
 #include "../ExtSim.h"
 
-#include "../param/IdList.h"
+#include "../param/IdParam.h"
 #include "../param/Position.h"
-#include "../param/ValRange.h"
+#include "../param/ValueParam.h"
 
 #include "../object/TypeRule.h"
 
@@ -37,6 +37,18 @@ void loadFiles()
 	}
 }
 
+void printErrors()
+{
+	const exts::ExtErrorMgr::MessageVec &msgVec = extSim.getError().getMessages();
+	if(msgVec.size() > 0)
+		printf("ExtSim error list:\n");
+	
+	for(size_t i=0; i<msgVec.size(); ++i) {
+		exts::ExtErrorMgr::Message msg = msgVec.at(i);
+		printf("\t%s : %s\n", msg.where.c_str(), msg.what.c_str());
+	}
+}
+
 void setupWorld()
 {
 	extSim.getAgent().setupAgents(2);
@@ -63,8 +75,6 @@ void buildBotInput(uint32_t depth)
 		
 		extSim.getReplay().selectBranch(activeId);
 		extSim.getReplay().gotoActive();
-		Sim::Vector pos = sim.getState().getBotFactory()
-		.getBot(0)->getState().mBody.mPos;
 		
 		// Create the branches
 		for(size_t i=0; i<2; ++i) {
@@ -148,6 +158,9 @@ int main(void)
 	
 	// Analyze replay
 	displayReplayTree();
+	
+	// Display any errors
+	printErrors();
 	
 	// Shutdown the simulation
 	extSim.shutdown();
