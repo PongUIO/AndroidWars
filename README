@@ -9,6 +9,7 @@ boost (just get libboost-dev)
 libopenal-dev
 libalut-dev
 libvorbis-dev
+libtecla1-dev
 
 To compile and run:
 mkdir build

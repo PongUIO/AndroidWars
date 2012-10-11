@@ -22,6 +22,6 @@ void runstep::run(const Nepeta::Node& node)
 	if(state == Sim::State::StInPhase)
 		sim.step();
 	if(state == Sim::State::StEndPhase)
-		sim.endPhase(true);
+		sim.endPhase();
 	
 }

@@ -18,7 +18,7 @@ void runphase::run(const Nepeta::Node& node)
 	while(sim.hasPhaseStep())
 		sim.step();
 	
-	sim.endPhase(true);
+	sim.endPhase();
 	
 
 }

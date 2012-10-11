@@ -14,4 +14,4 @@ add_executable(cli
 	command/runphase.cpp
 )
 
-target_link_libraries(cli -lnepeta -ltecla AWExtSim)
+target_link_libraries(cli nepeta -ltecla AWExtSim)
