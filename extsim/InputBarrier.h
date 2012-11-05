@@ -23,6 +23,7 @@ namespace exts {
 			
 			bool registerInput(ParamList *param);
 			void inheritList(InputList &source);
+			void copyList(const InputList &source);
 			
 			void discardInput();
 			
@@ -66,6 +67,10 @@ namespace exts {
 			
 			/// @name Interface
 			//@{
+				// Access
+				InputList &getInputList() { return mInput; }
+				const InputList &getInputList() const { return mInput; }
+				
 				// Utility functions
 				void copyInput(const InputList &il);
 				void applyInput(InputList &il);

@@ -62,6 +62,17 @@ namespace exts {
 		source.mInput = ParamListVec();
 	}
 	
+	/**
+	 * @brief Copies the input from the source \c InputList
+	 */
+	void InputList::copyList(const InputList& source)
+	{
+		for(ParamListVec::const_iterator i = source.mInput.begin();
+		i!=source.mInput.end(); ++i) {
+			registerInput(new ParamList(**i));
+		}
+	}
+	
 	void InputList::save(Sim::Save::BasePtr& fp) const
 	{
 		fp << uint32_t(mInput. size());
@@ -105,29 +116,20 @@ namespace exts {
 	 * original contents.
 	 */
 	void InputBarrier::copyInput(const InputList& il)
-	{
-		for(InputList::ParamListVec::const_iterator i = mInput
-		.getParamList().begin(); i!=mInput.getParamList().end(); ++i) {
-			registerInput(new ParamList(**i));
-		}
-	}
+	{	mInput.copyList(il); }
 	
 	/**
 	 * @brief Makes the \c InputBarrier take ownership of all the input
 	 * in the \c InputList provided.
 	 */
 	void InputBarrier::applyInput(InputList& il)
-	{
-		mInput.inheritList(il);
-	}
+	{	mInput.inheritList(il); }
 	
 	/**
 	 * @see InputList::registerInput
 	 */
 	bool InputBarrier::registerInput(ParamList* param)
-	{
-		return mInput.registerInput(param);
-	}
+	{	return mInput.registerInput(param); }
 	
 	/**
 	 * @brief Dispatches input to the simulation and optionally saves a replay.
