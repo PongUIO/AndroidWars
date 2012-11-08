@@ -5,7 +5,7 @@
 #include<QtGui>
 
 #define DELTAMINLIMIT 0.08
-#define ZOOMSPEED 0.07
+#define ZOOMSPEED 0.025
 #define EDGE 10
 #define MAX_ZOOM 16
 #define MIN_ZOOM 1
@@ -24,7 +24,7 @@ enum {
 
 class Camera {
 	public:
-		double mZoom, mDeltaZoom, mPanFriction, mZoomFriction, mRatio, mScrollSpeed, mZoomDistRest;
+		double mZoom, mDeltaZoom, mPanFriction, mZoomFriction, mRatio, mScrollSpeed, mZoomDistRest, mZoomDistStart, mZoomSpeedFactor;
 		int mLastX, mLastY, mXres, mYres;
 		Sim::Vector mPos, mDelta, mZoomTarget;
 		bool mKeyMovement[4], mDragMove;
@@ -41,6 +41,7 @@ class Camera {
 			mScrollSpeed = 0.002;
 			mDragMove = false;
 			mZoomDistRest = 0;
+			mZoomSpeedFactor = 0.05;
 
 			for(int i = 0; i < KEY_LAST + 1; i++) {
 				mKeyMovement[i] = false;
@@ -62,9 +63,12 @@ class Camera {
 		}
 
 		void modZoom(double mod) {
-			mZoomTarget =  Sim::Vector(xPixToDouble(mLastX), yPixToDouble(mLastY));
-			mZoomDistRest = Sim::Vector(xToSimLocal(mLastX, mZoom+0.5), yToSimLocal(mLastY, mZoom+0.5)).len();
-			mDeltaZoom = 0.05*((mod > 0) * -2 + 1);
+			if (!mDragMove) {
+				mZoomTarget =  Sim::Vector(xPixToDouble(mLastX), yPixToDouble(mLastY));
+				mZoomDistStart = mZoomDistRest = Sim::Vector(xToSimLocal(mLastX, mZoom+0.5), yToSimLocal(mLastY, mZoom+0.5)).len();
+			}
+			mDeltaZoom = ((mod > 0) * -2 + 1);
+			mZoomSpeedFactor += 1;
 		}
 
 		void setKeyMoveState(int dir, bool state) {
@@ -75,6 +79,7 @@ class Camera {
 
 		void setDragMove(bool state) {
 			mDragMove = state;
+			mDeltaZoom = 0;
 		}
 
 		void handleMouseMove(int nx, int ny) {
@@ -90,38 +95,48 @@ class Camera {
 		}
 
 		void iter() {
+
+			// handle WASD
 			mDelta.y -= mKeyMovement[KEY_UP] * KEY_MOVESPEED;
 			mDelta.y += mKeyMovement[KEY_DOWN] * KEY_MOVESPEED;
 			mDelta.x -= mKeyMovement[KEY_RIGHT] * KEY_MOVESPEED;
 			mDelta.x += mKeyMovement[KEY_LEFT] * KEY_MOVESPEED;
 
+
+			// handle window-edge scrolling
 			if ( 0 < mLastX && mLastX < mXres && 0 < mLastY && mLastY < mYres) {
 				mDelta += Sim::Vector((mLastX > mXres -EDGE ) * (-(mLastX - mXres + EDGE)*mScrollSpeed) +
 						(mLastX < EDGE) * (-(mLastX-EDGE)*mScrollSpeed),
 						(mLastY < EDGE) * ((mLastY - EDGE)*mScrollSpeed) +
 						((mLastY > mYres - EDGE)) * ((mLastY - mYres + EDGE)* mScrollSpeed))/2;
 			}
+
+			// Actual movement
 			mPos += mDelta*mZoom;
 			mDelta *= mPanFriction;
-			if (mDeltaZoom > 0) {
-				mZoom *= mDeltaZoom + 1;
+
+			// Handle zoom
+			if (mDeltaZoom > 0 || mDragMove) {
+				mZoom *= ZOOMSPEED * mDeltaZoom * mZoomSpeedFactor + 1;
 				mDeltaZoom *= mZoomFriction;
 				mZoomDistRest = 0;
-			}
-
-			//qDebug("%4.4f %4.4f\n", temp.x, temp.y);
-			if (mZoomDistRest > 0.01) {
-				Sim::Vector delta = mZoomTarget*(mDeltaZoom*10);
+			} else if (mZoomDistRest > 0.01) {
+				Sim::Vector delta = -mZoomTarget*mZoomDistStart*0.1;
 				if (delta.len() < DELTAMINLIMIT) {
 					delta = delta.normalize()*DELTAMINLIMIT;
 				}
 				mPos += delta;
 				mZoomDistRest -= delta.len();
-				mZoom *= mDeltaZoom + 1;
+				mZoom *= 1 - delta.len()*mZoomSpeedFactor*ZOOMSPEED;
+				qDebug() <<  mZoomSpeedFactor;
+			} else {
+				mZoomSpeedFactor = 0.0;
 			}
-			if (mZoom < MIN_ZOOM) {
+			if (mZoom <= MIN_ZOOM) {
+				mDeltaZoom = 0;
 				mZoom = MIN_ZOOM;
-			} else if (mZoom > MAX_ZOOM) {
+			} else if (mZoom >= MAX_ZOOM) {
+				mDeltaZoom = 0;
 				mZoom = MAX_ZOOM;
 			}
 
