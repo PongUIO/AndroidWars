@@ -3,6 +3,7 @@
 #include<QtGui>
 #include<QtOpenGL/qgl.h>
 #include<iostream>
+#include<stdlib.h>
 #include "Simulation.h"
 #include "../util/camera.h"
 #include "../util/client.h"
@@ -261,6 +262,8 @@ protected:
 	void paintGL() {
 		exts::ExtSim *sim = mStates->getSim();
 
+		std::vector<exts::ParamList*> currentInput = sim->getInput().getInputList().getParamList();
+
 		mTestShader->bind();
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClear(GL_DEPTH_BUFFER_BIT);
@@ -292,6 +295,15 @@ protected:
 			mRobots[(*bot)->getTypeId()]->draw(pos.x, pos.y, 0);
 
 		}
+
+		if (currentInput.size() != 0) {
+			for (std::vector<exts::ParamList*>::iterator order = currentInput.begin(); order != currentInput.end(); order++) {
+				exts::ParamList* ptr = order; //tmp hack to make ctrl+space work for this pointer...
+				qDebug() << (*order)->getAgent();
+
+			}
+		}
+
 		mTestShader->release();
 		glDisable(GL_TEXTURE_2D);
 		glDisable(GL_BLEND);
