@@ -45,6 +45,7 @@ public:
 	bool mFullScreen;
 	float mSelAlpha;
 	bool mDirAlpha;
+	SkeletalSystem mSkeletalSystem;
 	QGLShaderProgram *mTestShader;
 
 	QVector<GLObj*> mRobots;
@@ -118,6 +119,24 @@ public:
 		}
 	}
 protected:
+
+	void skeletalInit() {
+		int skel = mSkeletalSystem.addSkeleton();
+		QQuaternion q1 = QQuaternion();
+		q1.setVector(1,0,0);
+		QQuaternion q2 = QQuaternion();
+		q2.setVector(0,0,1);
+		q1.normalize();
+		q2.normalize();
+
+		int b = mSkeletalSystem.addBoneToSkeleton(skel, q1, -1);
+		int b2 = mSkeletalSystem.addBoneToSkeleton(skel, q2, b);
+
+		//mSkeletalSystem.rotateBone(0, 1, QQuaternion(1,0,0,1));
+		//mSkeletalSystem.rotateBone(0, 0, QQuaternion(2,0,2,0));
+		mSkeletalSystem.calculateRotations();
+	}
+
 	// overriden
 	void mouseMoveEvent(QMouseEvent * event) {
 		mLastX = event->pos().x();
@@ -148,7 +167,7 @@ protected:
 	}
 
 	// overridden
-	void initializeGL() {
+	void initializeGL(){
 		Sim::World *wld = &(mStates->getSim()->getSim().getState().getWorld());
 		glClearColor( 0.1, 0.1, 0.1, 0.0 );
 		glEnable(GL_DEPTH_TEST);
@@ -184,8 +203,10 @@ protected:
 			mTestShader->link();
 		}
 		glDisable(GL_TEXTURE_2D);
+		skeletalInit();
 
 	}
+
 	void loadAndBind(QString path, QImage *img, GLuint *bind, GLuint xsize = -1, GLuint ysize = -1, bool vertFlip = false, bool horFlip = false) {
 		if (xsize != -1) {
 			img->load(path);
@@ -263,16 +284,18 @@ protected:
 		exts::ExtSim *sim = mStates->getSim();
 
 		std::vector<exts::ParamList*> currentInput = sim->getInput().getInputList().getParamList();
+		QVector4D colorVec;
 
 		mTestShader->bind();
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClear(GL_DEPTH_BUFFER_BIT);
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
-		glFrustum(-1, 1, -1*mCam->mRatio, 1*mCam->mRatio, 1, 5.1+mCam->mZoom);
-		glTranslatef(mCam->mPos.x,mCam->mPos.y,-1-mCam->mZoom);
-		glMatrixMode(GL_MODELVIEW);
-		glLoadIdentity();
+		QMatrix4x4 m;
+		m.setToIdentity();
+		mTestShader->setUniformValue("modelview_matrix", m);
+		m.setToIdentity();
+		m.frustum(-1, 1, -1*mCam->mRatio, 1*mCam->mRatio, 1, 5.1+mCam->mZoom);
+		m.translate(mCam->mPos.x,mCam->mPos.y,-1-mCam->mZoom);
+		mTestShader->setUniformValue("projection_matrix", m);
 
 		std::list<Sim::Bot*> bots = sim->getSim().getState().getBotFactory().getBotList();
 		std::list<Sim::Bot*>::iterator bot;
@@ -282,24 +305,42 @@ protected:
 		glEnable(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D, mCheck);
 		mTestShader->bind();
-		mTestShader->setAttributeValue("testtween", 0.5);
-		mGameMap->draw();
+/*		QVector4D vec;
+		vec.setX(0);
+		vec.setY(0);
+		vec.setZ(0);
+		mTestShader->setUniformValue("orig_Position", vec);
+		QMatrix4x4 mat;
+		mat.setToIdentity();
+		mat.data()[0] = 1;
+		mat.data()[5] = 1;
+		mat.data()[10] = 1;
+		mTestShader->setUniformValue("test", mat);
+		mat.data()[0] = mSelAlpha;
+		mat.data()[5] = mSelAlpha;
+		mat.data()[10] = mSelAlpha;
+		mTestShader->setUniformValue("test", mat);*/
+		mGameMap->draw(mTestShader, &m);
 		for (bot = bots.begin(); bot != bots.end(); bot++) {
 			Sim::Vector pos = (*bot)->getBody().mPos;
+			/*vec.setX(pos.x);
+			vec.setY(pos.y);
+			vec.setZ(mCam->mZoom);
+			mTestShader->setUniformValue("orig_Position", vec);*/
 			if (mStates->isSelected((*bot)->getId())) {
-
-				glColor4f(0.2f, 1.0f, 0.2f, mSelAlpha);
+				colorVec = QVector4D(0.2, 1, 0.2, mSelAlpha);
 			} else {
-				glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+				colorVec = QVector4D(1.0, 1, 1.0, 1.0);
 			}
-			mRobots[(*bot)->getTypeId()]->draw(pos.x, pos.y, 0);
+			mTestShader->setUniformValue("color", colorVec);
+			mRobots[(*bot)->getTypeId()]->draw(pos.x, pos.y, 0, mTestShader, "projection_matrix", &m);
 
 		}
 
 		if (currentInput.size() != 0) {
 			for (std::vector<exts::ParamList*>::iterator order = currentInput.begin(); order != currentInput.end(); order++) {
-				exts::ParamList* ptr = order; //tmp hack to make ctrl+space work for this pointer...
-				qDebug() << (*order)->getAgent();
+				//exts::ParamList* ptr = order; //tmp hack to make ctrl+space work for this pointer...
+				//qDebug() << (*order)->getAgent();
 
 			}
 		}

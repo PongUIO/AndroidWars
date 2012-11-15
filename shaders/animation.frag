@@ -1,9 +1,14 @@
+#version 330
+uniform vec4 color;
 uniform sampler2D qt_Texture0;
-varying highp vec4 qt_TexCoord0;
-varying vec2 tex;
+
+in vec2 texOut;
+
+layout(location=0) out vec4 colorOut;
 
 void main(void)
 {
-    gl_FragColor = min(texture2D(qt_Texture0, tex), gl_Color);
-    gl_FragColor[3] = gl_Color[3];
+	//colorOut = vec4(texOut, 0, 1);//texture2D(qt_Texture0, texOut);//min(texture2D(qt_Texture0, texOut), color);
+	colorOut = color;
+	colorOut[3] = color[3];
 }

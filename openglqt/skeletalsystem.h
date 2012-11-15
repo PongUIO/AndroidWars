@@ -20,8 +20,6 @@ class Bone {
 			if (tmp != NULL) {
 				rot *= tmp->rot;
 				rotOrigin = tmp->rot * rotOrigin;
-				qDebug() << rotOrigin;
-				qDebug() << "debug";
 			}
 		}
 

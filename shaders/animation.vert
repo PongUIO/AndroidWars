@@ -1,11 +1,16 @@
-#version 120
-varying highp vec4 qt_TexCoord0;
-varying vec2 tex;
+#version 330
+
+uniform mat4 projection_matrix;
+uniform mat4 modelview_matrix;
+
+in vec3 vertex;
+in vec2 texCoord;
+
+out vec2 texOut;
 
 void main(void)
 {
-	gl_Position = ftransform();
-	tex = gl_MultiTexCoord0.xy;
-	gl_FrontColor = gl_Color;
-        //gl_FrontSecondaryColor = gl_SecondaryColor;
+	//texOut = gl_MultiTexCoord0.xy;
+	//gl_Position = vec4(vertex, 1.0);
+	gl_Position = projection_matrix * modelview_matrix * vec4(vertex, 1.0);
 }

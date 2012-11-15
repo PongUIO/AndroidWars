@@ -79,7 +79,8 @@ public:
 		mWld = tmp;
 		updateDimensions();
 	}
-	void draw() {
+	void draw(QGLShaderProgram *shader, QMatrix4x4 *m) {
+		QVector4D colorVec;
 		int i,j;
 		int mt;
 		int fx = mCam->xSimLim(-1);
@@ -96,13 +97,15 @@ public:
 				if (mt == 0) {
 					mt = getPiece(i, j);
 					if (mt != -1) {
-						glColor4f(1.0f, 0.f, 0.f, 1.0f);
-						mPieces[mt-1].mObj->draw(i,j,-1);
+						colorVec = QVector4D(1.0, 0., 0., 1.0);
+						shader->setUniformValue("color", colorVec);
+						mPieces[mt-1].mObj->draw(i, j, -1, shader, "projection_matrix", m);
 					}
 				} else {
 					if (mt > 0) {
-						glColor4f(0.f, 0.0f, 1.f, 1.0f);
-						mPieces[mt-1].mObj->draw(i, j, 0);
+						colorVec = QVector4D(0., 0.0, 1., 1.0);
+						shader->setUniformValue("color", colorVec);
+						mPieces[mt-1].mObj->draw(i, j, 0, shader, "projection_matrix", m);
 					}
 				}
 			}
