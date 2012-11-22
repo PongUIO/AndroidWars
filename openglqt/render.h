@@ -302,9 +302,9 @@ protected:
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glEnable(GL_TEXTURE_2D);
-		glBindTexture(GL_TEXTURE_2D, mCheck);
 		mTestShader->bind();
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, mCheck);
 /*		QVector4D vec;
 		vec.setX(0);
 		vec.setY(0);
@@ -321,6 +321,7 @@ protected:
 		mat.data()[10] = mSelAlpha;
 		mTestShader->setUniformValue("test", mat);*/
 		mGameMap->draw(mTestShader, &m);
+		mTestShader->setAttributeValue("edgeColor", QVector4D(0,0,0,1));
 		for (bot = bots.begin(); bot != bots.end(); bot++) {
 			Sim::Vector pos = (*bot)->getBody().mPos;
 			/*vec.setX(pos.x);
@@ -346,7 +347,6 @@ protected:
 		}
 
 		mTestShader->release();
-		glDisable(GL_TEXTURE_2D);
 		glDisable(GL_BLEND);
 		glFlush();
 		glFinish();

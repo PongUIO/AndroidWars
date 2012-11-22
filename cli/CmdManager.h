@@ -3,7 +3,6 @@
 
 #include <string>
 #include <boost/unordered_map.hpp>
-#include <libtecla.h>
 
 #include "Command.h"
 #include "SimMgr.h"

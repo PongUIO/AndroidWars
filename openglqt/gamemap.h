@@ -80,13 +80,13 @@ public:
 		updateDimensions();
 	}
 	void draw(QGLShaderProgram *shader, QMatrix4x4 *m) {
-		QVector4D colorVec;
 		int i,j;
 		int mt;
 		int fx = mCam->xSimLim(-1);
 		int tx = mCam->xSimLim(1)+1;
 		int fy = mCam->ySimLim(1);
 		int ty = mCam->ySimLim(-1)+1;
+		shader->setUniformValue("edgeColor", QVector4D(0.,0.,1.0,1.0));
 		for (i = fx; i < tx; i++) {
 			for (j = fy; j < ty; j++) {
 				if (inMap(i, j)) {
@@ -97,14 +97,12 @@ public:
 				if (mt == 0) {
 					mt = getPiece(i, j);
 					if (mt != -1) {
-						colorVec = QVector4D(1.0, 0., 0., 1.0);
-						shader->setUniformValue("color", colorVec);
+						shader->setUniformValue("color", QVector4D(1.0, 0., 0., 1.0));
 						mPieces[mt-1].mObj->draw(i, j, -1, shader, "projection_matrix", m);
 					}
 				} else {
 					if (mt > 0) {
-						colorVec = QVector4D(0., 0.0, 1., 1.0);
-						shader->setUniformValue("color", colorVec);
+						shader->setUniformValue("color", QVector4D(0., 0., 0., 1.0));
 						mPieces[mt-1].mObj->draw(i, j, 0, shader, "projection_matrix", m);
 					}
 				}
