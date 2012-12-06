@@ -9,6 +9,7 @@
 #include "ExtErrorMgr.h"
 #include "InputBarrier.h"
 #include "TypeRuleMgr.h"
+#include "TimelineMgr.h"
 #include "replay/ReplayManager.h"
 #include "agent/AgentMgr.h"
 #include "simcontrol/ExtCpuInput.h"
@@ -20,6 +21,7 @@ namespace exts {
 	_EXTS_X(InputBarrier, Input) \
 	_EXTS_X(TypeRuleMgr, TypeRuleMgr) \
 	_EXTS_X(ReplayManager, Replay) \
+	_EXTS_X(TimelineMgr, Timeline) \
 	_EXTS_X(AgentMgr, Agent) \
 	_EXTS_X(ExtCpuInput, CpuInput) \
 	_EXTS_X(ExtErrorMgr, Error)
