@@ -9,5 +9,6 @@ in vec3 normal;
 
 void main(void)
 {
-	colorOut = vec4(normal, 1);
+	//colorOut = vec4(color, 1);
+	colorOut = color;
 }
